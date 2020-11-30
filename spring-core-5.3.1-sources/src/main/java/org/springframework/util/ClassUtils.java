@@ -54,6 +54,7 @@ import org.springframework.lang.Nullable;
  * @see TypeUtils
  * @see ReflectionUtils
  */
+// 20201130 其他{@code java.lang.Class}实用方法。主要用于框架内内部使用。
 public abstract class ClassUtils {
 
 	/** Suffix for array class names: {@code "[]"}. */
@@ -100,12 +101,14 @@ public abstract class ClassUtils {
 	 * Map with primitive type name as key and corresponding primitive
 	 * type as value, for example: "int" -> "int.class".
 	 */
+	// 20201130 以基元类型名称为键，对应的基元类型为值的映射，例如：“int”->“国际级".
 	private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<>(32);
 
 	/**
 	 * Map with common Java language class name as key and corresponding Class as value.
 	 * Primarily for efficient deserialization of remote invocations.
 	 */
+	// 20201130 以公共Java语言类名为键，相应类为值的映射。主要用于远程调用的高效反序列化。
 	private static final Map<String, Class<?>> commonClassCache = new HashMap<>(64);
 
 	/**
@@ -242,21 +245,30 @@ public abstract class ClassUtils {
 	 * @throws LinkageError if the class file could not be loaded
 	 * @see Class#forName(String, boolean, ClassLoader)
 	 */
+	// 20201130 替换{@code Class.forName（）}它还返回原语（例如“int”）和数组类名（例如“String[]）的类实例。
+	// 20201130 此外，它还能够解析Java源代码风格的内部类名（例如java.lang.Thread.State“代替”java.lang.Thread$State“）。
+	// 20201130 即根据类名和类加载器获取对应的类对象
 	public static Class<?> forName(String name, @Nullable ClassLoader classLoader)
 			throws ClassNotFoundException, LinkageError {
 
+		// 202011130 类名称不能为空
 		Assert.notNull(name, "Name must not be null");
 
+		// 20201130 根据类名称获取所有类对象
 		Class<?> clazz = resolvePrimitiveClassName(name);
 		if (clazz == null) {
+			// 20201130 如果类对象为空, 则从缓存中获取
 			clazz = commonClassCache.get(name);
 		}
+
+		// 20201130 返回类对象
 		if (clazz != null) {
 			return clazz;
 		}
 
 		// "java.lang.String[]" style arrays
 		if (name.endsWith(ARRAY_SUFFIX)) {
+			// 202011130 返回对应数组的类型
 			String elementClassName = name.substring(0, name.length() - ARRAY_SUFFIX.length());
 			Class<?> elementClass = forName(elementClassName, classLoader);
 			return Array.newInstance(elementClass, 0).getClass();
@@ -349,8 +361,10 @@ public abstract class ClassUtils {
 	 * (typically a missing dependency declaration in a Jigsaw module definition
 	 * for a superclass or interface implemented by the class to be checked here)
 	 */
+	// 20201130 确定由提供的名称标识的{@link Class}是否存在并且可以加载。如果类或其依赖项之一不存在或无法加载，则将返回{@code false}。
 	public static boolean isPresent(String className, @Nullable ClassLoader classLoader) {
 		try {
+			// 20201130 检查该类能否正确加载, 如果没抛异常, 则说明加载正确
 			forName(className, classLoader);
 			return true;
 		}
@@ -448,6 +462,12 @@ public abstract class ClassUtils {
 	}
 
 	/**
+	 * 20201130
+	 * 替换{@code Class.forName（）}它还返回原语的类实例（例如“int”）和数组类名（例如“StringResolve the given Class name as primitive Class，if appropriable），
+	 * 根据JVM的基元类命名规则。还支持基元数组的JVM内部类名。不支持基元数组的“[]”后缀表示法；这只受{@link #forName（String，ClassLoader）}.[]”支持。
+	 * 此外，它还能够解析Java源代码风格的内部类名（例如java.lang.Thread.State“代替”java.lang.Thread$State“）。
+	 */
+	/**
 	 * Resolve the given class name as primitive class, if appropriate,
 	 * according to the JVM's naming rules for primitive classes.
 	 * <p>Also supports the JVM's internal class names for primitive arrays.
@@ -457,13 +477,16 @@ public abstract class ClassUtils {
 	 * @return the primitive class, or {@code null} if the name does not denote
 	 * a primitive class or primitive array class
 	 */
+	// 20201130 根据类型获取类对象
 	@Nullable
 	public static Class<?> resolvePrimitiveClassName(@Nullable String name) {
 		Class<?> result = null;
 		// Most class names will be quite long, considering that they
 		// SHOULD sit in a package, so a length check is worthwhile.
+		// 20201130 考虑到类名应该放在一个包中，大多数类名都很长，所以长度检查是值得的。
 		if (name != null && name.length() <= 7) {
 			// Could be a primitive - likely.
+			// 20201130 可能是原始的-很可能 => 根据类名获取类对象
 			result = primitiveTypeNameMap.get(name);
 		}
 		return result;

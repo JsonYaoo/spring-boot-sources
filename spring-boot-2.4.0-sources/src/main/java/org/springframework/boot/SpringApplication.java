@@ -85,6 +85,41 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.support.StandardServletEnvironment;
 
 /**
+ * 20201130
+ * A. 该类可用于从javamain方法引导和启动Spring应用程序。默认情况下，类将执行以下步骤来引导应用程序：
+ *      a. 创建适当的{@linkapplicationContext}实例（取决于您的类路径）
+ *      b. 注册{@link CommandLinePropertySource}以将命令行参数公开为Spring属性
+ *      c. 刷新应用程序上下文，加载所有单例bean\
+ *      d. 触发任何{@link CommandLineRunner}bean
+ * B. 在大多数情况下，可以直接从{@literal main}方法调用静态{@link #run（Class，String[]）}方法来引导应用程序：
+ * 		a.
+ * 			@Configuration
+ *			@EnableAutoConfiguration
+ *	 		public class MyApplication  {
+ *
+ *		   		// ... Bean definitions
+ *
+ *		   		public static void main(String[] args) {
+ *		   			SpringApplication.run(MyApplication.class, args);
+ *		   		}
+ *	 		}
+ * C. 对于更高级的配置，可以在运行{@link SpringApplication}实例之前创建并自定义：
+ * 		a.
+ * 			public static void main(String[] args) {
+ *   			SpringApplication application = new SpringApplication(MyApplication.class);
+ *   			// ... customize application settings here
+ *   			application.run(args)
+ * 			}
+ * D. {@link springapplication}可以从各种不同的源读取bean。通常建议使用单个{@code @Configuration}类来引导应用程序，但是，您也可以从以下位置设置
+ *    {@link #getSources（）sources}：
+ *    	a. {@link AnnotatedBeanDefinitionReader}要加载的完全限定类名
+ *    	b. {@link XmlBeanDefinitionReader}要加载的XML资源的位置，或要由{@link GroovyBeanDefinitionReader}加载的groovy脚本的位置
+ *    	c. {@link ClassPathBeanDefinitionScanner}扫描的包的名称
+ * E. 配置属性也绑定到{@link springapplication}。这使得动态设置{@link springapplication}属性成为可能，就像其他源（“spring.main.sources“即一个CSV列表）
+ *    指示web环境的标志（”spring.main.web-“应用程序类型=none”）或用于关闭横幅的标志（“spring.main.banner-模式=off”）。
+ */
+/**
+ * A.
  * Class that can be used to bootstrap and launch a Spring application from a Java main
  * method. By default class will perform the following steps to bootstrap your
  * application:
@@ -98,6 +133,7 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * <li>Trigger any {@link CommandLineRunner} beans</li>
  * </ul>
  *
+ * B.
  * In most circumstances the static {@link #run(Class, String[])} method can be called
  * directly from your {@literal main} method to bootstrap your application:
  *
@@ -114,6 +150,7 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * }
  * </pre>
  *
+ * C.
  * <p>
  * For more advanced configuration a {@link SpringApplication} instance can be created and
  * customized before being run:
@@ -126,6 +163,7 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * }
  * </pre>
  *
+ * D.
  * {@link SpringApplication}s can read beans from a variety of different sources. It is
  * generally recommended that a single {@code @Configuration} class is used to bootstrap
  * your application, however, you may also set {@link #getSources() sources} from:
@@ -137,6 +175,7 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * <li>The name of a package to be scanned by {@link ClassPathBeanDefinitionScanner}</li>
  * </ul>
  *
+ * E.
  * Configuration properties are also bound to the {@link SpringApplication}. This makes it
  * possible to set {@link SpringApplication} properties dynamically, like additional
  * sources ("spring.main.sources" - a CSV list) the flag to indicate a web environment
@@ -202,6 +241,7 @@ public class SpringApplication {
 
 	private static final Log logger = LogFactory.getLog(SpringApplication.class);
 
+	// 20201130 主类Class对象集合
 	private Set<Class<?>> primarySources;
 
 	private Set<String> sources = new LinkedHashSet<>();
@@ -251,41 +291,68 @@ public class SpringApplication {
 	private ApplicationStartup applicationStartup = ApplicationStartup.DEFAULT;
 
 	/**
-	 * Create a new {@link SpringApplication} instance. The application context will load
-	 * beans from the specified primary sources (see {@link SpringApplication class-level}
-	 * documentation for details. The instance can be customized before calling
-	 * {@link #run(String...)}.
-	 * @param primarySources the primary bean sources
-	 * @see #run(Class, String[])
-	 * @see #SpringApplication(ResourceLoader, Class...)
-	 * @see #setSources(Set)
+	 * 20201130
+	 * 创建一个新的{@link springapplication}实例。应用程序上下文将从指定的主源加载bean（有关详细信息，请参见{@link springapplication class level}文档）。
+	 * 可以在调用之前自定义实例
 	 */
-	public SpringApplication(Class<?>... primarySources) {
-		this(null, primarySources);
-	}
-
 	/**
 	 * Create a new {@link SpringApplication} instance. The application context will load
 	 * beans from the specified primary sources (see {@link SpringApplication class-level}
 	 * documentation for details. The instance can be customized before calling
 	 * {@link #run(String...)}.
-	 * @param resourceLoader the resource loader to use
-	 * @param primarySources the primary bean sources
+	 * @param primarySources the primary bean sources	// 20201130 主类的Class对象列表
+	 * @see #run(Class, String[])
+	 * @see #SpringApplication(ResourceLoader, Class...)
+	 * @see #setSources(Set)
+	 */
+	// 20201130 通过指定的主类的Class对象列表构造SpringApplication, 不指定资源加载器
+	public SpringApplication(Class<?>... primarySources) {
+		this(null, primarySources);
+	}
+
+	/**
+	 * 20201130
+	 * 创建一个新的{@link springapplication}实例。应用程序上下文将从指定的主源加载bean（有关详细信息，请参见{@links pringapplication class level}文档）。
+	 * 可以在调用之前自定义实例
+	 */
+	/**
+	 * Create a new {@link SpringApplication} instance. The application context will load
+	 * beans from the specified primary sources (see {@link SpringApplication class-level}
+	 * documentation for details. The instance can be customized before calling
+	 * {@link #run(String...)}.
+	 * @param resourceLoader the resource loader to use		// 20201130 要使用的资源加载程序
+	 * @param primarySources the primary bean sources	// 20201130 主类的Class对象列表
 	 * @see #run(Class, String[])
 	 * @see #setSources(Set)
 	 */
+	// 20201130 指定资源加载器、主类Class列表构造SpringApplication
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
 		this.resourceLoader = resourceLoader;
+
+		// 20201130 主类的Class对象列表不能为空
 		Assert.notNull(primarySources, "PrimarySources must not be null");
+
+		// 20201130 去重 => 注册主类Class集合
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+
+		// 20201130 从Classpath推断出服务器类型 => 注册服务器类型
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
+
+		// 20201130 根据Bootstrapper获取SpringFactories实例 => 注册启动引导实例
 		this.bootstrappers = new ArrayList<>(getSpringFactoriesInstances(Bootstrapper.class));
+
+		// 20201130 根据上下文初始化器获取SpringFactories实例 => 注册上下文初始化器实例
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+
+		// 20201130 根据应用程序事件监听器获取SpringFactories实例 => 注册应用程序事件监听器实例
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+
+		// 20201130 判断获取主类的中main方法对象 => 注册主类main方法
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
+	// 20201130 判断获取主类的中main方法对象
 	private Class<?> deduceMainApplicationClass() {
 		try {
 			StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
@@ -438,19 +505,30 @@ public class SpringApplication {
 				this.applicationStartup);
 	}
 
+	// 20201130 根据Bootstrapper获取SpringFactories实例
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type) {
 		return getSpringFactoriesInstances(type, new Class<?>[] {});
 	}
 
+	// 20201130 根据类型、Class列表、参数列表获取SpringFactories实例
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes, Object... args) {
+		// 20201130 获取Spring类加载器
 		ClassLoader classLoader = getClassLoader();
-		// Use names and ensure unique to protect against duplicates
+
+		// Use names and ensure unique to protect against duplicates // 20201130 使用名称并确保唯一以防止重复
 		Set<String> names = new LinkedHashSet<>(SpringFactoriesLoader.loadFactoryNames(type, classLoader));
+
+		// 20201130 创建SpringFactories实例
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes, classLoader, args, names);
+
+		// 20201130 对SpringFactories实例进行注解排序
 		AnnotationAwareOrderComparator.sort(instances);
+
+		// 20201130 返回这些SpringFactories实例
 		return instances;
 	}
 
+	// 20201130 创建SpringFactories实例
 	@SuppressWarnings("unchecked")
 	private <T> List<T> createSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes,
 			ClassLoader classLoader, Object[] args, Set<String> names) {
@@ -715,6 +793,8 @@ public class SpringApplication {
 	 * class loader (if not null), or the loader of the Spring {@link ClassUtils} class.
 	 * @return a ClassLoader (never null)
 	 */
+	// 20201130 将在ApplicationContext中使用的类加载器（如果设置了{@link #setResourceLoader（ResourceLoader）ResourceLoader}，
+	// 20201130 或者上下文类加载器（如果不是null），或者Spring{@link ClassUtils}类的加载器。@返回类加载器（从不为空）
 	public ClassLoader getClassLoader() {
 		if (this.resourceLoader != null) {
 			return this.resourceLoader.getClassLoader();
@@ -1290,22 +1370,26 @@ public class SpringApplication {
 	/**
 	 * Static helper that can be used to run a {@link SpringApplication} from the
 	 * specified source using default settings.
-	 * @param primarySource the primary source to load
+	 * @param primarySource the primary source to load  // 20201130 要加载的主源
 	 * @param args the application arguments (usually passed from a Java main method)
-	 * @return the running {@link ApplicationContext}
+	 * @return the running {@link ApplicationContext} // 20201130 返回一个正在运行的{@link ApplicationContext}
 	 */
+	// 20201130 静态帮助器，可用于使用默认设置从指定源运行{@linkspringapplication}。
 	public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
+		// 20201130 args封装成args数组
 		return run(new Class<?>[] { primarySource }, args);
 	}
 
 	/**
 	 * Static helper that can be used to run a {@link SpringApplication} from the
 	 * specified sources using default settings and user supplied arguments.
-	 * @param primarySources the primary sources to load
+	 * @param primarySources the primary sources to load    // 20201130 要加载的主源
 	 * @param args the application arguments (usually passed from a Java main method)
-	 * @return the running {@link ApplicationContext}
+	 * @return the running {@link ApplicationContext}   // 20201130 返回一个正在运行的{@link ApplicationContext}
 	 */
+	// 20201130 静态帮助器，可用于使用默认设置和用户提供的参数从指定的源运行{@linkspringapplication}。 => args数组参数
 	public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
+		// 20201130 使用args参数启动
 		return new SpringApplication(primarySources).run(args);
 	}
 

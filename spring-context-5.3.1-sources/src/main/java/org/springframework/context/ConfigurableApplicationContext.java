@@ -28,11 +28,20 @@ import org.springframework.core.metrics.ApplicationStartup;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201130
+ * A. SPI接口将由大多数（如果不是所有）应用程序上下文实现。除了{@link org.springframework.context.ApplicationContext} 接口中的应用程序上下文客户端方法外，
+ *    还提供了配置应用程序上下文的工具。
+ * B. 这里封装了配置和生命周期方法，以避免使它们对ApplicationContext客户端代码显而易见。目前的方法只能由启动和关闭代码使用。
+ */
+
+/**
+ * A.
  * SPI interface to be implemented by most if not all application contexts.
  * Provides facilities to configure an application context in addition
  * to the application context client methods in the
  * {@link org.springframework.context.ApplicationContext} interface.
  *
+ * B.
  * <p>Configuration and lifecycle methods are encapsulated here to avoid
  * making them obvious to ApplicationContext client code. The present
  * methods should only be used by startup and shutdown code.
@@ -42,6 +51,7 @@ import org.springframework.lang.Nullable;
  * @author Sam Brannen
  * @since 03.11.2003
  */
+// 20201130 上下文配置接口
 public interface ConfigurableApplicationContext extends ApplicationContext, Lifecycle, Closeable {
 
 	/**

@@ -25,6 +25,7 @@ package org.springframework.boot;
  * @see SpringApplication#addBootstrapper(Bootstrapper)
  * @see BootstrapRegistry
  */
+// 20201130 回调接口，可用于在使用{@link BootstrapRegistry}之前对其进行初始化。
 public interface Bootstrapper {
 
 	/**

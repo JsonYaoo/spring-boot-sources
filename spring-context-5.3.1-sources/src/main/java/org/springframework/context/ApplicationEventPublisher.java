@@ -17,8 +17,15 @@
 package org.springframework.context;
 
 /**
+ * 20201130
+ * A. 封装事件发布功能的接口。
+ * B. 用作{@link ApplicationContext}的超级接口。
+ */
+/**
+ * A.
  * Interface that encapsulates event publication functionality.
  *
+ * B.
  * <p>Serves as a super-interface for {@link ApplicationContext}.
  *
  * @author Juergen Hoeller
@@ -30,6 +37,7 @@ package org.springframework.context;
  * @see org.springframework.context.event.ApplicationEventMulticaster
  * @see org.springframework.context.event.EventPublicationInterceptor
  */
+// 20201130 封装事件发布功能的接口
 @FunctionalInterface
 public interface ApplicationEventPublisher {
 

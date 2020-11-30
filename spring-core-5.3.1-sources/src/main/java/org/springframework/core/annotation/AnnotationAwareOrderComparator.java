@@ -44,6 +44,7 @@ import org.springframework.lang.Nullable;
  * @see Order
  * @see javax.annotation.Priority
  */
+// 20201130 注解排序实现类 => 实现顺序比较器
 public class AnnotationAwareOrderComparator extends OrderComparator {
 
 	/**

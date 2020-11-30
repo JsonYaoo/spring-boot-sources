@@ -50,6 +50,7 @@ import org.springframework.util.ObjectUtils;
  * @see List#sort(Comparator)
  * @see Arrays#sort(Object[], Comparator)
  */
+// 20201130 {@link Comparator}实现{@link Ordered}对象，按顺序值升序排序，按优先级降序排序。
 public class OrderComparator implements Comparator<Object> {
 
 	/**

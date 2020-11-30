@@ -17,15 +17,27 @@
 package org.springframework.context;
 
 /**
+ * 20201130
+ * A. 用于在{@linkplain ConfigurableApplicationContext}被{@linkplain ConfigurableApplicationContext}之前初始化Spring
+ *    {@link ConfigurableApplicationContext}的回调接口。
+ * B. 通常用于需要对应用程序上下文进行一些编程初始化的web应用程序中。例如，针对{@linkplain ConfigurableApplicationContext#getEnvironment（）上下文的
+ *     environment}注册属性源或激活配置文件。分别参见{@code ContextLoader}和{@code FrameworkServlet}对声明“contextInitializerClasses”上下文参数和init param的支持。
+ * C. {@code ApplicationContextInitializer}处理器被鼓励检测Spring的{@link org.springframework.core.Ordered Ordered}接口已实现，或者如果
+ *    {@link org.springframework.core.annotation.Order @Order}注释已经存在，并且在调用之前对实例进行相应的排序。
+ */
+/**
+ * A.
  * Callback interface for initializing a Spring {@link ConfigurableApplicationContext}
  * prior to being {@linkplain ConfigurableApplicationContext#refresh() refreshed}.
  *
+ * B.
  * <p>Typically used within web applications that require some programmatic initialization
  * of the application context. For example, registering property sources or activating
  * profiles against the {@linkplain ConfigurableApplicationContext#getEnvironment()
  * context's environment}. See {@code ContextLoader} and {@code FrameworkServlet} support
  * for declaring a "contextInitializerClasses" context-param and init-param, respectively.
  *
+ * C.
  * <p>{@code ApplicationContextInitializer} processors are encouraged to detect
  * whether Spring's {@link org.springframework.core.Ordered Ordered} interface has been
  * implemented or if the {@link org.springframework.core.annotation.Order @Order}
@@ -39,6 +51,7 @@ package org.springframework.context;
  * @see org.springframework.web.servlet.FrameworkServlet#setContextInitializerClasses
  * @see org.springframework.web.servlet.FrameworkServlet#applyInitializers
  */
+// 20201130 应用程序上下文初始化器
 @FunctionalInterface
 public interface ApplicationContextInitializer<C extends ConfigurableApplicationContext> {
 

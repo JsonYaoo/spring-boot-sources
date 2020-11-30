@@ -22,23 +22,39 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 /**
+ * 20201130
+ * A. 用于将位置模式（例如，Ant样式的路径模式）解析为资源对象的策略接口。
+ * B. 这是{@link ResourceLoader}接口的扩展。传入的ResourceLoader（例如，{@linkorg.springframework.context.ApplicationContext}通过
+ *    {@link org.springframework.context.resourceLoaderware}在上下文中运行时传入）可以检查它是否也实现了此扩展接口。
+ * C. {@link PathMatchingResourcePatternResolver}是一个独立的实现，可在ApplicationContext外部使用，
+ *    {@link ResourceArrayPropertyEditor}也可用于填充资源数组bean属性。
+ * D. 可用于任何类型的位置模式（例如“/WEB-INF/*-上下文.xml“）：输入模式必须与策略实现相匹配。此接口只指定转换方法，而不是指定特定的模式格式。
+ * E. 此接口还为类路径中的所有匹配资源建议一个新的资源前缀“classpath*：”。注意，在这种情况下，资源位置应该是没有占位符的路径（例如/bean.xml“）；
+ *    JAR文件或类目录可以包含多个同名文件。
+ */
+/**
+ * A.
  * Strategy interface for resolving a location pattern (for example,
  * an Ant-style path pattern) into Resource objects.
  *
+ * B.
  * <p>This is an extension to the {@link ResourceLoader}
  * interface. A passed-in ResourceLoader (for example, an
  * {@link org.springframework.context.ApplicationContext} passed in via
  * {@link org.springframework.context.ResourceLoaderAware} when running in a context)
  * can be checked whether it implements this extended interface too.
  *
+ * C.
  * <p>{@link PathMatchingResourcePatternResolver} is a standalone implementation
  * that is usable outside an ApplicationContext, also used by
  * {@link ResourceArrayPropertyEditor} for populating Resource array bean properties.
  *
+ * D.
  * <p>Can be used with any sort of location pattern (e.g. "/WEB-INF/*-context.xml"):
  * Input patterns have to match the strategy implementation. This interface just
  * specifies the conversion method rather than a specific pattern format.
  *
+ * E.
  * <p>This interface also suggests a new resource prefix "classpath*:" for all
  * matching resources from the class path. Note that the resource location is
  * expected to be a path without placeholders in this case (e.g. "/beans.xml");
@@ -51,6 +67,7 @@ import org.springframework.core.io.ResourceLoader;
  * @see org.springframework.context.ApplicationContext
  * @see org.springframework.context.ResourceLoaderAware
  */
+// 20201130 路径模式 => 资源对象的策略接口
 public interface ResourcePatternResolver extends ResourceLoader {
 
 	/**

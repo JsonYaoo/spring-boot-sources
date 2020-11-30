@@ -20,11 +20,21 @@ import java.util.EventListener;
 import java.util.function.Consumer;
 
 /**
+ * 20201130
+ * A. 由应用程序事件侦听器实现的接口。
+ * B. 基于标准{@Code java.util.EventListener}观察者设计模式的接口。
+ * C. 从Spring3.0开始，{@Code ApplicationListener}可以一般性地声明它感兴趣的事件类型。当注册到Spring{@code applicationContext}时，事件将被相应地过滤，
+ *    侦听器只为匹配的事件对象调用。
+ */
+/**
+ * A.
  * Interface to be implemented by application event listeners.
  *
+ * B.
  * <p>Based on the standard {@code java.util.EventListener} interface
  * for the Observer design pattern.
  *
+ * C.
  * <p>As of Spring 3.0, an {@code ApplicationListener} can generically declare
  * the event type that it is interested in. When registered with a Spring
  * {@code ApplicationContext}, events will be filtered accordingly, with the
@@ -37,6 +47,7 @@ import java.util.function.Consumer;
  * @see org.springframework.context.event.ApplicationEventMulticaster
  * @see org.springframework.context.event.EventListener
  */
+// 20201130 应用程序事件监听器 -> 基于观察者模式设计的接口
 @FunctionalInterface
 public interface ApplicationListener<E extends ApplicationEvent> extends EventListener {
 
