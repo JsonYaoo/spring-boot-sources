@@ -40,8 +40,18 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201130
+ * A. 通用工厂加载机制，内部使用框架。
+ * B. {@code SpringFactoriesLoader}{@linkplain loadFactories loadFactories}并从类路径中的多个JAR文件中实例化给定类型的工厂。
+ *    {@Code spring.factories}文件必须是{@link Properties}格式，其中键是接口或抽象类的完全限定名，值是以逗号分隔的实现类名列表。例如：
+ *    		example.MyService=example.MyServiceImpl1,example.MyServiceImpl2
+ *    其中{@code example.MyService}是接口的名称，{@code MyServiceImpl1}和{@code MyServiceImpl2}是两个实现。
+ */
+/**
+ * A.
  * General purpose factory loading mechanism for internal use within the framework.
  *
+ * B.
  * <p>{@code SpringFactoriesLoader} {@linkplain #loadFactories loads} and instantiates
  * factories of a given type from {@value #FACTORIES_RESOURCE_LOCATION} files which
  * may be present in multiple JAR files in the classpath. The {@code spring.factories}
@@ -59,6 +69,7 @@ import org.springframework.util.StringUtils;
  * @author Sam Brannen
  * @since 3.2
  */
+// 20201130 Spring工厂加载器
 public final class SpringFactoriesLoader {
 
 	/**
@@ -70,6 +81,7 @@ public final class SpringFactoriesLoader {
 
 	private static final Log logger = LogFactory.getLog(SpringFactoriesLoader.class);
 
+	// 20201130 Spring工厂缓存 -> 类加载器-
 	static final Map<ClassLoader, Map<String, List<String>>> cache = new ConcurrentReferenceHashMap<>();
 
 
@@ -128,39 +140,59 @@ public final class SpringFactoriesLoader {
 	public static List<String> loadFactoryNames(Class<?> factoryType, @Nullable ClassLoader classLoader) {
 		ClassLoader classLoaderToUse = classLoader;
 		if (classLoaderToUse == null) {
+			// 20201130 如果没有指定类加载器, 则使用Spring工厂加载器
 			classLoaderToUse = SpringFactoriesLoader.class.getClassLoader();
 		}
+
+		// 20201130 获取工厂类型名称
 		String factoryTypeName = factoryType.getName();
+
+		// 20201130 根据类加载器(启动时当前线程没有加载器, 即默认使用Spring工厂加载器)加载指定类型的工厂实例名称
+		// 20201130 构造SpringApplication的factoryTypeName类型: Bootstrapper、ApplicationContextInitializer、ApplicationListener
 		return loadSpringFactories(classLoaderToUse).getOrDefault(factoryTypeName, Collections.emptyList());
 	}
 
+	// 20201130 根据构造器加载工厂实例名称
 	private static Map<String, List<String>> loadSpringFactories(ClassLoader classLoader) {
+		// 20201130 从Spring工厂缓存中获取
 		Map<String, List<String>> result = cache.get(classLoader);
 		if (result != null) {
 			return result;
 		}
 
+		// 20201130 获取不到则需要进行工厂实例化
 		result = new HashMap<>();
 		try {
+			// 20201130 获取"META-INF/spring.factories"所有资源 -> 里面存放着各种工厂的全类名
 			Enumeration<URL> urls = classLoader.getResources(FACTORIES_RESOURCE_LOCATION);
+
+			// 20201130 遍历所有资源
 			while (urls.hasMoreElements()) {
 				URL url = urls.nextElement();
 				UrlResource resource = new UrlResource(url);
 				Properties properties = PropertiesLoaderUtils.loadProperties(resource);
 				for (Map.Entry<?, ?> entry : properties.entrySet()) {
+					// 20201130 获取工厂名称
 					String factoryTypeName = ((String) entry.getKey()).trim();
+
+					// 20201130 转换为工厂类名称列表
 					String[] factoryImplementationNames =
 							StringUtils.commaDelimitedListToStringArray((String) entry.getValue());
+
+					// 20201130 遍历所有工厂类名称
 					for (String factoryImplementationName : factoryImplementationNames) {
+						// 20201130 将每个工厂类名称注册到result结果中
 						result.computeIfAbsent(factoryTypeName, key -> new ArrayList<>())
 								.add(factoryImplementationName.trim());
 					}
 				}
 			}
 
-			// Replace all lists with unmodifiable lists containing unique elements
+			// Replace all lists with unmodifiable lists containing unique elements // 20201130 将结果列表替换为包含唯一元素的不可修改列表
 			result.replaceAll((factoryType, implementations) -> implementations.stream().distinct()
 					.collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList)));
+
+			// 20201130 把结果添加到缓存中
 			cache.put(classLoader, result);
 		}
 		catch (IOException ex) {

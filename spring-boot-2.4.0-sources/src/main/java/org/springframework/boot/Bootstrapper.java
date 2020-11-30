@@ -32,6 +32,7 @@ public interface Bootstrapper {
 	 * Initialize the given {@link BootstrapRegistry} with any required registrations.
 	 * @param registry the registry to initialize
 	 */
+	// 20201130 使用任何必需的注册初始化给定的{@link BootstrapRegistry}。
 	void intitialize(BootstrapRegistry registry);
 
 }

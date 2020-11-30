@@ -258,6 +258,7 @@ public class SpringApplication {
 
 	private Banner banner;
 
+	// 20201130 资源加载器
 	private ResourceLoader resourceLoader;
 
 	private BeanNameGenerator beanNameGenerator;
@@ -511,14 +512,15 @@ public class SpringApplication {
 	}
 
 	// 20201130 根据类型、Class列表、参数列表获取SpringFactories实例
+	// 20201130 构造SpringApplication的factoryTypeName类型: Bootstrapper、ApplicationContextInitializer、ApplicationListener
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes, Object... args) {
-		// 20201130 获取Spring类加载器
+		// 20201130 获取类加载器
 		ClassLoader classLoader = getClassLoader();
 
-		// Use names and ensure unique to protect against duplicates // 20201130 使用名称并确保唯一以防止重复
+		// Use names and ensure unique to protect against duplicates // 20201130 使用名称并确保唯一以防止重复, 加载工厂类实例名称
 		Set<String> names = new LinkedHashSet<>(SpringFactoriesLoader.loadFactoryNames(type, classLoader));
 
-		// 20201130 创建SpringFactories实例
+		// 20201130 创建工厂类实例
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes, classLoader, args, names);
 
 		// 20201130 对SpringFactories实例进行注解排序
@@ -528,10 +530,11 @@ public class SpringApplication {
 		return instances;
 	}
 
-	// 20201130 创建SpringFactories实例
+	// 20201130 创建工厂类实例
 	@SuppressWarnings("unchecked")
 	private <T> List<T> createSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes,
 			ClassLoader classLoader, Object[] args, Set<String> names) {
+		//
 		List<T> instances = new ArrayList<>(names.size());
 		for (String name : names) {
 			try {
@@ -797,8 +800,11 @@ public class SpringApplication {
 	// 20201130 或者上下文类加载器（如果不是null），或者Spring{@link ClassUtils}类的加载器。@返回类加载器（从不为空）
 	public ClassLoader getClassLoader() {
 		if (this.resourceLoader != null) {
+			// 20201130 如果存在资源加载器则使用资源加载器
 			return this.resourceLoader.getClassLoader();
 		}
+
+		// 20201130 否则获取默认的类加载器, 线程上下文类加载器 -> ClassUtils类加载器 -> 系统加载器
 		return ClassUtils.getDefaultClassLoader();
 	}
 
