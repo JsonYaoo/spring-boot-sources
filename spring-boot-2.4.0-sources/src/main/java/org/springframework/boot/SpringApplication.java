@@ -340,13 +340,13 @@ public class SpringApplication {
 		// 20201130 从Classpath推断出服务器类型 => 注册服务器类型
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
 
-		// 20201130 根据Bootstrapper获取SpringFactories实例 => 注册启动引导实例
+		// 20201130 根据Bootstrapper获取SpringFactories实例 => 注册启动引导实例结果集
 		this.bootstrappers = new ArrayList<>(getSpringFactoriesInstances(Bootstrapper.class));
 
-		// 20201130 根据上下文初始化器获取SpringFactories实例 => 注册上下文初始化器实例
+		// 20201130 根据上下文初始化器获取SpringFactories实例 => 注册上下文初始化器实例结果集
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
 
-		// 20201130 根据应用程序事件监听器获取SpringFactories实例 => 注册应用程序事件监听器实例
+		// 20201130 根据应用程序事件监听器获取SpringFactories实例 => 注册应用程序事件监听器实例结果集
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
 
 		// 20201130 判断获取主类的中main方法对象 => 注册主类main方法
@@ -520,13 +520,13 @@ public class SpringApplication {
 		// Use names and ensure unique to protect against duplicates // 20201130 使用名称并确保唯一以防止重复, 加载工厂类实例名称
 		Set<String> names = new LinkedHashSet<>(SpringFactoriesLoader.loadFactoryNames(type, classLoader));
 
-		// 20201130 创建工厂类实例
+		// 20201130 创建工厂类实例 -> 获取工厂类实例结果集
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes, classLoader, args, names);
 
 		// 20201130 对SpringFactories实例进行注解排序
 		AnnotationAwareOrderComparator.sort(instances);
 
-		// 20201130 返回这些SpringFactories实例
+		// 20201130 返回排序后的SpringFactories实例结果集
 		return instances;
 	}
 
@@ -534,20 +534,33 @@ public class SpringApplication {
 	@SuppressWarnings("unchecked")
 	private <T> List<T> createSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes,
 			ClassLoader classLoader, Object[] args, Set<String> names) {
-		//
+		// 20201201 工厂类实例集合
 		List<T> instances = new ArrayList<>(names.size());
+
+		// 20201201 遍历每个工厂类名称
 		for (String name : names) {
 			try {
+				// 20201201 获取工厂类Class对象
 				Class<?> instanceClass = ClassUtils.forName(name, classLoader);
+
+				// 20201201 如果instanceClass不是type的子类型, 则抛出异常
 				Assert.isAssignable(type, instanceClass);
+
+				// 20201201 根据main方法参数获取工厂类对应的构造方法
 				Constructor<?> constructor = instanceClass.getDeclaredConstructor(parameterTypes);
+
+				// 20201201 使用main方法参数值进行实例化工厂, 没指定时使用基础类型默认值
 				T instance = (T) BeanUtils.instantiateClass(constructor, args);
+
+				// 20201201 实例添加到结果集合中
 				instances.add(instance);
 			}
 			catch (Throwable ex) {
 				throw new IllegalArgumentException("Cannot instantiate " + type + " : " + name, ex);
 			}
 		}
+
+		// 20201201 返回实例结果集
 		return instances;
 	}
 

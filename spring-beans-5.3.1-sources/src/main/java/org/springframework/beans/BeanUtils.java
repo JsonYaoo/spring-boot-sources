@@ -58,9 +58,17 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201201
+ * A. JavaBeans的静态方便方法：用于实例化bean、检查bean属性类型、复制bean属性等。
+ * B. 主要用于框架内的内部使用，但在某种程度上也适用于应用程序类。考虑<a href=“https://commons.apache.org/proper/commons-beanutils/“>Apache Commons BeanUtils</a>，
+ *    <a href=”https://hotelsdotcom.github.io/bull/“>BULL-Bean Utils Light Library</a>，或类似的第三方框架，用于更全面的Bean实用程序。
+ */
+/**
+ * A.
  * Static convenience methods for JavaBeans: for instantiating beans,
  * checking bean property types, copying bean properties, etc.
  *
+ * B.
  * <p>Mainly for internal use within the framework, but to some degree also
  * useful for application classes. Consider
  * <a href="https://commons.apache.org/proper/commons-beanutils/">Apache Commons BeanUtils</a>,
@@ -83,6 +91,7 @@ public abstract class BeanUtils {
 	private static final Set<Class<?>> unknownEditorTypes =
 			Collections.newSetFromMap(new ConcurrentReferenceHashMap<>(64));
 
+	// 20201201 基础类型 key -> boolean、byte、short、int、long, value -> false, 0, 0, 0, 0
 	private static final Map<Class<?>, Object> DEFAULT_TYPE_VALUES;
 
 	static {
@@ -189,26 +198,42 @@ public abstract class BeanUtils {
 	 * @throws BeanInstantiationException if the bean cannot be instantiated
 	 * @see Constructor#newInstance
 	 */
+	// 20201201 使用给定构造函数实例化类的便利方法。请注意，如果给定了不可访问（即非公共）构造函数，则此方法尝试将构造函数设置为可访问的，并支持具有可选参数和默认值的Kotlin类。
 	public static <T> T instantiateClass(Constructor<T> ctor, Object... args) throws BeanInstantiationException {
+		// 20201201 构造器非空
 		Assert.notNull(ctor, "Constructor must not be null");
 		try {
+			// 20201201 开启构造器方法访问权限
 			ReflectionUtils.makeAccessible(ctor);
+
+			// 20201201 如果是Kotlin虚拟机, 则使用调用Kotlin的实例化方法
 			if (KotlinDetector.isKotlinReflectPresent() && KotlinDetector.isKotlinType(ctor.getDeclaringClass())) {
 				return KotlinDelegate.instantiateClass(ctor, args);
 			}
+
+			// 20201201 否则按照普通的方法实例化
 			else {
+				// 20201201 获取构造器参数类型
 				Class<?>[] parameterTypes = ctor.getParameterTypes();
+
+				// 20201201 main方法参数个数不能<=构造器的
 				Assert.isTrue(args.length <= parameterTypes.length, "Can't specify more arguments than constructor parameters");
 				Object[] argsWithDefaultValues = new Object[args.length];
 				for (int i = 0 ; i < args.length; i++) {
+					// 20201201 如果main参数值为空
 					if (args[i] == null) {
+						// 20201201 则使用构造器的参数类型
 						Class<?> parameterType = parameterTypes[i];
+						// 20201201 如果参数类型属于基础类型, 则初始化为默认值, 否则为null
 						argsWithDefaultValues[i] = (parameterType.isPrimitive() ? DEFAULT_TYPE_VALUES.get(parameterType) : null);
 					}
 					else {
+						// 20201201 如果指定了main参数类型, 则初始化指定的值
 						argsWithDefaultValues[i] = args[i];
 					}
 				}
+
+				// 20201201 调用构造方法实例化对象
 				return ctor.newInstance(argsWithDefaultValues);
 			}
 		}

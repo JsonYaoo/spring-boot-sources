@@ -23,20 +23,38 @@ import java.util.function.Supplier;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201201
+ * A. 帮助验证参数的断言实用程序类。
+ * B. 有助于在运行时尽早清楚地识别程序员错误。
+ * C. 例如，如果公共方法的协定声明它不允许{@code null}参数，{@code Assert}可用于验证该协定。这样做可以清楚地表明当它发生时违反了契约，并保护了类的不变量。
+ * D. 通常用于验证方法参数而不是配置属性，以检查通常是程序员错误而不是配置错误的情况。与配置初始化代码不同的是，在这种方法中通常没有返回默认值的意义。
+ * E. 这个类类似于JUnit的断言库。如果参数值被认为无效，则抛出{@link IllegalArgumentException}（通常）。例如：
+ * 		a. Assert.notNull(clazz, "The class must not be null");
+ * 		b. Assert.isTrue(i > 0, "The value must be greater than zero");
+ * F. 主要用于框架内的内部使用；对于更全面的断言实用程序套件，请考虑{@code org.apache.commons.lang3.Validate}来自网站
+ *    <a href=“https://commons.apache.org/proper/commons-lang/“>Apache Commons Lang</a>，
+ *    Google Guava'sa href=”https://github.com/google/guava/wiki/PreconditionsExplained“>Preconditions</a>，或类似的第三方库。
+ */
+/**
+ * A.
  * Assertion utility class that assists in validating arguments.
  *
+ * B.
  * <p>Useful for identifying programmer errors early and clearly at runtime.
  *
+ * C.
  * <p>For example, if the contract of a public method states it does not
  * allow {@code null} arguments, {@code Assert} can be used to validate that
  * contract. Doing this clearly indicates a contract violation when it
  * occurs and protects the class's invariants.
  *
+ * D.
  * <p>Typically used to validate method arguments rather than configuration
  * properties, to check for cases that are usually programmer errors rather
  * than configuration errors. In contrast to configuration initialization
  * code, there is usually no point in falling back to defaults in such methods.
  *
+ * E.
  * <p>This class is similar to JUnit's assertion library. If an argument value is
  * deemed invalid, an {@link IllegalArgumentException} is thrown (typically).
  * For example:
@@ -45,6 +63,7 @@ import org.springframework.lang.Nullable;
  * Assert.notNull(clazz, "The class must not be null");
  * Assert.isTrue(i > 0, "The value must be greater than zero");</pre>
  *
+ * F.
  * <p>Mainly for internal use within the framework; for a more comprehensive suite
  * of assertion utilities consider {@code org.apache.commons.lang3.Validate} from
  * <a href="https://commons.apache.org/proper/commons-lang/">Apache Commons Lang</a>,
@@ -59,6 +78,7 @@ import org.springframework.lang.Nullable;
  * @author Rob Harrop
  * @since 1.1.2
  */
+// 20201201 Spring断言库
 public abstract class Assert {
 
 	/**
@@ -645,8 +665,12 @@ public abstract class Assert {
 	 * offending sub type will be appended.
 	 * @throws IllegalArgumentException if the classes are not assignable
 	 */
+	// 20201201 断言{@code超类型.isAssignableFrom（子类型）}是{@code true}。
 	public static void isAssignable(Class<?> superType, @Nullable Class<?> subType, String message) {
+		// 20201201 超类不能为空
 		notNull(superType, "Super type to check against must not be null");
+
+		// 20201201 如果不属于子类, 则设置提示语subType + " is not assignable to " + superType
 		if (subType == null || !superType.isAssignableFrom(subType)) {
 			assignableCheckFailed(superType, subType, message);
 		}
@@ -678,6 +702,7 @@ public abstract class Assert {
 	 * @param subType the sub type to check
 	 * @throws IllegalArgumentException if the classes are not assignable
 	 */
+	// 20201201 断言{@code超类型.isAssignableFrom（子类型）}是{@code true}。
 	public static void isAssignable(Class<?> superType, Class<?> subType) {
 		isAssignable(superType, subType, "");
 	}
@@ -702,6 +727,7 @@ public abstract class Assert {
 		throw new IllegalArgumentException(result);
 	}
 
+	// 20201201 设置提示语subType + " is not assignable to " + superType
 	private static void assignableCheckFailed(Class<?> superType, @Nullable Class<?> subType, @Nullable String msg) {
 		String result = "";
 		boolean defaultMessage = true;
