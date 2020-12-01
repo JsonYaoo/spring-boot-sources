@@ -24,18 +24,31 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201201
+ * A. 简单的秒表，允许多个任务计时，显示每个命名任务的总运行时间和运行时间。
+ * B. 隐藏{@link System#nanoTime（）}的使用，提高应用程序代码的可读性并降低计算错误的可能性。
+ * C. 请注意，此对象不是设计为线程安全的，并且不使用同步。
+ * D. 此类通常用于在概念验证工作和开发过程中验证性能，而不是作为生产应用程序的一部分。
+ * E. 从springframework5.2开始，运行时间以纳秒为单位进行跟踪和报告。
+ */
+/**
+ * A.
  * Simple stop watch, allowing for timing of a number of tasks, exposing total
  * running time and running time for each named task.
  *
+ * B.
  * <p>Conceals use of {@link System#nanoTime()}, improving the readability of
  * application code and reducing the likelihood of calculation errors.
  *
+ * C.
  * <p>Note that this object is not designed to be thread-safe and does not use
  * synchronization.
  *
+ * D.
  * <p>This class is normally used to verify performance during proof-of-concept
  * work and in development, rather than as part of production applications.
  *
+ * E.
  * <p>As of Spring Framework 5.2, running time is tracked and reported in
  * nanoseconds.
  *
@@ -44,6 +57,7 @@ import org.springframework.lang.Nullable;
  * @author Sam Brannen
  * @since May 2, 2001
  */
+// 20201201 纳秒级别计时器 -> 不用于生产程序
 public class StopWatch {
 
 	/**
@@ -114,7 +128,6 @@ public class StopWatch {
 		this.keepTaskList = keepTaskList;
 	}
 
-
 	/**
 	 * Start an unnamed task.
 	 * <p>The results are undefined if {@link #stop()} or timing methods are
@@ -122,6 +135,7 @@ public class StopWatch {
 	 * @see #start(String)
 	 * @see #stop()
 	 */
+	// 20201201 开始一个未命名的任务。<p>如果未首先调用{@link\#stop（）}或计时方法而未首先调用此方法，则结果是未定义的。
 	public void start() throws IllegalStateException {
 		start("");
 	}
@@ -134,11 +148,14 @@ public class StopWatch {
 	 * @see #start()
 	 * @see #stop()
 	 */
+	// 20201201 启动命名任务。<p>如果未首先调用{@link\#stop（）}或计时方法而未首先调用此方法，则结果是未定义的。
 	public void start(String taskName) throws IllegalStateException {
 		if (this.currentTaskName != null) {
 			throw new IllegalStateException("Can't start StopWatch: it's already running");
 		}
 		this.currentTaskName = taskName;
+
+		// 2020 获取开始时的纳秒时间
 		this.startTimeNanos = System.nanoTime();
 	}
 

@@ -33,7 +33,6 @@ import org.springframework.lang.Nullable;
  *    还提供了配置应用程序上下文的工具。
  * B. 这里封装了配置和生命周期方法，以避免使它们对ApplicationContext客户端代码显而易见。目前的方法只能由启动和关闭代码使用。
  */
-
 /**
  * A.
  * SPI interface to be implemented by most if not all application contexts.

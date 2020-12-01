@@ -33,6 +33,7 @@ import org.springframework.util.Assert;
  * @author Phillip Webb
  * @since 2.4.0
  */
+// 20201201 默认{@link ConfigurableBootstrapContext}实现 -> 实现Springboot最初启动接口
 public class DefaultBootstrapContext implements ConfigurableBootstrapContext {
 
 	private final Map<Class<?>, InstanceSupplier<?>> instanceSuppliers = new HashMap<>();

@@ -27,6 +27,7 @@ import java.util.function.Supplier;
  *
  * @author Brian Clozel
  */
+// 20201201 默认的“no-op”{@code ApplicationStartup}实现。这个变体是为最小的开销而设计的，不记录事件。
 class DefaultApplicationStartup implements ApplicationStartup {
 
 	@Override

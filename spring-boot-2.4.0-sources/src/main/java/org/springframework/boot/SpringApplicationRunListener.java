@@ -33,6 +33,9 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
  * @author Andy Wilkinson
  * @since 1.0.0
  */
+// 20201201 {@link springapplication}{@code run}方法的侦听器。{@link SpringApplicationRunListener}是通过{@link SpringFactoriesLoader}加载的，
+// 20201201 并且应该声明一个公共构造函数，该构造函数接受一个{@link SpringApplication}实例和一个{@code String[]}参数。
+// 20201201 {springlistener}将为每个应用程序创建一个新的runlink实例。
 public interface SpringApplicationRunListener {
 
 	/**
@@ -40,6 +43,7 @@ public interface SpringApplicationRunListener {
 	 * early initialization.
 	 * @param bootstrapContext the bootstrap context
 	 */
+	// 20201201 当run方法第一次启动时立即调用。可用于非常早期的初始化。
 	default void starting(ConfigurableBootstrapContext bootstrapContext) {
 		starting();
 	}
@@ -47,9 +51,10 @@ public interface SpringApplicationRunListener {
 	/**
 	 * Called immediately when the run method has first started. Can be used for very
 	 * early initialization.
-	 * @deprecated since 2.4.0 in favor of {@link #starting(ConfigurableBootstrapContext)}
+	 * @deprecated since 2.4.0 in favor of {@link #starting(ConfigurableBootstrapContext)} // 20201201 从2.4.0开始支持{@link #starting（ConfigurableBootstrapContext）}
 	 */
-	@Deprecated
+	@Deprecated // 20201201 已弃用
+	// 20201201 当run方法第一次启动时立即调用。可用于非常早期的初始化。
 	default void starting() {
 	}
 

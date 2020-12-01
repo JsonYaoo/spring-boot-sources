@@ -34,14 +34,18 @@ import org.springframework.util.ReflectionUtils;
  *
  * @author Phillip Webb
  */
+// 20201201 {@link springapplicationrunlistener}的集合。
 class SpringApplicationRunListeners {
 
 	private final Log log;
 
+	// 20201201 Spring上下文启动监听器实例列表
 	private final List<SpringApplicationRunListener> listeners;
 
+	// 20201201 上下文数据收集器
 	private final ApplicationStartup applicationStartup;
 
+	// 20201201 构造方法
 	SpringApplicationRunListeners(Log log, Collection<? extends SpringApplicationRunListener> listeners,
 			ApplicationStartup applicationStartup) {
 		this.log = log;
@@ -49,8 +53,16 @@ class SpringApplicationRunListeners {
 		this.applicationStartup = applicationStartup;
 	}
 
+	// 20201201 启动上下文启动监听器
 	void starting(ConfigurableBootstrapContext bootstrapContext, Class<?> mainApplicationClass) {
-		doWithListeners("spring.boot.application.starting", (listener) -> listener.starting(bootstrapContext),
+		doWithListeners(
+				// 20201201 启动步骤名称
+				"spring.boot.application.starting",
+
+				// 20201201 Consumer<SpringApplicationRunListener> listenerAction 每步执行的监听操作 -> 空实现
+				(listener) -> listener.starting(bootstrapContext),
+
+				// 20201201 Consumer<StartupStep> stepAction 每步执行的操作 -> 启动每个主类
 				(step) -> {
 					if (mainApplicationClass != null) {
 						step.tag("mainApplicationClass", mainApplicationClass.getName());
@@ -111,10 +123,15 @@ class SpringApplicationRunListeners {
 		doWithListeners(stepName, listenerAction, null);
 	}
 
-	private void doWithListeners(String stepName, Consumer<SpringApplicationRunListener> listenerAction,
-			Consumer<StartupStep> stepAction) {
+	// 20201201 使用上下文启动监听器启动
+	private void doWithListeners(String stepName, Consumer<SpringApplicationRunListener> listenerAction, Consumer<StartupStep> stepAction) {
+		// 20201201 上下文记录者记录步骤
 		StartupStep step = this.applicationStartup.start(stepName);
+
+		// 20201201 启动监听操作
 		this.listeners.forEach(listenerAction);
+
+		// 20201201 启动每个主类
 		if (stepAction != null) {
 			stepAction.accept(step);
 		}

@@ -22,8 +22,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 
 /**
+ * 20201201
+ * A. 一个简单的引导上下文，在启动和{@link Environment}后处理过程中可用，直到{@link ApplicationContext}准备就绪为止。
+ * B. 提供对singleton的延迟访问，这些访问可能很昂贵，或者需要在{@link ApplicationContext}可用之前共享。
+ */
+/**
+ * A.
  * A simple bootstrap context that is available during startup and {@link Environment}
  * post-processing up to the point that the {@link ApplicationContext} is prepared.
+ *
+ * B.
  * <p>
  * Provides lazy access to singletons that may be expensive to create, or need to be
  * shared before the {@link ApplicationContext} is available.
@@ -31,6 +39,7 @@ import org.springframework.core.env.Environment;
  * @author Phillip Webb
  * @since 2.4.0
  */
+// 20201201 Springboot最初启动上下文接口 -> 直到ApplicationContext初始化完毕后关闭
 public interface BootstrapContext {
 
 	/**

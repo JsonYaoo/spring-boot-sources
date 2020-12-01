@@ -26,6 +26,7 @@ package org.springframework.boot;
  * @see BootstrapContext
  * @see DefaultBootstrapContext
  */
+// 20201201 {@link bootstrapcontext}，它还通过{@link bootstrapregis}接口提供配置方法 => Springboot最初启动接口
 public interface ConfigurableBootstrapContext extends BootstrapRegistry, BootstrapContext {
 
 }

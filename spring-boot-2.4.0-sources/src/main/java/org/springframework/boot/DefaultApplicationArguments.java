@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
  * @author Phillip Webb
  * @since 1.4.1
  */
+// 20201201 {@link ApplicationArguments}的默认实现。
 public class DefaultApplicationArguments implements ApplicationArguments {
 
 	private final Source source;

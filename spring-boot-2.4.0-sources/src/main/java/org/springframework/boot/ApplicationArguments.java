@@ -25,6 +25,7 @@ import java.util.Set;
  * @author Phillip Webb
  * @since 1.3.0
  */
+// 20201201 提供对用于运行{@link springapplication}的参数的访问。
 public interface ApplicationArguments {
 
 	/**

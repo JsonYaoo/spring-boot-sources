@@ -25,16 +25,27 @@ package org.springframework.core.metrics;
  * @author Brian Clozel
  * @since 5.3
  */
+// 20201201 使用{@link startupbesteps}指令应用程序启动阶段。核心容器及其基础结构组件可以使用{@code applicationstartup}标记应用程序启动期间的步骤，
+// 20201201 并收集有关执行上下文或其处理时间的数据。
 public interface ApplicationStartup {
 
 	/**
 	 * Default "no op" {@code ApplicationStartup} implementation.
 	 * <p>This variant is designed for minimal overhead and does not record data.
 	 */
+	// 20201201 默认的“no-op”{@code ApplicationStartup}实现。这个变体是为最小的开销而设计的，不记录数据。
 	ApplicationStartup DEFAULT = new DefaultApplicationStartup();
 
 	/**
+	 * 20201201
+	 * A. 创建新步骤并标记其开始。
+	 * B. 步骤名称描述当前操作或阶段。此技术名称应使用“.”名称空间，并可在应用程序启动期间重用以描述同一步骤的其他实例。
+	 */
+	/**
+	 * A.
 	 * Create a new step and marks its beginning.
+	 *
+	 * B.
 	 * <p>A step name describes the current action or phase. This technical
 	 * name should be "." namespaced and can be reused to describe other instances of
 	 * the same step during application startup.

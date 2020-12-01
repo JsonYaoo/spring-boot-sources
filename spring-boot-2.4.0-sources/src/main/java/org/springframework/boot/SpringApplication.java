@@ -237,6 +237,7 @@ public class SpringApplication {
 	 */
 	public static final String BANNER_LOCATION_PROPERTY = SpringApplicationBannerPrinter.BANNER_LOCATION_PROPERTY;
 
+	// 20201201 awt包
 	private static final String SYSTEM_PROPERTY_JAVA_AWT_HEADLESS = "java.awt.headless";
 
 	private static final Log logger = LogFactory.getLog(SpringApplication.class);
@@ -263,8 +264,10 @@ public class SpringApplication {
 
 	private BeanNameGenerator beanNameGenerator;
 
+	// 20201201 配置环境
 	private ConfigurableEnvironment environment;
 
+	// 20201201 服务器类型 NONE、SERVLET、REACTIVE
 	private WebApplicationType webApplicationType;
 
 	private boolean headless = true;
@@ -277,6 +280,7 @@ public class SpringApplication {
 
 	private Map<String, Object> defaultProperties;
 
+	// 20201201 启动引导实例结果集 -> 本质上是个回调接口, 声明了初始化BootstrapRegistry SpringBoot最初注册表实例的方法
 	private List<Bootstrapper> bootstrappers;
 
 	private Set<String> additionalProfiles = Collections.emptySet();
@@ -289,6 +293,7 @@ public class SpringApplication {
 
 	private ApplicationContextFactory applicationContextFactory = ApplicationContextFactory.DEFAULT;
 
+	// 20201201 默认上下文数据收集器
 	private ApplicationStartup applicationStartup = ApplicationStartup.DEFAULT;
 
 	/**
@@ -373,18 +378,33 @@ public class SpringApplication {
 	 * Run the Spring application, creating and refreshing a new
 	 * {@link ApplicationContext}.
 	 * @param args the application arguments (usually passed from a Java main method)
-	 * @return a running {@link ApplicationContext}
+	 * @return a running {@link ApplicationContext} // 20201201 返回一个应用程序上下文对象
 	 */
+	// 20201201 运行Spring应用程序，创建并刷新一个新的{@link ApplicationContext}.
 	public ConfigurableApplicationContext run(String... args) {
+		// 20201201 构造纳秒计时器
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
+
+		// 20201201 构造Springboot最初上下文对象实例
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
+
+		// 20201201 上下文配置接口实例初始化
 		ConfigurableApplicationContext context = null;
+
+		// 20201201 无界面时的配置
 		configureHeadlessProperty();
+
+		// 20201201 获取Spring上下文启动监听器实例集合
 		SpringApplicationRunListeners listeners = getRunListeners(args);
+
+		// 20201201 启动Springboot, 记录每步操作, 每步启动监听器, 启动主类
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
 		try {
+			// 20201201 构造默认上下文参数访问器
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+
+			// 20201201 准备环境
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
 			configureIgnoreBeanInfo(environment);
 			Banner printedBanner = printBanner(environment);
@@ -415,15 +435,22 @@ public class SpringApplication {
 		return context;
 	}
 
+	// 20201201 构造Springboot最初上下文对象实例
 	private DefaultBootstrapContext createBootstrapContext() {
 		DefaultBootstrapContext bootstrapContext = new DefaultBootstrapContext();
+
+		// 20201201 遍历启动引导实例结果集, 初始化pringboot最初注册表
 		this.bootstrappers.forEach((initializer) -> initializer.intitialize(bootstrapContext));
+
+		// 20201201 返回注册好的Springboot最初上下文对象
 		return bootstrapContext;
 	}
 
+	// 20201201 准备环境
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
 			DefaultBootstrapContext bootstrapContext, ApplicationArguments applicationArguments) {
 		// Create and configure the environment
+		// 20201201 创建和配置环境
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
 		ConfigurationPropertySources.attach(environment);
@@ -499,10 +526,17 @@ public class SpringApplication {
 				System.getProperty(SYSTEM_PROPERTY_JAVA_AWT_HEADLESS, Boolean.toString(this.headless)));
 	}
 
+	// 20201201 获取Spring上下文启动监听器实例集合
 	private SpringApplicationRunListeners getRunListeners(String[] args) {
 		Class<?>[] types = new Class<?>[] { SpringApplication.class, String[].class };
+
+		// 20201201 构造Spring上下文启动监听器实例集合
 		return new SpringApplicationRunListeners(logger,
+
+				// 20201201 获取org.springframework.boot.context.event.EventPublishingRunListener Springboot启动监听器实例
 				getSpringFactoriesInstances(SpringApplicationRunListener.class, types, this, args),
+
+				// 20201201 默认上下文数据收集器
 				this.applicationStartup);
 	}
 
@@ -564,12 +598,17 @@ public class SpringApplication {
 		return instances;
 	}
 
+	// 20201201 创建和配置环境
 	private ConfigurableEnvironment getOrCreateEnvironment() {
 		if (this.environment != null) {
+			// 20201201 注册配置环境
 			return this.environment;
 		}
+
+		// 20201201 根据服务器类型启动环境
 		switch (this.webApplicationType) {
 		case SERVLET:
+			// 20201201 启动Servlet环境
 			return new StandardServletEnvironment();
 		case REACTIVE:
 			return new StandardReactiveWebEnvironment();
