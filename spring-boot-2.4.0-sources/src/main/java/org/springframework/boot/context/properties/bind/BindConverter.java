@@ -47,6 +47,7 @@ import org.springframework.util.Assert;
  * @author Phillip Webb
  * @author Andy Wilkinson
  */
+// 20201202 用于处理绑定期间所需的任何转换的实用程序。这个类不是线程安全的，因此会为每个顶级绑定创建一个新实例。
 final class BindConverter {
 
 	private static final Set<Class<?>> EXCLUDED_EDITORS;

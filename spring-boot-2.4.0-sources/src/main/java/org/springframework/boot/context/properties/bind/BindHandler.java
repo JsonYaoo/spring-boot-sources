@@ -44,6 +44,7 @@ public interface BindHandler {
 	 * @param context the bind context
 	 * @return the actual item that should be used for binding (may be {@code null})
 	 */
+	// 20201202 在元素绑定开始时但在确定任何结果之前调用。
 	default <T> Bindable<T> onStart(ConfigurationPropertyName name, Bindable<T> target, BindContext context) {
 		return target;
 	}

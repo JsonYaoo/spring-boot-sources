@@ -82,8 +82,12 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 	private int hashCode;
 
+	// 20201202 构造方法
 	private ConfigurationPropertyName(Elements elements) {
+		// 20201202 设置属性解析结果
 		this.elements = elements;
+
+		// 20201202 属性实际字符个数
 		this.uniformElements = new CharSequence[elements.getSize()];
 	}
 
@@ -534,7 +538,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	 * @return a {@link ConfigurationPropertyName} instance
 	 * @throws InvalidConfigurationPropertyNameException if the name is not valid
 	 */
-	// 20201202 为指定的字符串返回{@link ConfigurationPropertyName}。
+	// 20201202 为指定的字符串返回{@link ConfigurationPropertyName}。name => "spring.main"
 	public static ConfigurationPropertyName of(CharSequence name) {
 		return of(name, false);
 	}
@@ -558,9 +562,12 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	 * @throws InvalidConfigurationPropertyNameException if the name is not valid and
 	 * {@code returnNullIfInvalid} is {@code false}
 	 */
-	// 20201202 为指定的字符串返回{@link ConfigurationPropertyName}。
+	// 20201202 为指定的字符串返回{@link ConfigurationPropertyName}。 name => "spring.main"
 	static ConfigurationPropertyName of(CharSequence name, boolean returnNullIfInvalid) {
+		// 20201202 转换未统一的配置字符: 小写字母 | 数字 | -, 且含有每个字串开始结束索引
 		Elements elements = elementsOf(name, returnNullIfInvalid);
+
+		// 20201202 如果解析结果不空, 则构建 由点分隔的元素组成的配置属性名 对象
 		return (elements != null) ? new ConfigurationPropertyName(elements) : null;
 	}
 
@@ -568,13 +575,13 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 		return elementsOf(name, false, 1);
 	}
 
-	// 20201202 解析name的每个元素
+	// 20201202 解析name的每个元素 name => "spring.main"
 	private static Elements elementsOf(CharSequence name, boolean returnNullIfInvalid) {
 		// 20201202 ElementsParser解析器初始化容量为6
 		return elementsOf(name, returnNullIfInvalid, ElementsParser.DEFAULT_CAPACITY);
 	}
 
-	// 20201202 解析name的每个元素 -> 指定解析器初始化容量
+	// 20201202 解析name的每个元素 -> 指定解析器初始化容量 name => "spring.main"
 	private static Elements elementsOf(CharSequence name, boolean returnNullIfInvalid, int parserCapacity) {
 		// 20201202 如果属性名成为空
 		if (name == null) {
@@ -599,21 +606,26 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 			throw new InvalidConfigurationPropertyNameException(name, Collections.singletonList('.'));
 		}
 
-		// 20201202 构造ElementsParser解析器
+		// 20201202 构造ElementsParser解析器 name => "spring.main", 这里解析的结果是: start[]: 0, 7; end[]: 6, 10; type: UNIFORM: 表示字符已统一, 无需转换
 		Elements elements = new ElementsParser(name, '.', parserCapacity).parse();
 
-		// 20201202 遍历解析器
+		// 20201202 遍历解析结果
 		for (int i = 0; i < elements.getSize(); i++) {
+			// 20201202 如果有元素为NON_UNIFORM, 即表示字符未统一, 需要转换
 			if (elements.getType(i) == ElementType.NON_UNIFORM) {
+				// 20201202 如果忽略null & 非法字符, 则无需抛出异常
 				if (returnNullIfInvalid) {
 					return null;
 				}
+
+				// 20201202 否则抛出非法配置属性名称异常
 				throw new InvalidConfigurationPropertyNameException(name, getInvalidChars(elements, i));
 			}
 		}
 		return elements;
 	}
 
+	// 20201202 获取非法字符
 	private static List<Character> getInvalidChars(Elements elements, int index) {
 		List<Character> invalidChars = new ArrayList<>();
 		for (int charIndex = 0; charIndex < elements.getLength(index); charIndex++) {
@@ -854,18 +866,25 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 		// 20201202 ElementsParser解析器初始化容量
 		private static final int DEFAULT_CAPACITY = 6;
 
+		// 20201202 初始字符串
 		private final CharSequence source;
 
+		// 20201202 字符分隔符
 		private final char separator;
 
+		// 20201202 实际容量大小
 		private int size;
 
+		// 20201202 开始数组
 		private int[] start;
 
+		// 20201202 结束数组
 		private int[] end;
 
+		// 20201202 元素类型数组
 		private ElementType[] type;
 
+		// 20201202 已解析后的字符数组
 		private CharSequence[] resolved;
 
 		ElementsParser(CharSequence source, char separator) {
@@ -874,7 +893,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 
 		// 20201202 构造ElementsParser解析器
 		ElementsParser(CharSequence source, char separator, int capacity) {
-			// 20201202 注册属性源
+			// 20201202 注册属性源 name => "spring.main"
 			this.source = source;
 
 			// 20201202 注册字符分隔符
@@ -895,117 +914,228 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 			return parse(null);
 		}
 
-		// 20201202 解析器解析元素, 带值操作参数
+		// 20201202 解析器解析元素, 带值操作参数 name => "spring.main", 这里不适用操作器，这里解析的结果是: start[]: 0, 7; end[]: 6, 10; type: UNIFORM: 表示字符已统一, 无需转换
 		Elements parse(Function<CharSequence, CharSequence> valueProcessor) {
-			// TODO
+			// 20201202 获取解析源的长度
 			int length = this.source.length();
 			int openBracketCount = 0;
 			int start = 0;
+
+			// 20201202 初始化元素类型为 元素在逻辑上为空
 			ElementType type = ElementType.EMPTY;
+
+			// 20201202 遍历解析源
 			for (int i = 0; i < length; i++) {
+				// 20201202 获取i位置的char
 				char ch = this.source.charAt(i);
+
+				// 20201202 如果为'['
 				if (ch == '[') {
+					// 20201202 如果支架个数为0
 					if (openBracketCount == 0) {
+						// 20201202 记录start~i-1位置元素类型为当前元素类型
 						add(start, i, type, valueProcessor);
+
+						// 20201202 start指针移动到下一个位置
 						start = i + 1;
+
+						// 20201202 标识元素类型为 元素被数字索引
 						type = ElementType.NUMERICALLY_INDEXED;
 					}
+
+					// 20201202 支架元素个数+1
 					openBracketCount++;
 				}
+
+				// 20201202 如果为']'
 				else if (ch == ']') {
+					// 20201202 支架个数-1
 					openBracketCount--;
+
+					// 20201202 如果支架个数为0
 					if (openBracketCount == 0) {
+						// 20201202 记录start~i-1位置元素类型为当前元素类型
 						add(start, i, type, valueProcessor);
+
+						// 20201202 start指针移动到下一个位置
 						start = i + 1;
+
+						// 20201202 标识元素类型为 元素在逻辑上为空
 						type = ElementType.EMPTY;
 					}
 				}
+
+				// 20201202 如果既不是'['也不是']', 如果当前元素类型为INDEXED | NUMERICALLY_INDEXED(即开始时), 且如果当前char为分割符.时
 				else if (!type.isIndexed() && ch == this.separator) {
+					// 20201202 记录start~i-1位置元素类型为当前元素类型
 					add(start, i, type, valueProcessor);
+
+					// 20201202 start指针移动到下一个位置
 					start = i + 1;
+
+					// 20201202 标识元素类型为 元素在逻辑上为空
 					type = ElementType.EMPTY;
 				}
+
+				// 20201202 否则如果为普通char
 				else {
+					// 20201202 则更新元素类型
 					type = updateType(type, ch, i - start);
 				}
 			}
+
+			// 20201202 如果支架个数不为0
 			if (openBracketCount != 0) {
+				// 20201202 则标记元素类型为 元素包含非统一字符，需要转换
 				type = ElementType.NON_UNIFORM;
 			}
+
+			// 20201202 添加整个字符串到元素类型中
 			add(start, length, type, valueProcessor);
+
+			// 20201202 重新构建Elements对象
 			return new Elements(this.source, this.size, this.start, this.end, this.type, this.resolved);
 		}
 
 		private ElementType updateType(ElementType existingType, char ch, int index) {
+		    // 20201202 如果当前元素类型为INDEXED | NUMERICALLY_INDEXED(即开始时)
 			if (existingType.isIndexed()) {
+			    // 20201202 如果当前元素围殴NUMERICALLY_INDEXED(即开始时), 且当前char不是数字
 				if (existingType == ElementType.NUMERICALLY_INDEXED && !isNumeric(ch)) {
+				    // 20201202 则设置当前元素类型为INDEXED
 					return ElementType.INDEXED;
 				}
+
+				// 20201202 返回当前元素类型
 				return existingType;
 			}
+
+			// 20201202 如果当前元素类型为EMPTY()(即为整个字符串结束 或者 一小串字符 结束后), 且当前元素是否合法: 小写字母, 数字, -
 			if (existingType == ElementType.EMPTY && isValidChar(ch, index)) {
+			    // 20201202 如果是新的字串开始, 且合法, 如果为第一个char则设置为UNIFORM, 否则设置为NON_UNIFORM
 				return (index == 0) ? ElementType.UNIFORM : ElementType.NON_UNIFORM;
 			}
+
+			// 20201202 如果为字串连续出现--
 			if (existingType == ElementType.UNIFORM && ch == '-') {
+			    // 20201202 则设置元素类型为DASHED
 				return ElementType.DASHED;
 			}
+
+			// 20201202 如果当前char不合法
 			if (!isValidChar(ch, index)) {
+			    // 20201202 如果当前元素类型为EMPTY(即为整个字符串结束 或者 一小串字符 结束后), 且小写转换后的字符还不合法
 				if (existingType == ElementType.EMPTY && !isValidChar(Character.toLowerCase(ch), index)) {
+				    // 20201202 则当前元素类型设置为EMPTY, 表示忽略该字符
 					return ElementType.EMPTY;
 				}
+
+				// 20201202 否则标识它为NON_UNIFORM, 需要进行转换
 				return ElementType.NON_UNIFORM;
 			}
+
+			// 20201202 返回更新后的元素类型
 			return existingType;
 		}
 
+		// 20201202 添加start、end索引, 记录start~end-1位置元素类型为当前元素类型
 		private void add(int start, int end, ElementType type, Function<CharSequence, CharSequence> valueProcessor) {
+			// 20201202 如果长度<1, 或者该元素类型为 元素在逻辑上为空（不包含有效字符）
 			if ((end - start) < 1 || type == ElementType.EMPTY) {
+				// 20201202 则直接返回
 				return;
 			}
+
+			// 20201202 如果开始数组大小为实际元素个数, 达到临界, 进行扩容
 			if (this.start.length == this.size) {
+				// 20201202 对开始数组扩容+6
 				this.start = expand(this.start);
+
+				// 20201202 对结束数组扩容+6
 				this.end = expand(this.end);
+
+				// 20201202 对元素类型数组扩容
 				this.type = expand(this.type);
+
+				// 20201202 对目标结果数组扩容
 				this.resolved = expand(this.resolved);
 			}
+
+			// 20201202 如果存在值操作器
 			if (valueProcessor != null) {
+				// 20201202 如果结果数组为空
 				if (this.resolved == null) {
+					// 20201202 则初始化开始数组为结果数组
 					this.resolved = new CharSequence[this.start.length];
 				}
+
+				// 20201202 操作器处理子序列 start~end-1
 				CharSequence resolved = valueProcessor.apply(this.source.subSequence(start, end));
+
+				// 20201202 不适用操作器重新构造resolvedElements
 				Elements resolvedElements = new ElementsParser(resolved, '.').parse();
+
+				// 20201202 这种情况下长度必须大于1
 				Assert.state(resolvedElements.getSize() == 1, "Resolved element must not contain multiple elements");
+
+				// 20201202 获取第一个元素, 添加到结果数组末尾
 				this.resolved[this.size] = resolvedElements.get(0);
+
+				// 20201202 获取第一个元素类型作为元素类型
 				type = resolvedElements.getType(0);
 			}
+
+			// 20201202 添加开始索引到开始数组
 			this.start[this.size] = start;
+
+			// 20201202 添加结束索引到结束数组
 			this.end[this.size] = end;
+
+			// 20201202 添加元素类型到元素类型数组
 			this.type[this.size] = type;
+
+			// 20201202 实际元素个数+1
 			this.size++;
 		}
 
+		// 20201202 扩充数组
 		private int[] expand(int[] src) {
+			// 20201202 目标数组长度 = 当前数组长度 + 默认容量6
 			int[] dest = new int[src.length + DEFAULT_CAPACITY];
+
+			// 20201202 复制srcPos~src.length-1到destPos~dest.length-1
 			System.arraycopy(src, 0, dest, 0, src.length);
 			return dest;
 		}
 
+		// 20201202 对元素类型数组扩容
 		private ElementType[] expand(ElementType[] src) {
+			// 20201202 目标数组长度 = 当前数组长度 + 默认容量6
 			ElementType[] dest = new ElementType[src.length + DEFAULT_CAPACITY];
+
+			// 20201202 复制srcPos~src.length-1到destPos~dest.length-1
 			System.arraycopy(src, 0, dest, 0, src.length);
 			return dest;
 		}
 
+		// 20201202 对目标结果数组扩容
 		private CharSequence[] expand(CharSequence[] src) {
+			// 20201202 如果结果数组为空, 则不做处理
 			if (src == null) {
 				return null;
 			}
+
+			// 20201202 目标数组长度 = 当前数组长度 + 默认容量6
 			CharSequence[] dest = new CharSequence[src.length + DEFAULT_CAPACITY];
+
+			// 20201202 复制srcPos~src.length-1到destPos~dest.length-1
 			System.arraycopy(src, 0, dest, 0, src.length);
 			return dest;
 		}
 
+		// 20201202 判断当前索引的char是否合法
 		static boolean isValidChar(char ch, int index) {
+		    // 20201202 如果为小写字母, 数字, 或者-分隔符, 则都是合法的
 			return isAlpha(ch) || isNumeric(ch) || (index != 0 && ch == '-');
 		}
 
@@ -1013,10 +1143,12 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 			return isAlpha(ch) || isNumeric(ch);
 		}
 
+		// 20201202 判断当前char是否为小写字母: a~z
 		private static boolean isAlpha(char ch) {
 			return ch >= 'a' && ch <= 'z';
 		}
 
+		// 20201202 判断当前char是否数字: 0~9
 		private static boolean isNumeric(char ch) {
 			return ch >= '0' && ch <= '9';
 		}

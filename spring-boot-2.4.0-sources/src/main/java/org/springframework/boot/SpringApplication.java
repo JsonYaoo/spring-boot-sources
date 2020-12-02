@@ -290,6 +290,7 @@ public class SpringApplication {
 
 	private boolean allowBeanDefinitionOverriding;
 
+	// 20201202 是否为定制化的环境
 	private boolean isCustomEnvironment = false;
 
 	private boolean lazyInitialization = false;
@@ -471,9 +472,12 @@ public class SpringApplication {
 		// 20201202 为环境配置额外的配置文件 -> profiles: spring.profiles.active
 		configureAdditionalProfiles(environment);
 
-		// 20201202
+		// 20201202 环境绑定"spring.main"属性, 绑定失败会抛出绑定异常
 		bindToSpringApplication(environment);
+
+		// 20201202 如果是定制化的环境
 		if (!this.isCustomEnvironment) {
+
 			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
 					deduceEnvironmentClass());
 		}
@@ -754,7 +758,7 @@ public class SpringApplication {
 	// 20201202 将环境绑定到{@link springapplication}。
 	protected void bindToSpringApplication(ConfigurableEnvironment environment) {
 		try {
-			// 20201202 构建${}占位符解析器binder
+			// 20201202 构建${}占位符解析器binder, 即为"spring.main"属性绑定一个binder, 如果绑定失败则抛出异常
 			Binder.get(environment).bind("spring.main",
 					// 20201202 构造Bindable实例 -> ResolvableType实例 & 开箱类型 & 无注释
 					Bindable.ofInstance(this)

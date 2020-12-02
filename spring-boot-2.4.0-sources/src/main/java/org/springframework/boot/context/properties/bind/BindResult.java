@@ -33,6 +33,7 @@ import org.springframework.util.ObjectUtils;
  * @author Madhura Bhave
  * @since 2.0.0
  */
+// 20201202 返回{@link Binder}绑定操作结果的容器对象。可能包含成功绑定的对象或空结果。
 public final class BindResult<T> {
 
 	private static final BindResult<?> UNBOUND = new BindResult<>(null);

@@ -60,8 +60,10 @@ public class Binder {
 
 	private final PlaceholdersResolver placeholdersResolver;
 
+	// 20201202 用于类型转换的服务接口
 	private final ConversionService conversionService;
 
+	// 20201202 属性注册的中心接口
 	private final Consumer<PropertyEditorRegistry> propertyEditorInitializer;
 
 	// 20201202 默认绑定后的回调接口
@@ -223,9 +225,16 @@ public class Binder {
 	 */
 	// 20201202 使用此绑定器的{@link ConfigurationPropertySource property sources}绑定指定的目标{@link Bindable}。
 	public <T> BindResult<T> bind(String name, Bindable<T> target) {
+		// 20201202 String name => CharSequence name
 		return bind(
+				// 20201202 构造ConfigurationPropertyName对象, 持有属性解析后的对象
 				ConfigurationPropertyName.of(name),
-				target, null);
+
+				// 20201202 Bindable - Binder实例
+				target,
+
+				// 不适用助手类
+				null);
 	}
 
 	/**
@@ -257,13 +266,15 @@ public class Binder {
 	/**
 	 * Bind the specified target {@link Bindable} using this binder's
 	 * {@link ConfigurationPropertySource property sources}.
-	 * @param name the configuration property name to bind
-	 * @param target the target bindable
-	 * @param handler the bind handler (may be {@code null})
-	 * @param <T> the bound type
-	 * @return the binding result (never {@code null})
+	 * @param name the configuration property name to bind	// 20201202 要绑定的配置属性名称
+	 * @param target the target bindable // 20201202 目标绑定
+	 * @param handler the bind handler (may be {@code null}) // 20201202 绑定处理程序（可以是{@code null}）
+	 * @param <T> the bound type // 20201202 绑定类型
+	 * @return the binding result (never {@code null}) // 20201202 绑定结果（never{@code null}）
 	 */
+	// 20201202 使用此绑定器绑定指定的目标{@link Bindable}
 	public <T> BindResult<T> bind(ConfigurationPropertyName name, Bindable<T> target, BindHandler handler) {
+		// 20201202 bindable实例绑定配置属性名称
 		T bound = bind(name, target, handler, false);
 		return BindResult.of(bound);
 	}
@@ -329,23 +340,42 @@ public class Binder {
 		return bind(name, target, handler, true);
 	}
 
+	// 20201202 绑定操作的实现逻辑
 	private <T> T bind(ConfigurationPropertyName name, Bindable<T> target, BindHandler handler, boolean create) {
+		// 20201202 配置属性名称不能为空
 		Assert.notNull(name, "Name must not be null");
+
+		// 20201202 绑定实例不能为空
 		Assert.notNull(target, "Target must not be null");
+
+		// 20201202 如果助手处理程序为空, 则使用默认的处理程序BindHandler
 		handler = (handler != null) ? handler : this.defaultBindHandler;
+
+		// 20201202 构建BindContext
 		Context context = new Context();
+
+		// 20201202 执行绑定操作的实现逻辑
 		return bind(name, target, handler, context, false, create);
 	}
 
+	// 20201202 执行绑定操作的实现逻辑
 	private <T> T bind(ConfigurationPropertyName name, Bindable<T> target, BindHandler handler, Context context,
 			boolean allowRecursiveBinding, boolean create) {
 		try {
+			// 20201202 绑定开始时进行回调
 			Bindable<T> replacementTarget = handler.onStart(name, target, context);
 			if (replacementTarget == null) {
+				// 20201202 如果回调结果为空, 则抛出绑定异常
 				return handleBindResult(name, target, handler, context, null, create);
 			}
+
+			// 20201202 否则设置绑定回调结果
 			target = replacementTarget;
+
+			// 20201202 获取绑定实例结果
 			Object bound = bindObject(name, target, handler, context, allowRecursiveBinding);
+
+			// 20201202 如果绑定结果为空, 将会抛出绑定异常
 			return handleBindResult(name, target, handler, context, bound, create);
 		}
 		catch (Exception ex) {
@@ -546,12 +576,14 @@ public class Binder {
 	/**
 	 * Context used when binding and the {@link BindContext} implementation.
 	 */
+	// 20201202 绑定和{@link BindContext}实现时使用的上下文。
 	final class Context implements BindContext {
-
+		// 20201202 用于处理绑定期间所需的任何转换的实用程序
 		private final BindConverter converter;
 
 		private int depth;
 
+		// 20201202 属性源列表
 		private final List<ConfigurationPropertySource> source = Arrays.asList((ConfigurationPropertySource) null);
 
 		private int sourcePushCount;
@@ -562,7 +594,9 @@ public class Binder {
 
 		private ConfigurationProperty configurationProperty;
 
+		// 20201202 构建BindContext
 		Context() {
+			// 20201202 注册用于处理绑定期间所需的任何转换的实用程序 => 根据用于类型转换的服务接口 & 属性注册的中心接口获取
 			this.converter = BindConverter.get(Binder.this.conversionService, Binder.this.propertyEditorInitializer);
 		}
 

@@ -26,6 +26,7 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyS
  * @author Madhura Bhave
  * @since 2.0.0
  */
+// 20201202 {@link BindHandler BindHandlers}使用的上下文信息。
 public interface BindContext {
 
 	/**
