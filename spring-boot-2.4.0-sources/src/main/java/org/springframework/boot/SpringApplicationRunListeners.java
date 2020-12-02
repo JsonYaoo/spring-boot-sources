@@ -70,6 +70,7 @@ class SpringApplicationRunListeners {
 				});
 	}
 
+	// 20201202 环境准备完毕事件
 	void environmentPrepared(ConfigurableBootstrapContext bootstrapContext, ConfigurableEnvironment environment) {
 		doWithListeners("spring.boot.application.environment-prepared",
 				(listener) -> listener.environmentPrepared(bootstrapContext, environment));
@@ -119,7 +120,9 @@ class SpringApplicationRunListeners {
 		}
 	}
 
+	// 20201202 执行监听事件
 	private void doWithListeners(String stepName, Consumer<SpringApplicationRunListener> listenerAction) {
+		// 20201202 没有指定主类的监听事件
 		doWithListeners(stepName, listenerAction, null);
 	}
 

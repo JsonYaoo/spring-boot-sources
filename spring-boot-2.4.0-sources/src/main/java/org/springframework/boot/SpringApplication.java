@@ -253,6 +253,7 @@ public class SpringApplication {
 
 	private boolean logStartupInfo = true;
 
+	// 20201202 允许读取命令行参数Properties属性
 	private boolean addCommandLineProperties = true;
 
 	private boolean addConversionService = true;
@@ -278,11 +279,13 @@ public class SpringApplication {
 
 	private List<ApplicationListener<?>> listeners;
 
+	// 20201202 默认Properties源
 	private Map<String, Object> defaultProperties;
 
 	// 20201201 启动引导实例结果集 -> 本质上是个回调接口, 声明了初始化BootstrapRegistry SpringBoot最初注册表实例的方法
 	private List<Bootstrapper> bootstrappers;
 
+	// 20201202 额外的配置文件集合
 	private Set<String> additionalProfiles = Collections.emptySet();
 
 	private boolean allowBeanDefinitionOverriding;
@@ -452,11 +455,23 @@ public class SpringApplication {
 		// Create and configure the environment
 		// 20201201 创建和配置环境
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
+
+		// 20201202 配置环境 -> 命令行环境 & profile属性对应的环境
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
+
+		// 20201202 环境绑定属性源 -> 添加Spring属性源
 		ConfigurationPropertySources.attach(environment);
+
+		// 20201202 监听器执行环境准备完毕事件
 		listeners.environmentPrepared(bootstrapContext, environment);
+
+		// 20201202 移动“defaultProperties”属性源，使其成为给定{@link ConfigurableEnvironment}中的最后一个源。
 		DefaultPropertiesPropertySource.moveToEnd(environment);
+
+		// 20201202 为环境配置额外的配置文件 -> profiles: spring.profiles.active
 		configureAdditionalProfiles(environment);
+
+		// 20201202
 		bindToSpringApplication(environment);
 		if (!this.isCustomEnvironment) {
 			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
@@ -608,7 +623,7 @@ public class SpringApplication {
 		// 20201201 根据服务器类型启动环境
 		switch (this.webApplicationType) {
 		case SERVLET:
-			// 20201201 启动Servlet环境
+			// 20201201 启动标准Servlet环境 => 提供Servlet所有实例 & 配置环境
 			return new StandardServletEnvironment();
 		case REACTIVE:
 			return new StandardReactiveWebEnvironment();
@@ -628,12 +643,23 @@ public class SpringApplication {
 	 * @see #configureProfiles(ConfigurableEnvironment, String[])
 	 * @see #configurePropertySources(ConfigurableEnvironment, String[])
 	 */
+	// 20201202 模板方法委托给{@link #configurePropertySources（ConfigurableEnvironment，String[]）
+	// 20201202 和{@link #configureProfiles（ConfigurableEnvironment，String[]）}的模板方法。重写此方法以实现对环境自定义的完全控制，
+	// 20201202 或重写上述方法之一以分别对属性源或配置文件进行细粒度控制。 => 配置环境: 命令行环境 & profile属性对应的环境
 	protected void configureEnvironment(ConfigurableEnvironment environment, String[] args) {
+		// 20201202 默认为true, 需要添加property转换服务
 		if (this.addConversionService) {
+			// 20201202 应用程序注册表注册服务 => 配置、注册、回调通知 -> 单例, 双重检查锁
 			ConversionService conversionService = ApplicationConversionService.getSharedInstance();
+
+			// 20201202 给环境指定property转换服务
 			environment.setConversionService((ConfigurableConversionService) conversionService);
 		}
+
+		// 20201202 根据args配置命令行property对象
 		configurePropertySources(environment, args);
+
+		// 20201202 配置{@code spring.profiles.active} profile环境属性
 		configureProfiles(environment, args);
 	}
 
@@ -644,20 +670,40 @@ public class SpringApplication {
 	 * @param args arguments passed to the {@code run} method
 	 * @see #configureEnvironment(ConfigurableEnvironment, String[])
 	 */
+	// 20201202 添加、删除或重新排序此应用程序环境中的任何{@link PropertySource}。 => 根据args配置命令行property对象
 	protected void configurePropertySources(ConfigurableEnvironment environment, String[] args) {
+		// 20201202 获取可变的PropertySource集合
 		MutablePropertySources sources = environment.getPropertySources();
+
+		// 20201202 如果存在默认Properties源, 则创建map类型PropertySource集合
 		DefaultPropertiesPropertySource.ifNotEmpty(this.defaultProperties, sources::addLast);
+
+		// 20201202 如果允许读取命令行参数Properties属性
 		if (this.addCommandLineProperties && args.length > 0) {
+			//20201202 获取{@link CommandLinePropertySource}实例的默认名称 => commandLineArgs
 			String name = CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME;
+
+			// 20201202 如果PropertySource源集合包含CommandLinePropertySource实例
 			if (sources.contains(name)) {
+				// 20201202 则获取该CommandLinePropertySource实例
 				PropertySource<?> source = sources.get(name);
+
+				// 20201202 初始化一个混合PropertySource对象
 				CompositePropertySource composite = new CompositePropertySource(name);
+
+				// 20201202 添加SimpleCommandLinePropertySource实例添加到链的末尾。
 				composite.addPropertySource(
+						// 20201202 根据main参数构造命令行参数propertySource
 						new SimpleCommandLinePropertySource("springApplicationCommandLineArgs", args));
+
+				// 20201202 将该CommandLinePropertySource实例添加到链的末尾。
 				composite.addPropertySource(source);
+
+				// 20201202 根据名称替换掉PropertySource源集合中对应的CommandLinePropertySource实例
 				sources.replace(name, composite);
 			}
 			else {
+				// 20201202 如果PropertySource源集合没包含CommandLinePropertySource实例, 则根据参数添加SimpleCommandLinePropertySource实例添加到链的末尾。
 				sources.addFirst(new SimpleCommandLinePropertySource(args));
 			}
 		}
@@ -672,14 +718,23 @@ public class SpringApplication {
 	 * @see #configureEnvironment(ConfigurableEnvironment, String[])
 	 * @see org.springframework.boot.context.config.ConfigFileApplicationListener
 	 */
+	// 20201202 配置此应用程序环境的活动（或默认情况下是活动的）配置文件。在配置期间，可以通过{@code spring.profiles.active}属性进行profile处理。
 	protected void configureProfiles(ConfigurableEnvironment environment, String[] args) {
 	}
 
+	// 20201202 配置额外的配置文件
 	private void configureAdditionalProfiles(ConfigurableEnvironment environment) {
+		// 20201202 额外的配置文件集合为空
 		if (!CollectionUtils.isEmpty(this.additionalProfiles)) {
+			// 20201202 获取有序的激活的配置文件Set集合 => spring.profiles.active
 			Set<String> profiles = new LinkedHashSet<>(Arrays.asList(environment.getActiveProfiles()));
+
+			// 20201202 如果这些配置文件没有包含那些额外的配置文件集
 			if (!profiles.containsAll(this.additionalProfiles)) {
+				// 20201202 则全部追加进去
 				profiles.addAll(this.additionalProfiles);
+
+				// 20201202 替换现有的配置文件集
 				environment.setActiveProfiles(StringUtils.toStringArray(profiles));
 			}
 		}
@@ -696,9 +751,14 @@ public class SpringApplication {
 	 * Bind the environment to the {@link SpringApplication}.
 	 * @param environment the environment to bind
 	 */
+	// 20201202 将环境绑定到{@link springapplication}。
 	protected void bindToSpringApplication(ConfigurableEnvironment environment) {
 		try {
-			Binder.get(environment).bind("spring.main", Bindable.ofInstance(this));
+			// 20201202 构建${}占位符解析器binder
+			Binder.get(environment).bind("spring.main",
+					// 20201202 构造Bindable实例 -> ResolvableType实例 & 开箱类型 & 无注释
+					Bindable.ofInstance(this)
+			);
 		}
 		catch (Exception ex) {
 			throw new IllegalStateException("Cannot bind to SpringApplication", ex);

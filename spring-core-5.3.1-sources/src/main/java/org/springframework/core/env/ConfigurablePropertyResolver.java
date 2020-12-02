@@ -28,6 +28,7 @@ import org.springframework.lang.Nullable;
  * @author Chris Beams
  * @since 3.1
  */
+// 20201202 Configuration接口并不是实现{@link PropertyResolver}所有的方法。提供访问和自定义{@link org.springframework.core.convert.ConversionService ConversionService}来进行转换property。
 public interface ConfigurablePropertyResolver extends PropertyResolver {
 
 	/**
@@ -55,6 +56,8 @@ public interface ConfigurablePropertyResolver extends PropertyResolver {
 	 * @see #getConversionService()
 	 * @see org.springframework.core.convert.converter.ConverterRegistry#addConverter
 	 */
+	// 20201202 设置在对属性执行类型转换时要使用的{@link ConfigurableConversionService}。注意：作为完全替换{@code ConversionService}的替代方法，
+	// 20201202 可以考虑通过钻取{@link #getConversionService()}并调用{@code addConverter}等方法来添加或删除单个{@code Converter}。
 	void setConversionService(ConfigurableConversionService conversionService);
 
 	/**

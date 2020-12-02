@@ -27,6 +27,7 @@ import org.springframework.core.convert.converter.ConverterRegistry;
  * @author Juergen Hoeller
  * @since 3.0
  */
+// 20201202 字段格式化逻辑的注册表。
 public interface FormatterRegistry extends ConverterRegistry {
 
 	/**

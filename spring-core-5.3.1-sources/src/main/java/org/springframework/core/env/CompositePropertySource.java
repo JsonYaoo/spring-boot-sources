@@ -27,10 +27,18 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201202
+ * A. 迭代一组{@link PropertySource}实例的复合{@link PropertySource}实现。在多个属性源共享同一名称的情况下，例如向{@code @PropertySource}提供多个值时，需要使用此选项。
+ * B. 从spring4.1.2开始，这个类扩展了{@link EnumerablePropertySource}而不是普通的{@link PropertySource}，根据所有包含的源（尽可能远的）累积的属性名公开
+ *    {@link #getPropertyNames（）}。
+ */
+/**
+ * A.
  * Composite {@link PropertySource} implementation that iterates over a set of
  * {@link PropertySource} instances. Necessary in cases where multiple property sources
  * share the same name, e.g. when multiple values are supplied to {@code @PropertySource}.
  *
+ * B.
  * <p>As of Spring 4.1.2, this class extends {@link EnumerablePropertySource} instead
  * of plain {@link PropertySource}, exposing {@link #getPropertyNames()} based on the
  * accumulated property names from all contained sources (as far as possible).
@@ -40,8 +48,10 @@ import org.springframework.util.StringUtils;
  * @author Phillip Webb
  * @since 3.1.1
  */
+// 20201202 混合PropertySource对象
 public class CompositePropertySource extends EnumerablePropertySource<Object> {
 
+	// 20201202 propertySource集合
 	private final Set<PropertySource<?>> propertySources = new LinkedHashSet<>();
 
 
@@ -94,6 +104,7 @@ public class CompositePropertySource extends EnumerablePropertySource<Object> {
 	 * Add the given {@link PropertySource} to the end of the chain.
 	 * @param propertySource the PropertySource to add
 	 */
+	// 20201202 将给定的{@link PropertySource}添加到链的末尾。
 	public void addPropertySource(PropertySource<?> propertySource) {
 		this.propertySources.add(propertySource);
 	}

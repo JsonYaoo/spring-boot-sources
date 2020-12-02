@@ -616,9 +616,11 @@ public abstract class Assert {
 	 * of the offending object's type will be appended.
 	 * @throws IllegalArgumentException if the object is not an instance of type
 	 */
+	// 20201202 断言提供的对象是所提供类的实例。
 	public static void isInstanceOf(Class<?> type, @Nullable Object obj, String message) {
 		notNull(type, "Type to check against must not be null");
 		if (!type.isInstance(obj)) {
+			// 20201202 如果obj实例不是type类型的实例, 则抛出实例断言提示语
 			instanceCheckFailed(type, obj, message);
 		}
 	}
@@ -649,6 +651,7 @@ public abstract class Assert {
 	 * @param obj the object to check
 	 * @throws IllegalArgumentException if the object is not an instance of type
 	 */
+	// 20201202 断言提供的对象是所提供类的实例
 	public static void isInstanceOf(Class<?> type, @Nullable Object obj) {
 		isInstanceOf(type, obj, "");
 	}
@@ -707,7 +710,7 @@ public abstract class Assert {
 		isAssignable(superType, subType, "");
 	}
 
-
+	// 20201202 抛出实例断言提示语
 	private static void instanceCheckFailed(Class<?> type, @Nullable Object obj, @Nullable String msg) {
 		String className = (obj != null ? obj.getClass().getName() : "null");
 		String result = "";

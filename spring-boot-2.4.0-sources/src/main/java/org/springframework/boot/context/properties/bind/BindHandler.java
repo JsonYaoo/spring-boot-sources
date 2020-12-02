@@ -26,6 +26,7 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyN
  * @author Madhura Bhave
  * @since 2.0.0
  */
+// 20201202 回调接口，可用于在元素{@link Binder binding}期间处理其他逻辑。
 public interface BindHandler {
 
 	/**

@@ -32,6 +32,8 @@ import org.springframework.lang.Nullable;
  * @since 3.1.2
  * @see ConfigurableWebApplicationContext#getEnvironment()
  */
+// 20201202 {@link ConfigurableEnvironment}的专门化允许初始化与servlet相关的{@linkorg.springframework.core.env.PropertySource}对象,
+// 20201202 在{@link ServletContext}和（可选）{@link ServletConfig}可用的最早时刻。
 public interface ConfigurableWebEnvironment extends ConfigurableEnvironment {
 
 	/**

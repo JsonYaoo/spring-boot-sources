@@ -48,6 +48,7 @@ import org.springframework.util.Assert;
  * @author Stephane Nicoll
  * @author Phillip Webb
  */
+// 20201202 {@link DataObjectBinder}用于不可变值对象。
 class ValueObjectBinder implements DataObjectBinder {
 
 	private final BindConstructorProvider constructorProvider;

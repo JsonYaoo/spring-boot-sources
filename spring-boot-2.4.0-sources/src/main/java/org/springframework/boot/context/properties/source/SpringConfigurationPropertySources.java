@@ -38,13 +38,16 @@ import org.springframework.util.ConcurrentReferenceHashMap.ReferenceType;
  *
  * @author Phillip Webb
  */
+// 20201202 适应变换Spring的{@link MutablePropertySources}到{@link ConfigurationPropertySource ConfigurationPropertySources}.
 class SpringConfigurationPropertySources implements Iterable<ConfigurationPropertySource> {
 
+	// 20201202 属性源集合
 	private final Iterable<PropertySource<?>> sources;
 
 	private final Map<PropertySource<?>, ConfigurationPropertySource> cache = new ConcurrentReferenceHashMap<>(16,
 			ReferenceType.SOFT);
 
+	// 20201202 构建Spring的属性源 -> 展开的所有属性源
 	SpringConfigurationPropertySources(Iterable<PropertySource<?>> sources) {
 		Assert.notNull(sources, "Sources must not be null");
 		this.sources = sources;

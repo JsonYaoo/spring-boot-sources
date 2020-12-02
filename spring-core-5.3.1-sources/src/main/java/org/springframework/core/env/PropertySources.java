@@ -29,6 +29,7 @@ import org.springframework.lang.Nullable;
  * @since 3.1
  * @see PropertySource
  */
+// 20201202 包含一个或多个{@link PropertySource}对象的持有者。
 public interface PropertySources extends Iterable<PropertySource<?>> {
 
 	/**

@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
  * @since 3.1
  * @see PropertiesPropertySource
  */
+// 20201202 {@link PropertySource}从{@code map}对象读取键和值。基础映射不应包含任何{@code null}值，以符合{@link #getProperty}和{@link #containsProperty}语义。
 public class MapPropertySource extends EnumerablePropertySource<Map<String, Object>> {
 
 	/**

@@ -61,6 +61,7 @@ import org.springframework.util.StringUtils;
  * @author David Haraburda
  * @since 3.0
  */
+// 20201202 基本{@link ConversionService}实现适合在大多数环境中使用。{@link configurationaregistry}通过@link convertblegistry}间接实现连接。
 public class GenericConversionService implements ConfigurableConversionService {
 
 	/**

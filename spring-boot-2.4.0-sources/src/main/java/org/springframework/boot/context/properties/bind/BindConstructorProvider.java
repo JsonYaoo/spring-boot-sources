@@ -24,6 +24,7 @@ import java.lang.reflect.Constructor;
  * @author Madhura Bhave
  * @since 2.2.1
  */
+// 20201202 策略接口，用于确定绑定时要使用的特定构造函数。
 @FunctionalInterface
 public interface BindConstructorProvider {
 
@@ -31,6 +32,7 @@ public interface BindConstructorProvider {
 	 * Default {@link BindConstructorProvider} implementation that only returns a value
 	 * when there's a single constructor and when the bindable has no existing value.
 	 */
+	// 20201202 默认的{@link BindConstructorProvider}实现，仅在存在单个构造函数且bindable没有现有值时返回值。
 	BindConstructorProvider DEFAULT = new DefaultBindConstructorProvider();
 
 	/**

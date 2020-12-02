@@ -31,12 +31,14 @@ import org.springframework.util.SystemPropertyUtils;
  * @author Madhura Bhave
  * @since 2.0.0
  */
+// 20201202 {@link PlaceholdersResolver}从{@link PropertySources}解析占位符。
 public class PropertySourcesPlaceholdersResolver implements PlaceholdersResolver {
 
 	private final Iterable<PropertySource<?>> sources;
 
 	private final PropertyPlaceholderHelper helper;
 
+	// 20201202 使用默认分隔符解析器${}
 	public PropertySourcesPlaceholdersResolver(Environment environment) {
 		this(getSources(environment), null);
 	}
@@ -45,10 +47,21 @@ public class PropertySourcesPlaceholdersResolver implements PlaceholdersResolver
 		this(sources, null);
 	}
 
+	// 20201202 构造属性源占位符解析器
 	public PropertySourcesPlaceholdersResolver(Iterable<PropertySource<?>> sources, PropertyPlaceholderHelper helper) {
+		// 20201202 注册属性源
 		this.sources = sources;
-		this.helper = (helper != null) ? helper : new PropertyPlaceholderHelper(SystemPropertyUtils.PLACEHOLDER_PREFIX,
-				SystemPropertyUtils.PLACEHOLDER_SUFFIX, SystemPropertyUtils.VALUE_SEPARATOR, true);
+
+		// 20201202 如果助手类为空, 则创建指定占位符的解析器并注册
+		this.helper = (helper != null) ? helper : new PropertyPlaceholderHelper(
+				// 20201202 指定占位符前缀${
+				SystemPropertyUtils.PLACEHOLDER_PREFIX,
+				// 20201202 指定占位符后缀}
+				SystemPropertyUtils.PLACEHOLDER_SUFFIX,
+				// 20201202 指定占位符分隔符:
+				SystemPropertyUtils.VALUE_SEPARATOR,
+				// 20201202 指定是否能忽略非法占位符true
+				true);
 	}
 
 	@Override
@@ -71,10 +84,16 @@ public class PropertySourcesPlaceholdersResolver implements PlaceholdersResolver
 		return null;
 	}
 
+	// 20201202 根据环境获取属性源
 	private static PropertySources getSources(Environment environment) {
+		// 20201202 环境不能为null
 		Assert.notNull(environment, "Environment must not be null");
+
+		// 20201202 环境必须为ConfigurableEnvironment.class实例
 		Assert.isInstanceOf(ConfigurableEnvironment.class, environment,
 				"Environment must be a ConfigurableEnvironment");
+
+		// 20201202 获取属性源
 		return ((ConfigurableEnvironment) environment).getPropertySources();
 	}
 

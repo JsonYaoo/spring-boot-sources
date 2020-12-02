@@ -26,10 +26,17 @@ import java.util.stream.Stream;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201202
+ * A. {@link PropertySources}接口的默认实现。允许操作包含的属性源，并提供用于复制现有{@code PropertySources}实例的构造函数。
+ * B. 如果在诸如{@link #addFirst}和{@link #addLast}等方法中提到了优先级，那么这与使用{@link PropertyResolver}解析给定属性时搜索属性源的顺序有关。
+ */
+/**
+ * A.
  * The default implementation of the {@link PropertySources} interface.
  * Allows manipulation of contained property sources and provides a constructor
  * for copying an existing {@code PropertySources} instance.
  *
+ * B.
  * <p>Where <em>precedence</em> is mentioned in methods such as {@link #addFirst}
  * and {@link #addLast}, this is with regard to the order in which property sources
  * will be searched when resolving a given property with a {@link PropertyResolver}.
@@ -39,8 +46,10 @@ import org.springframework.lang.Nullable;
  * @since 3.1
  * @see PropertySourcesPropertyResolver
  */
+// 20201202 可变的PropertySource集合
 public class MutablePropertySources implements PropertySources {
 
+	// 20201202 propertySource集合 -> 线程安全
 	private final List<PropertySource<?>> propertySourceList = new CopyOnWriteArrayList<>();
 
 
@@ -112,6 +121,7 @@ public class MutablePropertySources implements PropertySources {
 	/**
 	 * Add the given property source object with lowest precedence.
 	 */
+	// 20201202 添加具有最低优先级的给定属性源对象。
 	public void addLast(PropertySource<?> propertySource) {
 		synchronized (this.propertySourceList) {
 			removeIfPresent(propertySource);
@@ -205,6 +215,7 @@ public class MutablePropertySources implements PropertySources {
 	/**
 	 * Remove the given property source if it is present.
 	 */
+	// 20201202 删除给定的属性源（如果存在）。
 	protected void removeIfPresent(PropertySource<?> propertySource) {
 		this.propertySourceList.remove(propertySource);
 	}

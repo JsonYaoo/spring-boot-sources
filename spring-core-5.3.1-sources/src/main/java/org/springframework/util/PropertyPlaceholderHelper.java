@@ -37,10 +37,13 @@ import org.springframework.lang.Nullable;
  * @author Rob Harrop
  * @since 3.0
  */
+// 20201202 用于处理包含占位符值的字符串的实用程序类。占位符采用{@code${name}}的形式。使用{@code PropertyPlaceholderHelper}，这些占位符可以替换为用户提供的值。
+// 20201202 可以使用{@link Properties}实例或{@link PlaceholderResolver}来提供替换值。
 public class PropertyPlaceholderHelper {
 
 	private static final Log logger = LogFactory.getLog(PropertyPlaceholderHelper.class);
 
+	// 20201202 预定占位符前缀集合
 	private static final Map<String, String> wellKnownSimplePrefixes = new HashMap<>(4);
 
 	static {
@@ -49,9 +52,10 @@ public class PropertyPlaceholderHelper {
 		wellKnownSimplePrefixes.put(")", "(");
 	}
 
-
+	// 20201202 占位符前缀
 	private final String placeholderPrefix;
 
+	// 20201202 占位符后缀
 	private final String placeholderSuffix;
 
 	private final String simplePrefix;
@@ -74,28 +78,40 @@ public class PropertyPlaceholderHelper {
 
 	/**
 	 * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
-	 * @param placeholderPrefix the prefix that denotes the start of a placeholder
-	 * @param placeholderSuffix the suffix that denotes the end of a placeholder
+	 * @param placeholderPrefix the prefix that denotes the start of a placeholder // 20201202 表示占位符开头的前缀
+	 * @param placeholderSuffix the suffix that denotes the end of a placeholder // 20201202 表示占位符开头的后缀
 	 * @param valueSeparator the separating character between the placeholder variable
-	 * and the associated default value, if any
+	 * and the associated default value, if any // 20201202 占位符变量和关联的默认值（如果有）之间的分隔符
 	 * @param ignoreUnresolvablePlaceholders indicates whether unresolvable placeholders should
-	 * be ignored ({@code true}) or cause an exception ({@code false})
+	 * be ignored ({@code true}) or cause an exception ({@code false}) // 20201202 指示是应忽略不可解析的占位符（{@code true}）还是导致异常（{@code false}）
 	 */
+	// 20201202 创建一个新的{@code PropertyPlaceholderHelper}，它使用提供的前缀和后缀。
 	public PropertyPlaceholderHelper(String placeholderPrefix, String placeholderSuffix,
 			@Nullable String valueSeparator, boolean ignoreUnresolvablePlaceholders) {
 
+		// 20201202 占位符前后缀不能为空
 		Assert.notNull(placeholderPrefix, "'placeholderPrefix' must not be null");
 		Assert.notNull(placeholderSuffix, "'placeholderSuffix' must not be null");
+
+		// 20201202 注册占位符前后缀
 		this.placeholderPrefix = placeholderPrefix;
 		this.placeholderSuffix = placeholderSuffix;
+
+		// 20201202 根据占位符后缀获取前缀
 		String simplePrefixForSuffix = wellKnownSimplePrefixes.get(this.placeholderSuffix);
+
+		// 20201202 如果占位符前缀非法则使用带出的前缀
 		if (simplePrefixForSuffix != null && this.placeholderPrefix.endsWith(simplePrefixForSuffix)) {
 			this.simplePrefix = simplePrefixForSuffix;
 		}
 		else {
 			this.simplePrefix = this.placeholderPrefix;
 		}
+
+		// 20201202 注册值分隔符
 		this.valueSeparator = valueSeparator;
+
+		// 20201202 注册非法分隔符忽略标志
 		this.ignoreUnresolvablePlaceholders = ignoreUnresolvablePlaceholders;
 	}
 

@@ -34,6 +34,8 @@ import org.springframework.util.CollectionUtils;
  * @author Phillip Webb
  * @since 2.4.0
  */
+// 20201202 {@link mappropertysource}包含直接为{@code springapplication}提供的默认属性。按照惯例，{@link defaultproperties propertySource}始终是
+// 20201202 {@link Environment}中的最后一个属性源。
 public class DefaultPropertiesPropertySource extends MapPropertySource {
 
 	/**
@@ -66,6 +68,7 @@ public class DefaultPropertiesPropertySource extends MapPropertySource {
 	 * @param action the action used to consume the
 	 * {@link DefaultPropertiesPropertySource}
 	 */
+	// 20201202 如果提供的源不为空，则创建一个consume a new{@link defaultproperties propertySource}实例。
 	public static void ifNotEmpty(Map<String, Object> source, Consumer<DefaultPropertiesPropertySource> action) {
 		if (!CollectionUtils.isEmpty(source) && action != null) {
 			action.accept(new DefaultPropertiesPropertySource(source));
@@ -77,6 +80,7 @@ public class DefaultPropertiesPropertySource extends MapPropertySource {
 	 * given {@link ConfigurableEnvironment}.
 	 * @param environment the environment to update
 	 */
+	// 20201202 移动“defaultProperties”属性源，使其成为给定{@link ConfigurableEnvironment}中的最后一个源。
 	public static void moveToEnd(ConfigurableEnvironment environment) {
 		moveToEnd(environment.getPropertySources());
 	}
@@ -86,7 +90,9 @@ public class DefaultPropertiesPropertySource extends MapPropertySource {
 	 * given {@link MutablePropertySources}.
 	 * @param propertySources the property sources to update
 	 */
+	// 20201202 移动“defaultProperties”属性源，使其成为给定{@link MutablePropertySources}中的最后一个源。
 	public static void moveToEnd(MutablePropertySources propertySources) {
+		// 20201202 删除defaultProperties属性源, 然后在末尾添加回来
 		PropertySource<?> propertySource = propertySources.remove(NAME);
 		if (propertySource != null) {
 			propertySources.addLast(propertySource);

@@ -50,6 +50,7 @@ import org.springframework.util.Assert;
  * @author Madhura Bhave
  * @since 2.0.0
  */
+// 20201202 绑定一个或多个{@link ConfigurationPropertySource ConfigurationPropertySources}中的对象的容器对象。
 public class Binder {
 
 	private static final Set<Class<?>> NON_BEAN_CLASSES = Collections
@@ -63,8 +64,10 @@ public class Binder {
 
 	private final Consumer<PropertyEditorRegistry> propertyEditorInitializer;
 
+	// 20201202 默认绑定后的回调接口
 	private final BindHandler defaultBindHandler;
 
+	// 20201202 data绑定实例集合
 	private final List<DataObjectBinder> dataObjectBinders;
 
 	/**
@@ -123,17 +126,20 @@ public class Binder {
 
 	/**
 	 * Create a new {@link Binder} instance for the specified sources.
-	 * @param sources the sources used for binding
-	 * @param placeholdersResolver strategy to resolve any property placeholders
+	 * @param sources the sources used for binding	// 20201202 用于绑定的源
+	 * @param placeholdersResolver strategy to resolve any property placeholders // 20201202 解析任何属性占位符的策略
 	 * @param conversionService the conversion service to convert values (or {@code null}
-	 * to use {@link ApplicationConversionService})
+	 * to use {@link ApplicationConversionService}) // 20201202 转换值的转换服务（或{@code null}使用{@link ApplicationConversionService}）
+	 *
+	 * // 20201202 初始化器用于配置可以转换值的属性编辑器（如果不需要初始化，则使用{@code null}）。通常用于调用{@link ConfigurableListableBeanFactory#copyRegisteredEditorsTo}。
 	 * @param propertyEditorInitializer initializer used to configure the property editors
 	 * that can convert values (or {@code null} if no initialization is required). Often
 	 * used to call {@link ConfigurableListableBeanFactory#copyRegisteredEditorsTo}.
 	 * @param defaultBindHandler the default bind handler to use if none is specified when
-	 * binding
+	 * binding // 20201202 绑定时未指定时要使用的默认绑定处理程序
 	 * @since 2.2.0
 	 */
+	// 20201202 为指定的源创建一个新的{@link binder}实例。
 	public Binder(Iterable<ConfigurationPropertySource> sources, PlaceholdersResolver placeholdersResolver,
 			ConversionService conversionService, Consumer<PropertyEditorRegistry> propertyEditorInitializer,
 			BindHandler defaultBindHandler) {
@@ -150,26 +156,46 @@ public class Binder {
 	 * that can convert values (or {@code null} if no initialization is required). Often
 	 * used to call {@link ConfigurableListableBeanFactory#copyRegisteredEditorsTo}.
 	 * @param defaultBindHandler the default bind handler to use if none is specified when
-	 * binding
+	 * binding // 20201220 绑定时未指定时要使用的默认绑定处理程序
 	 * @param constructorProvider the constructor provider which provides the bind
-	 * constructor to use when binding
+	 * constructor to use when binding // 20201202 提供绑定时要使用的绑定构造函数的构造函数提供程序
 	 * @since 2.2.1
 	 */
+	// 20201202 为指定的源创建一个新的{@linkbinder}实例。
 	public Binder(Iterable<ConfigurationPropertySource> sources, PlaceholdersResolver placeholdersResolver,
 			ConversionService conversionService, Consumer<PropertyEditorRegistry> propertyEditorInitializer,
 			BindHandler defaultBindHandler, BindConstructorProvider constructorProvider) {
+		// 202021202 属性源不能为空
 		Assert.notNull(sources, "Sources must not be null");
+
+		// 20201202 注册属性源
 		this.sources = sources;
+
+		// 20201202 注册${}占位符解析器
 		this.placeholdersResolver = (placeholdersResolver != null) ? placeholdersResolver : PlaceholdersResolver.NONE;
+
+		// 20201202 注册默认应用程序共享实例
 		this.conversionService = (conversionService != null) ? conversionService
 				: ApplicationConversionService.getSharedInstance();
+
+		// 20201202 注册属性注册中心
 		this.propertyEditorInitializer = propertyEditorInitializer;
+
+		// 20201202 注册绑定后的回调接口
 		this.defaultBindHandler = (defaultBindHandler != null) ? defaultBindHandler : BindHandler.DEFAULT;
+
+		// 20201202 注册绑定策略接口实现
 		if (constructorProvider == null) {
 			constructorProvider = BindConstructorProvider.DEFAULT;
 		}
+
+		// 20201202 构建值绑定对象
 		ValueObjectBinder valueObjectBinder = new ValueObjectBinder(constructorProvider);
+
+		// 20201202 默认data绑定实例
 		JavaBeanBinder javaBeanBinder = JavaBeanBinder.INSTANCE;
+
+		// 20201202 初始化data绑定实例集合 -> 其中unmodifiableList表示: 不可修改的集合
 		this.dataObjectBinders = Collections.unmodifiableList(Arrays.asList(valueObjectBinder, javaBeanBinder));
 	}
 
@@ -195,8 +221,11 @@ public class Binder {
 	 * @return the binding result (never {@code null})
 	 * @see #bind(ConfigurationPropertyName, Bindable, BindHandler)
 	 */
+	// 20201202 使用此绑定器的{@link ConfigurationPropertySource property sources}绑定指定的目标{@link Bindable}。
 	public <T> BindResult<T> bind(String name, Bindable<T> target) {
-		return bind(ConfigurationPropertyName.of(name), target, null);
+		return bind(
+				ConfigurationPropertyName.of(name),
+				target, null);
 	}
 
 	/**
@@ -487,7 +516,9 @@ public class Binder {
 	 * {@link ConfigurationPropertySources})
 	 * @return a {@link Binder} instance
 	 */
+	// 20201202 从指定的环境创建一个新的{@linkbinder}实例。
 	public static Binder get(Environment environment) {
+		// 20201202 不适用助手类
 		return get(environment, null);
 	}
 
@@ -495,14 +526,20 @@ public class Binder {
 	 * Create a new {@link Binder} instance from the specified environment.
 	 * @param environment the environment source (must have attached
 	 * {@link ConfigurationPropertySources})
-	 * @param defaultBindHandler the default bind handler to use if none is specified when
+	 * @param defaultBindHandler the default bind handler to use if none is specified when // 20201202 当没有指定时要使用的默认绑定处理程序
 	 * binding
 	 * @return a {@link Binder} instance
 	 * @since 2.2.0
 	 */
+	// 20201202 从指定的环境创建一个新的{@linkbinder}实例。
 	public static Binder get(Environment environment, BindHandler defaultBindHandler) {
+		// 20201202 根据环境获取Spring属性源(展开的所有属性源)
 		Iterable<ConfigurationPropertySource> sources = ConfigurationPropertySources.get(environment);
+
+		// 20201202 使用默认分隔符解析器${}
 		PropertySourcesPlaceholdersResolver placeholdersResolver = new PropertySourcesPlaceholdersResolver(environment);
+
+		// 20201202 为指定的源创建一个新的{@link binder}实例, 使用${}占位符解析器
 		return new Binder(sources, placeholdersResolver, null, null, defaultBindHandler);
 	}
 

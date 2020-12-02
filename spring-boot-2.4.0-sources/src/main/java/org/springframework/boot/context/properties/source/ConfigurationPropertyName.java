@@ -26,15 +26,30 @@ import java.util.function.Function;
 import org.springframework.util.Assert;
 
 /**
+ * 20201202
+ * A. 由点分隔的元素组成的配置属性名。用户创建的名称可以包含字符“{@code a-z}”“{@code 0-9}”）和“{@code-}”，它们必须是小写的，并且必须以字母数字字符开头。
+ *    “{@code-}”纯粹用于格式化，即“{@code foo-bar}”和“{@code foobar}”被认为是等效的。
+ * B. “{@code[}”和“{@code]}”字符可用于指示关联索引（即{@link Map}键或{@link Collection}索引）。索引名称不受限制，并且视为区分大小写。
+ * C. 以下是一些典型的例子：
+ * 		a. {@code spring.main.banner-mode}
+ * 		b. {@code server.hosts[0].name}
+ * 		c. {@code log[org.springboot].level}
+ */
+/**
+ * A.
  * A configuration property name composed of elements separated by dots. User created
  * names may contain the characters "{@code a-z}" "{@code 0-9}") and "{@code -}", they
  * must be lower-case and must start with an alpha-numeric character. The "{@code -}" is
  * used purely for formatting, i.e. "{@code foo-bar}" and "{@code foobar}" are considered
  * equivalent.
+ *
+ * B.
  * <p>
  * The "{@code [}" and "{@code ]}" characters may be used to indicate an associative
  * index(i.e. a {@link Map} key or a {@link Collection} index. Indexes names are not
  * restricted and are considered case-sensitive.
+ *
+ * C.
  * <p>
  * Here are some typical examples:
  * <ul>
@@ -49,6 +64,7 @@ import org.springframework.util.Assert;
  * @see #of(CharSequence)
  * @see ConfigurationPropertySource
  */
+// 20201202 由点分隔的元素组成的配置属性名
 public final class ConfigurationPropertyName implements Comparable<ConfigurationPropertyName> {
 
 	private static final String EMPTY_STRING = "";
@@ -518,6 +534,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	 * @return a {@link ConfigurationPropertyName} instance
 	 * @throws InvalidConfigurationPropertyNameException if the name is not valid
 	 */
+	// 20201202 为指定的字符串返回{@link ConfigurationPropertyName}。
 	public static ConfigurationPropertyName of(CharSequence name) {
 		return of(name, false);
 	}
@@ -536,11 +553,12 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	/**
 	 * Return a {@link ConfigurationPropertyName} for the specified string.
 	 * @param name the source name
-	 * @param returnNullIfInvalid if null should be returned if the name is not valid
+	 * @param returnNullIfInvalid if null should be returned if the name is not valid // 20201202 如果名称无效，则应返回if null
 	 * @return a {@link ConfigurationPropertyName} instance
 	 * @throws InvalidConfigurationPropertyNameException if the name is not valid and
 	 * {@code returnNullIfInvalid} is {@code false}
 	 */
+	// 20201202 为指定的字符串返回{@link ConfigurationPropertyName}。
 	static ConfigurationPropertyName of(CharSequence name, boolean returnNullIfInvalid) {
 		Elements elements = elementsOf(name, returnNullIfInvalid);
 		return (elements != null) ? new ConfigurationPropertyName(elements) : null;
@@ -550,25 +568,41 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 		return elementsOf(name, false, 1);
 	}
 
+	// 20201202 解析name的每个元素
 	private static Elements elementsOf(CharSequence name, boolean returnNullIfInvalid) {
+		// 20201202 ElementsParser解析器初始化容量为6
 		return elementsOf(name, returnNullIfInvalid, ElementsParser.DEFAULT_CAPACITY);
 	}
 
+	// 20201202 解析name的每个元素 -> 指定解析器初始化容量
 	private static Elements elementsOf(CharSequence name, boolean returnNullIfInvalid, int parserCapacity) {
+		// 20201202 如果属性名成为空
 		if (name == null) {
+			// 20201202 默认是不提示报错
 			Assert.isTrue(returnNullIfInvalid, "Name must not be null");
 			return null;
 		}
+
+		// 20201202 如果属性名为长度为0
 		if (name.length() == 0) {
+			// 20201202 则返回一个空列表
 			return Elements.EMPTY;
 		}
+
+		// 20201202 如果第一个元素或者最后一个元素为.
 		if (name.charAt(0) == '.' || name.charAt(name.length() - 1) == '.') {
 			if (returnNullIfInvalid) {
 				return null;
 			}
+
+			// 20201202 则默认抛出name名称非法异常
 			throw new InvalidConfigurationPropertyNameException(name, Collections.singletonList('.'));
 		}
+
+		// 20201202 构造ElementsParser解析器
 		Elements elements = new ElementsParser(name, '.', parserCapacity).parse();
+
+		// 20201202 遍历解析器
 		for (int i = 0; i < elements.getSize(); i++) {
 			if (elements.getType(i) == ElementType.NON_UNIFORM) {
 				if (returnNullIfInvalid) {
@@ -675,6 +709,7 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	 * Allows access to the individual elements that make up the name. We store the
 	 * indexes in arrays rather than a list of object in order to conserve memory.
 	 */
+	// 20201202 允许访问组成名称的各个元素。为了节省内存，我们将索引存储在数组中而不是对象列表中。
 	private static class Elements {
 
 		private static final int[] NO_POSITION = {};
@@ -814,8 +849,9 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	/**
 	 * Main parsing logic used to convert a {@link CharSequence} to {@link Elements}.
 	 */
+	// 20201202 用于将{@link CharSequence}转换为{@link Elements}的主解析逻辑。
 	private static class ElementsParser {
-
+		// 20201202 ElementsParser解析器初始化容量
 		private static final int DEFAULT_CAPACITY = 6;
 
 		private final CharSequence source;
@@ -836,19 +872,32 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 			this(source, separator, DEFAULT_CAPACITY);
 		}
 
+		// 20201202 构造ElementsParser解析器
 		ElementsParser(CharSequence source, char separator, int capacity) {
+			// 20201202 注册属性源
 			this.source = source;
+
+			// 20201202 注册字符分隔符
 			this.separator = separator;
+
+			// 20201202 注册开始capacity长数组
 			this.start = new int[capacity];
+
+			// 20201202 注册结束capacity长数组
 			this.end = new int[capacity];
+
+			// 20201202 注册capacity长ElementType数组
 			this.type = new ElementType[capacity];
 		}
 
+		// 20201202 解析器解析元素
 		Elements parse() {
 			return parse(null);
 		}
 
+		// 20201202 解析器解析元素, 带值操作参数
 		Elements parse(Function<CharSequence, CharSequence> valueProcessor) {
+			// TODO
 			int length = this.source.length();
 			int openBracketCount = 0;
 			int start = 0;
@@ -977,37 +1026,44 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 	/**
 	 * The various types of element that we can detect.
 	 */
+	// 20201202 我们能探测到的各种元素。
 	private enum ElementType {
 
 		/**
 		 * The element is logically empty (contains no valid chars).
 		 */
+		// 20201202 元素在逻辑上为空（不包含有效字符）。
 		EMPTY(false),
 
 		/**
 		 * The element is a uniform name (a-z, 0-9, no dashes, lowercase).
 		 */
+		// 20201202 元素是一个统一的名称（a-z，0-9，无虚线，小写）。
 		UNIFORM(false),
 
 		/**
 		 * The element is almost uniform, but it contains (but does not start with) at
 		 * least one dash.
 		 */
+		// 20201202 元素几乎是一致的，但它至少包含一个破折号（但不以破折号开头）。
 		DASHED(false),
 
 		/**
 		 * The element contains non uniform characters and will need to be converted.
 		 */
+		// 20201202 元素包含非统一字符，需要转换。
 		NON_UNIFORM(false),
 
 		/**
 		 * The element is non-numerically indexed.
 		 */
+		// 20201202 元素没有数字索引。
 		INDEXED(true),
 
 		/**
 		 * The element is numerically indexed.
 		 */
+		// 20201202 元素被数字索引。
 		NUMERICALLY_INDEXED(true);
 
 		private final boolean indexed;

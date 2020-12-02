@@ -35,8 +35,17 @@ import org.springframework.format.support.FormattingConversionService;
 import org.springframework.util.StringValueResolver;
 
 /**
+ * 20201202
+ * A. {@link FormattingConversionService}的一种特殊化，默认配置有适合大多数Spring引导应用程序的转换器和格式化程序。
+ * B. 为直接实例化而设计，但也公开了静态{@link #addApplicationConverters}和{@link #addApplicationFormatters（FormatRegistry）}实用程序方法，
+ *    用于针对注册表实例的即席使用。
+ */
+/**
+ * A.
  * A specialization of {@link FormattingConversionService} configured by default with
  * converters and formatters appropriate for most Spring Boot applications.
+ *
+ * B.
  * <p>
  * Designed for direct instantiation but also exposes the static
  * {@link #addApplicationConverters} and
@@ -46,8 +55,10 @@ import org.springframework.util.StringValueResolver;
  * @author Phillip Webb
  * @since 2.0.0
  */
+// 20201202 应用程序注册表注册服务 => 配置、注册、回调通知
 public class ApplicationConversionService extends FormattingConversionService {
 
+	// 20201202 默认应用程序共享实例 -> 单例, 双重检查锁
 	private static volatile ApplicationConversionService sharedInstance;
 
 	public ApplicationConversionService() {
@@ -62,15 +73,24 @@ public class ApplicationConversionService extends FormattingConversionService {
 	}
 
 	/**
+	 * 20201202
+	 * A. 返回一个共享的默认应用程序{@code ConversionService}实例，并在需要时懒加载构建它。
+	 * B. 注意：这个方法实际上返回一个{@link applicationconversionservice}实例。但是，{@code ConversionService}签名保留了二进制兼容性。
+	 */
+	/**
+	 * A.
 	 * Return a shared default application {@code ConversionService} instance, lazily
 	 * building it once needed.
+	 *
+	 * B.
 	 * <p>
 	 * Note: This method actually returns an {@link ApplicationConversionService}
 	 * instance. However, the {@code ConversionService} signature has been preserved for
 	 * binary compatibility.
-	 * @return the shared {@code ApplicationConversionService} instance (never
+	 * @return the shared {@code ApplicationConversionService} instance (never // 20201202 共享的{@code ApplicationConversionService}实例（从不为null）
 	 * {@code null})
 	 */
+	// 20201202 获取默认应用程序共享实例 -> 单例, 双重检查锁
 	public static ConversionService getSharedInstance() {
 		ApplicationConversionService sharedInstance = ApplicationConversionService.sharedInstance;
 		if (sharedInstance == null) {

@@ -23,6 +23,7 @@ package org.springframework.core.convert.converter;
  * @author Juergen Hoeller
  * @since 3.0
  */
+// 20201202 用于在类型转换系统中注册转换器。
 public interface ConverterRegistry {
 
 	/**

@@ -28,6 +28,7 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyN
  * @see JavaBeanBinder
  * @see ValueObjectBinder
  */
+// 20201202 {@link binder}用于绑定数据对象的内部策略。数据对象是由递归绑定属性组成的对象。
 interface DataObjectBinder {
 
 	/**

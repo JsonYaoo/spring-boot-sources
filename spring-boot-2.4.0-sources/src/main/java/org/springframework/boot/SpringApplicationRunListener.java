@@ -64,6 +64,7 @@ public interface SpringApplicationRunListener {
 	 * @param bootstrapContext the bootstrap context
 	 * @param environment the environment
 	 */
+	// 20201202 在环境准备好之后，但在{@link ApplicationContext}创建之前调用。
 	default void environmentPrepared(ConfigurableBootstrapContext bootstrapContext,
                                      ConfigurableEnvironment environment) {
 		environmentPrepared(environment);
@@ -76,7 +77,8 @@ public interface SpringApplicationRunListener {
 	 * @deprecated since 2.4.0 in favor of
 	 * {@link #environmentPrepared(ConfigurableBootstrapContext, ConfigurableEnvironment)}
 	 */
-	@Deprecated
+	// 20201202 在环境准备好之后，但在{@link ApplicationContext}创建之前调用。
+	@Deprecated // 20201202 已弃用
 	default void environmentPrepared(ConfigurableEnvironment environment) {
 	}
 

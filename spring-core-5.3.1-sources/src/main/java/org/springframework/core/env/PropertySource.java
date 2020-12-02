@@ -24,6 +24,19 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 20201202
+ * A. 表示名称/值属性对的源的抽象基类。底层的{@linkplain getSource（）source object}可以是封装属性的任何类型{@code T}。
+ *    示例包括{@link java.util.Properties}对象，{@link java.util.Map}对象，{@code ServletContext}和{@code ServletConfig}对象（用于访问init参数）。
+ *    研究{@code propertysource}类型层次结构以查看提供的实现。
+ * B. {@code PropertySource}对象通常不是单独使用的，而是通过一个{@link PropertySources}对象来使用，该对象聚合属性源并与{@link PropertyResolver}实现结合使用，
+ *    该实现可以跨{@code PropertySources}集执行基于优先级的搜索。
+ * C. {@code PropertySource}标识不是根据封装的属性的内容确定的，而是基于{@code PropertySource}的{@link}getName（）name}来确定的。这对于在集合上下文中操作
+ *    {@code PropertySource}对象非常有用。有关详细信息，请参见{@link MutablePropertySources}以及{@link #named（String）}和{@link #toString（）}方法中的操作。
+ * D. 请注意，使用@{@link org.springframework.context.annotation.Configuration Configuration}类时，
+ *    {@link org.springframework.context.annotation.PropertySourcePropertySource}注释提供了一种方便的、声明性的方法，可以将属性源添加到封闭的{@code Environment}。
+ */
+/**
+ * A.
  * Abstract base class representing a source of name/value property pairs. The underlying
  * {@linkplain #getSource() source object} may be of any type {@code T} that encapsulates
  * properties. Examples include {@link java.util.Properties} objects, {@link java.util.Map}
@@ -31,17 +44,20 @@ import org.springframework.util.ObjectUtils;
  * parameters). Explore the {@code PropertySource} type hierarchy to see provided
  * implementations.
  *
+ * B.
  * <p>{@code PropertySource} objects are not typically used in isolation, but rather
  * through a {@link PropertySources} object, which aggregates property sources and in
  * conjunction with a {@link PropertyResolver} implementation that can perform
  * precedence-based searches across the set of {@code PropertySources}.
  *
+ * C.
  * <p>{@code PropertySource} identity is determined not based on the content of
  * encapsulated properties, but rather based on the {@link #getName() name} of the
  * {@code PropertySource} alone. This is useful for manipulating {@code PropertySource}
  * objects when in collection contexts. See operations in {@link MutablePropertySources}
  * as well as the {@link #named(String)} and {@link #toString()} methods for details.
  *
+ * D.
  * <p>Note that when working with @{@link
  * org.springframework.context.annotation.Configuration Configuration} classes that
  * the @{@link org.springframework.context.annotation.PropertySource PropertySource}
@@ -57,6 +73,7 @@ import org.springframework.util.ObjectUtils;
  * @see MutablePropertySources
  * @see org.springframework.context.annotation.PropertySource
  */
+// 20201202 表示名称/值属性对的源的抽象基类 -> 不能单独使用, 需要通过PropertySources集合来使用
 public abstract class PropertySource<T> {
 
 	protected final Log logger = LogFactory.getLog(getClass());

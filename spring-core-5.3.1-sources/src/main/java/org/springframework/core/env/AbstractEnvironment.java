@@ -34,11 +34,21 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201202
+ * A. {@link Environment}实现的抽象基类。支持保留的默认配置文件名的概念，并允许通过{@link #active_profiles_PROPERTY_NAME}和{@link #default_profiles_PROPERTY_NAME}属性
+ *    指定活动和默认配置文件。
+ * B. 具体子类在默认情况下添加的{@link PropertySource}对象主要不同。{@code AbstractEnvironment}不添加任何内容。子类应该通过受保护的
+ *    {@link #customizePropertySources（MutablePropertySources）} hook提供属性源，而客户端应该使用{@link ConfigurableEnvironment#getPropertySources（）}并针对
+ *    {@link MutablePropertySources}API进行自定义。有关用法示例，请参见{@link ConfigurableEnvironment}javadoc。
+ */
+/**
+ * A.
  * Abstract base class for {@link Environment} implementations. Supports the notion of
  * reserved default profile names and enables specifying active and default profiles
  * through the {@link #ACTIVE_PROFILES_PROPERTY_NAME} and
  * {@link #DEFAULT_PROFILES_PROPERTY_NAME} properties.
  *
+ * B.
  * <p>Concrete subclasses differ primarily on which {@link PropertySource} objects they
  * add by default. {@code AbstractEnvironment} adds none. Subclasses should contribute
  * property sources through the protected {@link #customizePropertySources(MutablePropertySources)}
@@ -52,6 +62,7 @@ import org.springframework.util.StringUtils;
  * @see ConfigurableEnvironment
  * @see StandardEnvironment
  */
+// 20201202 {@link Environment}实现的抽象基类 => 支持保留的默认配置文件名的概念
 public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 	/**

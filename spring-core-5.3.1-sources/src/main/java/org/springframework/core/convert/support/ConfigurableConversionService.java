@@ -34,6 +34,8 @@ import org.springframework.core.convert.converter.ConverterRegistry;
  * @see org.springframework.core.env.ConfigurableEnvironment
  * @see org.springframework.context.ConfigurableApplicationContext#getEnvironment()
  */
+// 20201202 要由大多数{@link ConversionService}类型实现的配置接口。合并{@link ConversionService}公开的只读操作和{@link ConverterRegistry}的变异操作，
+// 20201202 以便方便地通过{@linkorg.springframework.core.convert.converter.Converter}临时添加和删除。后者在处理{@link org.springframework.core.env.ConfigurableEnvironment ConfigurableEnvironment}时特别有用, 应用程序上下文引导代码中的ConfigurableEnvironment实例。
 public interface ConfigurableConversionService extends ConversionService, ConverterRegistry {
 
 }

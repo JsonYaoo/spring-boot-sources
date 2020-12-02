@@ -30,10 +30,17 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.context.ConfigurableWebEnvironment;
 
 /**
+ * 20201202
+ * A. {@link Environment}实现将由基于{@code servlet}的web应用程序使用。默认情况下，所有与web相关（基于servlet）{@code ApplicationContext}类初始化实例。
+ * B. 提供{@code servletconfig}、{@code servletcontext}和基于JNDI的{@link propertysource}实例。有关详细信息，请参阅{@link #customizePropertySources}方法文档。
+ */
+/**
+ * A.
  * {@link Environment} implementation to be used by {@code Servlet}-based web
  * applications. All web-related (servlet-based) {@code ApplicationContext} classes
  * initialize an instance by default.
  *
+ * B.
  * <p>Contributes {@code ServletConfig}, {@code ServletContext}, and JNDI-based
  * {@link PropertySource} instances. See {@link #customizePropertySources} method
  * documentation for details.
@@ -42,6 +49,7 @@ import org.springframework.web.context.ConfigurableWebEnvironment;
  * @since 3.1
  * @see StandardEnvironment
  */
+// 20201202 标准Servlet环境对象 => 初始化Servlet所有实例, 供servlet应用程序使用
 public class StandardServletEnvironment extends StandardEnvironment implements ConfigurableWebEnvironment {
 
 	/** Servlet context init parameters property source name: {@value}. */

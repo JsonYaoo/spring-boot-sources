@@ -28,6 +28,7 @@ import org.springframework.core.KotlinDetector;
  * @author Madhura Bhave
  * @author Phillip Webb
  */
+// 20201202 默认{@link BindConstructorProvider}实现。
 class DefaultBindConstructorProvider implements BindConstructorProvider {
 
 	@Override

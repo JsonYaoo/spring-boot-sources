@@ -38,22 +38,36 @@ import org.springframework.util.ObjectUtils;
  * @see Bindable#of(Class)
  * @see Bindable#of(ResolvableType)
  */
+// 20201202 可由{@link Binder}绑定的源。
 public final class Bindable<T> {
 
+	// 20201202 无注释
 	private static final Annotation[] NO_ANNOTATIONS = {};
 
+	// 20201202 ResolvableType实例
 	private final ResolvableType type;
 
+	// 20201202 开箱类型
 	private final ResolvableType boxedType;
 
+	// 20201202 结果提供者
 	private final Supplier<T> value;
 
+	// 20201202 注释数组
 	private final Annotation[] annotations;
 
+	// 20201202 构造Bindable实例
 	private Bindable(ResolvableType type, ResolvableType boxedType, Supplier<T> value, Annotation[] annotations) {
+		// 20201202 注册ResolvableType实例
 		this.type = type;
+
+		// 20201202 注册开箱类型
 		this.boxedType = boxedType;
+
+		// 20201202 注册结果提供者
 		this.value = value;
+
+		// 20201202 注册注释数组
 		this.annotations = annotations;
 	}
 
@@ -157,10 +171,14 @@ public final class Bindable<T> {
 	 * @param existingValue the existing value
 	 * @return an updated {@link Bindable}
 	 */
+	// 20201202 使用现有值创建更新的{@linkbindable}实例。
 	public Bindable<T> withExistingValue(T existingValue) {
+		// 20201202 实例为空 | 实例为数组类型 | 实例为装箱类型, 则抛出异常
 		Assert.isTrue(
 				existingValue == null || this.type.isArray() || this.boxedType.resolve().isInstance(existingValue),
 				() -> "ExistingValue must be an instance of " + this.type);
+
+		// 20201202 声明为结果提供者接口类型
 		Supplier<T> value = (existingValue != null) ? () -> existingValue : null;
 		return new Bindable<>(this.type, this.boxedType, value, this.annotations);
 	}
@@ -183,10 +201,16 @@ public final class Bindable<T> {
 	 * @see #of(ResolvableType)
 	 * @see #withExistingValue(Object)
 	 */
+	// 20201202 创建指定实例类型的新{@link Bindable}，该实例的现有值等于该实例。
 	@SuppressWarnings("unchecked")
 	public static <T> Bindable<T> ofInstance(T instance) {
+		// 20201202 实例不能为空
 		Assert.notNull(instance, "Instance must not be null");
+
+		// 20201202 获取实例的Class对象
 		Class<T> type = (Class<T>) instance.getClass();
+
+		// 20201202 使用现有值创建更新的{@linkbindable}实例。
 		return of(type).withExistingValue(instance);
 	}
 
@@ -197,9 +221,16 @@ public final class Bindable<T> {
 	 * @return a {@link Bindable} instance
 	 * @see #of(ResolvableType)
 	 */
+	// 20201202 创建指定类型的新{@link Bindable}。
 	public static <T> Bindable<T> of(Class<T> type) {
+		// 20201202 Class不能为空
 		Assert.notNull(type, "Type must not be null");
-		return of(ResolvableType.forClass(type));
+
+		// 20201202 创建指定类型的新{@link Bindable}
+		return of(
+				// 20201202 使用Type类型构造ResolvableType实例
+				ResolvableType.forClass(type)
+		);
 	}
 
 	/**
@@ -241,20 +272,36 @@ public final class Bindable<T> {
 	 * @return a {@link Bindable} instance
 	 * @see #of(Class)
 	 */
+	// 20201202 创建指定类型的新{@link Bindable}。
 	public static <T> Bindable<T> of(ResolvableType type) {
+		// 20201202 ResolvableType实例不能为空
 		Assert.notNull(type, "Type must not be null");
+
+		// 20201202 获取ResolvableType实例的开箱类型 -> 装箱类型则开箱, 数组类型则取数组的组件类型
 		ResolvableType boxedType = box(type);
+
+		// 20201202 构造Bindable实例 -> ResolvableType实例 & 开箱类型 & 无注释
 		return new Bindable<>(type, boxedType, null, NO_ANNOTATIONS);
 	}
 
+	// 20201202 获取ResolvableType实例的开箱类型 -> 装箱类型则开箱, 数组类型则取数组的组件类型
 	private static ResolvableType box(ResolvableType type) {
+		// 20201202 获取已解析的类型
 		Class<?> resolved = type.resolve();
+
+		// 20201202 如果该类型是基础类型的装箱类型
 		if (resolved != null && resolved.isPrimitive()) {
+			// 20201202 则对基础类型进行拆箱
 			Object array = Array.newInstance(resolved, 1);
 			Class<?> wrapperType = Array.get(array, 0).getClass();
+
+			// 20201202 返回该类型的ResolvableType实例
 			return ResolvableType.forClass(wrapperType);
 		}
+
+		// 20201202 如果该类型是数组类型
 		if (resolved != null && resolved.isArray()) {
+			// 20201202 则构造数组类型的组件类型的ResolvableType实例
 			return ResolvableType.forArrayComponent(box(type.getComponentType()));
 		}
 		return type;

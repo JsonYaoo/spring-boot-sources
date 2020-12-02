@@ -33,9 +33,13 @@ import org.springframework.lang.Nullable;
  * @since 3.1
  * @see SimpleCommandLineArgsParser
  */
+// 20201202 命令行参数的简单表示，分为“选项参数”和“非选项参数”。
 class CommandLineArgs {
 
+	// 20201202 选项参数 key=value
 	private final Map<String, List<String>> optionArgs = new HashMap<>();
+
+	// 20201202 非选项参数
 	private final List<String> nonOptionArgs = new ArrayList<>();
 
 	/**

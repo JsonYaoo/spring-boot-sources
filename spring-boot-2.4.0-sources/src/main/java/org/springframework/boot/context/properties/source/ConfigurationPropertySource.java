@@ -31,6 +31,7 @@ import org.springframework.core.env.PropertySource;
  * @see OriginTrackedValue
  * @see #getConfigurationProperty(ConfigurationPropertyName)
  */
+// 20201202 {@link ConfigurationProperty ConfigurationProperties}的源。
 @FunctionalInterface
 public interface ConfigurationPropertySource {
 

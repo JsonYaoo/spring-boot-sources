@@ -23,12 +23,108 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201202
+ * A. 由命令行参数支持的{@link PropertySource}实现的抽象基类。参数化类型{@code T}表示命令行选项的底层源。在{@link SimpleCommandLinePropertySource}中，
+ *    这可能与字符串数组一样简单；在{@link JOptCommandLinePropertySource}的情况下，这可能是特定于特定API的，例如JOpt的{@code OptionSet}。
+ * B. 用途和一般用途: 用于基于Spring的独立应用程序，即通过传统的{@code main}方法从命令行接受{@code String[]}参数引导的应用程序。在许多情况下，直接在{@code main}方法中
+ *    处理命令行参数就足够了，但是在其他情况下，可能需要将参数作为值注入springbean中。在后一种情况下，{@code CommandLinePropertySource}就变得有用了。
+ *    {@code CommandLinePropertySource}通常会添加到Spring{@code ApplicationContext}的{@link Environment}，此时所有命令行参数都可以通过{@link Environment}
+ *    getProperty（String）}系列方法使用。例如：
+ *	 		public static void main(String[] args) {
+ *     			CommandLinePropertySource clps = ...;
+ *     			AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+ *     			ctx.getEnvironment().getPropertySources().addFirst(clps);
+ *     			ctx.register(AppConfig.class);
+ *     			ctx.refresh();
+ * 			}
+ * C. 使用上面的引导逻辑，{@code AppConfig}类可以{@code @Inject}Spring{@code Environment}，并直接查询其属性:
+ * 			@Configuration
+ * 			public class AppConfig {
+ * 				@Inject
+ *     			Environment env;
+ *
+ *     			@Bean
+ *     			public void DataSource dataSource() {
+ *         			MyVendorDataSource dataSource = new MyVendorDataSource();
+ *         			dataSource.setHostname(env.getProperty("db.hostname", "localhost"));
+ *         			dataSource.setUsername(env.getRequiredProperty("db.username"));
+ *         			dataSource.setPassword(env.getRequiredProperty("db.password"));
+ *         			// ...
+ *         			return dataSource;
+ *     			}
+ * 			}
+ * D. 对于上面的引导逻辑，由于{@code CommandLinePropertySource}是使用{@code #addFirst}方法添加到{@code Environment}的{@link MutablePropertySources}集合中，
+ *    因此它具有最高的搜索优先级，这意味着数据库主机名”和其他属性可能存在于其他属性源（如系统环境）中变量，它将首先从命令行属性源中选择。这是一种合理的方法，因为在命令行中
+ *    指定的参数自然比指定为环境的参数更具体变量。{@code AppConfig}类可以{@code@Inject}Spring{@code Environment}并直接查询其属性。
+ * E. 作为注入{@code Environment}的替代方法，Spring的{@code @Value}注释可以用来注入这些属性，前提是{@link PropertySourcesPropertyResolver}bean已经注册，
+ *    可以直接注册，也可以使用{@code <context:property-placeholder>}元素。例如：
+ * 			@Component
+ * 			public class MyComponent {
+ *
+ *     			@Value("my.property:defaultVal")
+ *     			private String myProperty;
+ *
+ *     			public void getMyProperty() {
+ *         			return this.myProperty;
+ *     			}
+ *
+ *     			// ...
+ * 			}
+ * F. 使用选项参数: 单个命令行参数通过常用的{@link PropertySource#getProperty（String）}和{@link PropertySource#containsProperty（String）}方法表示为属性。例如，给定以下命令行：
+ * 		a. --o1=v1 --o2
+ * 		b. “o1”和“o2”被视为“选项参数”，以下断言的值为true：
+ * 			b.1. CommandLinePropertySource<?> ps = ...
+ * 			b.2. assert ps.containsProperty("o1") == true;
+ * 			b.3. assert ps.containsProperty("o2") == true;
+ * 			b.4. assert ps.containsProperty("o3") == false;
+ * 			b.5. assert ps.getProperty("o1").equals("v1");
+ * 			b.6. assert ps.getProperty("o2").equals("");
+ * 			b.7. assert ps.getProperty("o3") == null;
+ * G. 注意'o2'选项没有参数，但是{@code getProperty（“o2”）}解析为空字符串（{@code“”}），而{@code getProperty（“o3”）}解析为{@code null}，因为没有指定它。
+ *    此行为与所有{@code propertysource}实现遵循的通用约定一致。
+ * H. 还请注意，虽然在上面的示例中使用“--”来表示选项参数，但此语法可能因各个命令行参数库而异。例如，基于JOpt或Commons CLI的实现可能允许使用单破折号（“-”）“short”选项参数等。
+ * I. 使用非选项参数: 这种抽象也支持非选项参数。提供的任何没有选项样式前缀（如“-”或“--”）的参数都被视为“非选项参数”，可以通过特殊的
+ *    {@linkplain #DEFAULT_non_option_ARGS_PROPERTY_NAME“non optionargs”}属性使用。如果指定了多个非选项参数，则此属性的值将是包含所有参数的逗号分隔字符串。
+ *    这种方法确保了来自{@code CommandLinePropertySource}的所有属性都有一个简单而一致的返回类型（String），同时，当与Spring{@link Environment}及其内置的
+ *    {@code ConversionService}一起使用时，它还可以进行转换。考虑以下示例：
+ *    	a. --o1=v1 --o2=v2 /path/to/file1 /path/to/file2
+ *      b. 在这个例子中，“o1”和“o2”将被视为“选项参数”，而这两个文件系统路径被限定为“非选项参数”。因此，以下断言的结果为true：
+ * 			b.1. CommandLinePropertySource<?> ps = ...
+ * 			b.2. assert ps.containsProperty("o1") == true;
+ * 			b.3. assert ps.containsProperty("o2") == true;
+ * 			b.4. assert ps.containsProperty("nonOptionArgs") == true;
+ * 			b.5. assert ps.getProperty("o1").equals("v1");
+ * 			b.6. assert ps.getProperty("o2").equals("v2");
+ * 			b.7. assert ps.getProperty("nonOptionArgs").equals("/path/to/file1,/path/to/file2");
+ * J. 如上所述，当与Spring{@code Environment}抽象结合使用时，这个逗号分隔的字符串可以很容易地转换为字符串数组或列表：
+* 			Environment env = applicationContext.getEnvironment();
+ * 			String[] nonOptionArgs = env.getProperty("nonOptionArgs", String[].class);
+ * 			assert nonOptionArgs[0].equals("/path/to/file1");
+ * 			assert nonOptionArgs[1].equals("/path/to/file2");
+ * K. 特殊的“非选项参数”属性的名称可以通过{@link #setNonOptionArgsPropertyName（String）}方法自定义。建议这样做，因为它为非选项参数提供了适当的语义值。
+ *    例如，如果文件系统路径被指定为非选项参数，则最好将其称为类似于文件.位置”而不是默认的“非选项args”：
+ * 			public static void main(String[] args) {
+ *     			CommandLinePropertySource clps = ...;
+ *     			clps.setNonOptionArgsPropertyName("file.locations");
+ *
+ *     			AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+ *     			ctx.getEnvironment().getPropertySources().addFirst(clps);
+ *     			ctx.register(AppConfig.class);
+ *     			ctx.refresh();
+ * 			}
+ * L. 局限性: 这个抽象并不打算公开底层命令行解析api（如JOpt或Commons-CLI）的全部功能。它的目的恰恰相反：在命令行参数被解析后，提供最简单的抽象来访问它们。
+ *    因此，典型的情况是完全配置底层命令行解析API，解析进入main方法的参数的{@code String[]}，然后简单地将解析结果提供给{@code CommandLinePropertySource}的实现。
+ *    在这一点上，所有参数可以被视为“option”或“non-option”参数，如上所述，可以通过普通的{@code PropertySource}和{@code Environment}api来访问。
+ */
+/**
+ * A.
  * Abstract base class for {@link PropertySource} implementations backed by command line
  * arguments. The parameterized type {@code T} represents the underlying source of command
  * line options. This may be as simple as a String array in the case of
  * {@link SimpleCommandLinePropertySource}, or specific to a particular API such as JOpt's
  * {@code OptionSet} in the case of {@link JOptCommandLinePropertySource}.
  *
+ * B.
  * <h3>Purpose and General Usage</h3>
  *
  * For use in standalone Spring-based applications, i.e. those that are bootstrapped via
@@ -50,6 +146,7 @@ import org.springframework.util.StringUtils;
  *     ctx.refresh();
  * }</pre>
  *
+ * C.
  * With the bootstrap logic above, the {@code AppConfig} class may {@code @Inject} the
  * Spring {@code Environment} and query it directly for properties:
  *
@@ -70,6 +167,7 @@ import org.springframework.util.StringUtils;
  *     }
  * }</pre>
  *
+ * D.
  * Because the {@code CommandLinePropertySource} was added to the {@code Environment}'s
  * set of {@link MutablePropertySources} using the {@code #addFirst} method, it has
  * highest search precedence, meaning that while "db.hostname" and other properties may
@@ -78,6 +176,7 @@ import org.springframework.util.StringUtils;
  * given that arguments specified on the command line are naturally more specific than
  * those specified as environment variables.
  *
+ * E.
  * <p>As an alternative to injecting the {@code Environment}, Spring's {@code @Value}
  * annotation may be used to inject these properties, given that a {@link
  * PropertySourcesPropertyResolver} bean has been registered, either directly or through
@@ -97,6 +196,7 @@ import org.springframework.util.StringUtils;
  *     // ...
  * }</pre>
  *
+ * F.
  * <h3>Working with option arguments</h3>
  *
  * <p>Individual command line arguments are represented as properties through the usual
@@ -119,16 +219,19 @@ import org.springframework.util.StringUtils;
  * assert ps.getProperty("o3") == null;
  * </pre>
  *
+ * G.
  * Note that the 'o2' option has no argument, but {@code getProperty("o2")} resolves to
  * empty string ({@code ""}) as opposed to {@code null}, while {@code getProperty("o3")}
  * resolves to {@code null} because it was not specified. This behavior is consistent with
  * the general contract to be followed by all {@code PropertySource} implementations.
  *
+ * H.
  * <p>Note also that while "--" was used in the examples above to denote an option
  * argument, this syntax may vary across individual command line argument libraries. For
  * example, a JOpt- or Commons CLI-based implementation may allow for single dash ("-")
  * "short" option arguments, etc.
  *
+ * I.
  * <h3>Working with non-option arguments</h3>
  *
  * <p>Non-option arguments are also supported through this abstraction. Any arguments
@@ -158,6 +261,7 @@ import org.springframework.util.StringUtils;
  * assert ps.getProperty("nonOptionArgs").equals("/path/to/file1,/path/to/file2");
  * </pre>
  *
+ * J.
  * <p>As mentioned above, when used in conjunction with the Spring {@code Environment}
  * abstraction, this comma-delimited string may easily be converted to a String array or
  * list:
@@ -169,6 +273,7 @@ import org.springframework.util.StringUtils;
  * assert nonOptionArgs[1].equals("/path/to/file2");
  * </pre>
  *
+ * K.
  * <p>The name of the special "non-option arguments" property may be customized through
  * the {@link #setNonOptionArgsPropertyName(String)} method. Doing so is recommended as
  * it gives proper semantic value to non-option arguments. For example, if filesystem
@@ -186,6 +291,7 @@ import org.springframework.util.StringUtils;
  *     ctx.refresh();
  * }</pre>
  *
+ * L.
  * <h3>Limitations</h3>
  *
  * This abstraction is not intended to expose the full power of underlying command line
@@ -205,9 +311,11 @@ import org.springframework.util.StringUtils;
  * @see SimpleCommandLinePropertySource
  * @see JOptCommandLinePropertySource
  */
+// 20201202 由命令行参数支持的{@link PropertySource}实现的抽象基类。参数化类型{@code T}表示命令行选项的底层源。
 public abstract class CommandLinePropertySource<T> extends EnumerablePropertySource<T> {
 
 	/** The default name given to {@link CommandLinePropertySource} instances: {@value}. */
+	// 20201202 给{@link CommandLinePropertySource}实例的默认名称：{@value}。
 	public static final String COMMAND_LINE_PROPERTY_SOURCE_NAME = "commandLineArgs";
 
 	/** The default name of the property representing non-option arguments: {@value}. */
@@ -229,6 +337,7 @@ public abstract class CommandLinePropertySource<T> extends EnumerablePropertySou
 	 * Create a new {@link CommandLinePropertySource} having the given name
 	 * and backed by the given source object.
 	 */
+	// 20201202 创建一个新的{@link CommandLinePropertySource}，它具有给定的名称并由给定的源对象支持。
 	public CommandLinePropertySource(String name, T source) {
 		super(name, source);
 	}

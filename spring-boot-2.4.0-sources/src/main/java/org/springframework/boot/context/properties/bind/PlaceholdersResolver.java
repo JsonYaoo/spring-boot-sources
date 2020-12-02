@@ -26,6 +26,7 @@ import org.springframework.core.env.PropertyResolver;
  * @since 2.0.0
  * @see PropertySourcesPlaceholdersResolver
  */
+// 20201202 {@link Binder}用于解析属性占位符的可选策略。
 @FunctionalInterface
 public interface PlaceholdersResolver {
 
