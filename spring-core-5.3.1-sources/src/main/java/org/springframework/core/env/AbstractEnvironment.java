@@ -114,13 +114,17 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// 20201203 已激活的配置文件集
 	private final Set<String> activeProfiles = new LinkedHashSet<>();
 
 	private final Set<String> defaultProfiles = new LinkedHashSet<>(getReservedDefaultProfiles());
 
+	// 20201203 可变的PropertySource集合
 	private final MutablePropertySources propertySources = new MutablePropertySources();
 
+	// 20201203 转换property单例
 	private final ConfigurablePropertyResolver propertyResolver =
+			// 20201203 针对给定的属性源创建新的冲突解决程序
 			new PropertySourcesPropertyResolver(this.propertySources);
 
 
@@ -256,16 +260,26 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		}
 	}
 
+	// 20201203 设置激活的配置文件集 spring.boot.active
 	@Override
 	public void setActiveProfiles(String... profiles) {
+		// 20201203 文件集合不能为空
 		Assert.notNull(profiles, "Profile array must not be null");
+
+		// 20201203 如果是debugger级别, 则输出debugger日志
 		if (logger.isDebugEnabled()) {
+			// 20201203 激活配置文件: ..
 			logger.debug("Activating profiles " + Arrays.asList(profiles));
 		}
+
+		// 20201203 同步激活配置文件集
 		synchronized (this.activeProfiles) {
 			this.activeProfiles.clear();
 			for (String profile : profiles) {
+				// 20201203 检验配置文件, 不能为空 & 不能为空格 & 不能!开头
 				validateProfile(profile);
+
+				// 20201203 校验通过的添加到激活配置文件集中
 				this.activeProfiles.add(profile);
 			}
 		}
@@ -379,10 +393,15 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 * @see #addActiveProfile
 	 * @see #setDefaultProfiles
 	 */
+	// 20201203 在添加到活动或默认配置文件集之前，验证给定的配置文件（在内部调用）。子类可以重写以对概要文件语法施加进一步的限制。
 	protected void validateProfile(String profile) {
+		// 20201203 判断字符串不为空 & 是否为正确的文本
 		if (!StringUtils.hasText(profile)) {
+			// 20201203 如果不是正确的文本, 则抛出异常
 			throw new IllegalArgumentException("Invalid profile [" + profile + "]: must contain text");
 		}
+
+		// 20201203 如果配置文件属性第一个字符为!, 则属于非法参数异常
 		if (profile.charAt(0) == '!') {
 			throw new IllegalArgumentException("Invalid profile [" + profile + "]: must not begin with ! operator");
 		}
@@ -487,7 +506,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 
 	//---------------------------------------------------------------------
-	// Implementation of ConfigurablePropertyResolver interface
+	// Implementation of ConfigurablePropertyResolver interface // 20201203 执行配置属性接口
 	//---------------------------------------------------------------------
 
 	@Override
@@ -495,8 +514,10 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		return this.propertyResolver.getConversionService();
 	}
 
+	// 20201203 设置property转换服务
 	@Override
 	public void setConversionService(ConfigurableConversionService conversionService) {
+		// 20201203 给转换property单例设置property转换服务
 		this.propertyResolver.setConversionService(conversionService);
 	}
 

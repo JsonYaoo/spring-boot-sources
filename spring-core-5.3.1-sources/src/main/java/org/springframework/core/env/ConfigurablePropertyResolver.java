@@ -43,6 +43,10 @@ public interface ConfigurablePropertyResolver extends PropertyResolver {
 	 * @see PropertyResolver#getProperty(String, Class)
 	 * @see org.springframework.core.convert.converter.ConverterRegistry#addConverter
 	 */
+	// 20201203 返回对属性执行类型转换时使用的{@link ConfigurableConversionService}。
+	// 20201203 返回的转换服务的可配置性质允许方便地添加和删除单个{@code Converter}实例：
+	// 20201203 ConfigurableConversionService cs = env.getConversionService();
+	// 20201203 cs.addConverter(new FooConverter());
 	ConfigurableConversionService getConversionService();
 
 	/**

@@ -29,6 +29,7 @@ import org.springframework.lang.Nullable;
  * @see PropertySources
  * @see AbstractEnvironment
  */
+// 20201203 {@link PropertyResolver}实现，根据一组{@link PropertySources}解析属性值。
 public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 
 	@Nullable
@@ -39,6 +40,7 @@ public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 	 * Create a new resolver against the given property sources.
 	 * @param propertySources the set of {@link PropertySource} objects to use
 	 */
+	// 20201203 针对给定的属性源创建新的冲突解决程序。
 	public PropertySourcesPropertyResolver(@Nullable PropertySources propertySources) {
 		this.propertySources = propertySources;
 	}

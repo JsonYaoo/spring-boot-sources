@@ -18,11 +18,31 @@
 package org.apache.commons.logging;
 
 /**
+ * 20201203
+ * A. 一个简单的日志接口抽象日志API。为了成功地被{@link logfactory}实例化，实现这个接口的类必须有一个构造函数，该构造函数接受一个表示该日志的“name”的字符串参数。
+ * B. Log使用的六个日志级别是（按顺序）：
+ * 		a. trace (the least serious)
+ * 		b. debug
+ * 		c. info
+ * 		d. warn
+ * 		e. error
+ * 		f. fatal (the most serious)
+ * C. 这些日志级别到底层日志系统使用的概念的映射依赖于实现。不过，实现应该确保这种排序按预期的方式进行。
+ * D. 性能通常是一个日志问题。通过检查适当的属性，组件可以避免昂贵的操作（生成要记录的信息）, 例如：
+ *    	if (log.isDebugEnabled()) {
+ *        	... do something expensive ...
+ *        	log.debug(theResult);
+ *    	}
+ * E. 底层日志系统的配置通常是在日志API外部完成的，通过该系统支持的任何机制。
+ */
+/**
+ * A.
  * A simple logging interface abstracting logging APIs.  In order to be
  * instantiated successfully by {@link LogFactory}, classes that implement
  * this interface must have a constructor that takes a single String
  * parameter representing the "name" of this Log.
  *
+ * B.
  * <p>The six logging levels used by <code>Log</code> are (in order):
  * <ol>
  * <li>trace (the least serious)</li>
@@ -33,11 +53,13 @@ package org.apache.commons.logging;
  * <li>fatal (the most serious)</li>
  * </ol>
  *
+ * C.
  * The mapping of these log levels to the concepts used by the underlying
  * logging system is implementation dependent.
  * The implementation should ensure, though, that this ordering behaves
  * as expected.
  *
+ * D.
  * <p>Performance is often a logging concern.
  * By examining the appropriate property,
  * a component can avoid expensive operations (producing information
@@ -51,6 +73,7 @@ package org.apache.commons.logging;
  *    }
  * </pre>
  *
+ * E.
  * <p>Configuration of the underlying logging system will generally be done
  * external to the Logging APIs, through whatever mechanism is supported by
  * that system.
@@ -58,6 +81,7 @@ package org.apache.commons.logging;
  * @author Juergen Hoeller (for the {@code spring-jcl} variant)
  * @since 5.0
  */
+// 20201203 一个简单的日志接口抽象日志API
 public interface Log {
 
 	/**
@@ -101,8 +125,10 @@ public interface Log {
 	 * <p>Call this method to prevent having to perform expensive operations
 	 * (for example, <code>String</code> concatenation)
 	 * when the log level is more than debug.
-	 * @return true if debug is enabled in the underlying logger.
+	 * @return true if debug is enabled in the underlying logger. // 20201203 如果在基础记录器中启用了调试，则为true。
 	 */
+	// 20201203 当前是否启用调试日志记录？
+	// 20201203 调用此方法可防止在日志级别高于debug时必须执行昂贵的操作（例如，字符串连接）。
 	boolean isDebugEnabled();
 
 	/**

@@ -38,12 +38,21 @@ import java.util.TimeZone;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201203
+ * A. 其他{@link String}实用程序方法。
+ * B. 主要用于框架内的内部使用；请考虑<a href=“https://commons.apache.org/proper/commons-lang/“>Apache的Commons Lang</a>，以获得更全面的{@code String}实用程序套件。
+ * C. 这个类提供了一些应该由核心Java{@link string}和{@link stringbuilder}类真正提供的简单功能。它还提供了易于使用的方法来在分隔字符串（如CSV字符串）与集合和数组之间进行转换。
+ */
+/**
+ * A.
  * Miscellaneous {@link String} utility methods.
  *
+ * B.
  * <p>Mainly for internal use within the framework; consider
  * <a href="https://commons.apache.org/proper/commons-lang/">Apache's Commons Lang</a>
  * for a more comprehensive suite of {@code String} utilities.
  *
+ * C.
  * <p>This class delivers some simple functionality that should really be
  * provided by the core Java {@link String} and {@link StringBuilder}
  * classes. It also provides easy-to-use methods to convert between
@@ -59,6 +68,7 @@ import org.springframework.lang.Nullable;
  * @author Brian Clozel
  * @since 16 April 2001
  */
+// 20201203 其他{@link String}实用程序方法。
 public abstract class StringUtils {
 
 	private static final String[] EMPTY_STRING_ARRAY = {};
@@ -167,17 +177,29 @@ public abstract class StringUtils {
 	 * @see #hasLength(String)
 	 * @see Character#isWhitespace
 	 */
+	// 20201203 检查给定的{@code String}是否包含实际文本。更具体地说，此方法返回{@code true}，如果{@code String}不是{@code null}，它的长度大于0，并且至少包含一个
+	// 20201203 非空白字符。@param str要检查的{@code String}（可能是{@code null}）@return{@code true}如果{@code String}不是{@code null}，那么它的长度大于0，
+	// 20201203 并且不只包含空格 => 判断字符串不为空 & 是否为正确的文本
 	public static boolean hasText(@Nullable String str) {
+		// 20201203 字符串不为空 & 是否为正确的文本
 		return (str != null && !str.isEmpty() && containsText(str));
 	}
 
+	// 20201203 判断字符串是否文本
 	private static boolean containsText(CharSequence str) {
+		// 20201203 获取字符串的实际长度
 		int strLen = str.length();
+
+		// 20201203 遍历每个字符
 		for (int i = 0; i < strLen; i++) {
+			// 20201203 判断字符是否为空格
 			if (!Character.isWhitespace(str.charAt(i))) {
+				// 20201203 如果不是则返回true, 表示这是一个正确的文本
 				return true;
 			}
 		}
+
+		// 20201203 全是空格, 则返回false, 表示这不是一个正确的文本
 		return false;
 	}
 

@@ -477,17 +477,20 @@ public class SpringApplication {
 
 		// 20201202 如果是定制化的环境
 		if (!this.isCustomEnvironment) {
-
-			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
-					deduceEnvironmentClass());
+			// 20201203 这里则转换为Servlet类型的环境
+			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment, deduceEnvironmentClass());
 		}
+
+
 		ConfigurationPropertySources.attach(environment);
 		return environment;
 	}
 
+	// 20201203 获取环境的Class类型
 	private Class<? extends StandardEnvironment> deduceEnvironmentClass() {
 		switch (this.webApplicationType) {
 		case SERVLET:
+			// 20201203 SERVLET类型则返回StandardServletEnvironment.clas
 			return StandardServletEnvironment.class;
 		case REACTIVE:
 			return StandardReactiveWebEnvironment.class;
