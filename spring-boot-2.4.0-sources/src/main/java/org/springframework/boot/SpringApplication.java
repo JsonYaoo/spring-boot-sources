@@ -481,8 +481,10 @@ public class SpringApplication {
 			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment, deduceEnvironmentClass());
 		}
 
-
+		// 20201203 环境绑定属性源 -> 添加Spring属性源
 		ConfigurationPropertySources.attach(environment);
+
+		// 20201203 返回准备好的环境
 		return environment;
 	}
 
