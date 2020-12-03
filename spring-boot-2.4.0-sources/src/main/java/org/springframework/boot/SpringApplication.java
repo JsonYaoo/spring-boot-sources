@@ -410,7 +410,11 @@ public class SpringApplication {
 
 			// 20201201 准备环境
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
+
+			// 20201203 设置spring.beaninfo.ignore属性值为true, 跳过对{@code beaninfo}类的搜索
 			configureIgnoreBeanInfo(environment);
+
+
 			Banner printedBanner = printBanner(environment);
 			context = createApplicationContext();
 			context.setApplicationStartup(this.applicationStartup);
@@ -749,9 +753,14 @@ public class SpringApplication {
 		}
 	}
 
+	// 20201203 设置spring.beaninfo.ignore属性值为true, 跳过对{@code beaninfo}类的搜索
 	private void configureIgnoreBeanInfo(ConfigurableEnvironment environment) {
+		// 20201203 获取spring.beaninfo.ignore系统属性 => 如果没有配置跳过对{@code beaninfo}类的搜索
 		if (System.getProperty(CachedIntrospectionResults.IGNORE_BEANINFO_PROPERTY_NAME) == null) {
+			// 20201203 获取"spring.beaninfo.ignore属性值, 如果没有则设置为true
 			Boolean ignore = environment.getProperty("spring.beaninfo.ignore", Boolean.class, Boolean.TRUE);
+
+			// 20201203 设置spring.beaninfo.ignore属性值为true, 跳过对{@code beaninfo}类的搜索
 			System.setProperty(CachedIntrospectionResults.IGNORE_BEANINFO_PROPERTY_NAME, ignore.toString());
 		}
 	}

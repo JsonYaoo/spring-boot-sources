@@ -70,11 +70,12 @@ public interface PropertyResolver {
 	/**
 	 * Return the property value associated with the given key,
 	 * or {@code defaultValue} if the key cannot be resolved.
-	 * @param key the property name to resolve
-	 * @param targetType the expected type of the property value
-	 * @param defaultValue the default value to return if no value is found
+	 * @param key the property name to resolve	// 20201203 要解析的属性名
+	 * @param targetType the expected type of the property value	// 20201203 属性值的预期类型
+	 * @param defaultValue the default value to return if no value is found	// 20201203 找不到值时返回的默认值
 	 * @see #getRequiredProperty(String, Class)
 	 */
+	// 20201203 返回与给定键关联的属性值，如果无法解析该键，则返回{@code defaultValue}。
 	<T> T getProperty(String key, Class<T> targetType, T defaultValue);
 
 	/**
