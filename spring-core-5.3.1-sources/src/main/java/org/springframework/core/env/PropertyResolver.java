@@ -55,6 +55,7 @@ public interface PropertyResolver {
 	 * @see #getRequiredProperty(String)
 	 * @see #getProperty(String, Class)
 	 */
+	// 20201203 返回与给定键关联的属性值，如果无法解析该键，则返回{@code defaultValue}。
 	String getProperty(String key, String defaultValue);
 
 	/**

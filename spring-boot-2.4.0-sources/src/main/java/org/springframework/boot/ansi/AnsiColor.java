@@ -23,6 +23,7 @@ package org.springframework.boot.ansi;
  * @author Geoffrey Chandler
  * @since 1.3.0
  */
+// 20201204 {link AnsiElement Ansi}颜色。
 public enum AnsiColor implements AnsiElement {
 
 	DEFAULT("39"),
@@ -31,6 +32,7 @@ public enum AnsiColor implements AnsiElement {
 
 	RED("31"),
 
+	// 20201204 绿色 -> Springboot横幅
 	GREEN("32"),
 
 	YELLOW("33"),

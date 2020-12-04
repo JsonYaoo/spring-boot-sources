@@ -28,6 +28,7 @@ import org.springframework.core.env.Environment;
  * @author Jeremy Rickard
  * @since 1.2.0
  */
+// 20201203 用于以编程方式编写横幅的接口类。
 @FunctionalInterface
 public interface Banner {
 
@@ -37,26 +38,31 @@ public interface Banner {
 	 * @param sourceClass the source class for the application
 	 * @param out the output print stream
 	 */
+	// 20201203 将横幅打印到指定的打印流。
 	void printBanner(Environment environment, Class<?> sourceClass, PrintStream out);
 
 	/**
 	 * An enumeration of possible values for configuring the Banner.
 	 */
+	// 20201203 用于配置横幅的可能值的枚举。
 	enum Mode {
 
 		/**
 		 * Disable printing of the banner.
 		 */
+		// 20201203 禁止打印横幅。
 		OFF,
 
 		/**
 		 * Print the banner to System.out.
 		 */
+		// 20201203 将横幅打印到系统输出
 		CONSOLE,
 
 		/**
 		 * Print the banner to the log file.
 		 */
+		// 20201203 将横幅打印到日志文件。
 		LOG
 
 	}

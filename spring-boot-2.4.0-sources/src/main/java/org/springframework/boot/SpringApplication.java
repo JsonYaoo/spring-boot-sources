@@ -247,8 +247,10 @@ public class SpringApplication {
 
 	private Set<String> sources = new LinkedHashSet<>();
 
+	// 20201203 主类Class
 	private Class<?> mainApplicationClass;
 
+	// 20201203 Banner打印模式 => 控制台打印
 	private Mode bannerMode = Mode.CONSOLE;
 
 	private boolean logStartupInfo = true;
@@ -414,7 +416,7 @@ public class SpringApplication {
 			// 20201203 设置spring.beaninfo.ignore属性值为true, 跳过对{@code beaninfo}类的搜索
 			configureIgnoreBeanInfo(environment);
 
-
+			// 20201203 打印Springboot横幅
 			Banner printedBanner = printBanner(environment);
 			context = createApplicationContext();
 			context.setApplicationStartup(this.applicationStartup);
@@ -783,16 +785,26 @@ public class SpringApplication {
 		}
 	}
 
+	// 20201203 打印Springboot横幅
 	private Banner printBanner(ConfigurableEnvironment environment) {
+		// 20201203 如果Banner打印模式为关闭状态, 则直接返回不做处理
 		if (this.bannerMode == Mode.OFF) {
 			return null;
 		}
-		ResourceLoader resourceLoader = (this.resourceLoader != null) ? this.resourceLoader
-				: new DefaultResourceLoader(null);
+
+		// 20201203 否则获取资源加载器
+		ResourceLoader resourceLoader = (this.resourceLoader != null) ? this.resourceLoader : new DefaultResourceLoader(null);
+
+		// 20201203 构建打印横幅实现类
 		SpringApplicationBannerPrinter bannerPrinter = new SpringApplicationBannerPrinter(resourceLoader, this.banner);
+
+		// 20201203 如果Banner打印模式为日志级别
 		if (this.bannerMode == Mode.LOG) {
+			// 20201203 获取日志Banner, 同时输出spring.banner.charset="UFT-8"
 			return bannerPrinter.print(environment, this.mainApplicationClass, logger);
 		}
+
+		// 20201203 否则控制台模式打印Springboot横幅
 		return bannerPrinter.print(environment, this.mainApplicationClass, System.out);
 	}
 

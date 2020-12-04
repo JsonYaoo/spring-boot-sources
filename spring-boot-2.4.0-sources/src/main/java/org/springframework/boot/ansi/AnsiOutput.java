@@ -27,6 +27,7 @@ import org.springframework.util.Assert;
  * @author Phillip Webb
  * @since 1.0.0
  */
+// 20201204 生成ANSI编码的输出，自动尝试检测终端是否支持ANSI。
 public abstract class AnsiOutput {
 
 	private static final String ENCODE_JOIN = ";";
@@ -89,6 +90,7 @@ public abstract class AnsiOutput {
 	 * @param elements the elements to encode
 	 * @return a string of the encoded elements
 	 */
+	// 20201204 从指定的元素创建新的ANSI字符串。任何{@link AnsiElement}都将根据需要进行编码。
 	public static String toString(Object... elements) {
 		StringBuilder sb = new StringBuilder();
 		if (isEnabled()) {

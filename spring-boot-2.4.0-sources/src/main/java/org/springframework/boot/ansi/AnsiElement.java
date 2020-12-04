@@ -22,6 +22,7 @@ package org.springframework.boot.ansi;
  * @author Phillip Webb
  * @since 1.0.0
  */
+// 20201204 ANSI编码元素。
 public interface AnsiElement {
 
 	/**

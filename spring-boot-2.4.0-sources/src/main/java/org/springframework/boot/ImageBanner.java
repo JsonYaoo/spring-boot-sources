@@ -55,6 +55,7 @@ import org.springframework.util.Assert;
  * @author Raja Kolli
  * @since 1.4.0
  */
+// 20201203 打印从图像资源{@link resource}生成的ASCII图片的横幅实现。
 public class ImageBanner implements Banner {
 
 	private static final String PROPERTY_PREFIX = "spring.banner.image.";
@@ -65,9 +66,15 @@ public class ImageBanner implements Banner {
 
 	private final Resource image;
 
+	// 20201203 图片的横幅实现实例
 	public ImageBanner(Resource image) {
+		// 20201203 图片资源必须不能为空
 		Assert.notNull(image, "Image must not be null");
+
+		// 20201203 图片资源必须存在
 		Assert.isTrue(image.exists(), "Image must exist");
+
+		// 20201203 注册图片资源
 		this.image = image;
 	}
 

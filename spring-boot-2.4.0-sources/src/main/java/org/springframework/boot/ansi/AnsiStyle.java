@@ -22,6 +22,7 @@ package org.springframework.boot.ansi;
  * @author Phillip Webb
  * @since 1.3.0
  */
+// 20201204 {@link AnsiElement Ansi}样式。
 public enum AnsiStyle implements AnsiElement {
 
 	NORMAL("0"),

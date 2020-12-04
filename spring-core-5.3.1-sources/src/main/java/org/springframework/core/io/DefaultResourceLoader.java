@@ -31,11 +31,18 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201203
+ * A. {@link ResourceLoader}接口的默认实现。用于作为基类服务{@link org.springframework.context.support.AbstractApplicationContext}. 也可以单独使用。
+ * B. 如果位置值是URL，则返回{@link UrlResource}；如果位置值是非URL路径或“classpath:”伪URL，则返回{@link ClassPathResource}。
+ */
+/**
+ * A.
  * Default implementation of the {@link ResourceLoader} interface.
  * Used by {@link ResourceEditor}, and serves as base class for
  * {@link org.springframework.context.support.AbstractApplicationContext}.
  * Can also be used standalone.
  *
+ * B.
  * <p>Will return a {@link UrlResource} if the location value is a URL,
  * and a {@link ClassPathResource} if it is a non-URL path or a
  * "classpath:" pseudo-URL.
@@ -45,8 +52,10 @@ import org.springframework.util.StringUtils;
  * @see FileSystemResourceLoader
  * @see org.springframework.context.support.ClassPathXmlApplicationContext
  */
+// 20201203 {@link ResourceLoader}接口的默认实现。用于作为基类服务{@link org.springframework.context.support.AbstractApplicationContext}. 也可以单独使用。
 public class DefaultResourceLoader implements ResourceLoader {
 
+	// 20201203 用于加载类路径资源的类加载器，或用于在实际资源访问时使用线程上下文类加载器的{@code null}
 	@Nullable
 	private ClassLoader classLoader;
 
@@ -67,9 +76,12 @@ public class DefaultResourceLoader implements ResourceLoader {
 
 	/**
 	 * Create a new DefaultResourceLoader.
+	 *
+	 * // 20201203 用于加载类路径资源的类加载器，或用于在实际资源访问时使用线程上下文类加载器的{@code null}
 	 * @param classLoader the ClassLoader to load class path resources with, or {@code null}
 	 * for using the thread context class loader at the time of actual resource access
 	 */
+	// 20201203 创建新的DefaultResourceLoader。
 	public DefaultResourceLoader(@Nullable ClassLoader classLoader) {
 		this.classLoader = classLoader;
 	}

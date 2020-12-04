@@ -47,15 +47,22 @@ import org.springframework.util.StreamUtils;
  * @author Toshiaki Maki
  * @since 1.2.0
  */
+// 20201203 从源文本{@link Resource}打印的横幅实现。
 public class ResourceBanner implements Banner {
 
 	private static final Log logger = LogFactory.getLog(ResourceBanner.class);
 
 	private Resource resource;
 
+	// 20201203 源文本打印横幅实现。
 	public ResourceBanner(Resource resource) {
+		// 20201203 资源不能为null
 		Assert.notNull(resource, "Resource must not be null");
+
+		// 20201203 资必须存在
 		Assert.isTrue(resource.exists(), "Resource must exist");
+
+		// 20201203 注册资源
 		this.resource = resource;
 	}
 

@@ -28,8 +28,10 @@ import org.springframework.core.env.Environment;
  *
  * @author Phillip Webb
  */
+// 20201203 编写“Spring”横幅的默认横幅实现。
 class SpringBootBanner implements Banner {
 
+	// 20201203 获取横幅字符串数组
 	private static final String[] BANNER = { "", "  .   ____          _            __ _ _",
 			" /\\\\ / ___'_ __ _ _(_)_ __  __ _ \\ \\ \\ \\", "( ( )\\___ | '_ | '_| | '_ \\/ _` | \\ \\ \\ \\",
 			" \\\\/  ___)| |_)| | | | | || (_| |  ) ) ) )", "  '  |____| .__|_| |_|_| |_\\__, | / / / /",
@@ -37,22 +39,34 @@ class SpringBootBanner implements Banner {
 
 	private static final String SPRING_BOOT = " :: Spring Boot :: ";
 
+	// 20201203 控制台一行的长度
 	private static final int STRAP_LINE_SIZE = 42;
 
+	// 20201203 将横幅打印到指定的打印流
 	@Override
 	public void printBanner(Environment environment, Class<?> sourceClass, PrintStream printStream) {
+		// 20201203 遍历横幅字符串数组, 并按行打印
 		for (String line : BANNER) {
 			printStream.println(line);
 		}
+
+		// 20201204 获取Springboot的实现版本
 		String version = SpringBootVersion.getVersion();
+
+		// 20201204 拼凑输出版本号的格式: (v + version)
 		version = (version != null) ? " (v" + version + ")" : "";
+
+		// 20201204 铺满控制台一行
 		StringBuilder padding = new StringBuilder();
 		while (padding.length() < STRAP_LINE_SIZE - (version.length() + SPRING_BOOT.length())) {
 			padding.append(" ");
 		}
 
+		// 20201204 以GREEN颜色、ANSI字符串、AnsiStyle.FAINT样式输出是SPRING_BOOT, 以DEFAULT颜色、ANSI字符串、AnsiStyle.FAINT样式输出Springboot版本号
 		printStream.println(AnsiOutput.toString(AnsiColor.GREEN, SPRING_BOOT, AnsiColor.DEFAULT, padding.toString(),
 				AnsiStyle.FAINT, version));
+
+		// 20201204 打印换行
 		printStream.println();
 	}
 
