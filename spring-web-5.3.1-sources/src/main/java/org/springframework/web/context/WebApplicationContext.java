@@ -22,17 +22,28 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201204
+ * A. 提供Web应用程序配置的界面。 在应用程序运行时，它是只读的，但是如果实现支持，则可以重新加载。
+ * B. 此接口向通用ApplicationContext接口添加一个{@code getServletContext（）}方法，并定义一个众所周知的应用程序属性名称，在引导过程中根上下文必须绑定到该名称。
+ * C. 像通用应用程序上下文一样，Web应用程序上下文是分层的。 每个应用程序只有一个根上下文，而应用程序中的每个servlet（包括MVC框架中的调度程序servlet）都有自己的子上下文。
+ * D. 除了标准的应用程序上下文生命周期功能外，WebApplicationContext实现还需要检测{@link ServletContextAware} bean，并相应地调用{@code setServletContext}方法。
+ */
+/**
+ * A.
  * Interface to provide configuration for a web application. This is read-only while
  * the application is running, but may be reloaded if the implementation supports this.
  *
+ * B.
  * <p>This interface adds a {@code getServletContext()} method to the generic
  * ApplicationContext interface, and defines a well-known application attribute name
  * that the root context must be bound to in the bootstrap process.
  *
+ * C.
  * <p>Like generic application contexts, web application contexts are hierarchical.
  * There is a single root context per application, while each servlet in the application
  * (including a dispatcher servlet in the MVC framework) has its own child context.
  *
+ * D.
  * <p>In addition to standard application context lifecycle capabilities,
  * WebApplicationContext implementations need to detect {@link ServletContextAware}
  * beans and invoke the {@code setServletContext} method accordingly.
@@ -42,6 +53,7 @@ import org.springframework.lang.Nullable;
  * @since January 19, 2001
  * @see ServletContextAware#setServletContext
  */
+// 20201204 此接口向通用ApplicationContext接口添加一个{@code getServletContext（）}方法，并定义一个众所周知的应用程序属性名称，在引导过程中根上下文必须绑定到该名称。
 public interface WebApplicationContext extends ApplicationContext {
 
 	/**

@@ -297,6 +297,7 @@ public class SpringApplication {
 
 	private boolean lazyInitialization = false;
 
+	// 20201204 默认的{@link ApplicationContextFactory}实现，将为{@link WebApplicationType}创建适当的上下文。
 	private ApplicationContextFactory applicationContextFactory = ApplicationContextFactory.DEFAULT;
 
 	// 20201201 默认上下文数据收集器
@@ -812,10 +813,11 @@ public class SpringApplication {
 	 * Strategy method used to create the {@link ApplicationContext}. By default this
 	 * method will respect any explicitly set application context class or factory before
 	 * falling back to a suitable default.
-	 * @return the application context (not yet refreshed)
+	 * @return the application context (not yet refreshed)	// 20201204 应用程序上下文（尚未刷新）
 	 * @see #setApplicationContextClass(Class)
 	 * @see #setApplicationContextFactory(ApplicationContextFactory)
 	 */
+	// 20201204 用于创建{@link ApplicationContext}的策略方法。默认情况下，在返回到合适的默认值之前，此方法将尊重任何显式设置的应用程序上下文类或工厂。
 	protected ConfigurableApplicationContext createApplicationContext() {
 		return this.applicationContextFactory.create(this.webApplicationType);
 	}

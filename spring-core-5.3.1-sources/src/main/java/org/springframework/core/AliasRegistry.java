@@ -23,6 +23,7 @@ package org.springframework.core;
  * @author Juergen Hoeller
  * @since 2.5.2
  */
+// 20201204 用于管理别名的通用接口。 用作{@link org.springframework.beans.factory.support.BeanDefinitionRegistry}的超级接口。
 public interface AliasRegistry {
 
 	/**

@@ -35,12 +35,21 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 20201204
+ * A. {@link ServletWebServerApplicationContext}，它接受带注解的类作为输入，尤其是{@link org.springframework.context.annotation.Configuration @Configuration}带注解的类，
+ *    还有普通的{@link Component @Component}类和使用{@Code javax.inject}的注解。允许逐个注册类（将类名指定为配置位置）以及类路径扫描（将基包指定为配置位置）。
+ * B. 注意：对于多个{@code @Configuration}类，后面的{@code @Bean}定义将覆盖先前加载的文件中定义的定义。这可以用来通过一个额外的配置类故意覆盖某些bean定义。
+ */
+/**
+ * A.
  * {@link ServletWebServerApplicationContext} that accepts annotated classes as input - in
  * particular {@link org.springframework.context.annotation.Configuration @Configuration}
  * -annotated classes, but also plain {@link Component @Component} classes and JSR-330
  * compliant classes using {@code javax.inject} annotations. Allows for registering
  * classes one by one (specifying class names as config location) as well as for classpath
  * scanning (specifying base packages as config location).
+ *
+ * B.
  * <p>
  * Note: In case of multiple {@code @Configuration} classes, later {@code @Bean}
  * definitions will override ones defined in earlier loaded files. This can be leveraged
@@ -53,8 +62,8 @@ import org.springframework.util.ClassUtils;
  * @see ServletWebServerApplicationContext
  * @see AnnotationConfigServletWebApplicationContext
  */
-public class AnnotationConfigServletWebServerApplicationContext extends ServletWebServerApplicationContext
-		implements AnnotationConfigRegistry {
+// 20201204 Servlet注解应用程序上下文: 扫描注解配置核心类 @Configuration & @Component & javax.inject、允许对其应用任何bean定义读取器、支持Servlet上下文、配置上下文、Web生命周期获取、将资源路径解释为servlet上下文资源、注释配置应用程序上下文
+public class AnnotationConfigServletWebServerApplicationContext extends ServletWebServerApplicationContext implements AnnotationConfigRegistry {
 
 	private final AnnotatedBeanDefinitionReader reader;
 

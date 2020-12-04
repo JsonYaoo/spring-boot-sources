@@ -27,6 +27,7 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @see Theme
  */
+// 20201204 由可以解析{@link Theme Themes}的对象实现的接口。 这样就可以针对给定的“主题”对消息进行参数化和国际化。
 public interface ThemeSource {
 
 	/**

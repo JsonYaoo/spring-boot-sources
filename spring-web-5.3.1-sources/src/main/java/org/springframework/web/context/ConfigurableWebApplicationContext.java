@@ -23,10 +23,17 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201204
+ * A. 由可配置的Web应用程序上下文实现的接口。 由{@link ContextLoader}和{@link org.springframework.web.servlet.FrameworkServlet}支持。
+ * B. 注意：在调用从{@link ConfigurableApplicationContext}继承的{@link #refresh}方法之前，需要调用此接口的setter。 它们不会自行导致上下文初始化。
+ */
+/**
+ * A.
  * Interface to be implemented by configurable web application contexts.
  * Supported by {@link ContextLoader} and
  * {@link org.springframework.web.servlet.FrameworkServlet}.
  *
+ * B.
  * <p>Note: The setters of this interface need to be called before an
  * invocation of the {@link #refresh} method inherited from
  * {@link ConfigurableApplicationContext}.
@@ -38,6 +45,7 @@ import org.springframework.lang.Nullable;
  * @see ContextLoader#createWebApplicationContext
  * @see org.springframework.web.servlet.FrameworkServlet#createWebApplicationContext
  */
+// 20201204 由可配置的Web应用程序上下文实现的接口, 支持Servlet上下文、配置上下文、 声明周期获取
 public interface ConfigurableWebApplicationContext extends WebApplicationContext, ConfigurableApplicationContext {
 
 	/**

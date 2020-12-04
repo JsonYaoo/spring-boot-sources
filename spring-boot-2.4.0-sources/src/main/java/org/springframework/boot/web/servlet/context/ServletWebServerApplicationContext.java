@@ -61,13 +61,30 @@ import org.springframework.web.context.support.ServletContextScope;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
+ * 20201204
+ * A. 一个{@link WebApplicationContext}，可用于从包含的{@link ServletWebServerFactory} bean中进行自我引导。
+ * B. 通过在{@link ApplicationContext}本身内搜索单个{@link ServletWebServerFactory} bean，此上下文将创建，初始化和运行{@link WebServer}。
+ *    {@link ServletWebServerFactory}可以自由使用标准的Spring概念（例如依赖项注入，生命周期回调和属性占位符变量）。
+ * C. 另外，上下文中定义的任何{@link Servlet}或{@link Filter} bean都将自动在Web服务器上注册。 在单个Servlet bean的情况下，将使用“ /”映射。
+ *    如果找到多个Servlet Bean，则将小写的Bean名称用作映射前缀。 任何名为“ dispatcherServlet”的Servlet都将始终映射为“ /”。 过滤的Bean将被映射到所有URL（'/ *'）。
+ * D. 对于更高级的配置，上下文可以改为定义实现{@link ServletContextInitializer}接口的bean（最常见的是{@link ServletRegistrationBean}和或
+ *    {@link FilterRegistrationBean}）。 为了防止重复注册，使用{@link ServletContextInitializer} bean将禁用自动Servlet和Filter bean注册。
+ * E. 尽管可以直接使用此上下文，但是大多数开发人员应考虑使用{@link AnnotationConfigServletWebServerApplicationContext}或
+ *    {@link XmlServletWebServerApplicationContext}变体。
+ */
+/**
+ * A.
  * A {@link WebApplicationContext} that can be used to bootstrap itself from a contained
  * {@link ServletWebServerFactory} bean.
  * <p>
+ *
+ * B.
  * This context will create, initialize and run an {@link WebServer} by searching for a
  * single {@link ServletWebServerFactory} bean within the {@link ApplicationContext}
  * itself. The {@link ServletWebServerFactory} is free to use standard Spring concepts
  * (such as dependency injection, lifecycle callbacks and property placeholder variables).
+ *
+ * C.
  * <p>
  * In addition, any {@link Servlet} or {@link Filter} beans defined in the context will be
  * automatically registered with the web server. In the case of a single Servlet bean, the
@@ -75,11 +92,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * name will be used as a mapping prefix. Any Servlet named 'dispatcherServlet' will
  * always be mapped to '/'. Filter beans will be mapped to all URLs ('/*').
  * <p>
+ *
+ * D.
  * For more advanced configuration, the context can instead define beans that implement
  * the {@link ServletContextInitializer} interface (most often
  * {@link ServletRegistrationBean}s and/or {@link FilterRegistrationBean}s). To prevent
  * double registration, the use of {@link ServletContextInitializer} beans will disable
  * automatic Servlet and Filter bean registration.
+ *
+ * E.
  * <p>
  * Although this context can be used directly, most developers should consider using the
  * {@link AnnotationConfigServletWebServerApplicationContext} or
@@ -93,8 +114,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @see XmlServletWebServerApplicationContext
  * @see ServletWebServerFactory
  */
-public class ServletWebServerApplicationContext extends GenericWebApplicationContext
-		implements ConfigurableWebServerApplicationContext {
+// 20201204 Servlet Web程序上下文: 允许对其应用任何bean定义读取器、支持Servlet上下文、配置上下文、Web生命周期获取、将资源路径解释为servlet上下文资源
+public class ServletWebServerApplicationContext extends GenericWebApplicationContext implements ConfigurableWebServerApplicationContext {
 
 	private static final Log logger = LogFactory.getLog(ServletWebServerApplicationContext.class);
 

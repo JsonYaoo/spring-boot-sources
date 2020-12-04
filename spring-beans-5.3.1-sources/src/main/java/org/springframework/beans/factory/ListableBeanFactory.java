@@ -25,13 +25,14 @@ import org.springframework.lang.Nullable;
 
 /**
  * 20201130
- * A. {@linkbeanfactory}接口的扩展将由bean工厂实现，这些bean工厂可以枚举它们的所有bean实例，而不是按照客户机的请求逐个尝试按名称查找bean。
+ * A. {@link beanfactory}接口的扩展将由bean工厂实现，这些bean工厂可以枚举它们的所有bean实例，而不是按照客户机的请求逐个尝试按名称查找bean。
  *    预加载所有bean定义的BeanFactory实现（例如基于XML的工厂）可以实现这个接口。
  * B. 如果这是{@link HierarchicalBeanFactory}，则返回值将不考虑任何BeanFactory层次结构，而只与当前工厂中定义的bean相关。
  *    也可以使用{@link BeanFactoryUtils}助手类来考虑祖先工厂中的bean。
- * C. 只考虑这个bean在这个接口中的定义。它们将忽略任何通过其他方式（如注册的单例）{@linkbeanorg.springframework.beans.factory.config.ConfigurableBeanFactory}的
- *    {@code registerSingleton}方法，但{@code getBeanNamesForType}和{@code getBeansOfType}也将检查这些手动注册的单例实例。当然，BeanFactory的{@codegetbean}
- *    也允许对这种特殊bean的透明访问。然而，在典型的场景中，所有bean都将由外部bean定义来定义，因此大多数应用程序不需要担心这种区别。
+ * C. 该接口中的方法将仅遵守该工厂的bean定义。 他们将忽略通过其他方式（例如{@link org.springframework.beans.factory.config.ConfigurableBeanFactory}的
+ *    {@code registerSingleton}方法）注册的任何单例bean，但{@code getBeanNamesForType}和{@Code getBeansOfType}，它也将检查此类手动注册的单例。
+ *    当然，BeanFactory的{@code getBean}确实也允许透明访问此类特殊bean。 但是，在典型情况下，无论如何，所有bean都将由外部bean定义来定义，
+ *    因此大多数应用程序不必担心这种区别。
  * D. 注意：除了{@code getBeanDefinitionCount}和{@code containsBeanDefinition}，此接口中的方法不是为频繁调用而设计的。实施可能很慢。
  */
 /**

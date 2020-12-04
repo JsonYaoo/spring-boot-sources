@@ -23,9 +23,17 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 /**
+ * 20201204
+ * A. {@link ServletWebServerApplicationContext}从XML文档获取其配置，{@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}可以理解。
+ * B. 注意：如果有多个配置位置，则较新的Bean定义将覆盖较早加载的文件中定义的定义。 可以利用它来通过一个额外的XML文件有意覆盖某些bean定义。
+ */
+/**
+ * A.
  * {@link ServletWebServerApplicationContext} which takes its configuration from XML
  * documents, understood by an
  * {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}.
+ *
+ * B.
  * <p>
  * Note: In case of multiple config locations, later bean definitions will override ones
  * defined in earlier loaded files. This can be leveraged to deliberately override certain
@@ -38,6 +46,7 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
  * @see ServletWebServerApplicationContext
  * @see XmlWebApplicationContext
  */
+// 20201204 Servelt XML配置应用上下文: 从XML文档获取其配置、允许对其应用任何bean定义读取器、支持Servlet上下文、配置上下文、Web生命周期获取、将资源路径解释为servlet上下文资源
 public class XmlServletWebServerApplicationContext extends ServletWebServerApplicationContext {
 
 	private final XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(this);

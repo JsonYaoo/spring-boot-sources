@@ -24,7 +24,7 @@ import org.springframework.core.io.ResourceLoader;
 /**
  * 20201130
  * A. 用于将位置模式（例如，Ant样式的路径模式）解析为资源对象的策略接口。
- * B. 这是{@link ResourceLoader}接口的扩展。传入的ResourceLoader（例如，{@linkorg.springframework.context.ApplicationContext}通过
+ * B. 这是{@link ResourceLoader}接口的扩展。传入的ResourceLoader（例如，{@link org.springframework.context.ApplicationContext}通过
  *    {@link org.springframework.context.resourceLoaderware}在上下文中运行时传入）可以检查它是否也实现了此扩展接口。
  * C. {@link PathMatchingResourcePatternResolver}是一个独立的实现，可在ApplicationContext外部使用，
  *    {@link ResourceArrayPropertyEditor}也可用于填充资源数组bean属性。

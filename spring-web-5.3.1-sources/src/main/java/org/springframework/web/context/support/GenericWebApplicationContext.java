@@ -37,22 +37,36 @@ import org.springframework.web.context.ConfigurableWebEnvironment;
 import org.springframework.web.context.ServletContextAware;
 
 /**
+ * 20201204
+ * A. {@link GenericApplicationContext}的子类，适用于web环境。
+ * B. 实现{@link ConfigurableWebApplicationContext}，但不用于{@code web.xml}. 相反，它是为编程设置而设计的，例如用于构建嵌套上下文或
+ *    在{@link org.springframework.web.WebApplicationInitializer WebApplicationInitializer}中使用。
+ * C. 如果要实现从配置文件读取bean定义的WebApplicationContext，请考虑从AbstractRefreshableWebApplicationContext派生，在{@code loadBeanDefinitions}方法的实现中读取bean定义。
+ * D. 将资源路径解释为servlet上下文资源，即web应用程序根目录下的路径。绝对路径，例如web应用程序根目录之外的文件，可以通过AbstractApplicationContext实现的“file:”url进行访问。
+ * E. 除了{@link org.springframework.context.support.AbstractApplicationContext}检测到的特殊bean之外，这个类在上下文中检测一个名为“ThemeSource”的ThemeSource bean。
+ */
+/**
+ * A.
  * Subclass of {@link GenericApplicationContext}, suitable for web environments.
  *
+ * B.
  * <p>Implements {@link ConfigurableWebApplicationContext},
  * but is not intended for declarative setup in {@code web.xml}. Instead, it is designed
  * for programmatic setup, for example for building nested contexts or for use within
  * {@link org.springframework.web.WebApplicationInitializer WebApplicationInitializers}.
  *
+ * C.
  * <p><b>If you intend to implement a WebApplicationContext that reads bean definitions
  * from configuration files, consider deriving from AbstractRefreshableWebApplicationContext,
  * reading the bean definitions in an implementation of the {@code loadBeanDefinitions}
  * method.</b>
  *
+ * D.
  * <p>Interprets resource paths as servlet context resources, i.e. as paths beneath
  * the web application root. Absolute paths, e.g. for files outside the web app root,
  * can be accessed via "file:" URLs, as implemented by AbstractApplicationContext.
  *
+ * E.
  * <p>In addition to the special beans detected by
  * {@link org.springframework.context.support.AbstractApplicationContext},
  * this class detects a ThemeSource bean in the context, with the name "themeSource".
@@ -61,8 +75,8 @@ import org.springframework.web.context.ServletContextAware;
  * @author Chris Beams
  * @since 1.2
  */
-public class GenericWebApplicationContext extends GenericApplicationContext
-		implements ConfigurableWebApplicationContext, ThemeSource {
+// 20201204 一般Web应用程序上下文: 允许对其应用任何bean定义读取器、支持Servlet上下文、配置上下文、 声明周期获取、将资源路径解释为servlet上下文资源(web应用程序根目录下的路径)
+public class GenericWebApplicationContext extends GenericApplicationContext implements ConfigurableWebApplicationContext, ThemeSource {
 
 	@Nullable
 	private ServletContext servletContext;

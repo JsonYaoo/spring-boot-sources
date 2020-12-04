@@ -27,6 +27,7 @@ import org.springframework.util.ObjectUtils;
  * @author Phillip Webb
  * @since 2.0.0
  */
+// 20201204 由{@link ApplicationContext应用程序上下文}实现的接口，该接口创建和管理嵌入式{@link WebServer}的生命周期。
 public interface WebServerApplicationContext extends ApplicationContext {
 
 	/**

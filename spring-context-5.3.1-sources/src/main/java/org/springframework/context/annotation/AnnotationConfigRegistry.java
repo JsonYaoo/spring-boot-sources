@@ -23,6 +23,7 @@ package org.springframework.context.annotation;
  * @author Juergen Hoeller
  * @since 4.1
  */
+// 20201204 注释配置应用程序上下文的通用接口，定义了{@link #register}和{@link #scan}方法。
 public interface AnnotationConfigRegistry {
 
 	/**

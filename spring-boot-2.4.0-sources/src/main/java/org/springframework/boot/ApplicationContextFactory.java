@@ -34,6 +34,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  * @author Phillip Webb
  * @since 2.4.0
  */
+// 20201204 使用{@link springapplication}创建{@link ConfigurableApplicationContext}的策略接口。创建的上下文应该以它们的默认形式返回，{@code springapplication}负责配置和刷新上下文。
 @FunctionalInterface
 public interface ApplicationContextFactory {
 
@@ -41,10 +42,12 @@ public interface ApplicationContextFactory {
 	 * A default {@link ApplicationContextFactory} implementation that will create an
 	 * appropriate context for the {@link WebApplicationType}.
 	 */
+	// 20201204 默认的{@link ApplicationContextFactory}实现，将为{@link WebApplicationType}创建适当的上下文。
 	ApplicationContextFactory DEFAULT = (webApplicationType) -> {
 		try {
 			switch (webApplicationType) {
 			case SERVLET:
+				// 20201204 构造Servlet上下文
 				return new AnnotationConfigServletWebServerApplicationContext();
 			case REACTIVE:
 				return new AnnotationConfigReactiveWebServerApplicationContext();

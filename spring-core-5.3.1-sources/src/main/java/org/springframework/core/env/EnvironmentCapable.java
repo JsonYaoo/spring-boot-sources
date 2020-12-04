@@ -21,9 +21,9 @@ package org.springframework.core.env;
  * A. 接口，该接口指示包含并公开{@link Environment}引用的组件。
  * B. 所有Spring应用程序上下文都支持环境，接口主要用于在框架方法中执行{@code instanceof}检查，这些方法接受可能是也可能不是ApplicationContext实例的BeanFactory实例，
  * C. 以便与环境（如果环境确实可用）进行交互。
- * D. 如前所述，{@linkorg.springframework.context.ApplicationContext ApplicationContext}扩展了EnvironmentCapable，因此公开了{@link#getEnvironment（）}方法；
- *    但是，{@链接org.springframework.context.ConfigurableApplicationContext ConfigurableApplicationContext}重新定义
- *    {@linkorg.springframework.context.ConfigurableApplicationContext#getEnvironment getEnvironment（）}并缩小签名范围以返回
+ * D. 如前所述，{@link org.springframework.context.ApplicationContext ApplicationContext}扩展了EnvironmentCapable，因此公开了{@link #getEnvironment（）}方法；
+ *    但是，{@link org.springframework.context.ConfigurableApplicationContext ConfigurableApplicationContext}重新定义
+ *    {@link org.springframework.context.ConfigurableApplicationContext#getEnvironment getEnvironment（）}并缩小签名范围以返回
  *    {@link ConfigurableEnvironment}。其结果是，在从ConfigurableApplicationContext访问环境对象之前，它是“只读”的，此时也可以对其进行配置。
  */
 /**
