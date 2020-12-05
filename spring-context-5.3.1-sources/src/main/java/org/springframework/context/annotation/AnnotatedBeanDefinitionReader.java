@@ -34,8 +34,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 20201204
+ * A. 方便的适配器，用于以编程方式注册Bean类。
+ * B. 这是{@link ClassPathBeanDefinitionScanner}的替代方法，它应用相同的注释分辨率，但仅适用于显式注册的类。
+ */
+/**
+ * A.
  * Convenient adapter for programmatic registration of bean classes.
  *
+ * B.
  * <p>This is an alternative to {@link ClassPathBeanDefinitionScanner}, applying
  * the same resolution of annotations but for explicitly registered classes only.
  *
@@ -46,6 +53,7 @@ import org.springframework.util.Assert;
  * @since 3.0
  * @see AnnotationConfigApplicationContext#register
  */
+// 20201204 方便的适配器, 用于以编程方式注册Bean类。
 public class AnnotatedBeanDefinitionReader {
 
 	private final BeanDefinitionRegistry registry;
@@ -56,17 +64,28 @@ public class AnnotatedBeanDefinitionReader {
 
 	private ConditionEvaluator conditionEvaluator;
 
-
 	/**
+	 * 20201204
+	 * A. 为给定的注册表创建一个新的{@code AnnotatedBeanDefinitionReader}。
+	 * B. 如果注册表是{@link EnvironmentCapable}，例如 如果是{@code ApplicationContext}，则将继承{@link Environment}，否则将创建并使用新的
+	 *    {@link StandardEnvironment}。
+	 */
+	/**
+	 * A.
 	 * Create a new {@code AnnotatedBeanDefinitionReader} for the given registry.
+	 *
+	 * B.
 	 * <p>If the registry is {@link EnvironmentCapable}, e.g. is an {@code ApplicationContext},
 	 * the {@link Environment} will be inherited, otherwise a new
 	 * {@link StandardEnvironment} will be created and used.
+	 *
 	 * @param registry the {@code BeanFactory} to load bean definitions into,
-	 * in the form of a {@code BeanDefinitionRegistry}
+	 * in the form of a {@code BeanDefinitionRegistry} // 20201204 注册{@code BeanFactory}以便以{@code BeanDefinitionRegistry}的形式将bean定义加载到其中
+	 *
 	 * @see #AnnotatedBeanDefinitionReader(BeanDefinitionRegistry, Environment)
 	 * @see #setEnvironment(Environment)
 	 */
+	// 20201204 为给定的注册表创建一个方便的适配器, 用于以编程方式注册Bean类。
 	public AnnotatedBeanDefinitionReader(BeanDefinitionRegistry registry) {
 		this(registry, getOrCreateEnvironment(registry));
 	}
@@ -290,11 +309,18 @@ public class AnnotatedBeanDefinitionReader {
 	 * Get the Environment from the given registry if possible, otherwise return a new
 	 * StandardEnvironment.
 	 */
+	// 20201204 如果可能，从给定的注册表中获取环境，否则返回一个新的StandardEnvironment。
 	private static Environment getOrCreateEnvironment(BeanDefinitionRegistry registry) {
+		// 20201204 注册表不能为null
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
+
+		// 20201204 如果注册表属于顶层环境EnvironmentCapable的子类, 说明为Web环境
 		if (registry instanceof EnvironmentCapable) {
+			// 20201204 则获取子类的环境实例
 			return ((EnvironmentCapable) registry).getEnvironment();
 		}
+
+		// 20201204 否则说明不为Web环境, 则初始化一个标准环境(非Web)
 		return new StandardEnvironment();
 	}
 

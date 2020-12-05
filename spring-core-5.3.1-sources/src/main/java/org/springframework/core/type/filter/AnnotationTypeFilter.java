@@ -26,9 +26,17 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 20201205
+ * A. 一个简单的{@link TypeFilter}，它将类与给定的注解匹配，并检查继承的注解。
+ * B. 默认情况下，匹配逻辑与{@link AnnotationUtils＃getAnnotation（java.lang.reflect.AnnotatedElement，Class）}的逻辑进行镜像，支持为单个级别的元注解提供或存在的注解。
+ *    搜索元注解可能会被禁用。 类似地，可以选择启用对接口的注解的搜索。 有关详细信息，请咨询此类中的各种构造函数。
+ */
+/**
+ * A.
  * A simple {@link TypeFilter} which matches classes with a given annotation,
  * checking inherited annotations as well.
  *
+ * B.
  * <p>By default, the matching logic mirrors that of
  * {@link AnnotationUtils#getAnnotation(java.lang.reflect.AnnotatedElement, Class)},
  * supporting annotations that are <em>present</em> or <em>meta-present</em> for a
@@ -42,22 +50,37 @@ import org.springframework.util.ClassUtils;
  * @author Sam Brannen
  * @since 2.5
  */
+// 20201205 一个简单的{@link TypeFilter}: 检查类和继承的注解, 可以选择启用对接口的注解的搜索
 public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter {
 
+	// 20201205 注解类型
 	private final Class<? extends Annotation> annotationType;
 
+	// 20201205 是否也匹配元注解
 	private final boolean considerMetaAnnotations;
 
-
 	/**
+	 * 20201205
+	 * A. 为给定的注解类型创建一个新的{@code AnnotationTypeFilter}。
+	 * B. 过滤器还将匹配元注解。 要禁用元注解匹配，请使用接受'{@code thinkMetaAnnotations}'参数的构造函数。
+	 * C. 过滤器将不匹配接口。
+	 */
+	/**
+	 * A.
 	 * Create a new {@code AnnotationTypeFilter} for the given annotation type.
+	 *
+	 * B.
 	 * <p>The filter will also match meta-annotations. To disable the
 	 * meta-annotation matching, use the constructor that accepts a
 	 * '{@code considerMetaAnnotations}' argument.
+	 *
+	 * C.
 	 * <p>The filter will not match interfaces.
+	 *
 	 * @param annotationType the annotation type to match
 	 */
 	public AnnotationTypeFilter(Class<? extends Annotation> annotationType) {
+		// 20201205 为给定的注解类型创建一个新的{@code AnnotationTypeFilter} => 匹配元注解、不匹配接口
 		this(annotationType, true, false);
 	}
 
@@ -73,15 +96,24 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 
 	/**
 	 * Create a new {@code AnnotationTypeFilter} for the given annotation type.
-	 * @param annotationType the annotation type to match
-	 * @param considerMetaAnnotations whether to also match on meta-annotations
-	 * @param considerInterfaces whether to also match interfaces
+	 * @param annotationType the annotation type to match	// 20201205 匹配的注解类型
+	 * @param considerMetaAnnotations whether to also match on meta-annotations // 20201205 是否也匹配元注解
+	 * @param considerInterfaces whether to also match interfaces	// 20201205 是否也匹配接口
 	 */
-	public AnnotationTypeFilter(
-			Class<? extends Annotation> annotationType, boolean considerMetaAnnotations, boolean considerInterfaces) {
+	// 20201205 为给定的注解类型创建一个新的{@code AnnotationTypeFilter}。
+	public AnnotationTypeFilter(Class<? extends Annotation> annotationType, boolean considerMetaAnnotations, boolean considerInterfaces) {
+		super(
+				// 20201205 判断此元素上是否存在Inherited.class类型的注解 => Inherited注解仅使注解从超类继承； 已实现的接口上的注解无效，如果超类都不存在注解, 则说明不匹配超类注解
+				annotationType.isAnnotationPresent(Inherited.class),
 
-		super(annotationType.isAnnotationPresent(Inherited.class), considerInterfaces);
+				// 20201205 是否匹配接口
+				considerInterfaces
+		);
+
+		// 20201205 设置注解类型annotationType
 		this.annotationType = annotationType;
+
+		// 20201205 是否也匹配元注解
 		this.considerMetaAnnotations = considerMetaAnnotations;
 	}
 

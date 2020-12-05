@@ -210,6 +210,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	private ApplicationContext parent;
 
 	/** Environment used by this context. */
+	// 20201204 此上下文使用的环境。
 	@Nullable
 	private ConfigurableEnvironment environment;
 
@@ -347,21 +348,41 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 	/**
+	 * 20201204
+	 * A. 以可配置的形式返回此应用程序上下文的{@code Environment}，以便进行进一步的自定义。
+	 * B. 如果未指定，则默认环境将通过{@link #createEnvironment（）}初始化。
+	 */
+	/**
+	 * A.
 	 * Return the {@code Environment} for this application context in configurable
 	 * form, allowing for further customization.
+	 *
+	 * B.
 	 * <p>If none specified, a default environment will be initialized via
 	 * {@link #createEnvironment()}.
 	 */
 	@Override
 	public ConfigurableEnvironment getEnvironment() {
+		// 20201204 如果当前环境实例为null
 		if (this.environment == null) {
+			// 20201204 当需要构建Web环境时, 交由GenericWebApplicationContext重写createEnvironment()方法, 构造标准ServletWeb环境
 			this.environment = createEnvironment();
 		}
+
+		// 20201204 否则返回当前环境实例
 		return this.environment;
 	}
 
 	/**
+	 * 20201204
+	 * A. 创建并返回一个新的{@link StandardEnvironment}。
+	 * B. 子类可以重写此方法，以提供自定义的{@link ConfigurableEnvironment}实现。
+	 */
+	/**
+	 * A.
 	 * Create and return a new {@link StandardEnvironment}.
+	 *
+	 * B.
 	 * <p>Subclasses may override this method in order to supply
 	 * a custom {@link ConfigurableEnvironment} implementation.
 	 */

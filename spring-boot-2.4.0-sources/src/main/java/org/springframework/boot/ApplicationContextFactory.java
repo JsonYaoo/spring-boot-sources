@@ -64,9 +64,11 @@ public interface ApplicationContextFactory {
 	/**
 	 * Creates the {@link ConfigurableApplicationContext application context} for a
 	 * {@link SpringApplication}, respecting the given {@code webApplicationType}.
+	 *
 	 * @param webApplicationType the web application type
 	 * @return the newly created application context
 	 */
+	// 20201205 遵循给定的{@code webApplicationType}，为{@link SpringApplication}创建{@link ConfigurableApplicationContext}应用程序上下文。
 	ConfigurableApplicationContext create(WebApplicationType webApplicationType);
 
 	/**

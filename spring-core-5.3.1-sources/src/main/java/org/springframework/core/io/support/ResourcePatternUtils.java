@@ -21,15 +21,23 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ResourceUtils;
 
 /**
+ * 20201205
+ * A. 用于确定给定URL是否为可通过{@link ResourcePatternResolver}加载的资源位置的实用工具类。
+ * B. 如果{@link #isUrl（String）}方法返回{@code false}，则调用者通常会假设位置是相对路径。
+ */
+/**
+ * A.
  * Utility class for determining whether a given URL is a resource
  * location that can be loaded via a {@link ResourcePatternResolver}.
  *
+ * B.
  * <p>Callers will usually assume that a location is a relative path
  * if the {@link #isUrl(String)} method returns {@code false}.
  *
  * @author Juergen Hoeller
  * @since 1.2.3
  */
+// 20201205 用于确定给定URL是否为可通过{@link ResourcePatternResolver}加载的资源位置的实用工具类。
 public abstract class ResourcePatternUtils {
 
 	/**
@@ -49,22 +57,33 @@ public abstract class ResourcePatternUtils {
 	}
 
 	/**
+	 * // 20201205 为给定的{@link ResourceLoader}返回默认的{@link ResourcePatternResolver}。
 	 * Return a default {@link ResourcePatternResolver} for the given {@link ResourceLoader}.
+	 *
+	 * // 20201205 如果它实现了{@code ResourcePatternResolver}扩展名，则可能是{@code ResourceLoader}本身，或者是在给定的{@code ResourceLoader}上构建的默认
+	 * // 20201205 {@link PathMatchingResourcePatternResolver}。
 	 * <p>This might be the {@code ResourceLoader} itself, if it implements the
 	 * {@code ResourcePatternResolver} extension, or a default
 	 * {@link PathMatchingResourcePatternResolver} built on the given {@code ResourceLoader}.
+	 *
+	 * // 20201205 ResourceLoader为其构建模式解析器（可以为{@code null}以指示默认的ResourceLoader）
 	 * @param resourceLoader the ResourceLoader to build a pattern resolver for
 	 * (may be {@code null} to indicate a default ResourceLoader)
+	 *
 	 * @return the ResourcePatternResolver
 	 * @see PathMatchingResourcePatternResolver
 	 */
+	// 20201205 为给定的{@link ResourceLoader}返回默认的{@link ResourcePatternResolver}。 -> 获取路径模式资源处理器
 	public static ResourcePatternResolver getResourcePatternResolver(@Nullable ResourceLoader resourceLoader) {
+		// 20201205 如果本身为该类型则直接返回
 		if (resourceLoader instanceof ResourcePatternResolver) {
 			return (ResourcePatternResolver) resourceLoader;
 		}
+		// 20201205 否则根据资源加载器构造PathMatchingResourcePatternResolver
 		else if (resourceLoader != null) {
 			return new PathMatchingResourcePatternResolver(resourceLoader);
 		}
+		// 20201205 如果资源加载器也为为空, 则使用DefaultResourceLoader创建一个新的PathMatchingResourcePatternResolver
 		else {
 			return new PathMatchingResourcePatternResolver();
 		}

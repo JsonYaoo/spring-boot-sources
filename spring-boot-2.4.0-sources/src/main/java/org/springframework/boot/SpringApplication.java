@@ -419,7 +419,10 @@ public class SpringApplication {
 
 			// 20201203 打印Springboot横幅
 			Banner printedBanner = printBanner(environment);
+
+			// 20201205 创建AnnotationConfigServletWebServerApplicationContext ServletWeb应用程序配置上下文
 			context = createApplicationContext();
+
 			context.setApplicationStartup(this.applicationStartup);
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
 			refreshContext(context);
@@ -819,6 +822,8 @@ public class SpringApplication {
 	 */
 	// 20201204 用于创建{@link ApplicationContext}的策略方法。默认情况下，在返回到合适的默认值之前，此方法将尊重任何显式设置的应用程序上下文类或工厂。
 	protected ConfigurableApplicationContext createApplicationContext() {
+		// 20201205 遵循给定的{@code webApplicationType}，为{@link SpringApplication}创建{@link ConfigurableApplicationContext}应用程序上下文
+		// 20201205 -> 这里指的是AnnotationConfigServletWebServerApplicationContext
 		return this.applicationContextFactory.create(this.webApplicationType);
 	}
 

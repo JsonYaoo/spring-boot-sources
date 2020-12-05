@@ -28,8 +28,18 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * 20201205
+ * A. 提供对{@code META-INF / spring.components}中定义的候选者的访问。
+ * B. 可以在索引上注册（和查询）任意数量的构造型：一个典型的示例是为特定用例标记类的注释的完全限定名称。 以下调用返回{@code com.example}包（及其子包）的所有
+ *    {@code @Component}候选类型：
+ * 			Set<String> candidates = index.getCandidateTypes("com.example", "org.springframework.stereotype.Component");
+ * C. {@code type}通常是类的完全限定名称，尽管这不是规则。 同样，{@code stereotype}通常是目标类型的完全限定名称，但实际上可以是任何标记。
+ */
+/**
+ * A.
  * Provide access to the candidates that are defined in {@code META-INF/spring.components}.
  *
+ * B.
  * <p>An arbitrary number of stereotypes can be registered (and queried) on the index: a
  * typical example is the fully qualified name of an annotation that flags the class for
  * a certain use case. The following call returns all the {@code @Component}
@@ -39,6 +49,7 @@ import org.springframework.util.MultiValueMap;
  *         "com.example", "org.springframework.stereotype.Component");
  * </pre>
  *
+ * C.
  * <p>The {@code type} is usually the fully qualified name of a class, though this is
  * not a rule. Similarly, the {@code stereotype} is usually the fully qualified name of
  * a target type but it can be any marker really.
@@ -46,17 +57,20 @@ import org.springframework.util.MultiValueMap;
  * @author Stephane Nicoll
  * @since 5.0
  */
+// 20201205 提供对{@code META-INF / spring.components}中定义的候选者的访问。
 public class CandidateComponentsIndex {
 
 	private static final AntPathMatcher pathMatcher = new AntPathMatcher(".");
 
+	// 2020105 属性键值对Map
 	private final MultiValueMap<String, Entry> index;
 
-
+	// 20201205 构建候选者组件索引实例
 	CandidateComponentsIndex(List<Properties> content) {
 		this.index = parseIndex(content);
 	}
 
+	// 20201205 解析资源属性集列 -> 属性键值对Map
 	private static MultiValueMap<String, Entry> parseIndex(List<Properties> content) {
 		MultiValueMap<String, Entry> index = new LinkedMultiValueMap<>();
 		for (Properties entry : content) {

@@ -30,6 +30,7 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
  * @author Mark Fisher
  * @since 2.5
  */
+// 20201205 使用{@link MetadataReader}进行类型过滤的基本接口。
 @FunctionalInterface
 public interface TypeFilter {
 

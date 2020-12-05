@@ -169,9 +169,11 @@ public interface Resource extends InputStreamSource {
 	/**
 	 * Determine a filename for this resource, i.e. typically the last
 	 * part of the path: for example, "myfile.txt".
+	 *
 	 * <p>Returns {@code null} if this type of resource does not
-	 * have a filename.
+	 * have a filename. // 20201205 如果此类型的资源没有文件名，则返回{@code null}。
 	 */
+	// 20201205 确定此资源的文件名，即通常路径的最后一部分：例如“ myfile.txt”。
 	@Nullable
 	String getFilename();
 

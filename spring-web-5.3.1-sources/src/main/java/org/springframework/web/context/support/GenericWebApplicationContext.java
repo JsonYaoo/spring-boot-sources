@@ -151,6 +151,7 @@ public class GenericWebApplicationContext extends GenericApplicationContext impl
 	/**
 	 * Create and return a new {@link StandardServletEnvironment}.
 	 */
+	// 20201204 创建并返回一个新的{@link StandardServletEnvironment}。
 	@Override
 	protected ConfigurableEnvironment createEnvironment() {
 		return new StandardServletEnvironment();

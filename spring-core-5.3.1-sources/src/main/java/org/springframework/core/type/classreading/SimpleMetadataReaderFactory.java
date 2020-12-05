@@ -32,10 +32,11 @@ import org.springframework.util.ClassUtils;
  * @author Juergen Hoeller
  * @since 2.5
  */
+// 20201205 {@link MetadataReaderFactory}接口的简单实现，为每个请求创建一个新的ASM {@link org.springframework.asm.ClassReader}。
 public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
 
+	// 20201205 资源加载器
 	private final ResourceLoader resourceLoader;
-
 
 	/**
 	 * Create a new SimpleMetadataReaderFactory for the default class loader.
@@ -49,7 +50,9 @@ public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
 	 * @param resourceLoader the Spring ResourceLoader to use
 	 * (also determines the ClassLoader to use)
 	 */
+	// 20201205 为给定的资源加载器创建一个新的SimpleMetadataReaderFactory。
 	public SimpleMetadataReaderFactory(@Nullable ResourceLoader resourceLoader) {
+		// 20201205 设置资源加载器
 		this.resourceLoader = (resourceLoader != null ? resourceLoader : new DefaultResourceLoader());
 	}
 

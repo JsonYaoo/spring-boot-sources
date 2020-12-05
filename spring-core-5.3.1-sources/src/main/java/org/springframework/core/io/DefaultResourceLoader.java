@@ -61,16 +61,26 @@ public class DefaultResourceLoader implements ResourceLoader {
 
 	private final Set<ProtocolResolver> protocolResolvers = new LinkedHashSet<>(4);
 
+	// 20201205 资源缓存器
 	private final Map<Class<?>, Map<Resource, ?>> resourceCaches = new ConcurrentHashMap<>(4);
 
-
 	/**
+	 * 20201205
+	 * A. 创建一个新的DefaultResourceLoader。
+	 * B. 在实际资源访问时（从5.3开始），将使用线程上下文类加载器进行ClassLoader访问。 要获得更多控制，请将特定的ClassLoader传递到{@link #DefaultResourceLoader（ClassLoader）}。
+	 */
+	/**
+	 * A.
 	 * Create a new DefaultResourceLoader.
+	 *
+	 * B.
 	 * <p>ClassLoader access will happen using the thread context class loader
 	 * at the time of actual resource access (since 5.3). For more control, pass
 	 * a specific ClassLoader to {@link #DefaultResourceLoader(ClassLoader)}.
+	 *
 	 * @see Thread#getContextClassLoader()
 	 */
+	// 20201205 创建一个新的DefaultResourceLoader。
 	public DefaultResourceLoader() {
 	}
 
@@ -133,10 +143,15 @@ public class DefaultResourceLoader implements ResourceLoader {
 
 	/**
 	 * Obtain a cache for the given value type, keyed by {@link Resource}.
+	 *
+	 * // 20201205 值类型，例如 ASM {@code MetadataReader}
 	 * @param valueType the value type, e.g. an ASM {@code MetadataReader}
+	 *
+	 * // 20201205 在{@code ResourceLoader}级别共享的缓存{@link Map}
 	 * @return the cache {@link Map}, shared at the {@code ResourceLoader} level
 	 * @since 5.0
 	 */
+	// 20201205 如果存在(如MetadataReader.class)对应的缓存, 则返回, 否则创建新的缓存ConcurrentHashMap
 	@SuppressWarnings("unchecked")
 	public <T> Map<Resource, T> getResourceCache(Class<T> valueType) {
 		return (Map<Resource, T>) this.resourceCaches.computeIfAbsent(valueType, key -> new ConcurrentHashMap<>());

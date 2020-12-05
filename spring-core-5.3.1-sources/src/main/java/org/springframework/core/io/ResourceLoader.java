@@ -78,15 +78,26 @@ public interface ResourceLoader {
 	Resource getResource(String location);
 
 	/**
+	 * 20201205
+	 * A. 公开此ResourceLoader使用的ClassLoader。
+	 * B. 需要直接访问ClassLoader的客户端可以使用ResourceLoader以统一的方式进行操作，而不是依赖于线程上下文ClassLoader。
+	 */
+	/**
+	 * A.
 	 * Expose the ClassLoader used by this ResourceLoader.
+	 *
+	 * B.
 	 * <p>Clients which need to access the ClassLoader directly can do so
 	 * in a uniform manner with the ResourceLoader, rather than relying
 	 * on the thread context ClassLoader.
+	 *
 	 * @return the ClassLoader
-	 * (only {@code null} if even the system ClassLoader isn't accessible)
+	 * (only {@code null} if even the system ClassLoader isn't accessible) // 20201205 ClassLoader（即使无法访问系统ClassLoader，也只能使用{@code null}）
+	 *
 	 * @see org.springframework.util.ClassUtils#getDefaultClassLoader()
 	 * @see org.springframework.util.ClassUtils#forName(String, ClassLoader)
 	 */
+	// 20201205 获取该ResourceLoader使用的ClassLoader
 	@Nullable
 	ClassLoader getClassLoader();
 

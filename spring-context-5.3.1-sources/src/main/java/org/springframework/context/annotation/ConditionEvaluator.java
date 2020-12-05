@@ -45,6 +45,7 @@ import org.springframework.util.MultiValueMap;
  * @author Juergen Hoeller
  * @since 4.0
  */
+// 20201205 用于评估{@link Conditional}注解的内部类。
 class ConditionEvaluator {
 
 	private final ConditionContextImpl context;

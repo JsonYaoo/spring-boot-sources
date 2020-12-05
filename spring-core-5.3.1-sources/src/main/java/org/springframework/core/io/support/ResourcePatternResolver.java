@@ -67,7 +67,7 @@ import org.springframework.core.io.ResourceLoader;
  * @see org.springframework.context.ApplicationContext
  * @see org.springframework.context.ResourceLoaderAware
  */
-// 20201130 路径模式 => 资源对象的策略接口
+// 20201130 路径模式资源处理器 => 资源对象的策略接口
 public interface ResourcePatternResolver extends ResourceLoader {
 
 	/**

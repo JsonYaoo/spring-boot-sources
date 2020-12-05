@@ -51,7 +51,7 @@ package org.springframework.core.env;
  * @see ConfigurableEnvironment
  * @see org.springframework.context.ConfigurableApplicationContext#getEnvironment()
  */
-// 环境获取接口 => 声明获取环境的方法
+// 20201204 环境获取接口 => 声明获取环境的方法
 public interface EnvironmentCapable {
 
 	/**

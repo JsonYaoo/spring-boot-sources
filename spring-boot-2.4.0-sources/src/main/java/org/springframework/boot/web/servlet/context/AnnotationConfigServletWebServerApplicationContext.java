@@ -65,6 +65,7 @@ import org.springframework.util.ClassUtils;
 // 20201204 Servlet注解应用程序上下文: 扫描注解配置核心类 @Configuration & @Component & javax.inject、允许对其应用任何bean定义读取器、支持Servlet上下文、配置上下文、Web生命周期获取、将资源路径解释为servlet上下文资源、注释配置应用程序上下文
 public class AnnotationConfigServletWebServerApplicationContext extends ServletWebServerApplicationContext implements AnnotationConfigRegistry {
 
+	// 20201204 方便的适配器, 用于以编程方式注册Bean类。
 	private final AnnotatedBeanDefinitionReader reader;
 
 	private final ClassPathBeanDefinitionScanner scanner;
@@ -78,8 +79,12 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	 * to be populated through {@link #register} calls and then manually
 	 * {@linkplain #refresh refreshed}.
 	 */
+	// 20201204 创建一个新的{@link AnnotationConfigServletWebServerApplicationContext}通过{@link #register}调用填充，然后手动进行填充
 	public AnnotationConfigServletWebServerApplicationContext() {
+		// 20201204 使用当前环境实例获取注册表, 然后给当前注册表绑定一个Bean适配器
 		this.reader = new AnnotatedBeanDefinitionReader(this);
+
+		// 20201204 bean定义扫描器 -> 注册资源加载器, 建立"META-INF/spring.components"候选组件资源索引
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 

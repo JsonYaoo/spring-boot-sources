@@ -27,6 +27,8 @@ package org.springframework.context.annotation;
  * @since 4.0
  * @see Configuration
  */
+// 20201205 与{@code @Configuration}配合使用时，{@link Condition}可以提供更精细的控制。 当某些条件根据配置阶段匹配时允许进行调整。
+// 20201205 例如，检查bean是否已经注册的条件可能选择仅在{@link ConfigurationPhase＃REGISTER_BEAN REGISTER_BEAN} {@link ConfigurationPhase}期间进行评估。
 public interface ConfigurationCondition extends Condition {
 
 	/**

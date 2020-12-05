@@ -29,6 +29,7 @@ import org.springframework.core.io.Resource;
  * @see SimpleMetadataReaderFactory
  * @see CachingMetadataReaderFactory
  */
+// 20201205 {@link MetadataReader}实例的工厂接口。 允许为每个原始资源缓存MetadataReader。
 public interface MetadataReaderFactory {
 
 	/**

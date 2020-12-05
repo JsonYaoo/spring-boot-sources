@@ -61,6 +61,14 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 20201204
+ * A. 组件提供程序，提供基本程序包中的候选组件。 如果可用，可以使用{@link CandidateComponentsIndex the index}，否则可以扫描类路径。 通过应用排除和包含过滤器可以识别候选组件。
+ *    支持在注解/超类上使用{@link Indexed}注解的{@link AnnotationTypeFilter}，{@link AssignableTypeFilter}包含过滤器：如果指定了任何其他包含过滤器，则忽略索引并改用类路径扫描。
+ * B. 此实现基于Spring的{@link org.springframework.core.type.classreading.MetadataReader MetadataReader}工具，并由ASM
+ *    {@link org.springframework.asm.ClassReader ClassReader}支持。
+ */
+/**
+ * A.
  * A component provider that provides candidate components from a base package. Can
  * use {@link CandidateComponentsIndex the index} if it is available of scans the
  * classpath otherwise. Candidate components are identified by applying exclude and
@@ -69,6 +77,7 @@ import org.springframework.util.ClassUtils;
  * supported: if any other include filter is specified, the index is ignored and
  * classpath scanning is used instead.
  *
+ * B.
  * <p>This implementation is based on Spring's
  * {@link org.springframework.core.type.classreading.MetadataReader MetadataReader}
  * facility, backed by an ASM {@link org.springframework.asm.ClassReader ClassReader}.
@@ -84,6 +93,7 @@ import org.springframework.util.ClassUtils;
  * @see ScannedGenericBeanDefinition
  * @see CandidateComponentsIndex
  */
+// 20201204 组件提供程序，提供基本程序包中的候选组件: 声明获取环境的方法、通过ApplicationContext得到通知的任何对象所要实现的接口
 public class ClassPathScanningCandidateComponentProvider implements EnvironmentCapable, ResourceLoaderAware {
 
 	static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
@@ -93,25 +103,30 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 
 	private String resourcePattern = DEFAULT_RESOURCE_PATTERN;
 
+	// 20201205 类型过滤的基本接口列表
 	private final List<TypeFilter> includeFilters = new ArrayList<>();
 
 	private final List<TypeFilter> excludeFilters = new ArrayList<>();
 
+	// 20201205 环境实例
 	@Nullable
 	private Environment environment;
 
+	// 20201205 用于评估{@link Conditional}注解的内部类。
 	@Nullable
 	private ConditionEvaluator conditionEvaluator;
 
+	// 20201205 路径模式资源处理器
 	@Nullable
 	private ResourcePatternResolver resourcePatternResolver;
 
+	// 20210205 类MetadataReader实例
 	@Nullable
 	private MetadataReaderFactory metadataReaderFactory;
 
+	// 20201205 候选者组件索引实例
 	@Nullable
 	private CandidateComponentsIndex componentsIndex;
-
 
 	/**
 	 * Protected constructor for flexible subclass initialization.
@@ -192,46 +207,82 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	}
 
 	/**
+	 * 20201205
+	 * A. 为{@link Component @Component}注册默认过滤器。
+	 * B. 这将隐式注册具有{@link Component @Component}元注解的所有注解，包括{@link Repository @Repository}，{@ link Service @Service}和
+	 *    {@link Controller @Controller}构造型注解。
+	 * C. 如果可用，还支持Java EE 6的{@link javax.annotation.ManagedBean}和JSR-330的{@link javax.inject.Named}注解。
+	 */
+	/**
+	 * A.
 	 * Register the default filter for {@link Component @Component}.
+	 *
+	 * B.
 	 * <p>This will implicitly register all annotations that have the
 	 * {@link Component @Component} meta-annotation including the
 	 * {@link Repository @Repository}, {@link Service @Service}, and
 	 * {@link Controller @Controller} stereotype annotations.
+	 *
+	 * C.
 	 * <p>Also supports Java EE 6's {@link javax.annotation.ManagedBean} and
 	 * JSR-330's {@link javax.inject.Named} annotations, if available.
 	 *
 	 */
+	// 20201205 为{@link Component @Component}注册默认过滤器。
 	@SuppressWarnings("unchecked")
 	protected void registerDefaultFilters() {
+		// 20201205 匹配元注解、不匹配接口
 		this.includeFilters.add(new AnnotationTypeFilter(Component.class));
+
+		// 20201205 获取父类类加载器
 		ClassLoader cl = ClassPathScanningCandidateComponentProvider.class.getClassLoader();
 		try {
+			// 20201205 构造JSR-250: javax.annotation.ManagedBean实例, 添加到类型过滤的基本接口列表中 -> 不匹配元注解, 不匹配接口
 			this.includeFilters.add(new AnnotationTypeFilter(
-					((Class<? extends Annotation>) ClassUtils.forName("javax.annotation.ManagedBean", cl)), false));
+					((Class<? extends Annotation>) ClassUtils.forName("javax.annotation.ManagedBean", cl)), false)
+			);
 			logger.trace("JSR-250 'javax.annotation.ManagedBean' found and supported for component scanning");
 		}
 		catch (ClassNotFoundException ex) {
+			// 20201205 JSR-250 1.1 API（包含在Java EE 6中）不可用-只需跳过。
 			// JSR-250 1.1 API (as included in Java EE 6) not available - simply skip.
 		}
 		try {
+			// 20201205 构造JSR-330: javax.annotation.ManagedBean实例, 添加到类型过滤的基本接口列表中 -> 不匹配元注解, 不匹配接口
 			this.includeFilters.add(new AnnotationTypeFilter(
 					((Class<? extends Annotation>) ClassUtils.forName("javax.inject.Named", cl)), false));
 			logger.trace("JSR-330 'javax.inject.Named' annotation found and supported for component scanning");
 		}
 		catch (ClassNotFoundException ex) {
+			// 20201205 JSR-330 API不可用-只需跳过。
 			// JSR-330 API not available - simply skip.
 		}
 	}
 
 	/**
+	 * 20201205
+	 * A. 设置用于解析占位符并评估带有{@link Conditional @Conditional}注解的组件类时使用的环境。
+	 * B. 默认值为{@link StandardEnvironment}。
+	 */
+	/**
+	 * A.
 	 * Set the Environment to use when resolving placeholders and evaluating
 	 * {@link Conditional @Conditional}-annotated component classes.
+	 *
+	 * B.
 	 * <p>The default is a {@link StandardEnvironment}.
+	 *
 	 * @param environment the Environment to use
 	 */
+	// 20201205 设置@Conditional注解的组件类时使用的环境
 	public void setEnvironment(Environment environment) {
+		// 20201205 环境不能为空
 		Assert.notNull(environment, "Environment must not be null");
+
+		// 20201205 设置环境实例
 		this.environment = environment;
+
+		// 20201205 设置空的用于评估{@link Conditional}注解的内部类
 		this.conditionEvaluator = null;
 	}
 
@@ -252,18 +303,36 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	}
 
 	/**
+	 * 20201205
+	 * A. 设置{@link ResourceLoader}以用于资源位置。 这通常是{@link ResourcePatternResolver}的实现。
+	 * B. 默认值为{@code PathMatchingResourcePatternResolver}，也可以通过{@code ResourcePatternResolver}接口解析资源模式。
+	 */
+	/**
+	 * A.
 	 * Set the {@link ResourceLoader} to use for resource locations.
 	 * This will typically be a {@link ResourcePatternResolver} implementation.
+	 *
+	 * B.
 	 * <p>Default is a {@code PathMatchingResourcePatternResolver}, also capable of
 	 * resource pattern resolving through the {@code ResourcePatternResolver} interface.
+	 *
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
 	 */
+	// 20201205 设置{@link ResourceLoader}以用于资源位置。
 	@Override
 	public void setResourceLoader(@Nullable ResourceLoader resourceLoader) {
+		// 20201205 为给定的{@link ResourceLoader}返回默认的{@link ResourcePatternResolver} -> 设置路径模式资源处理器
 		this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
+
+		// 20201205 设置类MetadataReader实例, 每个Spring {@link Resource}句柄（即每个“ .class”文件）缓存一个{@link MetadataReader}实例(用于访问类元数据)
 		this.metadataReaderFactory = new CachingMetadataReaderFactory(resourceLoader);
-		this.componentsIndex = CandidateComponentsIndexLoader.loadIndex(this.resourcePatternResolver.getClassLoader());
+
+		// 20201205 使用给定的类加载器，从"META-INF/spring.components"加载并实例化候选者组件索引实例, 注册候选者组件索引实例
+		this.componentsIndex = CandidateComponentsIndexLoader.loadIndex(
+				// 20201205 获取该ResourceLoader使用的ClassLoader
+				this.resourcePatternResolver.getClassLoader()
+		);
 	}
 
 	/**

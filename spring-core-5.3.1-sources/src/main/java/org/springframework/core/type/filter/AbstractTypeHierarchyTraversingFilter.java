@@ -27,8 +27,15 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201205
+ * A. 类型过滤器，该过滤器可以遍历层次结构。
+ * B. 当需要基于潜在的整个类/接口层次进行匹配时，此过滤器很有用。 所采用的算法采用了快速成功策略：如果在任何时候声明匹配，将不执行进一步的处理。
+ */
+/**
+ * A.
  * Type filter that is aware of traversing over hierarchy.
  *
+ * B.
  * <p>This filter is useful when matching needs to be made based on potentially the
  * whole class/interface hierarchy. The algorithm employed uses a succeed-fast
  * strategy: if at any time a match is declared, no further processing is
@@ -38,17 +45,23 @@ import org.springframework.lang.Nullable;
  * @author Mark Fisher
  * @since 2.5
  */
+// 20201205 类型过滤器，该过滤器可以遍历层次结构
 public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilter {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// 20201205 是否匹配超类注解
 	private final boolean considerInherited;
 
+	// 20201205 是否匹配接口
 	private final boolean considerInterfaces;
 
 
 	protected AbstractTypeHierarchyTraversingFilter(boolean considerInherited, boolean considerInterfaces) {
+		// 20201205 是否匹配超类注解
 		this.considerInherited = considerInherited;
+
+		// 20201205 是否匹配接口
 		this.considerInterfaces = considerInterfaces;
 	}
 
