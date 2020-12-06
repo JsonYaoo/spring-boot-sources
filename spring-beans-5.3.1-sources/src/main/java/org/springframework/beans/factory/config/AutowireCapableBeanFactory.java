@@ -26,21 +26,36 @@ import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201206
+ * A. {@link BeanFactory}接口的扩展将由能够自动装配的bean工厂实现，只要它们想为现有bean实例公开此功能。
+ * B. BeanFactory的此子接口不能在常规应用程序代码中使用：对于典型的使用案例，请坚持使用{@link BeanFactory}或
+ *    {@link org.springframework.beans.factory.ListableBeanFactory}。
+ * C. 其他框架的集成代码可以利用此接口来连接和填充Spring无法控制其生命周期的现有bean实例。 例如，这对于WebWork操作和Tapestry页面对象特别有用。
+ * D. 请注意，{@link org.springframework.context.ApplicationContext}外观未实现此接口，因为应用程序代码几乎从未使用过此接口。 也就是说，它也可以从应用程序上下文中获得，
+ *    可以通过ApplicationContext的{@link org.springframework.context.ApplicationContext＃getAutowireCapableBeanFactory（）}方法进行访问。
+ * E. 您还可以实现{@link org.springframework.beans.factory.BeanFactoryAware}接口，该接口即使在ApplicationContext中运行时也公开内部BeanFactory，以访问
+ *    AutowireCapableBeanFactory：只需将传入的BeanFactory强制转换为AutowireCapableBeanFactory。
+ */
+/**
+ * A.
  * Extension of the {@link BeanFactory}
  * interface to be implemented by bean factories that are capable of
  * autowiring, provided that they want to expose this functionality for
  * existing bean instances.
  *
+ * B.
  * <p>This subinterface of BeanFactory is not meant to be used in normal
  * application code: stick to {@link BeanFactory}
  * or {@link org.springframework.beans.factory.ListableBeanFactory} for
  * typical use cases.
  *
+ * C.
  * <p>Integration code for other frameworks can leverage this interface to
  * wire and populate existing bean instances that Spring does not control
  * the lifecycle of. This is particularly useful for WebWork Actions and
  * Tapestry Page objects, for example.
  *
+ * D.
  * <p>Note that this interface is not implemented by
  * {@link org.springframework.context.ApplicationContext} facades,
  * as it is hardly ever used by application code. That said, it is available
@@ -48,6 +63,7 @@ import org.springframework.lang.Nullable;
  * {@link org.springframework.context.ApplicationContext#getAutowireCapableBeanFactory()}
  * method.
  *
+ * E.
  * <p>You may also implement the {@link org.springframework.beans.factory.BeanFactoryAware}
  * interface, which exposes the internal BeanFactory even when running in an
  * ApplicationContext, to get access to an AutowireCapableBeanFactory:
@@ -59,6 +75,7 @@ import org.springframework.lang.Nullable;
  * @see ConfigurableListableBeanFactory
  * @see org.springframework.context.ApplicationContext#getAutowireCapableBeanFactory()
  */
+// 20201206 {@link BeanFactory}接口的扩展将由能够自动装配的bean工厂实现，只要它们想为现有bean实例公开此功能, 不能在常规应用程序代码中使用
 public interface AutowireCapableBeanFactory extends BeanFactory {
 
 	/**

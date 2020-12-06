@@ -35,9 +35,16 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 20201205
+ * A. 实现{@link BeanDefinitionReader}接口的bean定义阅读器的抽象基类。
+ * B. 提供常用属性，例如要使用的bean工厂以及用于加载bean类的类加载器。
+ */
+/**
+ * A.
  * Abstract base class for bean definition readers which implement
  * the {@link BeanDefinitionReader} interface.
  *
+ * B.
  * <p>Provides common properties like the bean factory to work on
  * and the class loader to use for loading bean classes.
  *
@@ -46,6 +53,7 @@ import org.springframework.util.Assert;
  * @since 11.12.2003
  * @see BeanDefinitionReaderUtils
  */
+// 20201205 bean定义阅读器的抽象基类: 提供常用属性, 即要使用的bean工厂以及用于加载bean类的类加载器, 环境获取
 public abstract class AbstractBeanDefinitionReader implements BeanDefinitionReader, EnvironmentCapable {
 
 	/** Logger available to subclasses. */

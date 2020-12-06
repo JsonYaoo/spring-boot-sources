@@ -22,7 +22,7 @@ package org.springframework.context;
  * B. 可以由组件（通常是在Spring上下文中定义的Spring bean）和容器（通常是Spring {@link ApplicationContext}本身）实现。 容器会将开始/停止信号传播到每个容器中应用的所有组件，
  *    例如 在运行时停止/重新启动的情况。
  * C. 可用于直接调用或通过JMX进行管理操作。 在后一种情况下，通常使用{@link org.springframework.jmx.export.assembler.InterfaceBasedMBeanInfoAssembler}定义
- *    {@link org.springframework.jmx.export.MBeanExporter}，从而将活动控制的组件的可见性限制为 生命周期界面。
+ *    {@link org.springframework.jmx.export.MBeanExporter}，从而将活动控制的组件的可见性限制为 生命周期接口。
  * D. 请注意，当前的{@code Lifecycle}接口仅在顶级单例bean上受支持。 在任何其他组件上，{@code Lifecycle}接口将保持未被检测到并因此被忽略。 另外，请注意，扩展的
  *    {@link SmartLifecycle}接口提供了与应用程序上下文的启动和关闭阶段的复杂集成。
  */

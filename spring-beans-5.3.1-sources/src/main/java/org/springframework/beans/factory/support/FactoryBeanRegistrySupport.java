@@ -32,15 +32,23 @@ import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201206
+ * A. 支持需要处理{@link FactoryBean}实例的单例注册表的基类，并与{@link DefaultSingletonBeanRegistry}的单例管理集成在一起。
+ * B. 用作{@link AbstractBeanFactory}的基类。
+ */
+/**
+ * A.
  * Support base class for singleton registries which need to handle
  * {@link FactoryBean} instances,
  * integrated with {@link DefaultSingletonBeanRegistry}'s singleton management.
  *
+ * B.
  * <p>Serves as base class for {@link AbstractBeanFactory}.
  *
  * @author Juergen Hoeller
  * @since 2.5.1
  */
+// 20201206 支持需要处理{@link FactoryBean}实例的单例注册表的基类, 用作{@link AbstractBeanFactory}的基类。
 public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanRegistry {
 
 	/** Cache of singleton objects created by FactoryBeans: FactoryBean name to object. */

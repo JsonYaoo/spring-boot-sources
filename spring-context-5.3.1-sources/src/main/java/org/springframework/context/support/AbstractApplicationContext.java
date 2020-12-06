@@ -249,6 +249,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	private ApplicationEventMulticaster applicationEventMulticaster;
 
 	/** Application startup metrics. **/
+	// 20201205 应用程序启动指标 -> 默认DefaultApplicationStartup
 	private ApplicationStartup applicationStartup = ApplicationStartup.DEFAULT;
 
 	/** Statically specified listeners. */
@@ -488,9 +489,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		return this.applicationEventMulticaster;
 	}
 
+	// 20201205 注册应用程序启动指标
 	@Override
 	public void setApplicationStartup(ApplicationStartup applicationStartup) {
+		// 20201205 applicationStartup不能为空
 		Assert.notNull(applicationStartup, "applicationStartup should not be null");
+
+		// 20201205 注册应用程序启动指标
 		this.applicationStartup = applicationStartup;
 	}
 

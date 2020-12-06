@@ -24,10 +24,18 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201205
+ * A. 大多数可列出的bean工厂都将实现配置接口。 除了{@link ConfigurableBeanFactory}，它还提供了用于分析和修改Bean定义以及预先实例化单例的工具。
+ * B. {@link org.springframework.beans.factory.BeanFactory}的此子接口不适合在常规应用程序代码中使用：典型情况下，请坚持使用
+ *    {@link org.springframework.beans.factory.BeanFactory}或{@link ListableBeanFactory} 用例。 即使需要访问bean工厂配置方法，该接口也仅允许框架内部即插即用。
+ */
+/**
+ * A.
  * Configuration interface to be implemented by most listable bean factories.
  * In addition to {@link ConfigurableBeanFactory}, it provides facilities to
  * analyze and modify bean definitions, and to pre-instantiate singletons.
  *
+ * B.
  * <p>This subinterface of {@link org.springframework.beans.factory.BeanFactory}
  * is not meant to be used in normal application code: Stick to
  * {@link org.springframework.beans.factory.BeanFactory} or
@@ -39,8 +47,8 @@ import org.springframework.lang.Nullable;
  * @since 03.11.2003
  * @see org.springframework.context.support.AbstractApplicationContext#getBeanFactory()
  */
-public interface ConfigurableListableBeanFactory
-		extends ListableBeanFactory, AutowireCapableBeanFactory, ConfigurableBeanFactory {
+// 20201205 提供了用于分析和修改Bean定义以及预先实例化单例的工具, 仅允许框架内部即插即用, 不适合在常规应用程序代码中使用
+public interface ConfigurableListableBeanFactory extends ListableBeanFactory, AutowireCapableBeanFactory, ConfigurableBeanFactory {
 
 	/**
 	 * Ignore the given dependency type for autowiring:

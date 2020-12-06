@@ -38,23 +38,36 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201205
+ * A. 共享Bean实例的通用注册表，实现了{@link SingletonBeanRegistry}。 允许注册应该通过Bean名称获得的所有调用者共享的单例实例。
+ * B. 还支持{@link DisposableBean}实例的注册（可能与注册的单例相对应），可以在关闭注册表时销毁。 可以注册Bean之间的依赖关系以强制执行适当的关闭顺序。
+ * C. 此类主要用作{@link org.springframework.beans.factory.BeanFactory}实现的基类，从而排除了单例bean实例的常见管理。 请注意，
+ *    {@link org.springframework.beans.factory.config.ConfigurableBeanFactory}接口扩展了{@link SingletonBeanRegistry}接口。
+ * D. 请注意，与{@link AbstractBeanFactory}和{@link DefaultListableBeanFactory}（从其继承）相比，此类不假定bean定义概念也不为bean实例指定创建过程。
+ *    也可以用作委托的嵌套帮助器。
+ */
+/**
+ * A.
  * Generic registry for shared bean instances, implementing the
  * {@link SingletonBeanRegistry}.
  * Allows for registering singleton instances that should be shared
  * for all callers of the registry, to be obtained via bean name.
  *
+ * B.
  * <p>Also supports registration of
  * {@link DisposableBean} instances,
  * (which might or might not correspond to registered singletons),
  * to be destroyed on shutdown of the registry. Dependencies between
  * beans can be registered to enforce an appropriate shutdown order.
  *
+ * C.
  * <p>This class mainly serves as base class for
  * {@link org.springframework.beans.factory.BeanFactory} implementations,
  * factoring out the common management of singleton bean instances. Note that
  * the {@link org.springframework.beans.factory.config.ConfigurableBeanFactory}
  * interface extends the {@link SingletonBeanRegistry} interface.
  *
+ * D.
  * <p>Note that this class assumes neither a bean definition concept
  * nor a specific creation process for bean instances, in contrast to
  * {@link AbstractBeanFactory} and {@link DefaultListableBeanFactory}
@@ -68,6 +81,7 @@ import org.springframework.util.StringUtils;
  * @see DisposableBean
  * @see org.springframework.beans.factory.config.ConfigurableBeanFactory
  */
+// 20201206 共享Bean实例的通用注册表，实现了{@link SingletonBeanRegistry}。 允许注册应该通过Bean名称获得的所有调用者共享的单例实例。
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 
 	/** Maximum number of suppressed exceptions to preserve. */

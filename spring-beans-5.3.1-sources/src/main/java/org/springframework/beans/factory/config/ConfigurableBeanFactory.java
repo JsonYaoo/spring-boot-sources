@@ -32,11 +32,19 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringValueResolver;
 
 /**
+ * 20201206
+ * A. 大多数bean工厂都将实现配置接口。 除了{@link BeanFactory}接口中的bean工厂客户端方法之外，还提供了用于配置bean工厂的工具。
+ * B. 此bean工厂接口不适合在常规应用程序代码中使用：出于典型需求，请坚持使用{@link BeanFactory}或{@link org.springframework.beans.factory.ListableBeanFactory}。
+ *    此扩展接口仅用于允许在框架内部进行即插即用，并允许对bean工厂配置方法的特殊访问。
+ */
+/**
+ * A.
  * Configuration interface to be implemented by most bean factories. Provides
  * facilities to configure a bean factory, in addition to the bean factory
  * client methods in the {@link BeanFactory}
  * interface.
  *
+ * B.
  * <p>This bean factory interface is not meant to be used in normal application
  * code: Stick to {@link BeanFactory} or
  * {@link org.springframework.beans.factory.ListableBeanFactory} for typical
@@ -49,6 +57,7 @@ import org.springframework.util.StringValueResolver;
  * @see org.springframework.beans.factory.ListableBeanFactory
  * @see ConfigurableListableBeanFactory
  */
+// 20201206 bean工厂配置接口: 提供bean工厂客户端方法、提供了用于配置bean工厂的工具、层次bean工厂、以统一的方式公开其单例管理功能，仅用于允许在框架内部进行即插即用
 public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, SingletonBeanRegistry {
 
 	/**
@@ -278,11 +287,21 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	Scope getRegisteredScope(String scopeName);
 
 	/**
+	 * 20201206
+	 * A. 为此bean工厂设置{@code ApplicationStartup}。
+	 * B. 这允许应用程序上下文在应用程序启动期间记录指标。
+	 */
+	/**
+	 * A.
 	 * Set the {@code ApplicationStartup} for this bean factory.
+	 *
+	 * B.
 	 * <p>This allows the application context to record metrics during application startup.
-	 * @param applicationStartup the new application startup
+	 *
+	 * @param applicationStartup the new application startup	// 20201206 新应用启动
 	 * @since 5.3
 	 */
+	// 20201206 为此bean工厂设置{@code ApplicationStartup} -> 这允许应用程序上下文在应用程序启动期间记录指标
 	void setApplicationStartup(ApplicationStartup applicationStartup);
 
 	/**

@@ -86,19 +86,33 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201205
+ * A. Spring的{@link ConfigurableListableBeanFactory}和{@link BeanDefinitionRegistry}接口的默认实现：基于bean定义元数据的成熟bean工厂，可以通过后处理器进行扩展。
+ * B. 典型的用法是在访问bean之前先注册所有bean定义（可能是从bean定义文件中读取）。 因此，按名称查找Bean是对本地Bean定义表进行的廉价操作，
+ *    该操作对预先解析的Bean定义元数据对象进行操作。
+ * C. 请注意，特定bean定义格式的阅读器通常是单独实现的，而不是作为bean工厂的子类实现的：例如，参见
+ *    {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}。
+ * D. 对于{@link org.springframework.beans.factory.ListableBeanFactory}接口的替代实现，请查看{@link StaticListableBeanFactory}，它管理现有的bean实例，
+ *    而不是基于bean定义创建新的bean实例。
+ */
+/**
+ * A.
  * Spring's default implementation of the {@link ConfigurableListableBeanFactory}
  * and {@link BeanDefinitionRegistry} interfaces: a full-fledged bean factory
  * based on bean definition metadata, extensible through post-processors.
  *
+ * B.
  * <p>Typical usage is registering all bean definitions first (possibly read
  * from a bean definition file), before accessing beans. Bean lookup by name
  * is therefore an inexpensive operation in a local bean definition table,
  * operating on pre-resolved bean definition metadata objects.
  *
+ * C.
  * <p>Note that readers for specific bean definition formats are typically
  * implemented separately rather than as bean factory subclasses: see for example
  * {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}.
  *
+ * D.
  * <p>For an alternative implementation of the
  * {@link org.springframework.beans.factory.ListableBeanFactory} interface,
  * have a look at {@link StaticListableBeanFactory}, which manages existing
@@ -117,9 +131,9 @@ import org.springframework.util.StringUtils;
  * @see #getBean
  * @see #resolveDependency
  */
+// 20201205 基于bean定义元数据的成熟bean工厂: 承担或实现bean定义注册表功能
 @SuppressWarnings("serial")
-public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
-		implements ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable {
+public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable {
 
 	@Nullable
 	private static Class<?> javaxInjectProviderClass;

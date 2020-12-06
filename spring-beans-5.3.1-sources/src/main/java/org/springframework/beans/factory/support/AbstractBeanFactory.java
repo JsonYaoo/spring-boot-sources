@@ -85,6 +85,17 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
 
 /**
+ * 20201205
+ * A. {@link BeanFactory}实现的抽象基类，提供{@link ConfigurableBeanFactory} SPI的全部功能。 不假定有可列出的bean工厂：因此也可以用作bean工厂实现的基类，
+ *    这些实现从某些后端资源（其中bean定义访问是一项昂贵的操作）获取bean定义。
+ * B. 此类提供单例缓存（通过其基类{@link DefaultSingletonBeanRegistry}，单例/原型确定，{@link FactoryBean}处理，别名，用于子bean定义的bean定义合并和bean销毁
+ *   （{@link org.springframework.bean.factory.DisposableBean}接口，自定义销毁方法）此外，它还可以通过实现
+ *    {@link org.springframework.beans.factory.HierarchicalBeanFactory}接口来管理bean工厂层次结构（在未知bean的情况下委托给父工厂）。
+ * C. 子类要实现的主要模板方法是{@link #getBeanDefinition}和{@link #createBean}，分别为给定的bean名称检索一个bean定义并为给定的bean定义创建一个bean实例。
+ *    这些操作的默认实现可以在{@link DefaultListableBeanFactory}和{@link AbstractAutowireCapableBeanFactory}中找到。
+ */
+/**
+ * A.
  * Abstract base class for {@link BeanFactory}
  * implementations, providing the full capabilities of the
  * {@link ConfigurableBeanFactory} SPI.
@@ -92,6 +103,7 @@ import org.springframework.util.StringValueResolver;
  * as base class for bean factory implementations which obtain bean definitions
  * from some backend resource (where bean definition access is an expensive operation).
  *
+ * B.
  * <p>This class provides a singleton cache (through its base class
  * {@link DefaultSingletonBeanRegistry},
  * singleton/prototype determination, {@link FactoryBean}
@@ -101,6 +113,7 @@ import org.springframework.util.StringValueResolver;
  * hierarchy (delegating to the parent in case of an unknown bean), through implementing
  * the {@link org.springframework.beans.factory.HierarchicalBeanFactory} interface.
  *
+ * C.
  * <p>The main template methods to be implemented by subclasses are
  * {@link #getBeanDefinition} and {@link #createBean}, retrieving a bean definition
  * for a given bean name and creating a bean instance for a given bean definition,
@@ -118,6 +131,7 @@ import org.springframework.util.StringValueResolver;
  * @see AbstractAutowireCapableBeanFactory#createBean
  * @see DefaultListableBeanFactory#getBeanDefinition
  */
+// 20201205 {@link BeanFactory(Tomcat包下)}实现的抽象基类: 提供单例缓存、单例/原型确定、{@link FactoryBean}处理，别名，用于子bean定义的bean定义合并和bean销毁
 public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport implements ConfigurableBeanFactory {
 
 	/** Parent bean factory, for bean inheritance support. */
@@ -180,6 +194,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private final ThreadLocal<Object> prototypesCurrentlyInCreation =
 			new NamedThreadLocal<>("Prototype beans currently in creation");
 
+	// 20201206 应用程序启动指标。-> 默认DefaultApplicationStartup
 	/** Application startup metrics. **/
 	private ApplicationStartup applicationStartup = ApplicationStartup.DEFAULT;
 
@@ -1058,9 +1073,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		this.securityContextProvider = securityProvider;
 	}
 
+	// 20201206 为此bean工厂设置{@code ApplicationStartup} -> 这允许应用程序上下文在应用程序启动期间记录指标
 	@Override
 	public void setApplicationStartup(ApplicationStartup applicationStartup) {
+		// 20201206 应用程序启动指标不能为空
 		Assert.notNull(applicationStartup, "applicationStartup should not be null");
+
+		// 20201206 注册应用程序启动指标
 		this.applicationStartup = applicationStartup;
 	}
 

@@ -20,7 +20,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * 20201204
- * SPI接口将由大多数{@link WebServerApplicationContext Web服务器应用程序上下文}（如果不是全部）实现。 除了{WebServerApplicationContext}界面中的方法之外，
+ * SPI接口将由大多数{@link WebServerApplicationContext Web服务器应用程序上下文}（如果不是全部）实现。 除了{WebServerApplicationContext}接口中的方法之外，
  * 还提供用于配置上下文的工具。
  */
 /**

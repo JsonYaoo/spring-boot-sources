@@ -29,7 +29,7 @@ import org.springframework.lang.Nullable;
 
 /**
  * 20201130
- * A. SPI接口将由大多数（如果不是全部）应用程序上下文实现。 除了{@link org.springframework.context.ApplicationContext}界面中的应用程序上下文客户端方法之外，
+ * A. SPI接口将由大多数（如果不是全部）应用程序上下文实现。 除了{@link org.springframework.context.ApplicationContext}接口中的应用程序上下文客户端方法之外，
  *    还提供了配置应用程序上下文的功能。
  * B. 配置和生命周期方法在此处进行了封装，以避免对ApplicationContext客户端代码显而易见。 本方法仅应由启动和关闭代码使用。
  */
@@ -144,12 +144,21 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	ConfigurableEnvironment getEnvironment();
 
 	/**
+	 * 20201205
+	 * A. 为此应用程序上下文设置{@link ApplicationStartup}。
+	 * B. 这允许应用程序上下文在启动期间记录指标。
+	 */
+	/**
+	 * A.
 	 * Set the {@link ApplicationStartup} for this application context.
+	 *
+	 * B.
 	 * <p>This allows the application context to record metrics
 	 * during startup.
 	 * @param applicationStartup the new context event factory
 	 * @since 5.3
 	 */
+	// 20201205 为此应用程序上下文设置{@link ApplicationStartup}: 允许应用程序上下文在启动期间记录指标
 	void setApplicationStartup(ApplicationStartup applicationStartup);
 
 	/**

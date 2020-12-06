@@ -420,10 +420,12 @@ public class SpringApplication {
 			// 20201203 打印Springboot横幅
 			Banner printedBanner = printBanner(environment);
 
-			// 20201205 创建AnnotationConfigServletWebServerApplicationContext ServletWeb应用程序配置上下文
+			// 20201205 创建 AnnotationConfigServletWebServerApplicationContext ServletWeb应用程序配置上下文
 			context = createApplicationContext();
 
+			// 20201206 GenericApplicationContext.setApplicationStartup(), 为ServletWeb上下文设置应用程序启动指标
 			context.setApplicationStartup(this.applicationStartup);
+
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
 			refreshContext(context);
 			afterRefresh(context, applicationArguments);

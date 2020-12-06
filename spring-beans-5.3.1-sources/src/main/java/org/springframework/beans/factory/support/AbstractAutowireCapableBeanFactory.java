@@ -85,22 +85,37 @@ import org.springframework.util.ReflectionUtils.MethodCallback;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201205
+ * A. 抽象的bean工厂超类，它实现默认的bean创建，并具有{@link RootBeanDefinition}类指定的全部功能。 除了AbstractBeanFactory的{@link #createBean}方法之外，
+ *    还实现了{@link AutowireCapableBeanFactory}接口。
+ * B. 提供Bean创建（具有构造函数解析），属性填充，接线（包括自动装配）和初始化。 处理运行时Bean引用，解析托管集合，调用初始化方法等。支持自动装配构造函数，
+ *    按名称的属性和按类型的属性。
+ * C. 子类要实现的主要模板方法是{@link #resolveDependency（DependencyDescriptor，String，Set，TypeConverter）}，用于按类型自动装配。
+ *    如果工厂能够搜索其bean定义，则通常将通过此类搜索来实现匹配的bean。 对于其他工厂样式，可以实现简化的匹配算法。
+ * D. 请注意，此类不承担或实现bean定义注册表功能。 有关{@link org.springframework.beans.factory.ListableBeanFactory}和{@link BeanDefinitionRegistry}接口的实现，
+ *    请参见{@link DefaultListableBeanFactory}，它们分别表示此类工厂的API和SPI视图。
+ */
+/**
+ * A.
  * Abstract bean factory superclass that implements default bean creation,
  * with the full capabilities specified by the {@link RootBeanDefinition} class.
  * Implements the {@link AutowireCapableBeanFactory}
  * interface in addition to AbstractBeanFactory's {@link #createBean} method.
  *
+ * B.
  * <p>Provides bean creation (with constructor resolution), property population,
  * wiring (including autowiring), and initialization. Handles runtime bean
  * references, resolves managed collections, calls initialization methods, etc.
  * Supports autowiring constructors, properties by name, and properties by type.
  *
+ * C.
  * <p>The main template method to be implemented by subclasses is
  * {@link #resolveDependency(DependencyDescriptor, String, Set, TypeConverter)},
  * used for autowiring by type. In case of a factory which is capable of searching
  * its bean definitions, matching beans will typically be implemented through such
  * a search. For other factory styles, simplified matching algorithms can be implemented.
  *
+ * D.
  * <p>Note that this class does <i>not</i> assume or implement bean definition
  * registry capabilities. See {@link DefaultListableBeanFactory} for an implementation
  * of the {@link org.springframework.beans.factory.ListableBeanFactory} and
@@ -120,8 +135,8 @@ import org.springframework.util.StringUtils;
  * @see DefaultListableBeanFactory
  * @see BeanDefinitionRegistry
  */
-public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory
-		implements AutowireCapableBeanFactory {
+// 20201204 抽象的bean工厂超类: 提供Bean创建（具有构造函数解析），属性填充，接线（包括自动装配）和初始化, 但不承担或实现bean定义注册表功能
+public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
 
 	/**
 	 * Whether this environment lives within a native image.

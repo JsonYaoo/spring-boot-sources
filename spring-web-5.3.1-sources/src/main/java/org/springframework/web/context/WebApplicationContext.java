@@ -23,7 +23,7 @@ import org.springframework.lang.Nullable;
 
 /**
  * 20201204
- * A. 提供Web应用程序配置的界面。 在应用程序运行时，它是只读的，但是如果实现支持，则可以重新加载。
+ * A. 提供Web应用程序配置的接口。 在应用程序运行时，它是只读的，但是如果实现支持，则可以重新加载。
  * B. 此接口向通用ApplicationContext接口添加一个{@code getServletContext（）}方法，并定义一个众所周知的应用程序属性名称，在引导过程中根上下文必须绑定到该名称。
  * C. 像通用应用程序上下文一样，Web应用程序上下文是分层的。 每个应用程序只有一个根上下文，而应用程序中的每个servlet（包括MVC框架中的调度程序servlet）都有自己的子上下文。
  * D. 除了标准的应用程序上下文生命周期功能外，WebApplicationContext实现还需要检测{@link ServletContextAware} bean，并相应地调用{@code setServletContext}方法。

@@ -122,6 +122,7 @@ import org.springframework.util.Assert;
 // 20201204 通用ApplicationContext实现, 实现BeanDefinitionRegistry接口，以便允许对其应用任何bean定义读取器
 public class GenericApplicationContext extends AbstractApplicationContext implements BeanDefinitionRegistry {
 
+	// 20201206 基于bean定义元数据的成熟bean工厂: 承担或实现bean定义注册表功能
 	private final DefaultListableBeanFactory beanFactory;
 
 	@Nullable
@@ -187,9 +188,13 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 		this.beanFactory.setParentBeanFactory(getInternalParentBeanFactory());
 	}
 
+	// 20201205 为此应用程序上下文设置{@link ApplicationStartup}: 允许应用程序上下文在启动期间记录指标
 	@Override
 	public void setApplicationStartup(ApplicationStartup applicationStartup) {
+		// 20201205 注册应用程序启动指标
 		super.setApplicationStartup(applicationStartup);
+
+		// 20201206 注册应用程序启动指标到bean注册表工厂中
 		this.beanFactory.setApplicationStartup(applicationStartup);
 	}
 
