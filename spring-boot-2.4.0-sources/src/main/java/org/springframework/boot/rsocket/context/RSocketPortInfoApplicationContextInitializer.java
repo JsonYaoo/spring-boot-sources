@@ -52,7 +52,7 @@ import org.springframework.core.env.PropertySource;
  * @author Eddú Meléndez
  * @since 2.2.0
  */
-// 20201207 RSocketServer服务端口应用程序上下文初始化器
+// 20201207 RSocketServer服务器端口应用程序上下文初始化器
 public class RSocketPortInfoApplicationContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
 	@Override

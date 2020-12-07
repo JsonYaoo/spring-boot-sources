@@ -531,13 +531,12 @@ public class SpringApplication {
 		postProcessApplicationContext(context);
 
 		// 20201207 在刷新之前，将所有{@link ApplicationContextInitializer}应用于上下文:
-		// 20201207 org.springframework.boot.context.ConfigurationWarningsApplicationContextInitializer,
-		// 20201207 org.springframework.boot.context.ContextIdApplicationContextInitializer,
-		// 20201207 org.springframework.boot.context.config.DelegatingApplicationContextInitializer,
-		// 20201207 org.springframework.boot.rsocket.context.RSocketPortInfoApplicationContextInitializer,
-		// 20201207 org.springframework.boot.web.context.ServerPortInfoApplicationContextInitializer
+		// 20201207 配置警告应用程序上下文初始化器: org.springframework.boot.context.ConfigurationWarningsApplicationContextInitializer,
+		// 20201207 上下文ID应用程序上下文初始化器: org.springframework.boot.context.ContextIdApplicationContextInitializer,
+		// 20201207 委托应用程序上下文初始化器: org.springframework.boot.context.config.DelegatingApplicationContextInitializer,
+		// 20201207 RSocketServer服务器端口应用程序上下文初始化器: org.springframework.boot.rsocket.context.RSocketPortInfoApplicationContextInitializer,
+		// 20201207 WebServer服务器端口应用程序上下文初始化器: org.springframework.boot.web.context.ServerPortInfoApplicationContextInitializer
 		applyInitializers(context);
-
 
 		listeners.contextPrepared(context);
 		bootstrapContext.close(context);
