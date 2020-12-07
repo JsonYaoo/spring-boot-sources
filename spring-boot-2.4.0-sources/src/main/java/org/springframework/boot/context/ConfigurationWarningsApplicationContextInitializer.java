@@ -49,8 +49,8 @@ import org.springframework.util.StringUtils;
  * @author Phillip Webb
  * @since 1.2.0
  */
-public class ConfigurationWarningsApplicationContextInitializer
-		implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+// 20201207 配置警告应用程序上下文初始化器: {@link ApplicationContextInitializer}报告常见配置错误的警告。
+public class ConfigurationWarningsApplicationContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
 	private static final Log logger = LogFactory.getLog(ConfigurationWarningsApplicationContextInitializer.class);
 

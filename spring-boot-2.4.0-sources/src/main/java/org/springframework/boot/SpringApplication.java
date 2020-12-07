@@ -908,7 +908,7 @@ public class SpringApplication {
 			// 20201207 获取应用程序上下文初始化器指定的泛型参数类型
 			Class<?> requiredType = GenericTypeResolver.resolveTypeArgument(initializer.getClass(), ApplicationContextInitializer.class);
 
-			// 20201207 该环境实例必须为该泛型参数类型
+			// 20201207 该环境实例泛型参数类型上限必须为ConfigurableApplicationContext
 			Assert.isInstanceOf(requiredType, context, "Unable to call initializer.");
 
 			// 20201207 初始化给定的应用程序上下文。

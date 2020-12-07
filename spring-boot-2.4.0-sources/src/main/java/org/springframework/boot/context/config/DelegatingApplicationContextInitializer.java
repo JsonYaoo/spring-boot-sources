@@ -39,8 +39,8 @@ import org.springframework.util.StringUtils;
  * @author Phillip Webb
  * @since 1.0.0
  */
-public class DelegatingApplicationContextInitializer
-		implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
+// 20201207 委托应用程序上下文初始化器: {@link ApplicationContextInitializer}委托给在{@literal context.initializer.classes}环境属性下指定的其他初始化程序。
+public class DelegatingApplicationContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
 
 	// NOTE: Similar to org.springframework.web.context.ContextLoader
 

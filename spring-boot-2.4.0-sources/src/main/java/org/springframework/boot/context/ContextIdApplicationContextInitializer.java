@@ -26,6 +26,11 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201207
+ * {@link ApplicationContextInitializer}设置Spring {@link ApplicationContext＃getId（）ApplicationContext ID}。
+ * {@code spring.application.name}属性用于创建ID。 如果未设置该属性，则使用{@code application}。
+ */
+/**
  * {@link ApplicationContextInitializer} that sets the Spring
  * {@link ApplicationContext#getId() ApplicationContext ID}. The
  * {@code spring.application.name} property is used to create the ID. If the property is
@@ -35,8 +40,8 @@ import org.springframework.util.StringUtils;
  * @author Andy Wilkinson
  * @since 1.0.0
  */
-public class ContextIdApplicationContextInitializer
-		implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
+// 20201207 上下文ID应用程序上下文初始化器
+public class ContextIdApplicationContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
 
 	private int order = Ordered.LOWEST_PRECEDENCE - 10;
 

@@ -32,10 +32,19 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 
 /**
+ * 20201207
+ * A. {@link ApplicationContextInitializer}为{@link RSocketServer}服务器实际监听的端口设置{@link Environment}属性。
+ * 	  属性{@literal“ local.rsocket.server.port”}可以使用{@link Value @Value}直接注入测试中，也可以通过{@link Environment}获得。
+ * B. 属性会自动传播到任何父上下文。
+ */
+/**
+ * A.
  * {@link ApplicationContextInitializer} that sets {@link Environment} properties for the
  * ports that {@link RSocketServer} servers are actually listening on. The property
  * {@literal "local.rsocket.server.port"} can be injected directly into tests using
  * {@link Value @Value} or obtained via the {@link Environment}.
+ *
+ * B.
  * <p>
  * Properties are automatically propagated up to any parent context.
  *
@@ -43,8 +52,8 @@ import org.springframework.core.env.PropertySource;
  * @author Eddú Meléndez
  * @since 2.2.0
  */
-public class RSocketPortInfoApplicationContextInitializer
-		implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+// 20201207 RSocketServer服务端口应用程序上下文初始化器
+public class RSocketPortInfoApplicationContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
 	@Override
 	public void initialize(ConfigurableApplicationContext applicationContext) {
