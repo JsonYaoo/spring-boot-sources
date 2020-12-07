@@ -15,6 +15,7 @@
         <module>spring-beans-5.3.1-sources</module>
         <module>spring-web-5.3.1-sources</module>
         <module>spring-jcl-5.3.1-sources</module>
+        <module>spring-aop-5.3.1-sources</module>
     </modules>
 
     <properties>
