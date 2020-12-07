@@ -258,6 +258,7 @@ public class SpringApplication {
 	// 20201202 允许读取命令行参数Properties属性
 	private boolean addCommandLineProperties = true;
 
+	// 20201207 是否添加转换服务, 默认为true
 	private boolean addConversionService = true;
 
 	private Banner banner;
@@ -265,6 +266,7 @@ public class SpringApplication {
 	// 20201130 资源加载器
 	private ResourceLoader resourceLoader;
 
+	// 20201206 用于为bean定义生成bean名称的策略接口
 	private BeanNameGenerator beanNameGenerator;
 
 	// 20201201 配置环境
@@ -277,6 +279,7 @@ public class SpringApplication {
 
 	private boolean registerShutdownHook = true;
 
+	// 20201207 应用程序上下文初始化器列表
 	private List<ApplicationContextInitializer<?>> initializers;
 
 	private List<ApplicationListener<?>> listeners;
@@ -423,9 +426,10 @@ public class SpringApplication {
 			// 20201205 创建 AnnotationConfigServletWebServerApplicationContext ServletWeb应用程序配置上下文
 			context = createApplicationContext();
 
-			// 20201206 GenericApplicationContext.setApplicationStartup(), 为ServletWeb上下文设置应用程序启动指标
+			// 20201206 GenericApplicationContext.setApplicationStartup(), 为ServletWeb应用程序配置上下文设置应用程序启动指标
 			context.setApplicationStartup(this.applicationStartup);
 
+			// 20201206 准备上下文
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
 			refreshContext(context);
 			afterRefresh(context, applicationArguments);
@@ -513,12 +517,28 @@ public class SpringApplication {
 		}
 	}
 
-	private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context,
-			ConfigurableEnvironment environment, SpringApplicationRunListeners listeners,
-			ApplicationArguments applicationArguments, Banner printedBanner) {
+	// 20201206 准备上下文 AnnotationConfigServletWebServerApplicationContext
+	private void prepareContext(DefaultBootstrapContext bootstrapContext,
+								ConfigurableApplicationContext context,
+								ConfigurableEnvironment environment,
+								SpringApplicationRunListeners listeners,
+								ApplicationArguments applicationArguments,
+								Banner printedBanner) {
+		// 20201206 将给定环境委托给基础的{@link AnnotatedBeanDefinitionReader}和{@link ClassPathBeanDefinitionScanner}成员。
 		context.setEnvironment(environment);
+
+		// 20201206 AnnotationConfigServletWebServerApplicationContext相关的后期处理 -> 注册bean单例、加载类路径资源、使用Spring ConversionService代替PropertyEditors
 		postProcessApplicationContext(context);
+
+		// 20201207 在刷新之前，将所有{@link ApplicationContextInitializer}应用于上下文:
+		// 20201207 org.springframework.boot.context.ConfigurationWarningsApplicationContextInitializer,
+		// 20201207 org.springframework.boot.context.ContextIdApplicationContextInitializer,
+		// 20201207 org.springframework.boot.context.config.DelegatingApplicationContextInitializer,
+		// 20201207 org.springframework.boot.rsocket.context.RSocketPortInfoApplicationContextInitializer,
+		// 20201207 org.springframework.boot.web.context.ServerPortInfoApplicationContextInitializer
 		applyInitializers(context);
+
+
 		listeners.contextPrepared(context);
 		bootstrapContext.close(context);
 		if (this.logStartupInfo) {
@@ -832,38 +852,66 @@ public class SpringApplication {
 	/**
 	 * Apply any relevant post processing the {@link ApplicationContext}. Subclasses can
 	 * apply additional processing as required.
+	 *
 	 * @param context the application context
 	 */
+	// 20201206 {@link ApplicationContext}相关的后期处理。 子类可以根据需要应用其他处理。 -> AnnotationConfigServletWebServerApplicationContext
 	protected void postProcessApplicationContext(ConfigurableApplicationContext context) {
+		// 20201206 如果用于为bean定义生成bean名称的策略接口不为null -> 注册bean单例
 		if (this.beanNameGenerator != null) {
-			context.getBeanFactory().registerSingleton(AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR,
+			// 20201206 GenericApplicationContext.getBeanFactory()返回ConfigurableListableBeanFactory -> ConfigurableListableBeanFactory.registerSingleton()
+			context.getBeanFactory().registerSingleton(
+					// 20201206 内部管理的BeanNameGenerator的Bean名称，用于在处理{@link Configuration}类时使用。
+					// 20201206 "org.springframework.context.annotation.internalConfigurationBeanNameGenerator"
+					AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR,
+
+					// 20201206 用于为bean定义生成bean名称的策略接口
 					this.beanNameGenerator);
 		}
+
+		// 20201207 如果资源加载器不为空 -> 加载类路径资源
 		if (this.resourceLoader != null) {
+			// 20201207 如果属于GenericApplicationContext通用ApplicationContext实现类型
 			if (context instanceof GenericApplicationContext) {
+				// 20201207 设置用于该上下文的ResourceLoader, 如果设置，则上下文会将所有{@code getResource}调用委派给给定的ResourceLoader。 如果未设置，则将应用默认资源加载器加载
 				((GenericApplicationContext) context).setResourceLoader(this.resourceLoader);
 			}
+
+			// 20201207 如果属于DefaultResourceLoader默认资源加载器, 则指定资源加载器的ClassLoader来加载类路径资源
 			if (context instanceof DefaultResourceLoader) {
 				((DefaultResourceLoader) context).setClassLoader(this.resourceLoader.getClassLoader());
 			}
 		}
+
+		// 20201207 是否添加转换服务, 默认为true -> 使用Spring ConversionService代替PropertyEditors
 		if (this.addConversionService) {
-			context.getBeanFactory().setConversionService(ApplicationConversionService.getSharedInstance());
+			// 20201207 GenericApplicationContext.getBeanFactory()返回ConfigurableListableBeanFactory -> ConfigurableListableBeanFactory.registerSingleton()
+			context.getBeanFactory().setConversionService(
+					// 20201207 返回一个共享的默认应用程序{@code ConversionService}实例，并在需要时懒加载构建它 -> 单例, 双重检查锁
+					ApplicationConversionService.getSharedInstance()
+			);
 		}
 	}
 
 	/**
 	 * Apply any {@link ApplicationContextInitializer}s to the context before it is
 	 * refreshed.
-	 * @param context the configured ApplicationContext (not refreshed yet)
+	 *
+	 * @param context the configured ApplicationContext (not refreshed yet)	// 20201207 配置的ApplicationContext（尚未刷新）
 	 * @see ConfigurableApplicationContext#refresh()
 	 */
+	// 20201207 在刷新之前，将所有{@link ApplicationContextInitializer}应用于上下文。
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void applyInitializers(ConfigurableApplicationContext context) {
+		// 20201207 遍历所有的应用程序上下文初始化器
 		for (ApplicationContextInitializer initializer : getInitializers()) {
-			Class<?> requiredType = GenericTypeResolver.resolveTypeArgument(initializer.getClass(),
-					ApplicationContextInitializer.class);
+			// 20201207 获取应用程序上下文初始化器指定的泛型参数类型
+			Class<?> requiredType = GenericTypeResolver.resolveTypeArgument(initializer.getClass(), ApplicationContextInitializer.class);
+
+			// 20201207 该环境实例必须为该泛型参数类型
 			Assert.isInstanceOf(requiredType, context, "Unable to call initializer.");
+
+			// 20201207 初始化给定的应用程序上下文。
 			initializer.initialize(context);
 		}
 	}
@@ -1476,7 +1524,9 @@ public class SpringApplication {
 	 * will be applied to the Spring {@link ApplicationContext}.
 	 * @return the initializers
 	 */
+	// 20201207 返回将应用于Spring {@link ApplicationContext}的只读应用程序上下文初始化器排序集。
 	public Set<ApplicationContextInitializer<?>> getInitializers() {
+		// 20201207 获取应用程序上下文初始化器列表的只读排序集
 		return asUnmodifiableOrderedSet(this.initializers);
 	}
 
@@ -1609,9 +1659,15 @@ public class SpringApplication {
 		}
 	}
 
+	// 20201207 获取集合的只读排序集
 	private static <E> Set<E> asUnmodifiableOrderedSet(Collection<E> elements) {
+		// 20201207 构建对应的列表
 		List<E> list = new ArrayList<>(elements);
+
+		// 20201207 对列表进行排序, 按注解排序实现类排序
 		list.sort(AnnotationAwareOrderComparator.INSTANCE);
+
+		// 20201207 使用LinkedHashSet对列表进行有序去重, 返回结果
 		return new LinkedHashSet<>(list);
 	}
 

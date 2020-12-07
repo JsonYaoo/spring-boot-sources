@@ -30,8 +30,15 @@ import org.springframework.util.Assert;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
 /**
+ * 20201207
+ * A. 用于根据类型变量解析泛型的Helper类。
+ * B. 主要用于框架内，可解析方法参数类型，即使它们是通用声明的。
+ */
+/**
+ * A.
  * Helper class for resolving generic types against type variables.
  *
+ * B.
  * <p>Mainly intended for usage within the framework, resolving method
  * parameter types even when they are declared generically.
  *
@@ -41,6 +48,7 @@ import org.springframework.util.ConcurrentReferenceHashMap;
  * @author Phillip Webb
  * @since 2.5.2
  */
+// 20201207 用于根据类型变量解析泛型的Helper类: 可解析方法参数类型
 public final class GenericTypeResolver {
 
 	/** Cache from Class to TypeVariable Map. */
@@ -103,24 +111,35 @@ public final class GenericTypeResolver {
 	 * Resolve the single type argument of the given generic interface against
 	 * the given target class which is assumed to implement the generic interface
 	 * and possibly declare a concrete type for its type variable.
-	 * @param clazz the target class to check against
-	 * @param genericIfc the generic interface or superclass to resolve the type argument from
-	 * @return the resolved type of the argument, or {@code null} if not resolvable
+	 *
+	 * @param clazz the target class to check against	// 20201207 要检查的目标类别
+	 * @param genericIfc the generic interface or superclass to resolve the type argument from	// 20201207 通用接口或超类，用于从中解析类型参数
+	 * @return the resolved type of the argument, or {@code null} if not resolvable	// 20201207 参数的解析类型，如果无法解析，则为{@code null}
 	 */
+	// 20201207 针对给定的目标类解析给定通用接口的单一类型参数，假定该目标类实现了通用接口，并可能为其类型变量声明具体类型 -> 即获取指定的泛型参数类型
 	@Nullable
 	public static Class<?> resolveTypeArgument(Class<?> clazz, Class<?> genericIfc) {
+		// 20201207 将此类型作为指定genericIfc类的{@link ResolvableType}返回
 		ResolvableType resolvableType = ResolvableType.forClass(clazz).as(genericIfc);
+
+		// 20201207 如果此类型不为泛型参数，则返回null
 		if (!resolvableType.hasGenerics()) {
 			return null;
 		}
+
+		// 20201207 返回第一个泛型参数类型
 		return getSingleGeneric(resolvableType);
 	}
 
+	// 20201207 返回第一个泛型参数类型
 	@Nullable
 	private static Class<?> getSingleGeneric(ResolvableType resolvableType) {
+		// 20201207 泛型参数只有一个时
 		Assert.isTrue(resolvableType.getGenerics().length == 1,
 				() -> "Expected 1 type argument on generic interface [" + resolvableType +
 				"] but found " + resolvableType.getGenerics().length);
+
+		// 20201207 则获取表示第0索引的泛型参数类型的{@link ResolvableType}
 		return resolvableType.getGeneric().resolve();
 	}
 

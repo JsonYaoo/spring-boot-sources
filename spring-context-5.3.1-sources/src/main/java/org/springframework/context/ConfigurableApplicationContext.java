@@ -133,6 +133,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * @param environment the new environment
 	 * @since 3.1
 	 */
+	// 20201206 为此应用程序上下文设置{@code Environment}。
 	void setEnvironment(ConfigurableEnvironment environment);
 
 	/**
@@ -206,16 +207,25 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	void addProtocolResolver(ProtocolResolver resolver);
 
 	/**
+	 * 20201206
+	 * A. 加载或刷新配置的持久性表示形式，该表示形式可能来自基于Java的配置，XML文件，属性文件，关系数据库模式或其他某种格式。
+	 * B. 由于这是一种启动方法，因此，如果失败，它应该销毁已创建的单例，以避免悬挂资源。 换句话说，在调用此方法之后，应实例化所有单例或根本不实例化。
+	 */
+	/**
+	 * A.
 	 * Load or refresh the persistent representation of the configuration, which
 	 * might be from Java-based configuration, an XML file, a properties file, a
 	 * relational database schema, or some other format.
+	 *
 	 * <p>As this is a startup method, it should destroy already created singletons
 	 * if it fails, to avoid dangling resources. In other words, after invocation
 	 * of this method, either all or no singletons at all should be instantiated.
+	 *
 	 * @throws BeansException if the bean factory could not be initialized
 	 * @throws IllegalStateException if already initialized and multiple refresh
 	 * attempts are not supported
 	 */
+	// 20201206 加载或刷新配置的持久性表示形式, 如果失败，它应该销毁已创建的单例，以避免悬挂资源
 	void refresh() throws BeansException, IllegalStateException;
 
 	/**
@@ -231,13 +241,25 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	void registerShutdownHook();
 
 	/**
+	 * 20201206
+	 * A. 关闭此应用程序上下文，释放实现可能持有的所有资源和锁。 这包括销毁所有缓存的单例bean。
+	 * B. 注意：不要在父上下文上调用{@code close}； 父级上下文具有自己的独立生命周期。
+	 * C. 可以多次调用此方法而没有副作用：在已经关闭的上下文上进行的后续{@code close}调用将被忽略。
+	 */
+	/**
+	 * A.
 	 * Close this application context, releasing all resources and locks that the
 	 * implementation might hold. This includes destroying all cached singleton beans.
+	 *
+	 * B.
 	 * <p>Note: Does <i>not</i> invoke {@code close} on a parent context;
 	 * parent contexts have their own, independent lifecycle.
+	 *
+	 * C.
 	 * <p>This method can be called multiple times without side effects: Subsequent
 	 * {@code close} calls on an already closed context will be ignored.
 	 */
+	// 20201206 关闭此应用程序上下文，释放实现可能持有的所有资源和锁。 这包括销毁所有缓存的单例bean。
 	@Override
 	void close();
 
@@ -249,18 +271,34 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * @see #close()
 	 * @see #getBeanFactory()
 	 */
+	// 20201206 确定此应用程序上下文是否处于活动状态，即，是否至少刷新一次并且尚未关闭。
 	boolean isActive();
 
 	/**
+	 * 20201206
+	 * A. 返回此应用程序上下文的内部bean工厂。
+	 * B. 可用于访问基础工厂的特定功能。
+	 * C. 注意：请勿使用此方法对bean工厂进行后处理。 单例之前已经实例化。 使用BeanFactoryPostProcessor来拦截Bean之前的BeanFactory设置过程。
+	 * D. 通常，只有在上下文处于活动状态时，即{@link #refresh（）}和{@link #close（）}之间，才能访问此内部工厂。 {@link #isActive（）}标志可用于检查上下文是否处于适当的状态。
+	 */
+	/**
+	 * A.
 	 * Return the internal bean factory of this application context.
+	 *
+	 * B.
 	 * Can be used to access specific functionality of the underlying factory.
+	 *
+	 * C.
 	 * <p>Note: Do not use this to post-process the bean factory; singletons
 	 * will already have been instantiated before. Use a BeanFactoryPostProcessor
 	 * to intercept the BeanFactory setup process before beans get touched.
+	 *
+	 * D.
 	 * <p>Generally, this internal factory will only be accessible while the context
 	 * is active, that is, in-between {@link #refresh()} and {@link #close()}.
 	 * The {@link #isActive()} flag can be used to check whether the context
 	 * is in an appropriate state.
+	 *
 	 * @return the underlying bean factory
 	 * @throws IllegalStateException if the context does not hold an internal
 	 * bean factory (usually if {@link #refresh()} hasn't been called yet or
@@ -270,6 +308,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * @see #close()
 	 * @see #addBeanFactoryPostProcessor
 	 */
+	// 20201206 返回此应用程序上下文的内部bean工厂 -> 只有在上下文处于活动状态时，即{@link #refresh（）}和{@link #close（）}之间，才能访问此内部工厂。
 	ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException;
 
 }

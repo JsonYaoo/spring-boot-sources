@@ -36,13 +36,23 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * 20201207
+ * A. 内部实用程序类，可用于获取{@link Type java.lang.reflect.Types}的包装的{@link Serializable}变体。
+ * B. {@link #forField（Field）Fields}或{@link #forMethodParameter（MethodParameter）MethodParameters}可用作可序列化类型的根源。 另外，常规的{@link Class}也可以用作源。
+ * C. 返回的类型将是{@link Class}或{@link GenericArrayType}，{@link ParameterizedType}，{@link TypeVariable}或{@link WildcardType}的可序列化代理。 除了
+ *    {@link Class}（这是最终的）之外，对将返回进一步返回{@link Type Types}（例如{@link GenericArrayType＃getGenericComponentType（）}）的方法的调用将被自动包装。
+ */
+/**
+ * A.
  * Internal utility class that can be used to obtain wrapped {@link Serializable}
  * variants of {@link Type java.lang.reflect.Types}.
  *
+ * B.
  * <p>{@link #forField(Field) Fields} or {@link #forMethodParameter(MethodParameter)
  * MethodParameters} can be used as the root source for a serializable type.
  * Alternatively, a regular {@link Class} can also be used as source.
  *
+ * C.
  * <p>The returned type will either be a {@link Class} or a serializable proxy of
  * {@link GenericArrayType}, {@link ParameterizedType}, {@link TypeVariable} or
  * {@link WildcardType}. With the exception of {@link Class} (which is final) calls
@@ -54,6 +64,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Sam Brannen
  * @since 4.0
  */
+// 20201207 内部实用程序类，可用于获取{@link Type java.lang.reflect.Types}的包装的{@link Serializable}变体。
 final class SerializableTypeWrapper {
 
 	private static final Class<?>[] SUPPORTED_SERIALIZABLE_TYPES = {
@@ -105,10 +116,19 @@ final class SerializableTypeWrapper {
 	}
 
 	/**
+	 * 20201207
+	 * A. 返回由{@link TypeProvider}支持的{@link Serializable} {@link Type}。
+	 * B. 如果类型工件通常在当前运行时环境中不可序列化，则此委托将仅按原样返回原始{@code Type}。
+	 */
+	/**
+	 * A.
 	 * Return a {@link Serializable} {@link Type} backed by a {@link TypeProvider} .
+	 *
+	 * B.
 	 * <p>If type artifacts are generally not serializable in the current runtime
 	 * environment, this delegate will simply return the original {@code Type} as-is.
 	 */
+	// 20201207 返回由{@link TypeProvider}支持的{@link Serializable} {@link Type}。
 	@Nullable
 	static Type forTypeProvider(TypeProvider provider) {
 		Type providedType = provider.getType();

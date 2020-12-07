@@ -59,6 +59,7 @@ public interface ApplicationContextInitializer<C extends ConfigurableApplication
 	 * Initialize the given application context.
 	 * @param applicationContext the application to configure
 	 */
+	// 20201207 初始化给定的应用程序上下文。
 	void initialize(C applicationContext);
 
 }

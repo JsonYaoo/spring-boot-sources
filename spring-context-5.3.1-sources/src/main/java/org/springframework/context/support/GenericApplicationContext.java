@@ -125,6 +125,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	// 20201206 基于bean定义元数据的成熟bean工厂: 承担或实现bean定义注册表功能
 	private final DefaultListableBeanFactory beanFactory;
 
+	// 20201207 资源加载器
 	@Nullable
 	private ResourceLoader resourceLoader;
 
@@ -222,23 +223,37 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
+	 * 20201207
+	 * A. 设置用于该上下文的ResourceLoader。 如果设置，则上下文会将所有{@code getResource}调用委派给给定的ResourceLoader。 如果未设置，则将应用默认资源加载器加载。
+	 * B. 指定自定义ResourceLoader的主要原因是要以特定方式解析资源路径（无URL前缀）。 默认行为是将此类路径解析为类路径位置。 要将资源路径解析为文件系统位置，
+	 *    请在此处指定FileSystemResourceLoader。
+	 * C. 您还可以传入一个完整的ResourcePatternResolver，它将由上下文自动检测到，并也用于{@code getResources}调用。 否则，将应用默认资源模式匹配。
+	 */
+	/**
+	 * A.
 	 * Set a ResourceLoader to use for this context. If set, the context will
 	 * delegate all {@code getResource} calls to the given ResourceLoader.
 	 * If not set, default resource loading will apply.
+	 *
+	 * B.
 	 * <p>The main reason to specify a custom ResourceLoader is to resolve
 	 * resource paths (without URL prefix) in a specific fashion.
 	 * The default behavior is to resolve such paths as class path locations.
 	 * To resolve resource paths as file system locations, specify a
 	 * FileSystemResourceLoader here.
+	 *
+	 * C.
 	 * <p>You can also pass in a full ResourcePatternResolver, which will
 	 * be autodetected by the context and used for {@code getResources}
 	 * calls as well. Else, default resource pattern matching will apply.
+	 *
 	 * @see #getResource
 	 * @see org.springframework.core.io.DefaultResourceLoader
 	 * @see org.springframework.core.io.FileSystemResourceLoader
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
 	 * @see #getResources
 	 */
+	// 20201207 设置用于该上下文的ResourceLoader, 如果设置，则上下文会将所有{@code getResource}调用委派给给定的ResourceLoader。 如果未设置，则将应用默认资源加载器加载
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
@@ -328,6 +343,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * Return the single internal BeanFactory held by this context
 	 * (as ConfigurableListableBeanFactory).
 	 */
+	// 20201206 返回此上下文拥有的单个内部BeanFactory（作为ConfigurableListableBeanFactory）。
 	@Override
 	public final ConfigurableListableBeanFactory getBeanFactory() {
 		return this.beanFactory;

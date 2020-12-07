@@ -48,15 +48,15 @@ import org.springframework.util.MultiValueMap;
 // 20201205 用于评估{@link Conditional}注解的内部类。
 class ConditionEvaluator {
 
+	// 20201206 ConditionContext实现: bean定义注册的接口实例、bean工厂实例、当前应用程序正在其中运行的环境的接口实例、资源加载器、类加载器
 	private final ConditionContextImpl context;
-
 
 	/**
 	 * Create a new {@link ConditionEvaluator} instance.
 	 */
-	public ConditionEvaluator(@Nullable BeanDefinitionRegistry registry,
-			@Nullable Environment environment, @Nullable ResourceLoader resourceLoader) {
-
+	// 20201206 创建一个新的{@link ConditionEvaluator}实例。
+	public ConditionEvaluator(@Nullable BeanDefinitionRegistry registry, @Nullable Environment environment, @Nullable ResourceLoader resourceLoader) {
+		// 20201206 注册bean定义注册的接口实例、bean工厂实例、当前应用程序正在其中运行的环境的接口实例、资源加载器、类加载器
 		this.context = new ConditionContextImpl(registry, environment, resourceLoader);
 	}
 
@@ -130,69 +130,101 @@ class ConditionEvaluator {
 	/**
 	 * Implementation of a {@link ConditionContext}.
 	 */
+	// 20201206 {@link ConditionContext}的实现。
 	private static class ConditionContextImpl implements ConditionContext {
 
+		// 20201206 bean定义注册的接口实例
 		@Nullable
 		private final BeanDefinitionRegistry registry;
 
+		// 20201206 bean工厂实例
 		@Nullable
 		private final ConfigurableListableBeanFactory beanFactory;
 
+		// 20201206 当前应用程序正在其中运行的环境的接口实例
 		private final Environment environment;
 
+		// 20201206 资源加载器
 		private final ResourceLoader resourceLoader;
 
+		// 20201206 类加载器
 		@Nullable
 		private final ClassLoader classLoader;
 
-		public ConditionContextImpl(@Nullable BeanDefinitionRegistry registry,
-				@Nullable Environment environment, @Nullable ResourceLoader resourceLoader) {
-
+		// 20201206 构造ConditionContext实现
+		public ConditionContextImpl(@Nullable BeanDefinitionRegistry registry, @Nullable Environment environment, @Nullable ResourceLoader resourceLoader) {
+			// 20201206 设置bean定义注册的接口实例
 			this.registry = registry;
+
+			// 20201206 根据注册表实例推断并设置Bean工厂实例
 			this.beanFactory = deduceBeanFactory(registry);
+
+			// 20201206 根据注册表推断并注册当前环境实例
 			this.environment = (environment != null ? environment : deduceEnvironment(registry));
+
+			// 20201206 根据注册表推断并注册资源加载器
 			this.resourceLoader = (resourceLoader != null ? resourceLoader : deduceResourceLoader(registry));
+
+			// 20201206 根据注册表推断并注册类加载器
 			this.classLoader = deduceClassLoader(resourceLoader, this.beanFactory);
 		}
 
+		// 20201206 根据注册表实例推断Bean工厂实例
 		@Nullable
 		private ConfigurableListableBeanFactory deduceBeanFactory(@Nullable BeanDefinitionRegistry source) {
+			// 20201206 如果注册表属于DefaultListableBeanFactory则直接强转返回
 			if (source instanceof ConfigurableListableBeanFactory) {
 				return (ConfigurableListableBeanFactory) source;
 			}
+
+			// 20201206 否则根据注册表上下文获取
 			if (source instanceof ConfigurableApplicationContext) {
 				return (((ConfigurableApplicationContext) source).getBeanFactory());
 			}
+
+			// 20201206 如果获取不到则为null
 			return null;
 		}
 
+		// 20201206 根据注册表推断当前环境实例
 		private Environment deduceEnvironment(@Nullable BeanDefinitionRegistry source) {
+			// 20201206 如果能直接拿到环境实例则返回
 			if (source instanceof EnvironmentCapable) {
 				return ((EnvironmentCapable) source).getEnvironment();
 			}
+
+			// 20201206 否则返回标准环境(非Web)实例
 			return new StandardEnvironment();
 		}
 
+		// 20201206 根据注册表推断资源加载器
 		private ResourceLoader deduceResourceLoader(@Nullable BeanDefinitionRegistry source) {
+			// 20201206 如果本身就是个资源加载器, 则强转后返回
 			if (source instanceof ResourceLoader) {
 				return (ResourceLoader) source;
 			}
+
+			// 20201206 否则返回新建的DefaultResourceLoader
 			return new DefaultResourceLoader();
 		}
 
+		// 20201206 根据注册表推断类加载器
 		@Nullable
-		private ClassLoader deduceClassLoader(@Nullable ResourceLoader resourceLoader,
-				@Nullable ConfigurableListableBeanFactory beanFactory) {
-
+		private ClassLoader deduceClassLoader(@Nullable ResourceLoader resourceLoader, @Nullable ConfigurableListableBeanFactory beanFactory) {
+			// 20201206 如果资源加载器不为空, 则返回资源加载器的类加载器
 			if (resourceLoader != null) {
 				ClassLoader classLoader = resourceLoader.getClassLoader();
 				if (classLoader != null) {
 					return classLoader;
 				}
 			}
+
+			// 20201206 否则获取bean工厂实例的类加载器
 			if (beanFactory != null) {
 				return beanFactory.getBeanClassLoader();
 			}
+
+			// 20201206 再否则返回默认的类加载器: 获取默认类加载器, 线程上下文类加载器 -> ClassUtils类加载器 -> 系统加载器
 			return ClassUtils.getDefaultClassLoader();
 		}
 

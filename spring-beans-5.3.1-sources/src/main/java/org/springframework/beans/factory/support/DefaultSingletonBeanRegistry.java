@@ -87,16 +87,19 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Maximum number of suppressed exceptions to preserve. */
 	private static final int SUPPRESSED_EXCEPTIONS_LIMIT = 100;
 
-
+	// 20201207 单例对象的高速缓存：bean名称到bean实例。
 	/** Cache of singleton objects: bean name to bean instance. */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
+	// 20201207 单例Object工厂的高速缓存：Bean名称为ObjectFactory。
 	/** Cache of singleton factories: bean name to ObjectFactory. */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
+	// 20201207 早期单例对象的高速缓存：Bean名称到Bean实例。
 	/** Cache of early singleton objects: bean name to bean instance. */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
+	// 20201207 已注册的单例集，按注册顺序包含Bean名称。
 	/** Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
@@ -127,32 +130,60 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
 
-
+	// 20201207 在给定的bean名称下，在bean注册表中将给定的现有对象注册为单例 => 注册表将不执行任何初始化回调，包括销毁回调
 	@Override
 	public void registerSingleton(String beanName, Object singletonObject) throws IllegalStateException {
+		// 20201207 Bean名称不能为空
 		Assert.notNull(beanName, "Bean name must not be null");
+
+		// 20201207 单例实例不能为空
 		Assert.notNull(singletonObject, "Singleton object must not be null");
+
+		// 20201207 对单例对象的高速缓存上锁
 		synchronized (this.singletonObjects) {
+			// 20201207 根据bean名称从单例对象的高速缓存中获取实例
 			Object oldObject = this.singletonObjects.get(beanName);
+
+			// 20201207 如果该实例已经注册, 则报错
 			if (oldObject != null) {
 				throw new IllegalStateException("Could not register object [" + singletonObject +
 						"] under bean name '" + beanName + "': there is already object [" + oldObject + "] bound");
 			}
+
+			// 20201207 如果为null, 则执行注册操作
 			addSingleton(beanName, singletonObject);
 		}
 	}
 
 	/**
+	 * 20201207
+	 * A. 将给定的单例对象添加到该工厂的单例缓存中。
+	 * B. 急于注册的单例。
+	 */
+	/**
+	 * A.
 	 * Add the given singleton object to the singleton cache of this factory.
+	 *
+	 * B.
 	 * <p>To be called for eager registration of singletons.
+	 *
 	 * @param beanName the name of the bean
 	 * @param singletonObject the singleton object
 	 */
+	// 20201207 将给定的单例对象添加到该工厂的单例缓存中
 	protected void addSingleton(String beanName, Object singletonObject) {
+		// 20201207 单例对象的高速缓存上锁
 		synchronized (this.singletonObjects) {
+			// 20201207 添加单例对象的高速缓存的键值对
 			this.singletonObjects.put(beanName, singletonObject);
+
+			// 20201207 移除单例Object工厂的高速缓存中的该bean实例
 			this.singletonFactories.remove(beanName);
+
+			// 20201207 移除早期单例对象的高速缓存中的该bean实例
 			this.earlySingletonObjects.remove(beanName);
+
+			// 20201207 把bean注册到单例集中
 			this.registeredSingletons.add(beanName);
 		}
 	}

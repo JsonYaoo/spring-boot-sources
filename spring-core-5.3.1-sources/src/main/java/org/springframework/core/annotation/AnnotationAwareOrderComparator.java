@@ -50,8 +50,8 @@ public class AnnotationAwareOrderComparator extends OrderComparator {
 	/**
 	 * Shared default instance of {@code AnnotationAwareOrderComparator}.
 	 */
+	// 20201207 {@code AnnotationAwareOrderComparator}的共享默认实例。
 	public static final AnnotationAwareOrderComparator INSTANCE = new AnnotationAwareOrderComparator();
-
 
 	/**
 	 * This implementation checks for {@link Order @Order} or

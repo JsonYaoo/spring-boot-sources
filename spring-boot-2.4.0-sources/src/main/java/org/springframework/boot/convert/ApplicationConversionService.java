@@ -90,7 +90,7 @@ public class ApplicationConversionService extends FormattingConversionService {
 	 * @return the shared {@code ApplicationConversionService} instance (never // 20201202 共享的{@code ApplicationConversionService}实例（从不为null）
 	 * {@code null})
 	 */
-	// 20201202 获取默认应用程序共享实例 -> 单例, 双重检查锁
+	// 20201202 返回一个共享的默认应用程序{@code ConversionService}实例，并在需要时懒加载构建它 -> 单例, 双重检查锁
 	public static ConversionService getSharedInstance() {
 		ApplicationConversionService sharedInstance = ApplicationConversionService.sharedInstance;
 		if (sharedInstance == null) {

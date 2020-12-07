@@ -112,11 +112,11 @@ public class ResolvableType implements Serializable {
 	// 202021202 {@code ResolvableType}在没有可用值时返回。{@code NONE}优先于{@code null}使用，这样可以安全地链接多个方法调用。
 	public static final ResolvableType NONE = new ResolvableType(EmptyType.INSTANCE, null, null, 0);
 
+	// 20201207 返回空的ResolvableType数组
 	private static final ResolvableType[] EMPTY_TYPES_ARRAY = new ResolvableType[0];
 
-	private static final ConcurrentReferenceHashMap<ResolvableType, ResolvableType> cache =
-			new ConcurrentReferenceHashMap<>(256);
-
+	// 20201207 ResolvableType缓存
+	private static final ConcurrentReferenceHashMap<ResolvableType, ResolvableType> cache = new ConcurrentReferenceHashMap<>(256);
 
 	/**
 	 * The underlying Java type being managed.
@@ -153,22 +153,24 @@ public class ResolvableType implements Serializable {
 	@Nullable
 	private Class<?> resolved;
 
+	// 20201207 直接超类ResolvableType
 	@Nullable
 	private volatile ResolvableType superType;
 
+	// 20201207 ResolvableType数组, 表示该实例实现的接口列表
 	@Nullable
 	private volatile ResolvableType[] interfaces;
 
+	// 20201207 ResolvableType泛型数组
 	@Nullable
 	private volatile ResolvableType[] generics;
-
 
 	/**
 	 * Private constructor used to create a new {@link ResolvableType} for cache key purposes,
 	 * with no upfront resolution.
 	 */
-	private ResolvableType(
-			Type type, @Nullable TypeProvider typeProvider, @Nullable VariableResolver variableResolver) {
+	// 20201207 专用构造函数，用于创建新的{@link ResolvableType}以用于缓存密钥，没有前期解决方案。
+	private ResolvableType(Type type, @Nullable TypeProvider typeProvider, @Nullable VariableResolver variableResolver) {
 
 		this.type = type;
 		this.typeProvider = typeProvider;
@@ -497,52 +499,92 @@ public class ResolvableType implements Serializable {
 	 * {@link #getSuperType() supertype} and {@link #getInterfaces() interface}
 	 * hierarchies to find a match, returning {@link #NONE} if this type does not
 	 * implement or extend the specified class.
-	 * @param type the required type (typically narrowed)
+	 *
+	 * @param type the required type (typically narrowed)	// 20201207 输入所需的类型（通常是缩小的）
 	 * @return a {@link ResolvableType} representing this object as the specified
-	 * type, or {@link #NONE} if not resolvable as that type
+	 * type, or {@link #NONE} if not resolvable as that type // 20201207 表示此对象为指定类型的{@link ResolvableType}，如果不能解析为该类型，则为{@link #NONE}
 	 * @see #asCollection()
 	 * @see #asMap()
 	 * @see #getSuperType()
 	 * @see #getInterfaces()
 	 */
+	// 20201207 将此类型作为指定类的{@link ResolvableType}返回。 搜索{@link #getSuperType（）父类型}和{@link #getInterfaces（）接口}层次结构以找到匹配项，如果此类型未实现或扩展指定的类，则返回{@link #NONE}。
 	public ResolvableType as(Class<?> type) {
+		// 2020107 如果调用该方法的实例为空, 则返回空的ResolvableType
 		if (this == NONE) {
 			return NONE;
 		}
+
+		// 20201207 获取已解析的{@link Class}，或{@code null}（如果无法解析）
 		Class<?> resolved = resolve();
+
+		// 20201207 如果解析后的resolved为null或者为指定类型
 		if (resolved == null || resolved == type) {
+			// 20201207 则无需转换直接返回该实例
 			return this;
 		}
+
+		// 20201207 遍历所有接口ResolvableType数组
 		for (ResolvableType interfaceType : getInterfaces()) {
+			// 20201207 递归获取接口的ResolvableType类型
 			ResolvableType interfaceAsType = interfaceType.as(type);
+
+			// 20201207 如果为空, 则返回这个接口的ResolvableType类型
 			if (interfaceAsType != NONE) {
 				return interfaceAsType;
 			}
 		}
+
+		// 20201207 如果没有接口则返回直接超类的ResolvableType类型
 		return getSuperType().as(type);
 	}
 
 	/**
+	 * 20201207
+	 * A. 返回表示此类型的直接超类型的{@link ResolvableType}。 如果没有超类型可用，则此方法返回{@link #NONE}。
+	 * B. 注意：生成的{@link ResolvableType}实例可能不是{@link Serializable}。
+	 */
+	/**
+	 * A.
 	 * Return a {@link ResolvableType} representing the direct supertype of this type.
 	 * If no supertype is available this method returns {@link #NONE}.
+	 *
+	 * B.
 	 * <p>Note: The resulting {@link ResolvableType} instance may not be {@link Serializable}.
 	 * @see #getInterfaces()
 	 */
+	// 20201207 返回表示此类型的直接超类型的{@link ResolvableType}。 如果没有超类型可用，则此方法返回{@link #NONE}。
 	public ResolvableType getSuperType() {
+		// 20201207 获取已解析的{@link Class}，或{@code null}（如果无法解析）
 		Class<?> resolved = resolve();
+
+		// 20201207 如果解析后的resolved类型为空
 		if (resolved == null) {
+			// 20201207 则返回空
 			return NONE;
 		}
 		try {
+			// 20201207 返回表示此{@code Class}表示的实体的直接超类的{@code Type}（类，接口，原始类型或void）。
 			Type superclass = resolved.getGenericSuperclass();
+
+			// 20201207 如果直接超类为null, 则返回空
 			if (superclass == null) {
 				return NONE;
 			}
+
+			// 20201207 获取已注册的直接超类ResolvableType
 			ResolvableType superType = this.superType;
+
+			// 20201207 如果直接超类ResolvableType还没注册
 			if (superType == null) {
+				// 20201207 则转换直接超类类型为当前类型
 				superType = forType(superclass, this);
+
+				// 20201207 注册直接超类类型
 				this.superType = superType;
 			}
+
+			// 2020127
 			return superType;
 		}
 		catch (TypeNotPresentException ex) {
@@ -552,26 +594,50 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
+	 * 20201207
+	 * A. 返回表示此类型实现的直接接口的{@link ResolvableType}数组。 如果此类型不实现任何接口，则返回一个空数组。
+	 * B. 注意：生成的{@link ResolvableType}实例可能不是{@link Serializable}。
+	 */
+	/**
+	 * A.
 	 * Return a {@link ResolvableType} array representing the direct interfaces
 	 * implemented by this type. If this type does not implement any interfaces an
 	 * empty array is returned.
+	 *
+	 * B.
 	 * <p>Note: The resulting {@link ResolvableType} instances may not be {@link Serializable}.
 	 * @see #getSuperType()
 	 */
+	// 20201207 返回表示此类型实现的直接接口的{@link ResolvableType}数组。 如果此类型不实现任何接口，则返回一个空数组。
 	public ResolvableType[] getInterfaces() {
+		// 20201207 获取已解析的{@link Class}，或{@code null}（如果无法解析）
 		Class<?> resolved = resolve();
+
+		// 20201207 如果解析后的resolved类型为空
 		if (resolved == null) {
+			// 20201207 则返回返回空的ResolvableType数组
 			return EMPTY_TYPES_ARRAY;
 		}
+
+		// 20201207 获取ResolvableType数组, 表示该实例实现的接口列表
 		ResolvableType[] interfaces = this.interfaces;
+
+		// 20201207 如果实现的接口列表为空, 证明还没进行初始化
 		if (interfaces == null) {
+			// 20201207 则获取表示由该对象实现的所有接口接口 -> 接口顺序为类的声明的{@code Implements}子句中接口名称的顺序
 			Type[] genericIfcs = resolved.getGenericInterfaces();
+
+			// 20201207 构造ResolvableType数组
 			interfaces = new ResolvableType[genericIfcs.length];
 			for (int i = 0; i < genericIfcs.length; i++) {
 				interfaces[i] = forType(genericIfcs[i], this);
 			}
+
+			// 20201207 更新ResolvableType数组
 			this.interfaces = interfaces;
 		}
+
+		// 20201207 返回该ResolvableType数组
 		return interfaces;
 	}
 
@@ -580,7 +646,9 @@ public class ResolvableType implements Serializable {
 	 * @see #getGeneric(int...)
 	 * @see #getGenerics()
 	 */
+	// 20201207 如果此类型为泛型参数，则返回{@code true}。
 	public boolean hasGenerics() {
+		// 20201207 返回参数化类型数组。 如果没有可用的泛型，则返回一个空数组。
 		return (getGenerics().length > 0);
 	}
 
@@ -722,6 +790,14 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
+	 * 20201207
+	 * A. 返回表示给定索引的通用参数的{@link ResolvableType}。 索引从零开始； 例如，给定类型为{@code Map <Integer，List <String >>}，
+	 *    {@code getGeneric（0）}将访问{@code Integer}。 可以通过指定多个索引来访问嵌套泛型。 例如，{@code getGeneric（1，0）}将从嵌套的{@code List}访问
+	 *    {@code String}。 为了方便起见，如果未指定索引，则返回第一个泛型。
+	 * B. 如果指定索引处没有通用名称，则返回{@link #NONE}。 @param索引引用泛型参数的索引（可以省略以返回第一个泛型）
+	 */
+	/**
+	 * A.
 	 * Return a {@link ResolvableType} representing the generic parameter for the
 	 * given indexes. Indexes are zero based; for example given the type
 	 * {@code Map<Integer, List<String>>}, {@code getGeneric(0)} will access the
@@ -729,15 +805,19 @@ public class ResolvableType implements Serializable {
 	 * for example {@code getGeneric(1, 0)} will access the {@code String} from the
 	 * nested {@code List}. For convenience, if no indexes are specified the first
 	 * generic is returned.
+	 *
+	 * B.
 	 * <p>If no generic is available at the specified indexes {@link #NONE} is returned.
 	 * @param indexes the indexes that refer to the generic parameter
 	 * (may be omitted to return the first generic)
+	 *
 	 * @return a {@link ResolvableType} for the specified generic, or {@link #NONE}
 	 * @see #hasGenerics()
 	 * @see #getGenerics()
 	 * @see #resolveGeneric(int...)
 	 * @see #resolveGenerics()
 	 */
+	// 20201207 返回表示给定索引的通用参数的{@link ResolvableType}。 索引从零开始, 支持嵌套索引
 	public ResolvableType getGeneric(@Nullable int... indexes) {
 		ResolvableType[] generics = getGenerics();
 		if (indexes == null || indexes.length == 0) {
@@ -755,43 +835,71 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
+	 * 20201207
+	 * 返回表示此类型的通用参数的{@link ResolvableType ResolvableTypes}数组。 如果没有可用的泛型，则返回一个空数组。 如果您需要访问特定的泛型，请考虑使用
+	 * {@link #getGeneric（int ...）}方法，因为该方法允许访问嵌套的泛型并且可以防止{@code IndexOutOfBoundsExceptions}。
+	 */
+	/**
 	 * Return an array of {@link ResolvableType ResolvableTypes} representing the generic parameters of
 	 * this type. If no generics are available an empty array is returned. If you need to
 	 * access a specific generic consider using the {@link #getGeneric(int...)} method as
 	 * it allows access to nested generics and protects against
 	 * {@code IndexOutOfBoundsExceptions}.
-	 * @return an array of {@link ResolvableType ResolvableTypes} representing the generic parameters
-	 * (never {@code null})
+	 *
+	 * // 20201207 代表通用参数的{@link ResolvableType ResolvableTypes}数组（永远{@code null}）
+	 * @return an array of {@link ResolvableType ResolvableTypes} representing the generic parameters (never {@code null})
 	 * @see #hasGenerics()
 	 * @see #getGeneric(int...)
 	 * @see #resolveGeneric(int...)
 	 * @see #resolveGenerics()
 	 */
+	// 20201207 返回参数化类型数组。 如果没有可用的泛型，则返回一个空数组。
 	public ResolvableType[] getGenerics() {
+		// 20201207 如果调用该方法的实例为空
 		if (this == NONE) {
+			// 20201207 则返回空数组
 			return EMPTY_TYPES_ARRAY;
 		}
+
+		// 20201207 获取ResolvableType泛型数组
 		ResolvableType[] generics = this.generics;
+
+		// 20201207 如果不存在泛型数组, 说明可能还没初始化
 		if (generics == null) {
+			// 20201207 如果正在管理的底层Java类型为Class类型
 			if (this.type instanceof Class) {
+				// 20201207 则获取它的泛型参数数组
 				Type[] typeParams = ((Class<?>) this.type).getTypeParameters();
+
+				// 20201207 构造ResolvableType泛型参数数组
 				generics = new ResolvableType[typeParams.length];
 				for (int i = 0; i < generics.length; i++) {
 					generics[i] = ResolvableType.forType(typeParams[i], this);
 				}
 			}
+
+			// 20201207 如果属于泛型类型
 			else if (this.type instanceof ParameterizedType) {
+				// 20201207 则获取该类型的实际类型参数的{@code Type}对象的数组
 				Type[] actualTypeArguments = ((ParameterizedType) this.type).getActualTypeArguments();
+
+				// 20201207 构造ResolvableType泛型参数数组
 				generics = new ResolvableType[actualTypeArguments.length];
 				for (int i = 0; i < actualTypeArguments.length; i++) {
 					generics[i] = forType(actualTypeArguments[i], this.variableResolver);
 				}
 			}
+
+			// 20201207 否则单级解析此类型转换为给定类型的ResolvableType, 然后获取其参数化类型数组
 			else {
 				generics = resolveType().getGenerics();
 			}
+
+			// 20201207 注册ResolvableType泛型数组
 			this.generics = generics;
 		}
+
+		// 20201207 返回该泛型数组
 		return generics;
 	}
 
@@ -912,33 +1020,57 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
+	 * 20201207
+	 * A. 通过单级解析此类型，返回解析值或{@link #NONE}。
+	 * B. 注意：返回的{@link ResolvableType}只能用作中介，因为无法序列化。
+	 */
+	/**
+	 * A.
 	 * Resolve this type by a single level, returning the resolved value or {@link #NONE}.
+	 *
+	 * B.
 	 * <p>Note: The returned {@link ResolvableType} should only be used as an intermediary
 	 * as it cannot be serialized.
 	 */
+	// 20201207 通过单级解析此类型, 转换为给定类型的ResolvableType
 	ResolvableType resolveType() {
+		// 20201207 如果该类型属于泛型类型
 		if (this.type instanceof ParameterizedType) {
+			// 20201207 则转换为给定类型的ResolvableType
 			return forType(((ParameterizedType) this.type).getRawType(), this.variableResolver);
 		}
+
+		// 20201207 如果该类型属于通配符类型
 		if (this.type instanceof WildcardType) {
+			// 20201207 获取代表此类型变量上限的{@code Type}对象数组。 请注意，如果未明确声明上限，则上限为{@code Object}。
 			Type resolved = resolveBounds(((WildcardType) this.type).getUpperBounds());
+
+			// 20201207 如果获取为null
 			if (resolved == null) {
+				// 20201207 则获取代表此类型变量下限的{@code Type}对象数组。 请注意，如果未明确声明下界，则下界为{@code null}的类型。 在这种情况下，将返回零长度数组。
 				resolved = resolveBounds(((WildcardType) this.type).getLowerBounds());
 			}
+
+			// 20201207 则转换为给定类型的ResolvableType
 			return forType(resolved, this.variableResolver);
 		}
+
+		// 20201207 如果该实例属于类类型变量的通用超级接口的实例
 		if (this.type instanceof TypeVariable) {
+			// 20201207 则转换为给定类型的ResolvableType
 			TypeVariable<?> variable = (TypeVariable<?>) this.type;
-			// Try default variable resolution
+			// Try default variable resolution // 20201207 尝试默认变量解析
 			if (this.variableResolver != null) {
 				ResolvableType resolved = this.variableResolver.resolveVariable(variable);
 				if (resolved != null) {
 					return resolved;
 				}
 			}
-			// Fallback to bounds
+			// Fallback to bounds // 20201207 后退到极限
 			return forType(resolveBounds(variable.getBounds()), this.variableResolver);
 		}
+
+		// 20201207 如果都不属于, 则返回空
 		return NONE;
 	}
 
@@ -1037,11 +1169,15 @@ public class ResolvableType implements Serializable {
 	/**
 	 * Adapts this {@link ResolvableType} to a {@link VariableResolver}.
 	 */
+	// 20201207 将此{@link ResolvableType}修改为{@link VariableResolver}。
 	@Nullable
 	VariableResolver asVariableResolver() {
+		// 20201207 如果调用的当前实例为空, 则返回空
 		if (this == NONE) {
 			return null;
 		}
+
+		// 20201207 否则构建DefaultVariableResolver内部实例 -> 用于解析{@link TypeVariable TypeVariables}的默认策略
 		return new DefaultVariableResolver(this);
 	}
 
@@ -1458,19 +1594,31 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
+	 * 20201207
+	 * A. 返回由给定所有者类型支持的指定{@link Type}的{@link ResolvableType}。
+	 * B. 注意：生成的{@link ResolvableType}实例可能不是{@link Serializable}。
+	 */
+	/**
+	 * A.
 	 * Return a {@link ResolvableType} for the specified {@link Type} backed by the given
 	 * owner type.
+	 *
+	 * B.
 	 * <p>Note: The resulting {@link ResolvableType} instance may not be {@link Serializable}.
-	 * @param type the source type or {@code null}
-	 * @param owner the owner type used to resolve variables
-	 * @return a {@link ResolvableType} for the specified {@link Type} and owner
+	 * @param type the source type or {@code null}	// 20201207 源类型或{@code null}
+	 * @param owner the owner type used to resolve variables	// 20201207 用于解析变量的所有者类型
+	 * @return a {@link ResolvableType} for the specified {@link Type} and owner // 20201207 指定的{@link Type}和所有者的{@link ResolvableType}
 	 * @see #forType(Type)
 	 */
+	// 20201207 转换为给定类型的ResolvableType。
 	public static ResolvableType forType(@Nullable Type type, @Nullable ResolvableType owner) {
 		VariableResolver variableResolver = null;
 		if (owner != null) {
+			// 20201207 获取用于解析{@link TypeVariable TypeVariables}的默认策略
 			variableResolver = owner.asVariableResolver();
 		}
+
+		// 20201207 转换为给定类型的ResolvableType
 		return forType(type, variableResolver);
 	}
 
@@ -1491,10 +1639,10 @@ public class ResolvableType implements Serializable {
 	 * Return a {@link ResolvableType} for the specified {@link Type} backed by a given
 	 * {@link VariableResolver}.
 	 * @param type the source type or {@code null}
-	 * @param variableResolver the variable resolver or {@code null}
+	 * @param variableResolver the variable resolver or {@code null}	// 20201207 变量解析器或{@code null}
 	 * @return a {@link ResolvableType} for the specified {@link Type} and {@link VariableResolver}
 	 */
-	// 20201202 返回由给定的{@link variablesolver}支持的指定的{@link ResolvableType}。
+	// 20201202 返回由给定的{@link variablesolver}支持的指定的{@link ResolvableType} -> 转换为给定类型的ResolvableType
 	static ResolvableType forType(@Nullable Type type, @Nullable VariableResolver variableResolver) {
 		return forType(type, null, variableResolver);
 	}
@@ -1502,31 +1650,37 @@ public class ResolvableType implements Serializable {
 	/**
 	 * Return a {@link ResolvableType} for the specified {@link Type} backed by a given
 	 * {@link VariableResolver}.
-	 * @param type the source type or {@code null}
-	 * @param typeProvider the type provider or {@code null}
-	 * @param variableResolver the variable resolver or {@code null}
-	 * @return a {@link ResolvableType} for the specified {@link Type} and {@link VariableResolver}
+	 * @param type the source type or {@code null}	// 20201207 源类型或{@code null}
+	 * @param typeProvider the type provider or {@code null}	// 20201207 类型提供者或{@code null}
+	 * @param variableResolver the variable resolver or {@code null}	// 20201207 变量解析器或{@code null}
+	 * @return a {@link ResolvableType} for the specified {@link Type} and {@link VariableResolver}	// 20201207 指定的{@link Type}和{@link VariableResolver}的{@link ResolvableType}
 	 */
-	// 20201202 返回由给定的{@link variablesolver}支持的指定的{@link ResolvableType}。
-	static ResolvableType forType(
-			@Nullable Type type, @Nullable TypeProvider typeProvider, @Nullable VariableResolver variableResolver) {
+	// 20201202 返回由给定的{@link variablesolver}支持的指定的{@link ResolvableType} -> 转换为给定类型的ResolvableType
+	static ResolvableType forType(@Nullable Type type, @Nullable TypeProvider typeProvider, @Nullable VariableResolver variableResolver) {
+		// 20201207 如果变量解析器不为空
 		if (type == null && typeProvider != null) {
+			// 20201207 则返回由{@link TypeProvider}支持的{@link Serializable} {@link Type}。
 			type = SerializableTypeWrapper.forTypeProvider(typeProvider);
 		}
+		// 20201207 如果变量解析器为空, 且type为空
 		if (type == null) {
+			// 20201207 则返回空
 			return NONE;
 		}
 
-		// For simple Class references, build the wrapper right away -
-		// no expensive resolution necessary, so not worth caching...
+		// For simple Class references, build the wrapper right away - no expensive resolution necessary, so not worth caching...
+		// 20201207 对于简单的类引用，请立即构建包装器-无需昂贵的解析度，因此不值得缓存...
 		if (type instanceof Class) {
+			// 20201207 构造ResolvableType类型并返回
 			return new ResolvableType(type, typeProvider, variableResolver, (ResolvableType) null);
 		}
 
 		// Purge empty entries on access since we don't have a clean-up thread or the like.
+		// 20201207 由于我们没有清理线程等，因此清除访问时的空条目。
 		cache.purgeUnreferencedEntries();
 
 		// Check the cache - we may have a ResolvableType which has been resolved before...
+		// 20201207 检查缓存-我们可能有一个ResolvableType，它已经在...之前解析了。
 		ResolvableType resultType = new ResolvableType(type, typeProvider, variableResolver);
 		ResolvableType cachedType = cache.get(resultType);
 		if (cachedType == null) {
@@ -1550,6 +1704,7 @@ public class ResolvableType implements Serializable {
 	/**
 	 * Strategy interface used to resolve {@link TypeVariable TypeVariables}.
 	 */
+	// 20201207 用于解析{@link TypeVariable TypeVariables}的策略接口。
 	interface VariableResolver extends Serializable {
 
 		/**
@@ -1562,17 +1717,21 @@ public class ResolvableType implements Serializable {
 		 * @param variable the variable to resolve
 		 * @return the resolved variable, or {@code null} if not found
 		 */
+		// 20201207 解决指定的变量。
 		@Nullable
 		ResolvableType resolveVariable(TypeVariable<?> variable);
 	}
 
-
+	// 20201207 用于解析{@link TypeVariable TypeVariables}的默认策略。
 	@SuppressWarnings("serial")
 	private static class DefaultVariableResolver implements VariableResolver {
 
+		// 20201207 初始ResolvableType类型
 		private final ResolvableType source;
 
+		// 20201207 构建DefaultVariableResolver内部实例
 		DefaultVariableResolver(ResolvableType resolvableType) {
+			// 20201207 设置初始ResolvableType类型
 			this.source = resolvableType;
 		}
 

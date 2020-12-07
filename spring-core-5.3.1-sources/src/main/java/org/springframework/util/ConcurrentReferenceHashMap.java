@@ -37,20 +37,32 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201207
+ * A. 一个{@link ConcurrentHashMap}，它对{@code keys}和{@code values}使用{@link ReferenceType＃SOFT soft}或{@linkplain ReferenceType＃WEAK weak}引用。
+ * B. 此类可以用作{@code Collections.synchronizedMap（new WeakHashMap <K，Reference <V >>（））}的替代方法，以便在并发访问时提供更好的性能。 此实现遵循与
+ *    {@link ConcurrentHashMap}相同的设计约束，但支持{@code null}值和{@code null}键。
+ * C. 注意：使用引用意味着不能保证放置在map中的项目随后将可用。 垃圾收集器可能会随时丢弃引用，因此似乎有一个未知线程正在静默删除条目。
+ * D. 如果未明确指定，则此实现将使用{@linkplain SoftReference软条目引用}。
+ */
+/**
+ * A.
  * A {@link ConcurrentHashMap} that uses {@link ReferenceType#SOFT soft} or
  * {@linkplain ReferenceType#WEAK weak} references for both {@code keys} and {@code values}.
  *
+ * B.
  * <p>This class can be used as an alternative to
  * {@code Collections.synchronizedMap(new WeakHashMap<K, Reference<V>>())} in order to
  * support better performance when accessed concurrently. This implementation follows the
  * same design constraints as {@link ConcurrentHashMap} with the exception that
  * {@code null} values and {@code null} keys are supported.
  *
+ * C.
  * <p><b>NOTE:</b> The use of references means that there is no guarantee that items
  * placed into the map will be subsequently available. The garbage collector may discard
  * references at any time, so it may appear that an unknown thread is silently removing
  * entries.
  *
+ * D.
  * <p>If not explicitly specified, this implementation will use
  * {@linkplain SoftReference soft entry references}.
  *
@@ -60,6 +72,7 @@ import org.springframework.lang.Nullable;
  * @param <K> the key type
  * @param <V> the value type
  */
+// 20201207 一个{@link ConcurrentHashMap}，它对{@code keys}和{@code values}使用{@link ReferenceType＃SOFT soft}或{@linkplain ReferenceType＃WEAK weak}引用。
 public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implements ConcurrentMap<K, V> {
 
 	private static final int DEFAULT_INITIAL_CAPACITY = 16;
@@ -78,6 +91,7 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
 	/**
 	 * Array of segments indexed using the high order bits from the hash.
 	 */
+	// 20201207 使用哈希中的高位索引的段数组。
 	private final Segment[] segments;
 
 	/**
@@ -377,8 +391,11 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
 	 * items are added or removed from the Map. This method can be used to force a purge,
 	 * and is useful when the Map is read frequently but updated less often.
 	 */
+	// 20201207 删除所有已被垃圾回收且不再被引用的条目。 在正常情况下，随着在map中添加或删除项目，垃圾收集条目将自动清除。 此方法可用于强制清除，
+	// 20201207 当频繁读取Map但更新频率较低时，此方法很有用。
 	public void purgeUnreferencedEntries() {
 		for (Segment segment : this.segments) {
+			// 20201207 必要时重组基础数据结构。 此方法可以增加引用表的大小，并清除已被垃圾回收的所有引用。
 			segment.restructureIfNecessary(false);
 		}
 	}
@@ -568,6 +585,7 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V> implemen
 		 * references that have been garbage collected.
 		 * @param allowResize if resizing is permitted
 		 */
+		// 20201207 必要时重组基础数据结构。 此方法可以增加引用表的大小，并清除已被垃圾回收的所有引用。
 		protected final void restructureIfNecessary(boolean allowResize) {
 			int currCount = this.count.get();
 			boolean needsResize = allowResize && (currCount > 0 && currCount >= this.resizeThreshold);

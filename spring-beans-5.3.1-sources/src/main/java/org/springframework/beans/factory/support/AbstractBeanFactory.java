@@ -153,6 +153,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@Nullable
 	private BeanExpressionResolver beanExpressionResolver;
 
+	// 20201207 使用Spring ConversionService代替PropertyEditors。
 	/** Spring ConversionService to use instead of PropertyEditors. */
 	@Nullable
 	private ConversionService conversionService;
@@ -187,12 +188,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/** Map from bean name to merged RootBeanDefinition. */
 	private final Map<String, RootBeanDefinition> mergedBeanDefinitions = new ConcurrentHashMap<>(256);
 
+	// 20201207 至少已经创建一次的bean的名称 -> newSetFromMap等价于map.keySet();
 	/** Names of beans that have already been created at least once. */
 	private final Set<String> alreadyCreated = Collections.newSetFromMap(new ConcurrentHashMap<>(256));
 
 	/** Names of beans that are currently in creation. */
-	private final ThreadLocal<Object> prototypesCurrentlyInCreation =
-			new NamedThreadLocal<>("Prototype beans currently in creation");
+	private final ThreadLocal<Object> prototypesCurrentlyInCreation = new NamedThreadLocal<>("Prototype beans currently in creation");
 
 	// 20201206 应用程序启动指标。-> 默认DefaultApplicationStartup
 	/** Application startup metrics. **/
@@ -852,8 +853,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		return this.beanExpressionResolver;
 	}
 
+	// 20201207 使用Spring ConversionService代替PropertyEditors。
 	@Override
 	public void setConversionService(@Nullable ConversionService conversionService) {
+		// 20201207 注册用于类型转换的服务接口
 		this.conversionService = conversionService;
 	}
 
@@ -1843,7 +1846,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @since 4.2.2
 	 * @see #markBeanAsCreated
 	 */
+	// 20201207 检查工厂的Bean创建阶段是否已经开始，即在此期间是否已将任何Bean标记为已创建。
 	protected boolean hasBeanCreationStarted() {
+		// 20201207 如果至少已经创建一次的bean的名称则返回true
 		return !this.alreadyCreated.isEmpty();
 	}
 

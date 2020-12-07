@@ -68,6 +68,7 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	// 20201204 方便的适配器, 用于以编程方式注册Bean类。
 	private final AnnotatedBeanDefinitionReader reader;
 
+	// 20201206 bean定义扫描器: 扫描@Component、@Repository、@Service、@Controller
 	private final ClassPathBeanDefinitionScanner scanner;
 
 	private final Set<Class<?>> annotatedClasses = new LinkedHashSet<>();
@@ -131,10 +132,16 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	 * Delegates given environment to underlying {@link AnnotatedBeanDefinitionReader} and
 	 * {@link ClassPathBeanDefinitionScanner} members.
 	 */
+	// 20201206 将给定环境委托给基础的{@link AnnotatedBeanDefinitionReader}和{@link ClassPathBeanDefinitionScanner}成员。
 	@Override
 	public void setEnvironment(ConfigurableEnvironment environment) {
+		// 20201206 为此应用程序上下文设置{@code Environment}。
 		super.setEnvironment(environment);
+
+		// 20201206 为适配器设置环境, 注册bean定义注册的接口实例、bean工厂实例、当前应用程序正在其中运行的环境的接口实例、资源加载器、类加载器到ConditionEvaluator
 		this.reader.setEnvironment(environment);
+
+		// 20201206 设置@Conditional注解的组件类时使用的环境
 		this.scanner.setEnvironment(environment);
 	}
 

@@ -336,15 +336,27 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 	/**
+	 * 20201206
+	 * A. 为此应用程序上下文设置{@code Environment}。
+	 * B. 默认值由{@link #createEnvironment（）}确定。 用此方法替换默认值是一个选项，但也应考虑通过{@link #getEnvironment（）}进行配置。 无论哪种情况，都应在
+	 *    之前使用 {@link #refresh（）}进行此类修改。
+	 */
+	/**
+	 * A.
 	 * Set the {@code Environment} for this application context.
+	 *
+	 * B.
 	 * <p>Default value is determined by {@link #createEnvironment()}. Replacing the
 	 * default with this method is one option but configuration through {@link
 	 * #getEnvironment()} should also be considered. In either case, such modifications
 	 * should be performed <em>before</em> {@link #refresh()}.
+	 *
 	 * @see org.springframework.context.support.AbstractApplicationContext#createEnvironment
 	 */
+	// 20201206 为此应用程序上下文设置{@code Environment}
 	@Override
 	public void setEnvironment(ConfigurableEnvironment environment) {
+		// 20201206 注册此上下文使用的环境
 		this.environment = environment;
 	}
 
@@ -1508,11 +1520,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	protected abstract void closeBeanFactory();
 
 	/**
+	 * 20201206
+	 * A. 子类必须在此处返回其内部bean工厂。 他们应该有效地实现查找，以便可以重复调用它而不会影响性能。
+	 * B. 注意：子类应在返回内部bean工厂之前检查上下文是否仍处于活动状态。 一旦关闭上下文，通常应将内部工厂视为不可用。
+	 */
+	/**
+	 * A.
 	 * Subclasses must return their internal bean factory here. They should implement the
 	 * lookup efficiently, so that it can be called repeatedly without a performance penalty.
+	 *
+	 * B.
 	 * <p>Note: Subclasses should check whether the context is still active before
 	 * returning the internal bean factory. The internal factory should generally be
 	 * considered unavailable once the context has been closed.
+	 *
 	 * @return this application context's internal bean factory (never {@code null})
 	 * @throws IllegalStateException if the context does not hold an internal bean factory yet
 	 * (usually if {@link #refresh()} has never been called) or if the context has been
@@ -1522,7 +1543,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 */
 	@Override
 	public abstract ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException;
-
 
 	/**
 	 * Return information about this context.

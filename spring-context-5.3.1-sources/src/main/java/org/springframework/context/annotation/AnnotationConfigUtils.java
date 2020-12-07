@@ -57,6 +57,9 @@ import org.springframework.util.ClassUtils;
  * @see org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
  * @see org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor
  */
+// 20201206 实用程序类，可以方便地注册通用的{@link org.springframework.beans.factory.config.BeanPostProcessor}和
+// 20201206 {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor}定义，以用于基于注释的配置。 还注册一个通用的
+// 20201206 {@link org.springframework.beans.factory.support.AutowireCandidateResolver}。
 public abstract class AnnotationConfigUtils {
 
 	/**
@@ -73,6 +76,8 @@ public abstract class AnnotationConfigUtils {
 	 * {@link ConfigurationClassPostProcessor}.
 	 * @since 3.1.1
 	 */
+	// 20201206 内部管理的BeanNameGenerator的Bean名称，用于在处理{@link Configuration}类时使用。 在引导过程中由{@link AnnotationConfigApplicationContext}和
+	// 20201206 {@code AnnotationConfigWebApplicationContext}进行设置，以使任何自定义名称生成策略可用于基础{@link ConfigurationClassPostProcessor}。
 	public static final String CONFIGURATION_BEAN_NAME_GENERATOR =
 			"org.springframework.context.annotation.internalConfigurationBeanNameGenerator";
 

@@ -62,6 +62,7 @@ public class AnnotatedBeanDefinitionReader {
 
 	private ScopeMetadataResolver scopeMetadataResolver = new AnnotationScopeMetadataResolver();
 
+	// 20201206 用于评估{@link Conditional}注解的内部类
 	private ConditionEvaluator conditionEvaluator;
 
 	/**
@@ -118,10 +119,14 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Set the {@code Environment} to use when evaluating whether
 	 * {@link Conditional @Conditional}-annotated component classes should be registered.
+	 *
 	 * <p>The default is a {@link StandardEnvironment}.
+	 *
 	 * @see #registerBean(Class, String, Class...)
 	 */
+	// 20201206 设置在评估是否应注册{@link条件@Conditional}注释的组件类时使用的{@code Environment}。默认值为{@link StandardEnvironment}。
 	public void setEnvironment(Environment environment) {
+		// 20201206 使用环境构造用于评估{@link Conditional}注解的内部类, 注册bean定义注册的接口实例、bean工厂实例、当前应用程序正在其中运行的环境的接口实例、资源加载器、类加载器到ConditionEvaluator
 		this.conditionEvaluator = new ConditionEvaluator(this.registry, environment, null);
 	}
 

@@ -174,21 +174,25 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	/** Map from dependency type to corresponding autowired value. */
 	private final Map<Class<?>, Object> resolvableDependencies = new ConcurrentHashMap<>(16);
 
+	// 20201207 Bean定义对象的映射，以Bean名称为键, bean实例描述为值
 	/** Map of bean definition objects, keyed by bean name. */
 	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
 
 	/** Map from bean name to merged BeanDefinitionHolder. */
 	private final Map<String, BeanDefinitionHolder> mergedBeanDefinitionHolders = new ConcurrentHashMap<>(256);
 
+	// 20201207 单例和非单例Bean名称的映射，按依赖项类型进行键控。
 	/** Map of singleton and non-singleton bean names, keyed by dependency type. */
 	private final Map<Class<?>, String[]> allBeanNamesByType = new ConcurrentHashMap<>(64);
 
+	// 20201207 仅依赖单例的bean名称的映射，由依赖项类型键控。
 	/** Map of singleton-only bean names, keyed by dependency type. */
 	private final Map<Class<?>, String[]> singletonBeanNamesByType = new ConcurrentHashMap<>(64);
 
 	/** List of bean definition names, in registration order. */
 	private volatile List<String> beanDefinitionNames = new ArrayList<>(256);
 
+	// 20201207 手动注册单例的名称列表，按注册顺序。
 	/** List of names of manually registered singletons, in registration order. */
 	private volatile Set<String> manualSingletonNames = new LinkedHashSet<>(16);
 
@@ -1147,10 +1151,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 	}
 
+	// 20201207 在给定的bean名称下，在bean注册表中将给定的现有对象注册为单例 => 注册表将不执行任何初始化回调，包括销毁回调
 	@Override
 	public void registerSingleton(String beanName, Object singletonObject) throws IllegalStateException {
+		// 20201207 DefaultSingletonBeanRegistry.registerSingleton() -> 注册beanName单例实例
 		super.registerSingleton(beanName, singletonObject);
+
+		// 20201207 如果Bean定义对象的映射不包含这个beanName, 则更新到手动注册单例的名称列表中
 		updateManualSingletonNames(set -> set.add(beanName), set -> !this.beanDefinitionMap.containsKey(beanName));
+
+		// 20201207 删除有关按类型映射的任何假设
 		clearByTypeCache();
 	}
 
@@ -1178,19 +1188,31 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 * @param condition a precondition for the modification action
 	 * (if this condition does not apply, the action can be skipped)
 	 */
+	// 20201207 更新工厂内部的手动单例名称集。
 	private void updateManualSingletonNames(Consumer<Set<String>> action, Predicate<Set<String>> condition) {
+		// 20201207 如果至少已经创建一次的bean的名称则返回true
 		if (hasBeanCreationStarted()) {
+			// 20201207 无法在修改启动时收集元素（用于稳定的迭代）
 			// Cannot modify startup-time collection elements anymore (for stable iteration)
+			// 20201207 Bean定义对象的映射上锁
 			synchronized (this.beanDefinitionMap) {
+				// 20201207 如果手动注册单例的名称列表符合条件
 				if (condition.test(this.manualSingletonNames)) {
+					// 20201207 则拷贝一份注册单例的名称列表
 					Set<String> updatedSingletons = new LinkedHashSet<>(this.manualSingletonNames);
+
+					// 20201207 单例实例执行某个操作
 					action.accept(updatedSingletons);
+
+					// 20201207 然后更新手动注册单例的名称列表
 					this.manualSingletonNames = updatedSingletons;
 				}
 			}
 		}
 		else {
+			// 20201207 如果一次也没注册过, 仍处于启动注册阶段
 			// Still in startup registration phase
+			// 20201207 则对符合条件的单例, 直接执行某个操作
 			if (condition.test(this.manualSingletonNames)) {
 				action.accept(this.manualSingletonNames);
 			}
@@ -1200,8 +1222,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	/**
 	 * Remove any assumptions about by-type mappings.
 	 */
+	// 20201207 删除有关按类型映射的任何假设。
 	private void clearByTypeCache() {
+		// 20201207 清空单例和非单例Bean名称的映射
 		this.allBeanNamesByType.clear();
+
+		// 20201207 清空仅依赖单例的bean名称的映射
 		this.singletonBeanNamesByType.clear();
 	}
 

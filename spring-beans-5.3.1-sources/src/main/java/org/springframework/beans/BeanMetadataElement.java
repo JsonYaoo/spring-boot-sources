@@ -25,6 +25,7 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 2.0
  */
+// 20201207 由包含配置源对象的bean元数据元素实现的接口。
 public interface BeanMetadataElement {
 
 	/**

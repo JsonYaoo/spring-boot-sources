@@ -96,13 +96,21 @@ public class DefaultResourceLoader implements ResourceLoader {
 		this.classLoader = classLoader;
 	}
 
-
 	/**
+	 * 20201207
+	 * A. 指定ClassLoader来加载类路径资源，或者指定{@code null}以便在实际访问资源时使用线程上下文类加载器。
+	 * B. 默认值是在实际资源访问时（从5.3开始），将使用线程上下文类加载器进行ClassLoader访问。
+	 */
+	/**
+	 * A.
 	 * Specify the ClassLoader to load class path resources with, or {@code null}
 	 * for using the thread context class loader at the time of actual resource access.
+	 *
+	 * B.
 	 * <p>The default is that ClassLoader access will happen using the thread context
 	 * class loader at the time of actual resource access (since 5.3).
 	 */
+	// 20201207 指定ClassLoader来加载类路径资源
 	public void setClassLoader(@Nullable ClassLoader classLoader) {
 		this.classLoader = classLoader;
 	}
