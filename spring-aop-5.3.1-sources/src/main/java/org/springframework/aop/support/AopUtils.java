@@ -42,10 +42,19 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * 20201207
+ * A. AOP支持代码的实用程序方法。
+ * B. 主要在Spring的AOP支持内供内部使用。
+ * C. 请参阅{@link org.springframework.aop.framework.AopProxyUtils}，了解依赖于Spring AOP框架实现内部的特定于框架的AOP实用程序方法的集合。
+ */
+/**
+ * A.
  * Utility methods for AOP support code.
  *
+ * B.
  * <p>Mainly for internal use within Spring's AOP support.
  *
+ * C.
  * <p>See {@link org.springframework.aop.framework.AopProxyUtils} for a
  * collection of framework-specific AOP utility methods which depend
  * on internals of Spring's AOP framework implementation.
@@ -55,6 +64,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Rob Harrop
  * @see org.springframework.aop.framework.AopProxyUtils
  */
+// 20201207 AOP支持代码的实用程序方法
 public abstract class AopUtils {
 
 	/**
@@ -83,35 +93,70 @@ public abstract class AopUtils {
 	}
 
 	/**
+	 * 20201207
+	 * A. 检查给定对象是否为CGLIB代理。
+	 * B. 通过额外检查给定对象是否为{@link SpringProxy}的实例，此方法超越了{@link ClassUtils＃isCglibProxy（Object）}的实现。
+	 */
+	/**
 	 * Check whether the given object is a CGLIB proxy.
+	 *
 	 * <p>This method goes beyond the implementation of
 	 * {@link ClassUtils#isCglibProxy(Object)} by additionally checking if
 	 * the given object is an instance of {@link SpringProxy}.
+	 *
 	 * @param object the object to check
 	 * @see ClassUtils#isCglibProxy(Object)
 	 */
+	// 20201207 检查给定对象是否为CGLIB代理
 	public static boolean isCglibProxy(@Nullable Object object) {
-		return (object instanceof SpringProxy &&
-				object.getClass().getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR));
+		// 20201207 如果Object为Spring的代理对象, 且Class名称含有CGLIB类分隔符：{@code“ $$”} -> 则说明为CGLIB代理
+		return (object instanceof SpringProxy && object.getClass().getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR));
 	}
 
 	/**
+	 * 20201207
+	 * A. 确定给定bean实例的目标类，它可能是AOP代理。
+	 * B. 返回AOP代理的目标类，否则返回普通类。
+	 */
+	/**
+	 * A.
 	 * Determine the target class of the given bean instance which might be an AOP proxy.
+	 *
+	 * B.
 	 * <p>Returns the target class for an AOP proxy or the plain class otherwise.
-	 * @param candidate the instance to check (might be an AOP proxy)
+	 *
+	 * @param candidate the instance to check (might be an AOP proxy)	// 20201207 要检查的实例（可能是AOP代理）
 	 * @return the target class (or the plain class of the given object as fallback;
-	 * never {@code null})
+	 * never {@code null}) // 20201207 目标类（或给定对象的普通类作为后备；永不{@code null}）
 	 * @see TargetClassAware#getTargetClass()
 	 * @see org.springframework.aop.framework.AopProxyUtils#ultimateTargetClass(Object)
 	 */
+	// 20201207 返回AOP代理的目标类，否则返回普通类 -> 获取代理后的Class(可能是原生Class)
 	public static Class<?> getTargetClass(Object candidate) {
+		// 20201207 候选类不能为空
 		Assert.notNull(candidate, "Candidate object must not be null");
+
+		// 20201207 代理后的Class(可能是原生Class)
 		Class<?> result = null;
+
+		// 20201207 如果候选类在被代理之后
 		if (candidate instanceof TargetClassAware) {
+			// 20201207 则获取实现对象在代理之后的目标类（通常是代理配置或实际代理）
 			result = ((TargetClassAware) candidate).getTargetClass();
 		}
+
+		// 20201207 如果在代理之中或之前
 		if (result == null) {
-			result = (isCglibProxy(candidate) ? candidate.getClass().getSuperclass() : candidate.getClass());
+			result = (
+					// 20201207 如果候选类已经CGLIB代理对象
+					isCglibProxy(candidate) ?
+
+					// 20201207 则获取CGLIB代理对象的父类
+					candidate.getClass().getSuperclass() :
+
+					// 20201207 否则返回原生Class
+					candidate.getClass()
+			);
 		}
 		return result;
 	}

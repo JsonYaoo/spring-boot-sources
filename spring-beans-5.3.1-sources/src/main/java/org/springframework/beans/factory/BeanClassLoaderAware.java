@@ -17,14 +17,23 @@
 package org.springframework.beans.factory;
 
 /**
+ * 20201207
+ * A. 允许一个bean是Aware bean {@link ClassLoader class loader}的回调； 也就是说，使用当前bean工厂的类加载器来加载bean类。
+ * B. 这主要是由框架类实现的，尽管它们可能是从共享类加载器加载的，但它们必须按名称选择应用程序类。
+ * C. 有关所有bean生命周期方法的列表，请参见{@link BeanFactory BeanFactory javadocs}。
+ */
+/**
+ * A.
  * Callback that allows a bean to be aware of the bean
  * {@link ClassLoader class loader}; that is, the class loader used by the
  * present bean factory to load bean classes.
  *
+ * B.
  * <p>This is mainly intended to be implemented by framework classes which
  * have to pick up application classes by name despite themselves potentially
  * being loaded from a shared class loader.
  *
+ * C.
  * <p>For a list of all bean lifecycle methods, see the
  * {@link BeanFactory BeanFactory javadocs}.
  *
@@ -35,6 +44,7 @@ package org.springframework.beans.factory;
  * @see BeanFactoryAware
  * @see InitializingBean
  */
+// 20201207 Aware Bean类加载器: 使用当前bean工厂的类加载器来加载bean类
 public interface BeanClassLoaderAware extends Aware {
 
 	/**

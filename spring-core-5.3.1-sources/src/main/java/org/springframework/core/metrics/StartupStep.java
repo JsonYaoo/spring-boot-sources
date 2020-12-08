@@ -21,8 +21,19 @@ import java.util.function.Supplier;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201208
+ * A. 分步记录有关在{@link ApplicationStartup}期间发生的特定阶段或操作的指标。
+ * B. {@code StartupStep}的生命周期如下：
+ * 		a. 该步骤是通过调用{@link ApplicationStartup＃start（String）应用程序启动}创建并开始的，并且分配了唯一的{@link StartupStep＃getId（）id}。
+ * 		b. 然后我们可以在处理过程中将信息附加到{@link Tags}
+ * 		c. 然后，我们需要标记该步骤的{@link #end（）}
+ * C. 实现可以跟踪步骤的“执行时间”或其他指标。
+ */
+/**
+ * A.
  * Step recording metrics about a particular phase or action happening during the {@link ApplicationStartup}.
  *
+ * B.
  * <p>The lifecycle of a {@code StartupStep} goes as follows:
  * <ol>
  * <li>the step is created and starts by calling {@link ApplicationStartup#start(String) the application startup}
@@ -31,11 +42,13 @@ import org.springframework.lang.Nullable;
  * <li>we then need to mark the {@link #end()} of the step
  * </ol>
  *
+ * C.
  * <p>Implementations can track the "execution time" or other metrics for steps.
  *
  * @author Brian Clozel
  * @since 5.3
  */
+// 20201208 分步记录有关在{@link ApplicationStartup}期间发生的特定阶段或操作的指标
 public interface StartupStep {
 
 	/**
@@ -68,9 +81,10 @@ public interface StartupStep {
 
 	/**
 	 * Add a {@link Tag} to the step.
-	 * @param key tag key
-	 * @param value {@link Supplier} for the tag value
+	 * @param key tag key	// 20201208 标签键
+	 * @param value {@link Supplier} for the tag value	// 20201208 提供的标签值
 	 */
+	// 20201208 在步骤中添加一个{@link Tag}。
 	StartupStep tag(String key, Supplier<String> value);
 
 	/**

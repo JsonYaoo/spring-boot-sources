@@ -27,6 +27,7 @@ import org.springframework.context.ApplicationEvent;
  * @author Brian Clozel
  * @since 2.2.0
  */
+// 20201207 刷新应用程序上下文并准备好{@link RSocketServer}之后将发布的事件。 对于获取正在运行的服务器的本地端口很有用。
 public class RSocketServerInitializedEvent extends ApplicationEvent {
 
 	public RSocketServerInitializedEvent(RSocketServer server) {
@@ -37,6 +38,7 @@ public class RSocketServerInitializedEvent extends ApplicationEvent {
 	 * Access the {@link RSocketServer}.
 	 * @return the embedded RSocket server
 	 */
+	// 20201207 访问{@link RSocketServer}。
 	public RSocketServer getServer() {
 		return getSource();
 	}
@@ -45,6 +47,7 @@ public class RSocketServerInitializedEvent extends ApplicationEvent {
 	 * Access the source of the event (an {@link RSocketServer}).
 	 * @return the embedded web server
 	 */
+	// 20201207 访问事件的来源（{@link RSocketServer}）。
 	@Override
 	public RSocketServer getSource() {
 		return (RSocketServer) super.getSource();

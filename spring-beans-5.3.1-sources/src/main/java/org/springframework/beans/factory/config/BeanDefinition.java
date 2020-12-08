@@ -316,14 +316,24 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	// Read-only attributes
 
 	/**
+	 * 20201207
+	 * A. 根据Bean类或其他特定的元数据返回此Bean定义的可解析类型。
+	 * B. 通常，在运行时合并的bean定义上可以完全解决此问题，而在配置时定义实例上则不必完全解决。
+	 */
+	/**
+	 * A.
 	 * Return a resolvable type for this bean definition,
 	 * based on the bean class or other specific metadata.
+	 *
+	 * B.
 	 * <p>This is typically fully resolved on a runtime-merged bean definition
 	 * but not necessarily on a configuration-time definition instance.
-	 * @return the resolvable type (potentially {@link ResolvableType#NONE})
+	 *
+	 * @return the resolvable type (potentially {@link ResolvableType#NONE}) // 20201207 可解析的类型（可能为{@link ResolvableType＃NONE}）
 	 * @since 5.2
 	 * @see ConfigurableBeanFactory#getMergedBeanDefinition
 	 */
+	// 20201207 获取实例的可解析的类型
 	ResolvableType getResolvableType();
 
 	/**

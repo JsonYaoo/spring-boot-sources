@@ -309,29 +309,42 @@ public class ResolvableType implements Serializable {
 	/**
 	 * Determine whether this {@code ResolvableType} is assignable from the
 	 * specified other type.
-	 * @param other the type to be checked against (as a {@code Class})
+	 * @param other the type to be checked against (as a {@code Class})	// 20201207 要检查的类型（作为{@code类}）
 	 * @since 4.2
 	 * @see #isAssignableFrom(ResolvableType)
 	 */
+	// 20201207 确定是否可以从指定的其他类型分配此{@code ResolvableType}。
 	public boolean isAssignableFrom(Class<?> other) {
 		return isAssignableFrom(forClass(other), null);
 	}
 
 	/**
+	 * 20201207
+	 * A. 确定是否可以从指定的其他类型分配此{@code ResolvableType}。
+	 * B. 尝试遵循与Java编译器相同的规则，考虑给定类型{{link #resolve（）解析}} {code Class}是否都是{@link Class＃isAssignableFrom（Class）可分配的}
+	 *   {@link #getGenerics（）泛型}是可分配的。
+	 */
+	/**
+	 * A.
 	 * Determine whether this {@code ResolvableType} is assignable from the
 	 * specified other type.
+	 *
+	 * B.
 	 * <p>Attempts to follow the same rules as the Java compiler, considering
 	 * whether both the {@link #resolve() resolved} {@code Class} is
 	 * {@link Class#isAssignableFrom(Class) assignable from} the given type
 	 * as well as whether all {@link #getGenerics() generics} are assignable.
+	 *
 	 * @param other the type to be checked against (as a {@code ResolvableType})
 	 * @return {@code true} if the specified other type can be assigned to this
 	 * {@code ResolvableType}; {@code false} otherwise
 	 */
+	// 20201207 判断当前实例是否为指定类型分配的
 	public boolean isAssignableFrom(ResolvableType other) {
 		return isAssignableFrom(other, null);
 	}
 
+	// 20201207 确定是否可以从指定的其他类型分配此{@code ResolvableType}。
 	private boolean isAssignableFrom(ResolvableType other, @Nullable Map<Type, Type> matchedBefore) {
 		Assert.notNull(other, "ResolvableType must not be null");
 
@@ -1321,6 +1334,11 @@ public class ResolvableType implements Serializable {
 	}
 
 	/**
+	 * 20201207
+	 * 返回指定实例的{@link ResolvableType}。 该实例不传达一般信息，但如果实现{@link ResolvableTypeProvider}，则可以使用比基于
+	 * {@link #forClass（Class）Class instance}的简单实例更精确的{@link ResolvableType}。
+	 */
+	/**
 	 * Return a {@link ResolvableType} for the specified instance. The instance does not
 	 * convey generic information but if it implements {@link ResolvableTypeProvider} a
 	 * more precise {@link ResolvableType} can be used than the simple one based on
@@ -1330,14 +1348,21 @@ public class ResolvableType implements Serializable {
 	 * @since 4.2
 	 * @see ResolvableTypeProvider
 	 */
+	// 20201207 返回指定实例的{@link ResolvableType}
 	public static ResolvableType forInstance(Object instance) {
+		// 20201207 指定实例不能为空
 		Assert.notNull(instance, "Instance must not be null");
+
+		// 20201207 如果属于ResolvableType提供者
 		if (instance instanceof ResolvableTypeProvider) {
+			// 20201207 则通过ResolvableType提供者获取ResolvableType实例
 			ResolvableType type = ((ResolvableTypeProvider) instance).getResolvableType();
 			if (type != null) {
 				return type;
 			}
 		}
+
+		// 20201207 为指定的{@link Class}返回{@link ResolvableType}，使用完整的泛型类型信息进行可分配性检查
 		return ResolvableType.forClass(instance.getClass());
 	}
 

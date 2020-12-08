@@ -405,10 +405,10 @@ public class SpringApplication {
 		// 20201201 无界面时的配置
 		configureHeadlessProperty();
 
-		// 20201201 获取Spring上下文启动监听器实例集合
+		// 20201201 获取Spring上下文启动监听器实例集合 EventPublishingRunListener
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 
-		// 20201201 启动Springboot, 记录每步操作, 每步启动监听器, 启动主类
+		// 20201201 启动Springboot, 记录每步操作, 每步启动监听器(执行监听操作, 多播事件), 启动主类
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
 		try {
 			// 20201201 构造默认上下文参数访问器
@@ -479,7 +479,7 @@ public class SpringApplication {
 		// 20201202 环境绑定属性源 -> 添加Spring属性源
 		ConfigurationPropertySources.attach(environment);
 
-		// 20201202 监听器执行环境准备完毕事件
+		// 20201202 监听器执行环境准备完毕事件 -> 将ApplicationEnvironmentPreparedEvent事件多播到适当的侦听器, 执行监听ApplicationEnvironmentPreparedEvent事件
 		listeners.environmentPrepared(bootstrapContext, environment);
 
 		// 20201202 移动“defaultProperties”属性源，使其成为给定{@link ConfigurableEnvironment}中的最后一个源。

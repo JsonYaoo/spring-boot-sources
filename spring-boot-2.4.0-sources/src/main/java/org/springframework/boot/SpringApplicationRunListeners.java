@@ -53,13 +53,13 @@ class SpringApplicationRunListeners {
 		this.applicationStartup = applicationStartup;
 	}
 
-	// 20201201 启动上下文启动监听器
+	// 20201201 启动上下文启动监听器 DefaultBootstrapContext
 	void starting(ConfigurableBootstrapContext bootstrapContext, Class<?> mainApplicationClass) {
 		doWithListeners(
 				// 20201201 启动步骤名称
 				"spring.boot.application.starting",
 
-				// 20201201 Consumer<SpringApplicationRunListener> listenerAction 每步执行的监听操作 -> 空实现
+				// 20201201 Consumer<SpringApplicationRunListener> listenerAction 执行监听操作, 多播事件 -> 子类EventPublishingRunListener实现
 				(listener) -> listener.starting(bootstrapContext),
 
 				// 20201201 Consumer<StartupStep> stepAction 每步执行的操作 -> 启动每个主类
@@ -70,9 +70,11 @@ class SpringApplicationRunListeners {
 				});
 	}
 
-	// 20201202 环境准备完毕事件
+	// 20201202 环境准备完毕事件 -> 将ApplicationEnvironmentPreparedEvent事件多播到适当的侦听器, 执行监听ApplicationEnvironmentPreparedEvent事件
 	void environmentPrepared(ConfigurableBootstrapContext bootstrapContext, ConfigurableEnvironment environment) {
+		// 20201208 执行监听ApplicationEnvironmentPreparedEvent事件
 		doWithListeners("spring.boot.application.environment-prepared",
+				// 20201208 在环境准备好之后，但在{@link ApplicationContext}创建之前调用 -> 将ApplicationEnvironmentPreparedEvent事件多播到适当的侦听器
 				(listener) -> listener.environmentPrepared(bootstrapContext, environment));
 	}
 

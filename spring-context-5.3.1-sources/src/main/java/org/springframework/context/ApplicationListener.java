@@ -55,8 +55,8 @@ public interface ApplicationListener<E extends ApplicationEvent> extends EventLi
 	 * Handle an application event.
 	 * @param event the event to respond to
 	 */
+	// 20201207 处理应用程序事件。
 	void onApplicationEvent(E event);
-
 
 	/**
 	 * Create a new {@code ApplicationListener} for the given payload consumer.

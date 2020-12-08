@@ -48,13 +48,24 @@ public interface GenericApplicationListener extends ApplicationListener<Applicat
 	 * Determine whether this listener actually supports the given event type.
 	 * @param eventType the event type (never {@code null})
 	 */
+	// 20201207 确定此侦听器是否实际上支持给定的事件类型。
 	boolean supportsEventType(ResolvableType eventType);
 
 	/**
+	 * 20201207
+	 * A. 确定此侦听器是否实际上支持给定的源类型。
+	 * B. 默认实现始终返回{@code true}。
+	 */
+	/**
+	 * A.
 	 * Determine whether this listener actually supports the given source type.
+	 *
+	 * B.
 	 * <p>The default implementation always returns {@code true}.
+	 *
 	 * @param sourceType the source type, or {@code null} if no source
 	 */
+	// 20201207 确定此侦听器是否实际上支持给定的源类型 -> 默认实现始终返回{@code true}
 	default boolean supportsSourceType(@Nullable Class<?> sourceType) {
 		return true;
 	}

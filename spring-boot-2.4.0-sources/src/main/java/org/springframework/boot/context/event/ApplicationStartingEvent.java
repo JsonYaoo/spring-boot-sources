@@ -23,6 +23,11 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.Environment;
 
 /**
+ * 20201207
+ * 可以想象，一旦启动{@link SpringApplication}，就可以尽早发布事件-在{@link Environment}或{@link ApplicationContext}可用之前，但在
+ * {@link ApplicationListener}被注册之后。 事件的来源是{@link SpringApplication}本身，但是要提防在此早期阶段过多使用其内部状态，因为它可能会在生命周期的后期进行修改。
+ */
+/**
  * Event published as early as conceivably possible as soon as a {@link SpringApplication}
  * has been started - before the {@link Environment} or {@link ApplicationContext} is
  * available, but after the {@link ApplicationListener}s have been registered. The source
@@ -33,9 +38,11 @@ import org.springframework.core.env.Environment;
  * @author Madhura Bhave
  * @since 1.5.0
  */
+// 20201207 一旦启动{@link SpringApplication}，就可以尽早发布事件: 在{@link Environment}或{@link ApplicationContext}可用之前，但在{@link ApplicationListener}被注册之后
 @SuppressWarnings("serial")
 public class ApplicationStartingEvent extends SpringApplicationEvent {
 
+	// 20201207 配置上下文实例
 	private final ConfigurableBootstrapContext bootstrapContext;
 
 	/**
@@ -56,9 +63,12 @@ public class ApplicationStartingEvent extends SpringApplicationEvent {
 	 * @param application the current application
 	 * @param args the arguments the application is running with
 	 */
-	public ApplicationStartingEvent(ConfigurableBootstrapContext bootstrapContext, SpringApplication application,
-			String[] args) {
+	// 20201207 构造ApplicationStartingEvent DefaultBootstrapContext
+	public ApplicationStartingEvent(ConfigurableBootstrapContext bootstrapContext, SpringApplication application, String[] args) {
+		// 20201207 构造SpringApplicationEvent
 		super(application, args);
+
+		// 20201207 设置配置上下文实例
 		this.bootstrapContext = bootstrapContext;
 	}
 

@@ -25,6 +25,7 @@ import java.net.InetSocketAddress;
  * @author Brian Clozel
  * @since 2.2.0
  */
+// 20201207 表示完全配置的RSocket服务器的简单接口。 允许服务器{@link #start（）启动}和{@link #stop（）停止}。
 public interface RSocketServer {
 
 	/**
@@ -45,6 +46,7 @@ public interface RSocketServer {
 	 * Return the address this server is listening on.
 	 * @return the address
 	 */
+	// 20201207 返回此服务器正在侦听的地址。
 	InetSocketAddress address();
 
 	/**

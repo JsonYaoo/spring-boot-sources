@@ -51,6 +51,7 @@ public interface ApplicationStartup {
 	 * the same step during application startup.
 	 * @param name the step name
 	 */
+	// 20201208 创建新步骤并标记其开始, 步骤名称描述当前操作或阶段
 	StartupStep start(String name);
 
 }

@@ -78,6 +78,7 @@ public abstract class ClassUtils {
 	/** The inner class separator character: {@code '$'}. */
 	private static final char INNER_CLASS_SEPARATOR = '$';
 
+	// 20201207 CGLIB类分隔符：{@code“ $$”}。
 	/** The CGLIB class separator: {@code "$$"}. */
 	public static final String CGLIB_CLASS_SEPARATOR = "$$";
 
@@ -417,22 +418,30 @@ public abstract class ClassUtils {
 	/**
 	 * Check whether the given class is cache-safe in the given context,
 	 * i.e. whether it is loaded by the given ClassLoader or a parent of it.
-	 * @param clazz the class to analyze
+	 * @param clazz the class to analyze	// 20201207 要分析的类
 	 * @param classLoader the ClassLoader to potentially cache metadata in
-	 * (may be {@code null} which indicates the system class loader)
+	 * (may be {@code null} which indicates the system class loader) // 20201207 ClassLoader以潜在地缓存元数据（可能是{@code null}，它指示系统类加载器）
 	 */
+	// 20201207 检查给定的类在给定的上下文中是否是缓存安全的，即是否由给定的ClassLoader或其父级加载。
 	public static boolean isCacheSafe(Class<?> clazz, @Nullable ClassLoader classLoader) {
+		// 20201207 Class对象不能为空
 		Assert.notNull(clazz, "Class must not be null");
 		try {
+			// 20201207 获取指定Class的类加载器
 			ClassLoader target = clazz.getClassLoader();
-			// Common cases
+			// Common cases // 20201209 常见情况
+			// 20201207 如果类加载器相同, 或者还没有类加载器, 则说明是缓存安全的
 			if (target == classLoader || target == null) {
 				return true;
 			}
+
+			// 20201207 如果指定的类加载器为空, 且Class的类加载器不为空, 说明不是缓存安全的
 			if (classLoader == null) {
 				return false;
 			}
-			// Check for match in ancestors -> positive
+
+			// Check for match in ancestors -> positive // 20201207 检查祖先是否匹配-> 肯定
+			// 20021207 如果指的类加载器的父类加载器为Class的类加载器, 则说明也是缓存安全的(推断: Class的类加载器为父类, 包含指定的类加载器时, 是缓存安全的)
 			ClassLoader current = classLoader;
 			while (current != null) {
 				current = current.getParent();
@@ -440,7 +449,9 @@ public abstract class ClassUtils {
 					return true;
 				}
 			}
-			// Check for match in children -> negative
+
+			// Check for match in children -> negative // 20201207 检查子类加载器是否匹配-> 否定
+			// 20201207 如果Class的父类加载器为指定的类的加载器, 则说明不是缓存安全的(推断: Class的类加载器是指定的类加载器时, 为不包含关系, 是非缓存安全的)
 			while (target != null) {
 				target = target.getParent();
 				if (target == classLoader) {
@@ -454,6 +465,7 @@ public abstract class ClassUtils {
 
 		// Fallback for ClassLoaders without parent/child relationship:
 		// safe if same Class can be loaded from given ClassLoader
+		// 20201207 没有父子关系的ClassLoader的关系：如果可以从给定的ClassLoader加载相同的Class，则安全
 		return (classLoader != null && isLoadable(clazz, classLoader));
 	}
 

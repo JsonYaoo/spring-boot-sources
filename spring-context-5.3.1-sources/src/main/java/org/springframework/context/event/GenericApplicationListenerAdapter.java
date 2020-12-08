@@ -38,23 +38,30 @@ import org.springframework.util.ConcurrentReferenceHashMap;
  */
 public class GenericApplicationListenerAdapter implements GenericApplicationListener, SmartApplicationListener {
 
+	// 20201207 监听器Class-监听器类型缓存
 	private static final Map<Class<?>, ResolvableType> eventTypeCache = new ConcurrentReferenceHashMap<>();
 
-
+	// 20201207 委托的应用程序事件监听器
 	private final ApplicationListener<ApplicationEvent> delegate;
 
+	// 20201207 监听器或Class代理后的ResolvableType
 	@Nullable
 	private final ResolvableType declaredEventType;
 
-
 	/**
 	 * Create a new GenericApplicationListener for the given delegate.
-	 * @param delegate the delegate listener to be invoked
+	 * @param delegate the delegate listener to be invoked	// 20201207 要调用的委托侦听器
 	 */
+	// 20201207 为给定的委托创建一个新的GenericApplicationListener。
 	@SuppressWarnings("unchecked")
 	public GenericApplicationListenerAdapter(ApplicationListener<?> delegate) {
+		// 20201207 要调用的委托侦听器不能为空
 		Assert.notNull(delegate, "Delegate listener must not be null");
+
+		// 20201207 注册委托的应用程序事件监听器
 		this.delegate = (ApplicationListener<ApplicationEvent>) delegate;
+
+		// 20201207 设置监听器或Class代理后的ResolvableType
 		this.declaredEventType = resolveDeclaredEventType(this.delegate);
 	}
 
@@ -64,23 +71,31 @@ public class GenericApplicationListenerAdapter implements GenericApplicationList
 		this.delegate.onApplicationEvent(event);
 	}
 
+	// 20201207 判断监听器或Class代理后的ResolvableType是否为该事件类型分配的
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean supportsEventType(ResolvableType eventType) {
+		// 20201207 如果委托的应用程序事件监听器为SmartApplicationListener类型(旧版)
 		if (this.delegate instanceof SmartApplicationListener) {
+			// 20201207 则先获取解析后的事件类型
 			Class<? extends ApplicationEvent> eventClass = (Class<? extends ApplicationEvent>) eventType.resolve();
+
+			// 20201207 再确定此侦听器是否实际上支持给定的事件类型
 			return (eventClass != null && ((SmartApplicationListener) this.delegate).supportsEventType(eventClass));
 		}
 		else {
+			// 20201207 否则如果为GenericApplicationListener, 则判断监听器或Class代理后的ResolvableType是否为该事件类型分配的
 			return (this.declaredEventType == null || this.declaredEventType.isAssignableFrom(eventType));
 		}
 	}
 
+	// 20201207 确定此侦听器是否实际上支持给定的事件类型。
 	@Override
 	public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {
 		return supportsEventType(ResolvableType.forClass(eventType));
 	}
 
+	// 20201207 确定此侦听器是否实际上支持给定的源类型 -> 默认实现始终返回{@code true}
 	@Override
 	public boolean supportsSourceType(@Nullable Class<?> sourceType) {
 		return !(this.delegate instanceof SmartApplicationListener) ||
@@ -92,26 +107,42 @@ public class GenericApplicationListenerAdapter implements GenericApplicationList
 		return (this.delegate instanceof Ordered ? ((Ordered) this.delegate).getOrder() : Ordered.LOWEST_PRECEDENCE);
 	}
 
-
+	// 20201207 返回监听器或Class代理后的ResolvableType
 	@Nullable
 	private static ResolvableType resolveDeclaredEventType(ApplicationListener<ApplicationEvent> listener) {
+		// 20201207 根据监听器Class对象获取对应的ResolvableType
 		ResolvableType declaredEventType = resolveDeclaredEventType(listener.getClass());
+
+		// 20201207 如果返回的ResolvableType确实是监听器Class分配的
 		if (declaredEventType == null || declaredEventType.isAssignableFrom(ApplicationEvent.class)) {
+			// 20201207 则获取监听器代理后的Class(可能是原生Class)
 			Class<?> targetClass = AopUtils.getTargetClass(listener);
+
+			// 20201207 如果监听器被代理过
 			if (targetClass != listener.getClass()) {
+				// 20201207 则获取对应的ResolvableType
 				declaredEventType = resolveDeclaredEventType(targetClass);
 			}
 		}
+
+		// 20201207 返回监听器或Class代理后的ResolvableType
 		return declaredEventType;
 	}
 
+	// 20201207 根据监听器Class对象获取对应的ResolvableType
 	@Nullable
 	static ResolvableType resolveDeclaredEventType(Class<?> listenerType) {
+		// 20201207 根据监听器Class从监听器Class-监听器类型缓存获取监听器类型
 		ResolvableType eventType = eventTypeCache.get(listenerType);
+
+		// 20201207 如果获取的监听器类型不存在
 		if (eventType == null) {
+			// 20201207 则返回并设置参数化类型数组的第一个监听器类型
 			eventType = ResolvableType.forClass(listenerType).as(ApplicationListener.class).getGeneric();
 			eventTypeCache.put(listenerType, eventType);
 		}
+
+		// 20201207 如果还是为空, 则返回null
 		return (eventType != ResolvableType.NONE ? eventType : null);
 	}
 

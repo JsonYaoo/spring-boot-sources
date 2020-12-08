@@ -19,14 +19,23 @@ package org.springframework.beans.factory;
 import org.springframework.beans.BeansException;
 
 /**
+ * 20201207
+ * A. Aware beans自己的bean工厂
+ * B. 例如，bean可以通过工厂（Dependency Lookup）来查找协作bean。 注意，大多数bean将选择通过相应的bean属性或构造函数参数（依赖注入）来接收对协作bean的引用。
+ * C. 有关所有bean生命周期方法的列表，请参见{@link BeanFactory BeanFactory javadocs}。
+ */
+/**
+ * A.
  * Interface to be implemented by beans that wish to be aware of their
  * owning {@link BeanFactory}.
  *
+ * B.
  * <p>For example, beans can look up collaborating beans via the factory
  * (Dependency Lookup). Note that most beans will choose to receive references
  * to collaborating beans via corresponding bean properties or constructor
  * arguments (Dependency Injection).
  *
+ * C.
  * <p>For a list of all bean lifecycle methods, see the
  * {@link BeanFactory BeanFactory javadocs}.
  *
@@ -38,6 +47,7 @@ import org.springframework.beans.BeansException;
  * @see InitializingBean
  * @see org.springframework.context.ApplicationContextAware
  */
+// 20201207 Aware beans自己的bean工厂
 public interface BeanFactoryAware extends Aware {
 
 	/**

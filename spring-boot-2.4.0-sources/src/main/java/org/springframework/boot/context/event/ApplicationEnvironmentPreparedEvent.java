@@ -28,11 +28,14 @@ import org.springframework.core.env.Environment;
  * @author Dave Syer
  * @since 1.0.0
  */
+// 20201208 在{@link SpringApplication}启动且{@link Environment}可用时, 用于检查和修改发布的事件。
 @SuppressWarnings("serial")
 public class ApplicationEnvironmentPreparedEvent extends SpringApplicationEvent {
 
+	// 20201208 引导上下文
 	private final ConfigurableBootstrapContext bootstrapContext;
 
+	// 20201208 刚创建的配置环境
 	private final ConfigurableEnvironment environment;
 
 	/**
@@ -51,15 +54,21 @@ public class ApplicationEnvironmentPreparedEvent extends SpringApplicationEvent 
 
 	/**
 	 * Create a new {@link ApplicationEnvironmentPreparedEvent} instance.
-	 * @param bootstrapContext the bootstrap context
-	 * @param application the current application
-	 * @param args the arguments the application is running with
-	 * @param environment the environment that was just created
+	 * @param bootstrapContext the bootstrap context	// 20201208 引导上下文
+	 * @param application the current application	// 20201208 当前的应用
+	 * @param args the arguments the application is running with	// 20201208 应用程序运行时使用的参数
+	 * @param environment the environment that was just created	// 20201208 刚刚创建的环境
 	 */
+	// 20201208 创建一个新的{@link ApplicationEnvironmentPreparedEvent}实例。
 	public ApplicationEnvironmentPreparedEvent(ConfigurableBootstrapContext bootstrapContext,
 			SpringApplication application, String[] args, ConfigurableEnvironment environment) {
+		// 20201208 构造SpringApplicationEvent
 		super(application, args);
+
+		// 20201208 注册引导上下文
 		this.bootstrapContext = bootstrapContext;
+
+		// 20201208 注册刚创建的配置环境
 		this.environment = environment;
 	}
 

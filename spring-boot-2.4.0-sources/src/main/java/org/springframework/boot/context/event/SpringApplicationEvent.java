@@ -25,13 +25,18 @@ import org.springframework.context.ApplicationEvent;
  * @author Phillip Webb
  * @since 1.0.0
  */
+// 20201207 与{@link SpringApplication}相关的{@link ApplicationEvent}的基类。
 @SuppressWarnings("serial")
 public abstract class SpringApplicationEvent extends ApplicationEvent {
 
 	private final String[] args;
 
+	// 20201207 构造SpringApplicationEvent
 	public SpringApplicationEvent(SpringApplication application, String[] args) {
+		// 20201027 构造ApplicationEvent
 		super(application);
+
+		// 20201207 设置参数
 		this.args = args;
 	}
 

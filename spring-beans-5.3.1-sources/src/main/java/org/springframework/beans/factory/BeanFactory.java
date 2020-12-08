@@ -186,13 +186,29 @@ public interface BeanFactory {
 	Object getBean(String name) throws BeansException;
 
 	/**
+	 * 20201207
+	 * A. 返回一个实例，该实例可以是指定bean的共享或独立的。
+	 * B. 行为与{@link #getBean（String）}相同，但是如果Bean不是必需的类型，则抛出BeanNotOfRequiredTypeException，从而提供了一种类型安全性措施。
+	 *    这意味着无法正确投射结果，就不会引发ClassCastException，就像{@link #getBean（String）}那样。
+	 * C. 将别名转换回相应的规范bean名称。
+	 * D. 将询问父工厂是否在该工厂实例中找不到该bean。
+	 */
+	/**
+	 * A.
 	 * Return an instance, which may be shared or independent, of the specified bean.
+	 *
+	 * B.
 	 * <p>Behaves the same as {@link #getBean(String)}, but provides a measure of type
 	 * safety by throwing a BeanNotOfRequiredTypeException if the bean is not of the
 	 * required type. This means that ClassCastException can't be thrown on casting
 	 * the result correctly, as can happen with {@link #getBean(String)}.
+	 *
+	 * C.
 	 * <p>Translates aliases back to the corresponding canonical bean name.
+	 *
+	 * D.
 	 * <p>Will ask the parent factory if the bean cannot be found in this factory instance.
+	 *
 	 * @param name the name of the bean to retrieve
 	 * @param requiredType type the bean must match; can be an interface or superclass
 	 * @return an instance of the bean
@@ -200,6 +216,7 @@ public interface BeanFactory {
 	 * @throws BeanNotOfRequiredTypeException if the bean is not of the required type
 	 * @throws BeansException if the bean could not be created
 	 */
+	// 20201207 返回一个实例，该实例可以是指定bean的共享或独立的。
 	<T> T getBean(String name, Class<T> requiredType) throws BeansException;
 
 	/**
@@ -367,13 +384,29 @@ public interface BeanFactory {
 	boolean isTypeMatch(String name, Class<?> typeToMatch) throws NoSuchBeanDefinitionException;
 
 	/**
+	 * 20201207
+	 * A. 确定具有给定名称的bean的类型。 更具体地说，确定{@link #getBean}将返回给定名称的对象的类型。
+	 * B. 对于{@link FactoryBean}，返回由{@link FactoryBean＃getObjectType（）}公开的FactoryBean创建的对象的类型。 这可能导致先前未初始化的
+	 *    {@code FactoryBean}的初始化（请参见{@link #getType（String，boolean）}）。
+	 * C. 将别名转换回相应的规范bean名称。
+	 * D. 将询问父工厂是否在该工厂实例中找不到该bean。
+	 */
+	/**
+	 * A.
 	 * Determine the type of the bean with the given name. More specifically,
 	 * determine the type of object that {@link #getBean} would return for the given name.
+	 *
+	 * B.
 	 * <p>For a {@link FactoryBean}, return the type of object that the FactoryBean creates,
 	 * as exposed by {@link FactoryBean#getObjectType()}. This may lead to the initialization
 	 * of a previously uninitialized {@code FactoryBean} (see {@link #getType(String, boolean)}).
+	 *
+	 * C.
 	 * <p>Translates aliases back to the corresponding canonical bean name.
+	 *
+	 * D.
 	 * <p>Will ask the parent factory if the bean cannot be found in this factory instance.
+	 *
 	 * @param name the name of the bean to query
 	 * @return the type of the bean, or {@code null} if not determinable
 	 * @throws NoSuchBeanDefinitionException if there is no bean with the given name
@@ -381,6 +414,7 @@ public interface BeanFactory {
 	 * @see #getBean
 	 * @see #isTypeMatch
 	 */
+	// 20201207 确定具有给定名称的bean的类型。 更具体地说，确定{@link #getBean}将返回给定名称的对象的类型。
 	@Nullable
 	Class<?> getType(String name) throws NoSuchBeanDefinitionException;
 

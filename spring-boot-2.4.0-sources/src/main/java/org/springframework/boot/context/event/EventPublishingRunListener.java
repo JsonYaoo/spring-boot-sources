@@ -54,6 +54,7 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 
 	private final String[] args;
 
+	// 20201207 简单的应用程序事件多播器实现
 	private final SimpleApplicationEventMulticaster initialMulticaster;
 
 	public EventPublishingRunListener(SpringApplication application, String[] args) {
@@ -70,16 +71,22 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 		return 0;
 	}
 
+	// 20201207 执行监听操作, 多播事件 DefaultBootstrapContext
 	@Override
 	public void starting(ConfigurableBootstrapContext bootstrapContext) {
-		this.initialMulticaster
-				.multicastEvent(new ApplicationStartingEvent(bootstrapContext, this.application, this.args));
+		// 20201208 将封装好的应用程序事件ApplicationStartingEvent多播到适当的侦听器
+		this.initialMulticaster.multicastEvent(
+				// 20201207 构造ApplicationStartingEvent
+				new ApplicationStartingEvent(bootstrapContext, this.application, this.args)
+		);
 	}
 
+	// 20201208 在环境准备好之后，但在{@link ApplicationContext}创建之前调用 -> 将ApplicationEnvironmentPreparedEvent事件多播到适当的侦听器
 	@Override
-	public void environmentPrepared(ConfigurableBootstrapContext bootstrapContext,
-			ConfigurableEnvironment environment) {
+	public void environmentPrepared(ConfigurableBootstrapContext bootstrapContext, ConfigurableEnvironment environment) {
+		// 20201208 将给定的应用程序事件多播到适当的侦听器
 		this.initialMulticaster.multicastEvent(
+				// 20201208 在{@link SpringApplication}启动且{@link Environment}可用时, 构建用于检查和修改发布的事件。
 				new ApplicationEnvironmentPreparedEvent(bootstrapContext, this.application, this.args, environment));
 	}
 

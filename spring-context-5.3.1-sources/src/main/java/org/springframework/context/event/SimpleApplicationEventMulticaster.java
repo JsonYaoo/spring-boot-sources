@@ -31,13 +31,22 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ErrorHandler;
 
 /**
+ * 20201207
+ * A. {@link ApplicationEventMulticaster}接口的简单实现。
+ * B. 将所有事件多播到所有注册的侦听器，让侦听器忽略他们不感兴趣的事件。侦听器通常将对传入的事件对象执行相应的{@code instanceof}检查。
+ * C. 默认情况下，所有侦听器在调用线程中被调用。 这带来了恶意侦听器阻塞整个应用程序的危险，但增加了最小的开销。 指定备用任务执行程序，以使侦听器在不同的线程中执行，例如从线程池中执行。
+ */
+/**
+ * A.
  * Simple implementation of the {@link ApplicationEventMulticaster} interface.
  *
+ * B.
  * <p>Multicasts all events to all registered listeners, leaving it up to
  * the listeners to ignore events that they are not interested in.
  * Listeners will usually perform corresponding {@code instanceof}
  * checks on the passed-in event object.
  *
+ * C.
  * <p>By default, all listeners are invoked in the calling thread.
  * This allows the danger of a rogue listener blocking the entire application,
  * but adds minimal overhead. Specify an alternative task executor to have
@@ -49,17 +58,20 @@ import org.springframework.util.ErrorHandler;
  * @author Brian Clozel
  * @see #setTaskExecutor
  */
+// 20201207 简单的应用程序事件多播器实现: 将所有事件多播到所有注册的侦听器，并在调用线程中调用它们。
 public class SimpleApplicationEventMulticaster extends AbstractApplicationEventMulticaster {
 
+	// 20201207 此多播程序的当前任务执行程序
 	@Nullable
 	private Executor taskExecutor;
 
+	// 20201207 此多播程序的当前错误处理程序。
 	@Nullable
 	private ErrorHandler errorHandler;
 
+	// 20201208 应用程序启动收集器
 	@Nullable
 	private ApplicationStartup applicationStartup;
-
 
 	/**
 	 * Create a new SimpleApplicationEventMulticaster.
@@ -94,6 +106,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	/**
 	 * Return the current task executor for this multicaster.
 	 */
+	// 20201207 返回此多播程序的当前任务执行程序。
 	@Nullable
 	protected Executor getTaskExecutor() {
 		return this.taskExecutor;
@@ -122,6 +135,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	 * Return the current error handler for this multicaster.
 	 * @since 4.1
 	 */
+	// 20201207 返回此多播程序的当前错误处理程序。
 	@Nullable
 	protected ErrorHandler getErrorHandler() {
 		return this.errorHandler;
@@ -143,35 +157,67 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 		return this.applicationStartup;
 	}
 
+	// 20201208 将给定的应用程序事件多播到适当的侦听器
 	@Override
 	public void multicastEvent(ApplicationEvent event) {
-		multicastEvent(event, resolveDefaultEventType(event));
+		// 20201207 将给定的应用程序事件多播到适当的侦听器
+		multicastEvent(
+				event,
+				// 20201207 返回指定实例的{@link ResolvableType}
+				resolveDefaultEventType(event)
+		);
 	}
 
+	// 20201207 将给定的应用程序事件多播到适当的侦听器
 	@Override
 	public void multicastEvent(final ApplicationEvent event, @Nullable ResolvableType eventType) {
+		// 20201207 获取指定实例的{@link ResolvableType}
 		ResolvableType type = (eventType != null ? eventType : resolveDefaultEventType(event));
+
+		// 20201207 获取此多播程序的当前任务执行程序
 		Executor executor = getTaskExecutor();
+
+		// 20201207 返回与给定事件类型匹配的ApplicationListeners的集合。 不匹配的会尽早被排除在外 -> 如果该事件没有注册, 则进行注册了再返回
+		// 20201207 遍历每个匹配的监听器
 		for (ApplicationListener<?> listener : getApplicationListeners(event, type)) {
+			// 20201207 如果此多播程序的当前任务执行程序存在
 			if (executor != null) {
+				// 20201208 用给定的事件调用给定的侦听器
 				executor.execute(() -> invokeListener(listener, event));
 			}
+
+			// 20201208 此多播程序的当前任务执行程序不存在, 如果应用程序启动收集器已注册
 			else if (this.applicationStartup != null) {
+				// 20201208 创建新步骤并标记其开始, 步骤名称描述当前操作或阶段
 				StartupStep invocationStep = this.applicationStartup.start("spring.event.invoke-listener");
+
+				// 20201208 用给定的事件调用给定的侦听器
 				invokeListener(listener, event);
+
+				// 20201208 设置event的标签, 并打印
 				invocationStep.tag("event", event::toString);
+
+				// 20201208 如果事件类型不为空, 则设置事件类型的标签, 并打印
 				if (eventType != null) {
 					invocationStep.tag("eventType", eventType::toString);
 				}
+
+				// 20201208 设置监听器标签, 并打印
 				invocationStep.tag("listener", listener::toString);
+
+				// 20201208 设置步骤结束
 				invocationStep.end();
 			}
+
+			// 20201208 如果应用程序启动收集器还没注册
 			else {
+				// 20201208 则直接用给定的事件调用给定的侦听器
 				invokeListener(listener, event);
 			}
 		}
 	}
 
+	// 20201207 返回指定实例的{@link ResolvableType}
 	private ResolvableType resolveDefaultEventType(ApplicationEvent event) {
 		return ResolvableType.forInstance(event);
 	}
@@ -182,37 +228,49 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	 * @param event the current event to propagate
 	 * @since 4.1
 	 */
+	// 20201207 用给定的事件调用给定的侦听器。
 	protected void invokeListener(ApplicationListener<?> listener, ApplicationEvent event) {
+		// 20201207 获取此多播程序的当前错误处理程序
 		ErrorHandler errorHandler = getErrorHandler();
+
+		// 20201207 如果此多播程序的当前错误处理程序存在
 		if (errorHandler != null) {
 			try {
+				// 20201208 监听器执行监听事件操作
 				doInvokeListener(listener, event);
 			}
 			catch (Throwable err) {
+				// 20201208 处理给定的错误，有可能将其作为致命异常重新抛出。
 				errorHandler.handleError(err);
 			}
 		}
 		else {
+			// 20201208 如果此多播程序的当前错误处理程序不存在, 则监听器直接执行监听事件操作
 			doInvokeListener(listener, event);
 		}
 	}
 
+	// 20201208 监听器执行监听事件操作
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private void doInvokeListener(ApplicationListener listener, ApplicationEvent event) {
 		try {
+			// 20201208 处理应用程序事件 -> 不同的监听器实现会执行不同的监听操作
 			listener.onApplicationEvent(event);
 		}
 		catch (ClassCastException ex) {
+			// 20201208 如果报类转换异常, 且异常类出在事件Class上, 说明是lambda定义的侦听器, 则打印异常日志
 			String msg = ex.getMessage();
 			if (msg == null || matchesClassCastMessage(msg, event.getClass())) {
 				// Possibly a lambda-defined listener which we could not resolve the generic event type for
 				// -> let's suppress the exception and just log a debug message.
+				// 20201208 可能是lambda定义的侦听器，我们无法解析通用事件类型，因此我们无法抑制该异常并仅记录调试消息。
 				Log logger = LogFactory.getLog(getClass());
 				if (logger.isTraceEnabled()) {
 					logger.trace("Non-matching event type for listener: " + listener, ex);
 				}
 			}
 			else {
+				// 20201208 如果不是lambda定义的侦听器, 则抛出异常
 				throw ex;
 			}
 		}
