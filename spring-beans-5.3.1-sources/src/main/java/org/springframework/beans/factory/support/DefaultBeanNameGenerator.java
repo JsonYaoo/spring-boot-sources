@@ -25,6 +25,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
  * @author Juergen Hoeller
  * @since 2.0.3
  */
+// 20201208 {@link BeanNameGenerator}接口的默认实现，委派给{@link BeanDefinitionReaderUtils＃generateBeanName（BeanDefinition，BeanDefinitionRegistry）}。
 public class DefaultBeanNameGenerator implements BeanNameGenerator {
 
 	/**
@@ -32,8 +33,8 @@ public class DefaultBeanNameGenerator implements BeanNameGenerator {
 	 * as used for {@link AbstractBeanDefinitionReader} setup.
 	 * @since 5.2
 	 */
+	// 20201208 用于默认{@code DefaultBeanNameGenerator}实例的便捷常量，用于{@link AbstractBeanDefinitionReader}设置。
 	public static final DefaultBeanNameGenerator INSTANCE = new DefaultBeanNameGenerator();
-
 
 	@Override
 	public String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {

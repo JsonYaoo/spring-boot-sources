@@ -30,19 +30,24 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @since 2.5
  */
+// 20201208 {@link ClassMetadata}实现，该实现使用标准反射内省给定的{@code Class}, 该Class实例包装了注解数据。
 public class StandardClassMetadata implements ClassMetadata {
 
+	// 20201208 需要加载的bean Class
 	private final Class<?> introspectedClass;
-
 
 	/**
 	 * Create a new StandardClassMetadata wrapper for the given Class.
 	 * @param introspectedClass the Class to introspect
 	 * @deprecated since 5.2 in favor of {@link StandardAnnotationMetadata}
 	 */
+	// 20201208 为给定的类创建一个新的StandardClassMetadata包装器。
 	@Deprecated
 	public StandardClassMetadata(Class<?> introspectedClass) {
+		// 20201208 需要加载的bean Class不能为空
 		Assert.notNull(introspectedClass, "Class must not be null");
+
+		// 20201208 注册需要加载的bean Class
 		this.introspectedClass = introspectedClass;
 	}
 

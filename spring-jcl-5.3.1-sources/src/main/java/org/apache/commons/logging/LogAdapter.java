@@ -34,6 +34,7 @@ import org.slf4j.spi.LocationAwareLogger;
  * @author Juergen Hoeller
  * @since 5.1
  */
+// 20201208 {@link LogFactory}和{@link LogFactoryService}后面的Spring通用JCL适配器。 检测到Log4j 2.x / SLF4J的存在，并回退到{@code java.util.logging}。
 final class LogAdapter {
 
 	private static final String LOG4J_SPI = "org.apache.logging.log4j.spi.ExtendedLogger";
@@ -44,7 +45,7 @@ final class LogAdapter {
 
 	private static final String SLF4J_API = "org.slf4j.Logger";
 
-
+	// 20201208 日志API枚举类: LOG4J, SLF4J_LAL, SLF4J, JUL
 	private static final LogApi logApi;
 
 	static {
@@ -83,13 +84,18 @@ final class LogAdapter {
 	 * Create an actual {@link Log} instance for the selected API.
 	 * @param name the logger name
 	 */
+	// 20201208 为所选API创建实际的{@link Log}实例。
 	public static Log createLog(String name) {
+		// 20201208 日志API枚举类: LOG4J, SLF4J_LAL, SLF4J, JUL
 		switch (logApi) {
 			case LOG4J:
+				// 20201208 返回Log4j的日志实例
 				return Log4jAdapter.createLog(name);
 			case SLF4J_LAL:
+				// 20201208 返回转换到SLF4J的日志实例
 				return Slf4jAdapter.createLocationAwareLog(name);
 			case SLF4J:
+				// 20201208 返回SLF4J的日志实例
 				return Slf4jAdapter.createLog(name);
 			default:
 				// Defensively use lazy-initializing adapter class here as well since the
@@ -98,6 +104,9 @@ final class LogAdapter {
 				// case of Log4j or SLF4J, we are trying to prevent early initialization
 				// of the JavaUtilLog adapter - e.g. by a JVM in debug mode - when eagerly
 				// trying to parse the bytecode for all the cases of this switch clause.
+				// 20201208 由于在JDK 9上默认不存在java.logging模块，因此在这里也应使用惰性初始化适配器类。如果Log4j或SLF4J都不可用，则要求使用它。 但是，对于Log4j或SLF4J，
+				// 20201208 我们试图阻止JavaUtilLog适配器的早期初始化-例如 由JVM在调试模式下-急于尝试针对此switch子句的所有情况解析字节码时。
+				// 20201208 适配返回JUL日志实例
 				return JavaUtilAdapter.createLog(name);
 		}
 	}
@@ -112,9 +121,7 @@ final class LogAdapter {
 		}
 	}
 
-
 	private enum LogApi {LOG4J, SLF4J_LAL, SLF4J, JUL}
-
 
 	private static class Log4jAdapter {
 

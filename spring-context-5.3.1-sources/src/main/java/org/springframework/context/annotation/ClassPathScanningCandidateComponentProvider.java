@@ -106,6 +106,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	// 20201205 类型过滤的基本接口列表
 	private final List<TypeFilter> includeFilters = new ArrayList<>();
 
+	// 20201208 排除类型过滤器列表
 	private final List<TypeFilter> excludeFilters = new ArrayList<>();
 
 	// 20201205 环境实例
@@ -186,7 +187,9 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	/**
 	 * Add an exclude type filter to the <i>front</i> of the exclusion list.
 	 */
+	// 20201208 将排除类型过滤器添加到排除列表的最前面
 	public void addExcludeFilter(TypeFilter excludeFilter) {
+		// 20201208 排除类型过滤器列表在第一位置添加指定过滤器
 		this.excludeFilters.add(0, excludeFilter);
 	}
 

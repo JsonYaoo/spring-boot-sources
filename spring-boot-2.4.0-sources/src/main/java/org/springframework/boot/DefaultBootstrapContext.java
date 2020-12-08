@@ -40,6 +40,7 @@ public class DefaultBootstrapContext implements ConfigurableBootstrapContext {
 
 	private final Map<Class<?>, Object> instances = new HashMap<>();
 
+	// 20201208 简单的应用程序事件多播器实现
 	private final ApplicationEventMulticaster events = new SimpleApplicationEventMulticaster();
 
 	@Override
@@ -128,8 +129,12 @@ public class DefaultBootstrapContext implements ConfigurableBootstrapContext {
 	 * {@link ApplicationContext} is prepared.
 	 * @param applicationContext the prepared context
 	 */
+	// 20201208 关闭引导上下文并配置上下文准备完毕 -> 构造BootstrapContextClosedEvent事件, 将BootstrapContextClosedEvent事件多播到适当的侦听器
 	public void close(ConfigurableApplicationContext applicationContext) {
-		this.events.multicastEvent(new BootstrapContextClosedEvent(this, applicationContext));
+		// 20201208 将BootstrapContextClosedEvent事件多播到适当的侦听器
+		this.events.multicastEvent(
+				// 20201208 构造BootstrapContextClosedEvent事件, 关闭时发布
+				new BootstrapContextClosedEvent(this, applicationContext));
 	}
 
 }

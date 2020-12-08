@@ -78,25 +78,45 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	public static final String IGNORE_GETENV_PROPERTY_NAME = "spring.getenv.ignore";
 
 	/**
+	 * 20201208
+	 * A. 要设置为指定活动配置文件的属性名称：{@value}。 值可以用逗号分隔。
+	 * B. 请注意，某些shell环境（例如Bash）不允许在变量名称中使用句点字符。 假设正在使用Spring的{@link SystemEnvironmentPropertySource}，则可以将此属性指定为
+	 *    {@code SPRING_PROFILES_ACTIVE}的环境变量。
+	 */
+	/**
+	 * A.
 	 * Name of property to set to specify active profiles: {@value}. Value may be comma
 	 * delimited.
+	 *
+	 * B.
 	 * <p>Note that certain shell environments such as Bash disallow the use of the period
 	 * character in variable names. Assuming that Spring's {@link SystemEnvironmentPropertySource}
 	 * is in use, this property may be specified as an environment variable as
 	 * {@code SPRING_PROFILES_ACTIVE}.
 	 * @see ConfigurableEnvironment#setActiveProfiles
 	 */
+	// 20201208 要设置为指定活动配置文件的属性名称：{@value}。 值可以用逗号分隔。
 	public static final String ACTIVE_PROFILES_PROPERTY_NAME = "spring.profiles.active";
 
 	/**
+	 * 20201208
+	 * A. 要设置以指定默认情况下处于活动状态的配置文件的属性名称：{@value}。 值可以用逗号分隔。
+	 * B. 请注意，某些shell环境（例如Bash）不允许在变量名称中使用句点字符。 假设正在使用Spring的{@link SystemEnvironmentPropertySource}，
+	 *    则可以将此属性指定为环境变量，其名称为{@code SPRING_PROFILES_DEFAULT}。
+	 */
+	/**
+	 * A.
 	 * Name of property to set to specify profiles active by default: {@value}. Value may
 	 * be comma delimited.
+	 *
+	 * B.
 	 * <p>Note that certain shell environments such as Bash disallow the use of the period
 	 * character in variable names. Assuming that Spring's {@link SystemEnvironmentPropertySource}
 	 * is in use, this property may be specified as an environment variable as
 	 * {@code SPRING_PROFILES_DEFAULT}.
 	 * @see ConfigurableEnvironment#setDefaultProfiles
 	 */
+	// 20201208 默认配置文件集名称
 	public static final String DEFAULT_PROFILES_PROPERTY_NAME = "spring.profiles.default";
 
 	/**
@@ -109,14 +129,15 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 * @see AbstractEnvironment#DEFAULT_PROFILES_PROPERTY_NAME
 	 * @see AbstractEnvironment#ACTIVE_PROFILES_PROPERTY_NAME
 	 */
+	// 20201208 保留的默认配置文件名称的名称：{@value}。 如果未明确指定默认配置文件名称，也未明确设置活动配置文件名称，则默认情况下将自动激活此配置文件。
 	protected static final String RESERVED_DEFAULT_PROFILE_NAME = "default";
-
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	// 20201203 已激活的配置文件集
 	private final Set<String> activeProfiles = new LinkedHashSet<>();
 
+	// 20201208 默认激活的配置文件集
 	private final Set<String> defaultProfiles = new LinkedHashSet<>(getReservedDefaultProfiles());
 
 	// 20201203 可变的PropertySource集合
@@ -225,6 +246,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 * @see #RESERVED_DEFAULT_PROFILE_NAME
 	 * @see #doGetDefaultProfiles()
 	 */
+	// 20201208 返回保留的默认配置文件名称集。 此实现返回{@value #RESERVED_DEFAULT_PROFILE_NAME}。 子类可以重写以自定义保留名称集。
 	protected Set<String> getReservedDefaultProfiles() {
 		return Collections.singleton(RESERVED_DEFAULT_PROFILE_NAME);
 	}
@@ -234,8 +256,10 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	// Implementation of ConfigurableEnvironment interface
 	//---------------------------------------------------------------------
 
+	// 20201208 获取激活的配置文件集
 	@Override
 	public String[] getActiveProfiles() {
+		// 20201208 获取/激活配置文件集
 		return StringUtils.toStringArray(doGetActiveProfiles());
 	}
 
@@ -247,15 +271,27 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 * @see #getActiveProfiles()
 	 * @see #ACTIVE_PROFILES_PROPERTY_NAME
 	 */
+	// 20201208 返回通过{@link #setActiveProfiles}明确设置的活动配置文件集，或者如果当前活动配置文件集为空，请检查{@value #ACTIVE_PROFILES_PROPERTY_NAME}属性的存在
+	// 20201208 并将其值分配给活动配置文件集 -> 即获取/激活配置文件集
 	protected Set<String> doGetActiveProfiles() {
+		// 20201208 已激活的配置文件集上锁
 		synchronized (this.activeProfiles) {
+			// 20201208 已激活的配置文件集为空
 			if (this.activeProfiles.isEmpty()) {
+				// 20201208 获取"spring.profiles.active"属性值
 				String profiles = getProperty(ACTIVE_PROFILES_PROPERTY_NAME);
+
+				// 20201208 如果该属性值包含实际文本
 				if (StringUtils.hasText(profiles)) {
-					setActiveProfiles(StringUtils.commaDelimitedListToStringArray(
-							StringUtils.trimAllWhitespace(profiles)));
+					// 20201208 设置激活的配置文件集 spring.boot.active
+					setActiveProfiles(
+							// 20201208 将逗号分隔列表（例如，CSV文件中的一行）转换为字符串数组。
+							StringUtils.commaDelimitedListToStringArray(StringUtils.trimAllWhitespace(profiles))
+					);
 				}
 			}
+
+			// 20201208 返回已注册的已激活的配置文件集
 			return this.activeProfiles;
 		}
 	}
@@ -297,12 +333,19 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		}
 	}
 
-
+	// 20201208 获取默认的配置文件集
 	@Override
 	public String[] getDefaultProfiles() {
+		// 20201208 获取/激活默认配置文件集
 		return StringUtils.toStringArray(doGetDefaultProfiles());
 	}
 
+	/**
+	 * 20201208
+	 * 返回通过{@link #setDefaultProfiles（String ...）}显式设置的默认配置文件集，或者如果当前的默认配置文件集仅由
+	 * {@linkplain #getReservedDefaultProfiles（）保留的默认配置文件}组成，然后检查是否存在 {@value #DEFAULT_PROFILES_PROPERTY_NAME}属性，
+	 * 并将其值（如果有）分配给默认配置文件集。
+	 */
 	/**
 	 * Return the set of default profiles explicitly set via
 	 * {@link #setDefaultProfiles(String...)} or if the current set of default profiles
@@ -315,34 +358,62 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 * @see #DEFAULT_PROFILES_PROPERTY_NAME
 	 * @see #getReservedDefaultProfiles()
 	 */
+	// 20201208 获取/激活默认配置文件集
 	protected Set<String> doGetDefaultProfiles() {
+		// 20201208 默认激活的配置文件集上锁
 		synchronized (this.defaultProfiles) {
+			// 20201208 如果激活的默认文件集与保留的配置文件集相同, 则说明还没进行过赋值
 			if (this.defaultProfiles.equals(getReservedDefaultProfiles())) {
+				// 20201208 则根据默认配置文件集名称获取属性
 				String profiles = getProperty(DEFAULT_PROFILES_PROPERTY_NAME);
+
+				// 20201208 如果该属性包含实际文本
 				if (StringUtils.hasText(profiles)) {
-					setDefaultProfiles(StringUtils.commaDelimitedListToStringArray(
-							StringUtils.trimAllWhitespace(profiles)));
+					// 20201208 调用此方法将删除覆盖在构造环境期间可能已添加的所有保留的默认配置文件
+					setDefaultProfiles(
+							// 20201208 将逗号分隔列表（例如，CSV文件中的一行）转换为字符串数组。
+							StringUtils.commaDelimitedListToStringArray(StringUtils.trimAllWhitespace(profiles)));
 				}
 			}
+
+			// 20201208 返回默认配置文件集
 			return this.defaultProfiles;
 		}
 	}
 
 	/**
+	 * 20201208
+	 * A. 如果没有通过{@link #setActiveProfiles}显式激活其他配置文件，则指定默认情况下将其激活的配置文件集。
+	 * B. 调用此方法将删除覆盖在构造环境期间可能已添加的所有保留的默认配置文件。
+	 */
+	/**
+	 * A.
 	 * Specify the set of profiles to be made active by default if no other profiles
 	 * are explicitly made active through {@link #setActiveProfiles}.
+	 *
+	 * B.
 	 * <p>Calling this method removes overrides any reserved default profiles
 	 * that may have been added during construction of the environment.
 	 * @see #AbstractEnvironment()
 	 * @see #getReservedDefaultProfiles()
 	 */
+	// 20201208 调用此方法将删除覆盖在构造环境期间可能已添加的所有保留的默认配置文件
 	@Override
 	public void setDefaultProfiles(String... profiles) {
+		// 20201208 配置文件集数组不能为空
 		Assert.notNull(profiles, "Profile array must not be null");
+
+		// 20201208 默认激活的配置文件集上锁
 		synchronized (this.defaultProfiles) {
+			// 20201208 清空之前保留的文件集
 			this.defaultProfiles.clear();
+
+			// 20201208 遍历配置文件集数组
 			for (String profile : profiles) {
+				// 20201208 校验每个配置文件集
 				validateProfile(profile);
+
+				// 20201208 通过校验则添加到默认激活的配置文件集
 				this.defaultProfiles.add(profile);
 			}
 		}

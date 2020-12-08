@@ -43,6 +43,7 @@ import org.springframework.util.MultiValueMap;
  * @see AnnotationMetadata
  * @see MethodMetadata
  */
+// 20201208 定义对特定类型（{@link AnnotationMetadata类}或{@link MethodMetadata方法}）的注解的访问，其形式不一定需要加载类。
 public interface AnnotatedTypeMetadata {
 
 	/**

@@ -267,6 +267,7 @@ public abstract class StringUtils {
 	 * @return the trimmed {@code String}
 	 * @see Character#isWhitespace
 	 */
+	// 20201208 修剪给定{@code String}中的所有空格：前导，尾随以及字符之间。
 	public static String trimAllWhitespace(String str) {
 		if (!hasLength(str)) {
 			return str;
@@ -1215,8 +1216,16 @@ public abstract class StringUtils {
 	}
 
 	/**
+	 * 20201208
+	 * A. 以一个{@code String}为分隔列表，并将其转换为{@code String}数组。
+	 * B. 单个{@code delimiter}可以包含多个字符，但是与{@link #tokenizeToStringArray}相比，它仍将被视为单个分隔符字符串，而不是一堆潜在的分隔符。
+	 */
+	/**
+	 * A.
 	 * Take a {@code String} that is a delimited list and convert it into a
 	 * {@code String} array.
+	 *
+	 * B.
 	 * <p>A single {@code delimiter} may consist of more than one character,
 	 * but it will still be considered as a single delimiter string, rather
 	 * than as bunch of potential delimiter characters, in contrast to
@@ -1227,6 +1236,7 @@ public abstract class StringUtils {
 	 * @return an array of the tokens in the list
 	 * @see #tokenizeToStringArray
 	 */
+	// 20201208 以delimiter为分隔符, 以一个{@code String}为分隔列表，并将其转换为{@code String}数组。
 	public static String[] delimitedListToStringArray(@Nullable String str, @Nullable String delimiter) {
 		return delimitedListToStringArray(str, delimiter, null);
 	}
@@ -1283,7 +1293,9 @@ public abstract class StringUtils {
 	 * @param str the input {@code String} (potentially {@code null} or empty)
 	 * @return an array of strings, or the empty array in case of empty input
 	 */
+	// 20201208 将逗号分隔列表（例如，CSV文件中的一行）转换为字符串数组。
 	public static String[] commaDelimitedListToStringArray(@Nullable String str) {
+		// 20201208 以","为分隔符, 以一个{@code String}为分隔列表，并将其转换为{@code String}数组。
 		return delimitedListToStringArray(str, ",");
 	}
 
@@ -1349,12 +1361,21 @@ public abstract class StringUtils {
 	}
 
 	/**
+	 * 20201208
+	 * A. 将{@code String}数组转换为定界的{@code String}（例如CSV）。
+	 * B. 对于{@code toString（）}实现很有用。
+	 */
+	/**
+	 * A.
 	 * Convert a {@code String} array into a delimited {@code String} (e.g. CSV).
+	 *
+	 * B.
 	 * <p>Useful for {@code toString()} implementations.
 	 * @param arr the array to display (potentially {@code null} or empty)
 	 * @param delim the delimiter to use (typically a ",")
 	 * @return the delimited {@code String}
 	 */
+	// 20201208 将{@code String}数组转换为定界的{@code String}（例如CSV）。
 	public static String arrayToDelimitedString(@Nullable Object[] arr, String delim) {
 		if (ObjectUtils.isEmpty(arr)) {
 			return "";
@@ -1371,12 +1392,21 @@ public abstract class StringUtils {
 	}
 
 	/**
+	 * 20201208
+	 * A. 将{@code String}数组转换为以逗号分隔的{@code String}（即CSV）。
+	 * B. 对于{@code toString（）}实现很有用。
+	 */
+	/**
+	 * A.
 	 * Convert a {@code String} array into a comma delimited {@code String}
 	 * (i.e., CSV).
+	 *
+	 * B.
 	 * <p>Useful for {@code toString()} implementations.
 	 * @param arr the array to display (potentially {@code null} or empty)
 	 * @return the delimited {@code String}
 	 */
+	// 20201208 将{@code String}数组转换为以逗号分隔的{@code String}（即CSV）。
 	public static String arrayToCommaDelimitedString(@Nullable Object[] arr) {
 		return arrayToDelimitedString(arr, ",");
 	}

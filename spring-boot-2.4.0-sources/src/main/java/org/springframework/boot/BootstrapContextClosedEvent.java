@@ -26,12 +26,18 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @since 2.4.0
  * @see BootstrapRegistry#addCloseListener(org.springframework.context.ApplicationListener)
  */
+// 20201208 {@link BootstrapContext}关闭时发布的{@link ApplicationEvent}。
 public class BootstrapContextClosedEvent extends ApplicationEvent {
 
+	// 20201208 当前已准备好的配置上下文
 	private final ConfigurableApplicationContext applicationContext;
 
+	// 20201208 构造BootstrapContextClosedEvent事件, 关闭时发布
 	BootstrapContextClosedEvent(BootstrapContext source, ConfigurableApplicationContext applicationContext) {
+		// 20201207 构造ApplicationEvent: 应用程序事件
 		super(source);
+
+		// 20201208 注册当前已准备好的配置上下文
 		this.applicationContext = applicationContext;
 	}
 

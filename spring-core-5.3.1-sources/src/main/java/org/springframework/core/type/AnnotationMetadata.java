@@ -38,6 +38,7 @@ import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
  * @see org.springframework.core.type.classreading.MetadataReader#getAnnotationMetadata()
  * @see AnnotatedTypeMetadata
  */
+// 20201208 该接口定义了对特定类的注解的抽象访问，该接口的形式不需要加载该类。
 public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata {
 
 	/**
@@ -123,6 +124,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	 * @return a new {@link AnnotationMetadata} instance
 	 * @since 5.2
 	 */
+	// 20201208 使用标准反射为给定类创建新的{@link AnnotationMetadata}实例的工厂方法。
 	static AnnotationMetadata introspect(Class<?> type) {
 		return StandardAnnotationMetadata.from(type);
 	}

@@ -56,7 +56,7 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 	// 20201205 是否匹配接口
 	private final boolean considerInterfaces;
 
-
+	// 20201208 构造AbstractTypeHierarchyTraversingFilter
 	protected AbstractTypeHierarchyTraversingFilter(boolean considerInherited, boolean considerInterfaces) {
 		// 20201205 是否匹配超类注解
 		this.considerInherited = considerInherited;

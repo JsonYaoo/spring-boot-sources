@@ -112,12 +112,23 @@ public interface Log {
 	boolean isWarnEnabled();
 
 	/**
+	 * 20201208
+	 * A. 当前是否启用了信息记录？
+	 * B. Spring的常用方法，调用此方法可避免在日志级别大于info时执行昂贵的操作（例如，字符串串联）。 {@link LogFactory}和{@link LogFactoryService}后面的适配器。
+	 *    检测到Log4j 2.x / SLF4J的存在，并回退到{@code java.util.logging}。
+	 */
+	/**
+	 * A.
 	 * Is info logging currently enabled?
+	 *
+	 * B.
 	 * <p>Call this method to prevent having to perform expensive operations
 	 * (for example, <code>String</code> concatenation)
 	 * when the log level is more than info.
+	 *
 	 * @return true if info is enabled in the underlying logger.
 	 */
+	// 20201208 如果在基础记录器中启用了信息，则为true。
 	boolean isInfoEnabled();
 
 	/**

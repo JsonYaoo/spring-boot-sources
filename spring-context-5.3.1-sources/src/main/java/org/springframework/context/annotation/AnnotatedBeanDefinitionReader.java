@@ -58,6 +58,7 @@ public class AnnotatedBeanDefinitionReader {
 
 	private final BeanDefinitionRegistry registry;
 
+	// 20201208 用于为bean定义生成bean名称的策略接口实例, 默认为AnnotationBeanNameGenerator的实例常量, 用于组件扫描
 	private BeanNameGenerator beanNameGenerator = AnnotationBeanNameGenerator.INSTANCE;
 
 	private ScopeMetadataResolver scopeMetadataResolver = new AnnotationScopeMetadataResolver();
@@ -124,19 +125,28 @@ public class AnnotatedBeanDefinitionReader {
 	 *
 	 * @see #registerBean(Class, String, Class...)
 	 */
-	// 20201206 设置在评估是否应注册{@link条件@Conditional}注释的组件类时使用的{@code Environment}。默认值为{@link StandardEnvironment}。
+	// 20201206 设置使用@Conditional注解组件类时的环境。默认值为{@link StandardEnvironment}。
 	public void setEnvironment(Environment environment) {
 		// 20201206 使用环境构造用于评估{@link Conditional}注解的内部类, 注册bean定义注册的接口实例、bean工厂实例、当前应用程序正在其中运行的环境的接口实例、资源加载器、类加载器到ConditionEvaluator
 		this.conditionEvaluator = new ConditionEvaluator(this.registry, environment, null);
 	}
 
 	/**
+	 * 20201208
+	 * A. 设置{@code BeanNameGenerator}以用于检测到的bean类。
+	 * B. 默认值为{@link AnnotationBeanNameGenerator}。
+	 */
+	/**
+	 * A.
 	 * Set the {@code BeanNameGenerator} to use for detected bean classes.
+	 *
+	 * B.
 	 * <p>The default is a {@link AnnotationBeanNameGenerator}.
 	 */
+	// 20201208 设置{@code BeanNameGenerator}以用于检测到的bean类, 默认值为{@link AnnotationBeanNameGenerator}。
 	public void setBeanNameGenerator(@Nullable BeanNameGenerator beanNameGenerator) {
-		this.beanNameGenerator =
-				(beanNameGenerator != null ? beanNameGenerator : AnnotationBeanNameGenerator.INSTANCE);
+		// 20201208 设置用于为bean定义生成bean名称的策略接口实例
+		this.beanNameGenerator = (beanNameGenerator != null ? beanNameGenerator : AnnotationBeanNameGenerator.INSTANCE);
 	}
 
 	/**
@@ -148,16 +158,27 @@ public class AnnotatedBeanDefinitionReader {
 				(scopeMetadataResolver != null ? scopeMetadataResolver : new AnnotationScopeMetadataResolver());
 	}
 
-
 	/**
+	 * 20201208
+	 * A. 注册一个或多个要处理的组件类。
+	 * B. 对{@code register}的调用是幂等的； 多次添加同一组件类不会产生任何其他影响。
+	 */
+	/**
+	 * A.
 	 * Register one or more component classes to be processed.
+	 *
+	 * B.
 	 * <p>Calls to {@code register} are idempotent; adding the same
 	 * component class more than once has no additional effect.
+	 *
 	 * @param componentClasses one or more component classes,
-	 * e.g. {@link Configuration @Configuration} classes
+	 * e.g. {@link Configuration @Configuration} classes // 20201208 一个或多个组件类，例如 {@link Configuration @Configuration}类
 	 */
+	// 20201208 注册一个或多个要处理的组件类
 	public void register(Class<?>... componentClasses) {
+		// 20201208 遍历组件bean类列表
 		for (Class<?> componentClass : componentClasses) {
+			// 20201208 注册每个一个组件bean类
 			registerBean(componentClass);
 		}
 	}
@@ -167,6 +188,7 @@ public class AnnotatedBeanDefinitionReader {
 	 * class-declared annotations.
 	 * @param beanClass the class of the bean
 	 */
+	// 20201208 从给定的bean类中注册一个bean，并从类声明的注释中派生其元数据。
 	public void registerBean(Class<?> beanClass) {
 		doRegisterBean(beanClass, null, null, null, null);
 	}
@@ -260,6 +282,7 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Register a bean from the given bean class, deriving its metadata from
 	 * class-declared annotations.
+	 *
 	 * @param beanClass the class of the bean
 	 * @param name an explicit name for the bean
 	 * @param qualifiers specific qualifier annotations to consider, if any,
@@ -270,9 +293,13 @@ public class AnnotatedBeanDefinitionReader {
 	 * {@link BeanDefinition}, e.g. setting a lazy-init or primary flag
 	 * @since 5.0
 	 */
-	private <T> void doRegisterBean(Class<T> beanClass, @Nullable String name,
-			@Nullable Class<? extends Annotation>[] qualifiers, @Nullable Supplier<T> supplier,
-			@Nullable BeanDefinitionCustomizer[] customizers) {
+	// 20201208 从给定的bean类中注册一个bean，并从类声明的注解中派生其元数据。
+	private <T> void doRegisterBean(Class<T> beanClass,// 20201208 待处理的bean类
+									@Nullable String name,// 20201208 Bean的显式名称
+									@Nullable Class<? extends Annotation>[] qualifiers,// 20201208 Bean类级别上的限定符，如果有的话，还要考虑特定的限定符注解
+									@Nullable Supplier<T> supplier,// 20201208 用于创建bean实例的回调（可以为{@code null}）
+									@Nullable BeanDefinitionCustomizer[] customizers// 20201208 一个或多个用于自定义工厂的{@link BeanDefinition}的回调，例如 设置惰性初始或主要标志
+	) {
 
 		AnnotatedGenericBeanDefinition abd = new AnnotatedGenericBeanDefinition(beanClass);
 		if (this.conditionEvaluator.shouldSkip(abd.getMetadata())) {

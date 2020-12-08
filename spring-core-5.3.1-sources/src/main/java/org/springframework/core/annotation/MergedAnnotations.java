@@ -28,9 +28,19 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 20201208
+ * A. 提供对合并注释的集合的访问，这些注释通常是从{@link Class}或{@link Method}之类的来源获得的。
+ * B. 每个合并的注释表示一个视图，在该视图中可以从不同的源值“合并”属性值，通常是：
+ * 		a. 注释中一个或多个属性的显式和隐式{@link AliasFor @AliasFor}声明
+ * 		b.
+ *
+ */
+/**
+ * A.
  * Provides access to a collection of merged annotations, usually obtained
  * from a source such as a {@link Class} or {@link Method}.
  *
+ * B.
  * <p>Each merged annotation represents a view where the attribute values may be
  * "merged" from different source values, typically:
  *
@@ -42,6 +52,7 @@ import org.springframework.util.Assert;
  * <li>From a meta-annotation declaration</li>
  * </ul>
  *
+ * C.
  * <p>For example, a {@code @PostMapping} annotation might be defined as follows:
  *
  * <pre class="code">
@@ -57,6 +68,7 @@ import org.springframework.util.Assert;
  * }
  * </pre>
  *
+ * D.
  * <p>If a method is annotated with {@code @PostMapping("/home")} it will contain
  * merged annotations for both {@code @PostMapping} and the meta-annotation
  * {@code @RequestMapping}. The merged view of the {@code @RequestMapping}
@@ -85,21 +97,25 @@ import org.springframework.util.Assert;
  * </tr>
  * </table>
  *
+ * E.
  * <p>{@link MergedAnnotations} can be obtained {@linkplain #from(AnnotatedElement)
  * from} any Java {@link AnnotatedElement}. They may also be used for sources that
  * don't use reflection (such as those that directly parse bytecode).
  *
+ * F.
  * <p>Different {@linkplain SearchStrategy search strategies} can be used to locate
  * related source elements that contain the annotations to be aggregated. For
  * example, {@link SearchStrategy#TYPE_HIERARCHY} will search both superclasses and
  * implemented interfaces.
  *
+ * G.
  * <p>From a {@link MergedAnnotations} instance you can either
  * {@linkplain #get(String) get} a single annotation, or {@linkplain #stream()
  * stream all annotations} or just those that match {@linkplain #stream(String)
  * a specific type}. You can also quickly tell if an annotation
  * {@linkplain #isPresent(String) is present}.
  *
+ * H.
  * <p>Here are some typical examples:
  *
  * <pre class="code">
@@ -120,6 +136,7 @@ import org.springframework.util.Assert;
  *     .forEach(System.out::println);
  * </pre>
  *
+ * I.
  * <p><b>NOTE: The {@code MergedAnnotations} API and its underlying model have
  * been designed for composable annotations in Spring's common component model,
  * with a focus on attribute aliasing and meta-annotation relationships.</b>

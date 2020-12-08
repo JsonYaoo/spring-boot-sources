@@ -33,17 +33,20 @@ import org.springframework.util.StringUtils;
  * @author Sam Brannen
  * @since 2.0
  */
+// 20201208 检测XML流是否正在使用基于DTD或XSD的验证。
 public class XmlValidationModeDetector {
 
 	/**
 	 * Indicates that the validation should be disabled.
 	 */
+	// 20201208 指示应禁用验证。
 	public static final int VALIDATION_NONE = 0;
 
 	/**
 	 * Indicates that the validation mode should be auto-guessed, since we cannot find
 	 * a clear indication (probably choked on some special characters, or the like).
 	 */
+	// 20201208 指示应该自动猜测验证模式，因为我们找不到清晰的指示（可能在某些特殊字符等上被阻塞）。
 	public static final int VALIDATION_AUTO = 1;
 
 	/**

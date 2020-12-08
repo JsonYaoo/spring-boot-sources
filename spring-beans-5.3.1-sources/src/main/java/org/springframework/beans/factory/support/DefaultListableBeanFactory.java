@@ -158,6 +158,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@Nullable
 	private String serializationId;
 
+	// 20201208 是否允许重新注册具有相同名称的不同定义。
 	/** Whether to allow re-registration of a different definition with the same name. */
 	private boolean allowBeanDefinitionOverriding = true;
 
@@ -245,13 +246,23 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	}
 
 	/**
+	 * 20201208
+	 * A. 通过注册具有相同名称的其他定义（自动替换前者）来设置是否应允许它覆盖bean定义。 否则，将引发异常。 这也适用于覆盖别名。
+	 * B. 默认为true
+	 */
+	/**
+	 * A.
 	 * Set whether it should be allowed to override bean definitions by registering
 	 * a different definition with the same name, automatically replacing the former.
 	 * If not, an exception will be thrown. This also applies to overriding aliases.
+	 *
+	 * B.
 	 * <p>Default is "true".
 	 * @see #registerBeanDefinition
 	 */
+	// 20201208 通过注册具有相同名称的其他定义（自动替换前者）来设置是否应允许它覆盖bean定义。 否则，将引发异常。 这也适用于覆盖别名。
 	public void setAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
+		// 20201208 注册是否允许重新注册具有相同名称的不同定义标志
 		this.allowBeanDefinitionOverriding = allowBeanDefinitionOverriding;
 	}
 

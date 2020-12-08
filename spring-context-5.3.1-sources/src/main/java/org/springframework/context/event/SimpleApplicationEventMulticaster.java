@@ -76,6 +76,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	/**
 	 * Create a new SimpleApplicationEventMulticaster.
 	 */
+	// 20201208 创建一个新的SimpleApplicationEventMulticaster。
 	public SimpleApplicationEventMulticaster() {
 	}
 

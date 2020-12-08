@@ -17,12 +17,27 @@
 package org.apache.commons.logging;
 
 /**
+ * 20201208
+ * A. Apache Commons Logging的{@code LogFactory} API的最小化版本，仅提供了常见的{@link Log}查找方法。 这是受JCL-over-SLF4J桥的启发，并且应该与
+ *    Commons Logging API的所有常用用法（特别是：使用{@code LogFactory.getLog（Class / String）}字段初始化程序）的源代码和二进制文件兼容。
+ * B. 此实现不支持Commons Logging的原始提供程序检测。 而是仅检查Spring Framework类路径中Log4j 2.x API和SLF4J 1.7 API是否存在，如果两者都不可用，则退回到
+ *    {@code java.util.logging}。 从这个意义上讲，它可以替代Log4j 2 Commons Logging桥接器以及JCL-over-SLF4J桥接器，因此两者对于基于Spring的设置都不相关
+ *    （不需要手动排除标准） Commons Logging API jar也可以）。 此外，对于没有外部日志记录提供程序的简单设置，Spring在类路径上不再需要任何额外的jar，因为在这种情况下，
+ *    此嵌入式日志工厂会自动委托给{@code java.util.logging}。
+ * C. 请注意，此Commons Logging变体仅用于核心框架和扩展中的基础结构日志记录目的，它还用作使用Commons Logging API的第三方库的通用桥梁。 Apache HttpClient和HtmlUnit，
+ *    使它们进入相同的一致安排，而无需任何额外的桥接器。
+ * D. 对于应用程序代码中的日志记录需求，建议直接使用Log4j 2.x或SLF4J或{@code java.util.logging}。只需将Log4j 2.x或Logback（或其他SLF4J提供程序）放到类路径中，
+ *    而无需任何额外的桥接 ，并让框架自动适应您的选择。
+ */
+/**
+ * A.
  * A minimal incarnation of Apache Commons Logging's {@code LogFactory} API,
  * providing just the common {@link Log} lookup methods. This is inspired
  * by the JCL-over-SLF4J bridge and should be source as well as binary
  * compatible with all common use of the Commons Logging API (in particular:
  * with {@code LogFactory.getLog(Class/String)} field initializers).
  *
+ * B.
  * <p>This implementation does not support Commons Logging's original provider
  * detection. It rather only checks for the presence of the Log4j 2.x API
  * and the SLF4J 1.7 API in the Spring Framework classpath, falling back to
@@ -35,12 +50,14 @@ package org.apache.commons.logging;
  * on the classpath anymore since this embedded log factory automatically
  * delegates to {@code java.util.logging} in such a scenario.
  *
+ * C.
  * <p><b>Note that this Commons Logging variant is only meant to be used for
  * infrastructure logging purposes in the core framework and in extensions.</b>
  * It also serves as a common bridge for third-party libraries using the
  * Commons Logging API, e.g. Apache HttpClient, and HtmlUnit, bringing
  * them into the same consistent arrangement without any extra bridge jars.
  *
+ * D.
  * <p><b>For logging need in application code, prefer direct use of Log4j 2.x
  * or SLF4J or {@code java.util.logging}.</b> Simply put Log4j 2.x or Logback
  * (or another SLF4J provider) onto your classpath, without any extra bridges,
@@ -49,24 +66,27 @@ package org.apache.commons.logging;
  * @author Juergen Hoeller (for the {@code spring-jcl} variant)
  * @since 5.0
  */
+// 20201208 Apache Commons Logging的{@code LogFactory} API的最小化版本，仅提供了常见的{@link Log}查找方法, 仅用于核心框架和扩展中的基础结构日志记录目的
 public abstract class LogFactory {
 
 	/**
 	 * Convenience method to return a named logger.
-	 * @param clazz containing Class from which a log name will be derived
+	 * @param clazz containing Class from which a log name will be derived // 20201208 包含将从中派生日志名称的Class
 	 */
+	// 20201208 返回指定类日志记录
 	public static Log getLog(Class<?> clazz) {
 		return getLog(clazz.getName());
 	}
 
 	/**
 	 * Convenience method to return a named logger.
-	 * @param name logical name of the <code>Log</code> instance to be returned
+	 * @param name logical name of the <code>Log</code> instance to be returned // 20201208 要返回的日志实例的逻辑名称
 	 */
+	// 20201208 根据类名称获取指定类日志记录
 	public static Log getLog(String name) {
+		// 20201208 为所选API创建实际的{@link Log}实例。
 		return LogAdapter.createLog(name);
 	}
-
 
 	/**
 	 * This method only exists for compatibility with unusual Commons Logging API

@@ -31,6 +31,7 @@ import org.springframework.lang.Nullable;
  * @see AnnotatedGenericBeanDefinition
  * @see AnnotationMetadata
  */
+// 20201208 扩展的{@link BeanDefinition}接口，公开了有关其bean类的{@link AnnotationMetadata}-无需加载该类。
 public interface AnnotatedBeanDefinition extends BeanDefinition {
 
 	/**

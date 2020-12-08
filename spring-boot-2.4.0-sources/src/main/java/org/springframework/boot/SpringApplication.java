@@ -240,11 +240,13 @@ public class SpringApplication {
 	// 20201201 awt包
 	private static final String SYSTEM_PROPERTY_JAVA_AWT_HEADLESS = "java.awt.headless";
 
+	// 20201208 记录SpringApplication类的日志
 	private static final Log logger = LogFactory.getLog(SpringApplication.class);
 
 	// 20201130 主类Class对象集合
 	private Set<Class<?>> primarySources;
 
+	// 20201208 上下文的其他源
 	private Set<String> sources = new LinkedHashSet<>();
 
 	// 20201203 主类Class
@@ -253,6 +255,7 @@ public class SpringApplication {
 	// 20201203 Banner打印模式 => 控制台打印
 	private Mode bannerMode = Mode.CONSOLE;
 
+	// 20201208 是否启动时打印日志, 默认为true
 	private boolean logStartupInfo = true;
 
 	// 20201202 允许读取命令行参数Properties属性
@@ -266,7 +269,7 @@ public class SpringApplication {
 	// 20201130 资源加载器
 	private ResourceLoader resourceLoader;
 
-	// 20201206 用于为bean定义生成bean名称的策略接口
+	// 20201206 用于为bean定义生成bean名称的策略接口实例
 	private BeanNameGenerator beanNameGenerator;
 
 	// 20201201 配置环境
@@ -293,11 +296,13 @@ public class SpringApplication {
 	// 20201202 额外的配置文件集合
 	private Set<String> additionalProfiles = Collections.emptySet();
 
+	// 20201208 是否允许重新注册具有相同名称的不同定义
 	private boolean allowBeanDefinitionOverriding;
 
 	// 20201202 是否为定制化的环境
 	private boolean isCustomEnvironment = false;
 
+	// 20201208 是否懒加载初始程序
 	private boolean lazyInitialization = false;
 
 	// 20201204 默认的{@link ApplicationContextFactory}实现，将为{@link WebApplicationType}创建适当的上下文。
@@ -538,29 +543,62 @@ public class SpringApplication {
 		// 20201207 WebServer服务器端口应用程序上下文初始化器: org.springframework.boot.web.context.ServerPortInfoApplicationContextInitializer
 		applyInitializers(context);
 
+		// 20201208 配置上线文准备完毕事件 -> 将ApplicationContextInitializedEvent事件多播到适当的侦听器, 执行监听ApplicationContextInitializedEvent事件
 		listeners.contextPrepared(context);
+
+		// 20201208 关闭引导上下文并配置上下文准备完毕 -> 构造BootstrapContextClosedEvent事件, 将BootstrapContextClosedEvent事件多播到适当的侦听器
 		bootstrapContext.close(context);
+
+		// 20201208 是否启动时打印日志, 默认为true
 		if (this.logStartupInfo) {
-			logStartupInfo(context.getParent() == null);
+			// 20201208 日志打印启动信息, 其中子类可以重写以添加其他日志。
+			logStartupInfo(
+					// 20201208 返回父级上下文，如果没有父级，则返回{@code null}，这是上下文层次结构的根。
+					context.getParent() == null
+			);
+
+			// 20201208 日志打印活动配置文件信息
 			logStartupProfileInfo(context);
 		}
-		// Add boot specific singleton beans
+
+		// Add boot specific singleton beans // 20201208 添加引导特定的单例beans
+		// 20201208 返回AnnotationConfigServletWebServerApplicationContext上下文拥有的单个内部BeanFactory
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+
+		// 20201207 在bean注册表中将applicationArguments对象注册为"springApplicationArguments"单例 => 注册表将不执行任何初始化回调，包括销毁回调
 		beanFactory.registerSingleton("springApplicationArguments", applicationArguments);
+
+		// 20201208 如果横幅编写类实例不为空
 		if (printedBanner != null) {
+			// 20201207 则在bean注册表中将printedBanner对象注册为"springBootBanner"单例 => 注册表将不执行任何初始化回调，包括销毁回调
 			beanFactory.registerSingleton("springBootBanner", printedBanner);
 		}
+
+		// 20201208 如果bean工厂为DefaultListableBeanFactory实例
 		if (beanFactory instanceof DefaultListableBeanFactory) {
-			((DefaultListableBeanFactory) beanFactory)
-					.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
+			// 20201208 通过注册具有相同名称的其他定义（自动替换前者）来设置是否应允许它覆盖bean定义。 否则，将引发异常。 这也适用于覆盖别名。
+			((DefaultListableBeanFactory) beanFactory).setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
+
+		// 20201208 如果是懒加载初始程序
 		if (this.lazyInitialization) {
-			context.addBeanFactoryPostProcessor(new LazyInitializationBeanFactoryPostProcessor());
+			// 20201208 添加一个新的工厂修改器BeanFactoryPostProcessor，应用于刷新
+			context.addBeanFactoryPostProcessor(
+					// 20201208 对尚未明确设置值的bean设置为懒加载
+					new LazyInitializationBeanFactoryPostProcessor()
+			);
 		}
-		// Load the sources
+
+		// Load the sources // 20201208 加载源
+		// 20201208 返回当调用{@link #run（String ...）}时将添加到ApplicationContext的所有源的不变集合
 		Set<Object> sources = getAllSources();
+
+		// 20201208 run()的所有源集合不能为空
 		Assert.notEmpty(sources, "Sources must not be empty");
+
+		// 20201208 将bean加载到应用程序上下文中
 		load(context, sources.toArray(new Object[0]));
+
 		listeners.contextLoaded(context);
 	}
 
@@ -918,11 +956,19 @@ public class SpringApplication {
 	/**
 	 * Called to log startup information, subclasses may override to add additional
 	 * logging.
-	 * @param isRoot true if this application is the root of a context hierarchy
+	 * @param isRoot true if this application is the root of a context hierarchy	// 20201208 如果此应用程序是上下文层次结构的根，则为true
 	 */
+	// 20201208 日志打印启动信息, 其中子类可以重写以添加其他日志。
 	protected void logStartupInfo(boolean isRoot) {
+		// 20201208 如果此应用程序是上下文层次结构的根，则为true
 		if (isRoot) {
-			new StartupInfoLogger(this.mainApplicationClass).logStarting(getApplicationLog());
+			// 20201208 构建启动时应用程序信息记录者 -> 主类记录者
+			new StartupInfoLogger(this.mainApplicationClass)
+					// 20201208 开始应用程序信息日志打印
+					.logStarting(
+							// 20201208 返回记录应用程序的日志实例。 默认情况下将被推导。
+							getApplicationLog()
+					);
 		}
 	}
 
@@ -930,16 +976,27 @@ public class SpringApplication {
 	 * Called to log active profile information.
 	 * @param context the application context
 	 */
+	// 20201208 日志打印活动配置文件信息 AnnotationConfigServletWebServerApplicationContext
 	protected void logStartupProfileInfo(ConfigurableApplicationContext context) {
+		// 20201208 返回记录应用程序的日志实例。 默认情况下将被推导。
 		Log log = getApplicationLog();
+
+		// 20201208 如果在基础记录器中启用了信息，则为true。
 		if (log.isInfoEnabled()) {
+			// 20201208 返回当前环境实例StandardServletEnvironment, 获取激活的配置文件集
 			String[] activeProfiles = context.getEnvironment().getActiveProfiles();
+
+			// 20201208 如果激活的配置文件集为空
 			if (ObjectUtils.isEmpty(activeProfiles)) {
+				// 20201208 返回当前环境实例StandardServletEnvironment, 获取默认的配置文件集
 				String[] defaultProfiles = context.getEnvironment().getDefaultProfiles();
+
+				// 20201208 打印使用默认配置文件集日志信息
 				log.info("No active profile set, falling back to default profiles: "
 						+ StringUtils.arrayToCommaDelimitedString(defaultProfiles));
 			}
 			else {
+				// 20201208 如果激活的配置文件集不为空, 则直接打印使用默认配置文件集日志信息
 				log.info("The following profiles are active: "
 						+ StringUtils.arrayToCommaDelimitedString(activeProfiles));
 			}
@@ -950,32 +1007,57 @@ public class SpringApplication {
 	 * Returns the {@link Log} for the application. By default will be deduced.
 	 * @return the application log
 	 */
+	// 20201208 该应用程序的{@link Log}。 默认情况下将被推导。
 	protected Log getApplicationLog() {
+		// 20201208 如果主类Class为空
 		if (this.mainApplicationClass == null) {
+			// 20201208 则返回记录SpringApplication类记录的日志
 			return logger;
 		}
+
+		// 20201208 否则返回主类记录的日志
 		return LogFactory.getLog(this.mainApplicationClass);
 	}
 
 	/**
 	 * Load beans into the application context.
-	 * @param context the context to load beans into
-	 * @param sources the sources to load
+	 * @param context the context to load beans into	// 20201208 将bean加载到的上下文
+	 * @param sources the sources to load	// 20201208 加载源
 	 */
+	// 20201208 将bean加载到应用程序上下文中。
 	protected void load(ApplicationContext context, Object[] sources) {
+		// 20201208 如果当前启用了调试日志记录
 		if (logger.isDebugEnabled()) {
+			// 20201208 则打印加载加载源日志信息
 			logger.debug("Loading source " + StringUtils.arrayToCommaDelimitedString(sources));
 		}
-		BeanDefinitionLoader loader = createBeanDefinitionLoader(getBeanDefinitionRegistry(context), sources);
+
+		// 20201208 创建一个新的{@link BeanDefinitionLoader}，它将把bean sources加载到指定的{@link BeanDefinitionRegistry}中。
+		BeanDefinitionLoader loader = createBeanDefinitionLoader(
+				// 20201208 获取bean定义注册表。
+				getBeanDefinitionRegistry(context),
+				// 20201208 所有加载源
+				sources);
+
+		// 20201208 如果存在用于为bean定义生成bean名称的策略接口实例
 		if (this.beanNameGenerator != null) {
+			// 20201208 设置要由基础阅读器和扫描器使用的bean名称生成器。
 			loader.setBeanNameGenerator(this.beanNameGenerator);
 		}
+
+		// 20201208 如果存在资源加载器
 		if (this.resourceLoader != null) {
+			// 20201208 设置要由基础读取器和扫描器使用的资源加载器
 			loader.setResourceLoader(this.resourceLoader);
 		}
+
+		// 20201208 如果存在配置环境
 		if (this.environment != null) {
+			// 20201208 设置基础阅读器和扫描仪要使用的环境
 			loader.setEnvironment(this.environment);
 		}
+
+		// 20201208 将源加载到阅读器中。
 		loader.load();
 	}
 
@@ -1011,13 +1093,21 @@ public class SpringApplication {
 	 * @param context the application context
 	 * @return the BeanDefinitionRegistry if it can be determined
 	 */
+	// 20201208 获取bean定义注册表。
 	private BeanDefinitionRegistry getBeanDefinitionRegistry(ApplicationContext context) {
+		// 20201208 如果上下文属于BeanDefinitionRegistry实例
 		if (context instanceof BeanDefinitionRegistry) {
+			// 20201208 则直接返回
 			return (BeanDefinitionRegistry) context;
 		}
+
+		// 20201208 如果属于AbstractApplicationContext实例
 		if (context instanceof AbstractApplicationContext) {
+			// 20201208 则获取基于bean定义元数据的成熟bean工厂
 			return (BeanDefinitionRegistry) ((AbstractApplicationContext) context).getBeanFactory();
 		}
+
+		// 20201208 如果这两种类型都不是则抛出异常
 		throw new IllegalStateException("Could not locate BeanDefinitionRegistry");
 	}
 
@@ -1025,9 +1115,11 @@ public class SpringApplication {
 	 * Factory method used to create the {@link BeanDefinitionLoader}.
 	 * @param registry the bean definition registry
 	 * @param sources the sources to load
-	 * @return the {@link BeanDefinitionLoader} that will be used to load beans
+	 * @return the {@link BeanDefinitionLoader} that will be used to load beans	// 20201208 {@link BeanDefinitionLoader}将用于加载bean
 	 */
+	// 20201208 用于创建{@link BeanDefinitionLoader}的工厂方法。
 	protected BeanDefinitionLoader createBeanDefinitionLoader(BeanDefinitionRegistry registry, Object[] sources) {
+		// 20201208 创建一个新的{@link BeanDefinitionLoader}，它将把bean加载到指定的{@link BeanDefinitionRegistry}中。
 		return new BeanDefinitionLoader(registry, sources);
 	}
 
@@ -1429,8 +1521,16 @@ public class SpringApplication {
 	}
 
 	/**
+	 * 20201208
+	 * A. 设置将用于创建ApplicationContext的其他源。 源可以是：类名称，程序包名称或XML资源位置。
+	 * B. 除了在构造函数中设置的任何主要源之外，还将使用此处设置的源。
+	 */
+	/**
+	 * A.
 	 * Set additional sources that will be used to create an ApplicationContext. A source
 	 * can be: a class name, package name, or an XML resource location.
+	 *
+	 * B.
 	 * <p>
 	 * Sources set here will be used in addition to any primary sources set in the
 	 * constructor.
@@ -1438,11 +1538,20 @@ public class SpringApplication {
 	 * @see #SpringApplication(Class...)
 	 * @see #getAllSources()
 	 */
+	// 20201208 设置将用于创建ApplicationContext的其他源。
 	public void setSources(Set<String> sources) {
+		// 20201208 要设置的其他源不能为空
 		Assert.notNull(sources, "Sources must not be null");
+
+		// 20201208 注册上下文的其他源
 		this.sources = new LinkedHashSet<>(sources);
 	}
 
+	/**
+	 * 20201208
+	 * 返回当调用{@link #run（String ...）}时将添加到ApplicationContext的所有源的不变集合。
+	 * 此方法将构造函数中指定的任何主要源与已经{@link #setSources（Set）显式设置}的任何其他源进行组合。
+	 */
 	/**
 	 * Return an immutable set of all the sources that will be added to an
 	 * ApplicationContext when {@link #run(String...)} is called. This method combines any
@@ -1450,14 +1559,24 @@ public class SpringApplication {
 	 * been {@link #setSources(Set) explicitly set}.
 	 * @return an immutable set of all sources
 	 */
+	// 20201208 返回当调用{@link #run（String ...）}时将添加到ApplicationContext的所有源的不变集合
 	public Set<Object> getAllSources() {
+		// 20201208 初始化结果集
 		Set<Object> allSources = new LinkedHashSet<>();
+
+		// 20201208 如果主类Class对象集合不为空
 		if (!CollectionUtils.isEmpty(this.primarySources)) {
+			// 20201208 则将主类Class对象集合添加到结果集中
 			allSources.addAll(this.primarySources);
 		}
+
+		// 20201208 如果上下文的其他源不为空
 		if (!CollectionUtils.isEmpty(this.sources)) {
+			// 20201208 则将上下文的其他源添加到结果集中
 			allSources.addAll(this.sources);
 		}
+
+		// 20201208 返回不可修改的结果集
 		return Collections.unmodifiableSet(allSources);
 	}
 

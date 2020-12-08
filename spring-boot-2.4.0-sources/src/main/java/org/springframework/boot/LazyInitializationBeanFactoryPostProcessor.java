@@ -38,6 +38,7 @@ import org.springframework.core.Ordered;
  * @since 2.2.0
  * @see LazyInitializationExcludeFilter
  */
+// 20201208 对尚未明确设置值的bean设置为懒加载: {@link BeanFactoryPostProcessor}可以对没有{@link LazyInitializationExcludeFilter}且尚未明确设置值的bean定义设置lazy-init。
 public final class LazyInitializationBeanFactoryPostProcessor implements BeanFactoryPostProcessor, Ordered {
 
 	@Override

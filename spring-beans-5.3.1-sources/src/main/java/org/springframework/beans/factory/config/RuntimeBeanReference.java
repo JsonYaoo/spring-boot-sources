@@ -29,6 +29,7 @@ import org.springframework.util.Assert;
  * @see org.springframework.beans.factory.BeanFactory#getBean(String)
  * @see org.springframework.beans.factory.BeanFactory#getBean(Class)
  */
+// 20201208 当属性值对象引用工厂中的另一个bean时，用于属性值对象的不可变占位符类，将在运行时解析。
 public class RuntimeBeanReference implements BeanReference {
 
 	private final String beanName;

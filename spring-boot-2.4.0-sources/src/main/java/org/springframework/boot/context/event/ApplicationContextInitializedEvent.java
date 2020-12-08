@@ -28,20 +28,26 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @author Artsiom Yudovin
  * @since 2.1.0
  */
+// 20201208 在启动{@link SpringApplication}并准备好{@link ApplicationContext}并已调用ApplicationContextInitializers之前（但未加载任何bean定义之前）发布的事件。
 @SuppressWarnings("serial")
 public class ApplicationContextInitializedEvent extends SpringApplicationEvent {
 
+	// 20201208 准备好了的配置上下文
 	private final ConfigurableApplicationContext context;
 
 	/**
 	 * Create a new {@link ApplicationContextInitializedEvent} instance.
-	 * @param application the current application
-	 * @param args the arguments the application is running with
-	 * @param context the context that has been initialized
+	 * @param application the current application	// 20201208 当前的应用
+	 * @param args the arguments the application is running with // 20201208 应用程序运行时使用的参数
+	 * @param context the context that has been initialized	// 20201208 已初始化的上下文
 	 */
+	// 20201208 创建一个新的{@link ApplicationContextInitializedEvent}实例。
 	public ApplicationContextInitializedEvent(SpringApplication application, String[] args,
 			ConfigurableApplicationContext context) {
+		// 20201208 构造SpringApplicationEvent:Springboot应用程序事件
 		super(application, args);
+
+		// 20201208 注册准备好了的配置上下文
 		this.context = context;
 	}
 

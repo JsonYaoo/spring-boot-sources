@@ -25,15 +25,23 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201208
+ * A. {@link AttributeAccessor AttributeAccessors}的支持类，提供所有方法的基本实现。 由子类扩展。
+ * B. {@link Serializable}（如果子类和所有属性值均为{@link Serializable}）。
+ */
+/**
+ * A.
  * Support class for {@link AttributeAccessor AttributeAccessors}, providing
  * a base implementation of all methods. To be extended by subclasses.
  *
+ * B.
  * <p>{@link Serializable} if subclasses and all attribute values are {@link Serializable}.
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @since 2.0
  */
+// 20201208 定义用于将元数据附加到任意对象或从任意对象访问元数据的通用协定的接口实现类, 提供所有方法的基本实现: 子类和所有属性值均可序列化
 @SuppressWarnings("serial")
 public abstract class AttributeAccessorSupport implements AttributeAccessor, Serializable {
 

@@ -38,19 +38,25 @@ import org.springframework.util.StringUtils;
  * @author Phillip Webb
  * @author Dave Syer
  */
+// 20201208 在启动时记录应用程序信息。
 class StartupInfoLogger {
 
 	private static final Log logger = LogFactory.getLog(StartupInfoLogger.class);
 
 	private static final long HOST_NAME_RESOLVE_THRESHOLD = 200;
 
+	// 20201208 记录源Class
 	private final Class<?> sourceClass;
 
+	// 20201208 构建启动时应用程序信息记录者。
 	StartupInfoLogger(Class<?> sourceClass) {
+		// 20201208 注册记录源Class
 		this.sourceClass = sourceClass;
 	}
 
+	// 20201208 开始应用程序信息日志打印
 	void logStarting(Log applicationLog) {
+		// 20201208
 		Assert.notNull(applicationLog, "Log must not be null");
 		applicationLog.info(LogMessage.of(this::getStartingMessage));
 		applicationLog.debug(LogMessage.of(this::getRunningMessage));

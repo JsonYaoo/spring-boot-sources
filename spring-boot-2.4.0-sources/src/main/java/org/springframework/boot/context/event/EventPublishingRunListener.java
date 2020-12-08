@@ -90,10 +90,13 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 				new ApplicationEnvironmentPreparedEvent(bootstrapContext, this.application, this.args, environment));
 	}
 
+	// 20201208 一旦创建并准备好{@link ApplicationContext}，但在加载源之前调用。
 	@Override
 	public void contextPrepared(ConfigurableApplicationContext context) {
-		this.initialMulticaster
-				.multicastEvent(new ApplicationContextInitializedEvent(this.application, this.args, context));
+		// 20201208 将ApplicationContextInitializedEvent事件多播到适当的侦听器
+		this.initialMulticaster.multicastEvent(
+				// 20201208 创建一个新的{@link ApplicationContextInitializedEvent}实例 -> 说明配置上下文已经准备好
+				new ApplicationContextInitializedEvent(this.application, this.args, context));
 	}
 
 	@Override

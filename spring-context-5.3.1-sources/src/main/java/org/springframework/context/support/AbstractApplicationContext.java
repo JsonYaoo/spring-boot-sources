@@ -205,6 +205,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	/** Display name. */
 	private String displayName = ObjectUtils.identityToString(this);
 
+	// 20201208 父级上下文
 	/** Parent context. */
 	@Nullable
 	private ApplicationContext parent;
@@ -214,6 +215,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	@Nullable
 	private ConfigurableEnvironment environment;
 
+	// 20201208 工厂修改器列表, BeanFactoryPostProcessors应用于刷新。
 	/** BeanFactoryPostProcessors to apply on refresh. */
 	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
 
@@ -329,6 +331,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * Return the parent context, or {@code null} if there is no parent
 	 * (that is, this context is the root of the context hierarchy).
 	 */
+	// 20201208 返回父级上下文，如果没有父级，则返回{@code null}（也就是说，此上下文是上下文层次结构的根）。
 	@Override
 	@Nullable
 	public ApplicationContext getParent() {
@@ -374,6 +377,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * <p>If none specified, a default environment will be initialized via
 	 * {@link #createEnvironment()}.
 	 */
+	// 20201208 返回当前环境实例
 	@Override
 	public ConfigurableEnvironment getEnvironment() {
 		// 20201204 如果当前环境实例为null
@@ -571,9 +575,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 	}
 
+	// 20201208 添加一个新的工厂修改器BeanFactoryPostProcessor，应用于刷新
 	@Override
 	public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor) {
+		// 20201208 工厂修改器不能为空
 		Assert.notNull(postProcessor, "BeanFactoryPostProcessor must not be null");
+
+		// 20201208 注册工厂修改器列表
 		this.beanFactoryPostProcessors.add(postProcessor);
 	}
 

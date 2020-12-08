@@ -33,14 +33,25 @@ import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201208
+ * A. 从{@link MergedAnnotations}集合返回的单个合并注释。 将视图显示在注释上，其中属性值可能已从不同的源值“合并”。
+ * B. 可以使用各种{@code get}方法访问属性值。 例如，要访问{@code int}属性，将使用{@link #getInt（String）}方法。
+ * C. 请注意，访问时不会转换属性值。 例如，如果基础属性是{@code int}，则无法调用{@link #getString（String）}。 该规则的唯一例外是{@code Class}和{@code Class []}值，
+ *    可以分别通过{@code String}和{@code String []}来访问，以防止潜在的早期类初始化。
+ * D. 如有必要，可以将{@code MergedAnnotation} {@linkplain #synthesize（）综合}返回到实际的{@link Annotation}中。
+ */
+/**
+ * A.
  * A single merged annotation returned from a {@link MergedAnnotations}
  * collection. Presents a view onto an annotation where attribute values may
  * have been "merged" from different source values.
  *
+ * B.
  * <p>Attribute values may be accessed using the various {@code get} methods.
  * For example, to access an {@code int} attribute the {@link #getInt(String)}
  * method would be used.
  *
+ * C.
  * <p>Note that attribute values are <b>not</b> converted when accessed.
  * For example, it is not possible to call {@link #getString(String)} if the
  * underlying attribute is an {@code int}. The only exception to this rule is
@@ -48,6 +59,7 @@ import org.springframework.lang.Nullable;
  * {@code String} and {@code String[]} respectively to prevent potential early
  * class initialization.
  *
+ * D.
  * <p>If necessary, a {@code MergedAnnotation} can be {@linkplain #synthesize()
  * synthesized} back into an actual {@link Annotation}.
  *
@@ -59,6 +71,7 @@ import org.springframework.lang.Nullable;
  * @see MergedAnnotations
  * @see MergedAnnotationPredicates
  */
+// 20201208 从{@link MergedAnnotations}集合返回的单个合并注释。 将视图显示在注释上，其中属性值可能已从不同的源值“合并”。
 public interface MergedAnnotation<A extends Annotation> {
 
 	/**

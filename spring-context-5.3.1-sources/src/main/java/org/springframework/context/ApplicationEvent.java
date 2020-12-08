@@ -46,7 +46,7 @@ public abstract class ApplicationEvent extends EventObject {
 	 * @param source the object on which the event initially occurred or with
 	 * which the event is associated (never {@code null}) // 20201207 最初发生事件或与事件相关联的对象（永远{@code null}）
 	 */
-	// 20201207 构造ApplicationEvent
+	// 20201207 构造ApplicationEvent: 应用程序事件
 	public ApplicationEvent(Object source) {
 		// 20201207 设置最初发生事件
 		super(source);

@@ -126,6 +126,7 @@ public interface Environment extends PropertyResolver {
 	 * @see ConfigurableEnvironment#setDefaultProfiles
 	 * @see AbstractEnvironment#DEFAULT_PROFILES_PROPERTY_NAME
 	 */
+	// 20201208 当未显式设置活动配置文件时，将默认情况下返回一组配置文件为活动状态。
 	String[] getDefaultProfiles();
 
 	/**

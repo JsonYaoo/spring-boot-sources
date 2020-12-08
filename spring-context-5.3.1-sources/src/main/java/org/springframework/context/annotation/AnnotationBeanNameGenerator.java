@@ -34,6 +34,15 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201208
+ * A. 带有{@link org.springframework.stereotype.Component @Component}注解或本身带有{@code @Component}注解的另一个注解的bean的{@link BeanNameGenerator}实现。
+ *    例如，Spring的构造型注解（例如{@link org.springframework.stereotype.Repository @Repository}）本身都带有{@code @Component}注解。
+ * B. 如果可用，还支持Java EE 6的{@link javax.annotation.ManagedBean}和JSR-330的{@link javax.inject.Named}注解。 请注意，Spring组件注解始终会覆盖此类标准注解。
+ * C. 如果注解的值不表示Bean名称，则将基于类的短名称（首字母小写）构建一个适当的名称。 例如：
+ * 			com.xyz.FooServiceImpl -> fooServiceImpl
+ */
+/**
+ * A.
  * {@link BeanNameGenerator} implementation for bean classes annotated with the
  * {@link org.springframework.stereotype.Component @Component} annotation or
  * with another annotation that is itself annotated with {@code @Component} as a
@@ -41,10 +50,12 @@ import org.springframework.util.StringUtils;
  * {@link org.springframework.stereotype.Repository @Repository}) are
  * themselves annotated with {@code @Component}.
  *
+ * B.
  * <p>Also supports Java EE 6's {@link javax.annotation.ManagedBean} and
  * JSR-330's {@link javax.inject.Named} annotations, if available. Note that
  * Spring component annotations always override such standard annotations.
  *
+ * C.
  * <p>If the annotation's value doesn't indicate a bean name, an appropriate
  * name will be built based on the short name of the class (with the first
  * letter lower-cased). For example:
@@ -61,6 +72,7 @@ import org.springframework.util.StringUtils;
  * @see javax.inject.Named#value()
  * @see FullyQualifiedAnnotationBeanNameGenerator
  */
+// 20201208 @Component注解的实现
 public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 
 	/**
@@ -68,6 +80,7 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 	 * as used for component scanning purposes.
 	 * @since 5.2
 	 */
+	// 20201208 用于默认{@code AnnotationBeanNameGenerator}实例的便捷常量，用于组件扫描。
 	public static final AnnotationBeanNameGenerator INSTANCE = new AnnotationBeanNameGenerator();
 
 	private static final String COMPONENT_ANNOTATION_CLASSNAME = "org.springframework.stereotype.Component";

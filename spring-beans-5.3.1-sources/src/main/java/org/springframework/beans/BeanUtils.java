@@ -132,11 +132,20 @@ public abstract class BeanUtils {
 	}
 
 	/**
+	 * 20201208
+	 * A. 使用其“主要”构造函数（对于Kotlin类，可能声明了默认参数）或其缺省构造函数（对于常规Java类，需要标准无参数设置）实例化一个类。
+	 * B. 请注意，如果给定了不可访问的（即非公共的）构造函数，则此方法尝试将构造函数设置为可访问。
+	 */
+	/**
+	 * A.
 	 * Instantiate a class using its 'primary' constructor (for Kotlin classes,
 	 * potentially having default arguments declared) or its default constructor
 	 * (for regular Java classes, expecting a standard no-arg setup).
+	 *
+	 * B.
 	 * <p>Note that this method tries to set the constructor accessible
 	 * if given a non-accessible (that is, non-public) constructor.
+	 *
 	 * @param clazz the class to instantiate
 	 * @return the new instance
 	 * @throws BeanInstantiationException if the bean cannot be instantiated.
@@ -147,15 +156,21 @@ public abstract class BeanUtils {
 	 * from the constructor invocation itself.
 	 * @see Constructor#newInstance
 	 */
+	// 20201208 使用其“主要”构造函数（对于Kotlin类，可能声明了默认参数）或其缺省构造函数（对于常规Java类，需要标准无参数设置）实例化一个类
 	public static <T> T instantiateClass(Class<T> clazz) throws BeanInstantiationException {
+		// 20201208 旧的Class对象不能为空
 		Assert.notNull(clazz, "Class must not be null");
+
+		// 20201208 如果该Class对象为接口类型, 则抛出异常
 		if (clazz.isInterface()) {
 			throw new BeanInstantiationException(clazz, "Specified class is an interface");
 		}
 		try {
+			// 20201208 使用给定构造函数实例化类的便利方法。
 			return instantiateClass(clazz.getDeclaredConstructor());
 		}
 		catch (NoSuchMethodException ex) {
+			// 20201208 如果抛出异常则通过设置构建函数为可访问, 反射调用构造函数构造Class实例
 			Constructor<T> ctor = findPrimaryConstructor(clazz);
 			if (ctor != null) {
 				return instantiateClass(ctor);
@@ -168,21 +183,37 @@ public abstract class BeanUtils {
 	}
 
 	/**
+	 * 20201208
+	 * A. 使用其无参数构造函数实例化一个类，并以指定的可分配类型返回新实例。
+	 * B. 在无法实例化的类类型（clazz）但已知所需类型（assignableTo）的情况下很有用。
+	 * C. 请注意，如果给定了不可访问的（即非公共的）构造函数，则此方法尝试将构造函数设置为可访问。
+	 */
+	/**
+	 * A.
 	 * Instantiate a class using its no-arg constructor and return the new instance
 	 * as the specified assignable type.
+	 *
+	 * B.
 	 * <p>Useful in cases where the type of the class to instantiate (clazz) is not
 	 * available, but the type desired (assignableTo) is known.
+	 *
+	 * C.
 	 * <p>Note that this method tries to set the constructor accessible if given a
 	 * non-accessible (that is, non-public) constructor.
+	 *
 	 * @param clazz class to instantiate
 	 * @param assignableTo type that clazz must be assignableTo
 	 * @return the new instance
 	 * @throws BeanInstantiationException if the bean cannot be instantiated
 	 * @see Constructor#newInstance
 	 */
+	// 20201208 使用其无参数构造函数实例化一个类，并以指定的可分配类型返回新实例
 	@SuppressWarnings("unchecked")
 	public static <T> T instantiateClass(Class<?> clazz, Class<T> assignableTo) throws BeanInstantiationException {
+		// 20201201 断言{@code superType.isAssignableFrom（子类型）}是{@code true}。
 		Assert.isAssignable(assignableTo, clazz);
+
+		//
 		return (T) instantiateClass(clazz);
 	}
 

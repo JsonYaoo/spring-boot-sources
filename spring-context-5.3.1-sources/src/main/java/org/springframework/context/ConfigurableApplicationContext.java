@@ -141,6 +141,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * form, allowing for further customization.
 	 * @since 3.1
 	 */
+	// 20201208 以可配置的形式返回此应用程序上下文的{@code Environment}，以便进行进一步的自定义。
 	@Override
 	ConfigurableEnvironment getEnvironment();
 
@@ -174,6 +175,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * bean definitions get evaluated. To be invoked during context configuration.
 	 * @param postProcessor the factory processor to register
 	 */
+	// 20201208 添加一个新的工厂修改器BeanFactoryPostProcessor，在刷新任何bean定义之前，将在刷新时将其应用于此应用程序上下文的内部bean工厂。 在上下文配置期间调用。
 	void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor);
 
 	/**

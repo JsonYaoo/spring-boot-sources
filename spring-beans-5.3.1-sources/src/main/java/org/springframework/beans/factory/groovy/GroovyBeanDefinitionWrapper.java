@@ -40,6 +40,7 @@ import org.springframework.util.CollectionUtils;
  * @author Juergen Hoeller
  * @since 4.0
  */
+// 20201208 Spring BeanDefinition的内部包装器，允许在{@link GroovyBeanDefinitionReader}闭包内访问Groovy样式的属性。
 class GroovyBeanDefinitionWrapper extends GroovyObjectSupport {
 
 	private static final String PARENT = "parent";

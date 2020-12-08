@@ -82,6 +82,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	@Nullable
 	private String[] autowireCandidatePatterns;
 
+	// 20201208 用于为bean定义生成bean名称的策略接口实例
 	private BeanNameGenerator beanNameGenerator = AnnotationBeanNameGenerator.INSTANCE;
 
 	private ScopeMetadataResolver scopeMetadataResolver = new AnnotationScopeMetadataResolver();
@@ -271,12 +272,21 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	}
 
 	/**
+	 * 20201208
+	 * A. 设置BeanNameGenerator以用于检测到的Bean类。
+	 * B. 默认值为{@link AnnotationBeanNameGenerator}。
+	 */
+	/**
+	 * A.
 	 * Set the BeanNameGenerator to use for detected bean classes.
+	 *
+	 * B.
 	 * <p>Default is a {@link AnnotationBeanNameGenerator}.
 	 */
+	// 20201208 设置BeanNameGenerator以用于检测到的Bean类。
 	public void setBeanNameGenerator(@Nullable BeanNameGenerator beanNameGenerator) {
-		this.beanNameGenerator =
-				(beanNameGenerator != null ? beanNameGenerator : AnnotationBeanNameGenerator.INSTANCE);
+		// 20201208 设置用于为bean定义生成bean名称的策略接口实例
+		this.beanNameGenerator = (beanNameGenerator != null ? beanNameGenerator : AnnotationBeanNameGenerator.INSTANCE);
 	}
 
 	/**

@@ -78,12 +78,17 @@ class SpringApplicationRunListeners {
 				(listener) -> listener.environmentPrepared(bootstrapContext, environment));
 	}
 
+	// 20201208 配置上线文准备完毕事件 -> 将ApplicationContextInitializedEvent事件多播到适当的侦听器, 执行监听ApplicationContextInitializedEvent事件
 	void contextPrepared(ConfigurableApplicationContext context) {
-		doWithListeners("spring.boot.application.context-prepared", (listener) -> listener.contextPrepared(context));
+		// 20201208 执行监听ApplicationContextInitializedEvent事件
+		doWithListeners("spring.boot.application.context-prepared",
+				// 20201208 一旦创建并准备好{@link ApplicationContext}，但在加载源之前调用 -> 将ApplicationContextInitializedEvent事件多播到适当的侦听器
+				(listener) -> listener.contextPrepared(context));
 	}
 
 	void contextLoaded(ConfigurableApplicationContext context) {
-		doWithListeners("spring.boot.application.context-loaded", (listener) -> listener.contextLoaded(context));
+		doWithListeners("spring.boot.application.context-loaded",
+				(listener) -> listener.contextLoaded(context));
 	}
 
 	void started(ConfigurableApplicationContext context) {

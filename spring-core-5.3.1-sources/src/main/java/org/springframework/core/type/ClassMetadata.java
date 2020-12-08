@@ -28,6 +28,7 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.core.type.classreading.MetadataReader#getClassMetadata()
  * @see AnnotationMetadata
  */
+// 20201208 定义特定类的抽象元数据的接口，其形式尚不要求加载该类。
 public interface ClassMetadata {
 
 	/**

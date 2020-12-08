@@ -705,7 +705,7 @@ public abstract class Assert {
 	 * @param subType the sub type to check
 	 * @throws IllegalArgumentException if the classes are not assignable
 	 */
-	// 20201201 断言{@code超类型.isAssignableFrom（子类型）}是{@code true}。
+	// 20201201 断言{@code superType.isAssignableFrom（子类型）}是{@code true}。
 	public static void isAssignable(Class<?> superType, Class<?> subType) {
 		isAssignable(superType, subType, "");
 	}

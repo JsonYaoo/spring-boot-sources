@@ -27,6 +27,7 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 2.5
  */
+// 20201208 {@link AttributeAccessorSupport}的扩展，将属性保存为{@link BeanMetadataAttribute}对象，以便跟踪定义源。
 @SuppressWarnings("serial")
 public class BeanMetadataAttributeAccessor extends AttributeAccessorSupport implements BeanMetadataElement {
 

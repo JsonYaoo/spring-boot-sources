@@ -93,11 +93,13 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	/**
 	 * Indicates that the validation should be disabled.
 	 */
+	// 20201208 指示应禁用验证。
 	public static final int VALIDATION_NONE = XmlValidationModeDetector.VALIDATION_NONE;
 
 	/**
 	 * Indicates that the validation mode should be detected automatically.
 	 */
+	// 20201208 指示应自动检测到验证模式。
 	public static final int VALIDATION_AUTO = XmlValidationModeDetector.VALIDATION_AUTO;
 
 	/**
@@ -114,8 +116,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	/** Constants instance for this class. */
 	private static final Constants constants = new Constants(XmlBeanDefinitionReader.class);
 
+	// 20201208 XML验证模式
 	private int validationMode = VALIDATION_AUTO;
 
+	// 20201208 名称空间
 	private boolean namespaceAware = false;
 
 	private Class<? extends BeanDefinitionDocumentReader> documentReaderClass =
@@ -151,22 +155,35 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	/**
 	 * Create new XmlBeanDefinitionReader for the given bean factory.
 	 * @param registry the BeanFactory to load bean definitions into,
-	 * in the form of a BeanDefinitionRegistry
+	 * in the form of a BeanDefinitionRegistry // 20201208 BeanFactory以BeanDefinitionRegistry的形式将Bean定义加载到其中
 	 */
+	// 20201208 为给定的bean工厂创建新的XmlBeanDefinitionReader。
 	public XmlBeanDefinitionReader(BeanDefinitionRegistry registry) {
+		// 20201208 为给定的bean工厂创建一个新的AbstractBeanDefinitionReader
 		super(registry);
 	}
 
-
 	/**
+	 * 20201208
+	 * A. 设置是否使用XML验证。 默认值为{@code true}.
+	 * B. 如果在关闭验证的情况下，此方法将启用名称空间意识，以便在这种情况下仍能正确处理架构名称空间。
+	 */
+	/**
+	 * A.
 	 * Set whether to use XML validation. Default is {@code true}.
+	 *
+	 * B.
 	 * <p>This method switches namespace awareness on if validation is turned off,
 	 * in order to still process schema namespaces properly in such a scenario.
 	 * @see #setValidationMode
 	 * @see #setNamespaceAware
 	 */
+	// 20201208 设置是否使用XML验证。 默认值为{@code true}.
 	public void setValidating(boolean validating) {
+		// 20201208 设置XML验证模式
 		this.validationMode = (validating ? VALIDATION_AUTO : VALIDATION_NONE);
+
+		// 20201208 设置名称空间, 如果在关闭验证的情况下，此方法将启用名称空间意识，以便在这种情况下仍能正确处理架构名称空间
 		this.namespaceAware = !validating;
 	}
 

@@ -44,6 +44,7 @@ import org.springframework.util.ReflectionUtils;
  * @author Sam Brannen
  * @since 2.5
  */
+// 20201208 {@link AnnotationMetadata}实现，该实现使用标准反射内省给定的{@link Class}, 该Class实例包装了注解数据。
 public class StandardAnnotationMetadata extends StandardClassMetadata implements AnnotationMetadata {
 
 	private final MergedAnnotations mergedAnnotations;
@@ -70,7 +71,11 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 	 * providing the option to return any nested annotations or annotation arrays in the
 	 * form of {@link org.springframework.core.annotation.AnnotationAttributes} instead
 	 * of actual {@link Annotation} instances.
-	 * @param introspectedClass the Class to introspect
+	 *
+	 * @param introspectedClass the Class to introspect // 20201208 需要加载的bean Class
+	 *
+	 * // 20201208 以{@link org.springframework.core.annotation.AnnotationAttributes}的形式返回嵌套的注解和注解数组，以与基于ASM的
+	 * // 20201208 {@link AnnotationMetadata}实现兼容
 	 * @param nestedAnnotationsAsMap return nested annotations and annotation arrays as
 	 * {@link org.springframework.core.annotation.AnnotationAttributes} for compatibility
 	 * with ASM-based {@link AnnotationMetadata} implementations
@@ -80,9 +85,14 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 	 * from {@link #getAnnotations()} rather than {@link #getAnnotationAttributes(String)}
 	 * if {@code nestedAnnotationsAsMap} is {@code false}
 	 */
+	// 20201208 为给定的类创建一个新的{@link StandardAnnotationMetadata}包装器，并提供以
+	// 20201208 {@link org.springframework.core.annotation.AnnotationAttributes}的形式而不是实际的{@link Annotation}形式返回任何嵌套注解或注解数组的选项实例。
 	@Deprecated
 	public StandardAnnotationMetadata(Class<?> introspectedClass, boolean nestedAnnotationsAsMap) {
+		// 20201208 为给定的类创建一个新的StandardClassMetadata包装器。
 		super(introspectedClass);
+
+		// 20201208
 		this.mergedAnnotations = MergedAnnotations.from(introspectedClass,
 				SearchStrategy.INHERITED_ANNOTATIONS, RepeatableContainers.none());
 		this.nestedAnnotationsAsMap = nestedAnnotationsAsMap;

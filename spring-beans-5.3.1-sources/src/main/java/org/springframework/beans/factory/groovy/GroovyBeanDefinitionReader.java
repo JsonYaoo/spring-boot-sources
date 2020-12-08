@@ -57,17 +57,76 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201208
+ * A. 基于Groovy的Spring bean定义阅读器：类似于Groovy构建器，但更多用于Spring配置的DSL。
+ * B. 该bean定义阅读器还了解XML bean定义文件，从而可以与Groovy bean定义文件进行无缝混合和匹配。
+ * C. 通常应用于{@link org.springframework.beans.factory.support.DefaultListableBeanFactory}或
+ *    {@link org.springframework.context.support.GenericApplicationContext}，但可用于任何{@link BeanDefinitionRegistry}实现。
+ * D. 语法范例:
+ * 		import org.hibernate.SessionFactory
+ * 		import org.apache.commons.dbcp.BasicDataSource
+ *
+ * 		def reader = new GroovyBeanDefinitionReader(myApplicationContext)
+ * 		reader.beans {
+ *     		dataSource(BasicDataSource) {                  // <--- invokeMethod
+ *         		driverClassName = "org.hsqldb.jdbcDriver"
+ *         		url = "jdbc:hsqldb:mem:grailsDB"
+ *         		username = "sa"                            // <-- setProperty
+ *         		password = ""
+ *         		settings = [mynew:"setting"]
+ *     		}
+ *
+ *     		sessionFactory(SessionFactory) {
+ *         		dataSource = dataSource                    // <-- getProperty for retrieving references
+ *     		}
+ *
+*    		myService(MyService) {
+*         		nestedBean = { AnotherBean bean ->         // <-- setProperty with closure for nested bean
+ *             		dataSource = dataSource
+ *         		}
+ *     		}
+ * 		}
+ * E. 您还可以使用{@link #loadBeanDefinitions（Resource ...）}或{@link #loadBeanDefinitions（String ...）}方法来加载包含在Groovy脚本中定义的bean的资源，
+ *    脚本的外观类似于以下内容:
+ * 			import org.hibernate.SessionFactory
+ * 			import org.apache.commons.dbcp.BasicDataSource
+ *
+ * 			beans {
+ *     			dataSource(BasicDataSource) {
+ *         			driverClassName = "org.hsqldb.jdbcDriver"
+ *         			url = "jdbc:hsqldb:mem:grailsDB"
+ *         			username = "sa"
+ *         			password = ""
+ *         			settings = [mynew:"setting"]
+ *     			}
+ *
+ *     			sessionFactory(SessionFactory) {
+ *         			dataSource = dataSource
+ *     			}
+ *
+ *     			myService(MyService) {
+ *         			nestedBean = { AnotherBean bean ->
+ *             			dataSource = dataSource
+ *         			}
+ *     			}
+ * 			}
+ */
+/**
+ * A.
  * A Groovy-based reader for Spring bean definitions: like a Groovy builder,
  * but more of a DSL for Spring configuration.
  *
+ * B.
  * <p>This bean definition reader also understands XML bean definition files,
  * allowing for seamless mixing and matching with Groovy bean definition files.
  *
+ * C.
  * <p>Typically applied to a
  * {@link org.springframework.beans.factory.support.DefaultListableBeanFactory}
  * or a {@link org.springframework.context.support.GenericApplicationContext},
  * but can be used against any {@link BeanDefinitionRegistry} implementation.
  *
+ * D.
  * <h3>Example Syntax</h3>
  * <pre class="code">
  * import org.hibernate.SessionFactory
@@ -92,6 +151,7 @@ import org.springframework.util.StringUtils;
  *     }
  * }</pre>
  *
+ * E.
  * <p>You can also load resources containing beans defined in a Groovy script using
  * either the {@link #loadBeanDefinitions(Resource...)} or
  * {@link #loadBeanDefinitions(String...)} method, with a script looking similar to
@@ -129,22 +189,26 @@ import org.springframework.util.StringUtils;
  * @see org.springframework.context.support.GenericApplicationContext
  * @see org.springframework.context.support.GenericGroovyApplicationContext
  */
+// 20201208 基于Groovy的Spring bean定义阅读器
 public class GroovyBeanDefinitionReader extends AbstractBeanDefinitionReader implements GroovyObject {
 
 	/**
 	 * Standard {@code XmlBeanDefinitionReader} created with default
 	 * settings for loading bean definitions from XML files.
 	 */
+	// 20201208 xml定义阅读器: 使用默认设置创建的标准{@code XmlBeanDefinitionReader}用于从XML文件加载bean定义。
 	private final XmlBeanDefinitionReader standardXmlBeanDefinitionReader;
 
 	/**
 	 * Groovy DSL {@code XmlBeanDefinitionReader} for loading bean definitions
 	 * via the Groovy DSL, typically configured with XML validation disabled.
 	 */
+	// 20201208 Groovy DSL加载bean定义: Groovy DSL {@code XmlBeanDefinitionReader}用于通过Groovy DSL加载bean定义，通常配置为禁用XML验证。
 	private final XmlBeanDefinitionReader groovyDslXmlBeanDefinitionReader;
 
 	private final Map<String, String> namespaces = new HashMap<>();
 
+	// 20201208 beanName-(注册表+属性名+属性值)缓存: 用于推迟向Bean定义添加属性
 	private final Map<String, DeferredProperty> deferredProperties = new HashMap<>();
 
 	private MetaClass metaClass = GroovySystem.getMetaClassRegistry().getMetaClass(getClass());
@@ -159,10 +223,18 @@ public class GroovyBeanDefinitionReader extends AbstractBeanDefinitionReader imp
 	 * {@link BeanDefinitionRegistry}.
 	 * @param registry the {@code BeanDefinitionRegistry} to load bean definitions into
 	 */
+	// 20201208 为给定的{@link BeanDefinitionRegistry}创建一个新的{@code GroovyBeanDefinitionReader}。
 	public GroovyBeanDefinitionReader(BeanDefinitionRegistry registry) {
+		// 20201208 为给定的bean工厂创建一个新的AbstractBeanDefinitionReader
 		super(registry);
+
+		// 20201208 设置xml定义阅读器
 		this.standardXmlBeanDefinitionReader = new XmlBeanDefinitionReader(registry);
+
+		// 20201208 设置Groovy DSL加载bean定义
 		this.groovyDslXmlBeanDefinitionReader = new XmlBeanDefinitionReader(registry);
+
+		// 20201208 设置不使用XML验证, 如果在关闭验证的情况下，此方法将启用名称空间意识，以便在这种情况下仍能正确处理架构名称空间
 		this.groovyDslXmlBeanDefinitionReader.setValidating(false);
 	}
 
@@ -289,6 +361,7 @@ public class GroovyBeanDefinitionReader extends AbstractBeanDefinitionReader imp
 	 * @param closure the block or closure
 	 * @return this {@code GroovyBeanDefinitionReader} instance
 	 */
+	// 20201208 为给定的块或闭包定义一组bean。
 	public GroovyBeanDefinitionReader beans(Closure<?> closure) {
 		return invokeBeanDefiningClosure(closure);
 	}
@@ -428,16 +501,27 @@ public class GroovyBeanDefinitionReader extends AbstractBeanDefinitionReader imp
 		return false;
 	}
 
+	// 20201208 注册beanName-(注册表+属性名+属性值)缓存里所有的bean
 	private void finalizeDeferredProperties() {
+		// 20201208 遍历(注册表+属性名+属性值)
 		for (DeferredProperty dp : this.deferredProperties.values()) {
+			// 20201208 如果属性值为List类型
 			if (dp.value instanceof List) {
+				// 20201208 则分类所有的RuntimeBeanReferences实例, 并更新属性值
 				dp.value = manageListIfNecessary((List<?>) dp.value);
 			}
+
+			// 20201208 如果属性值为Map类型
 			else if (dp.value instanceof Map) {
+				// 20201208 则分类所有的RuntimeBeanReferences实例, 并更新属性值
 				dp.value = manageMapIfNecessary((Map<?, ?>) dp.value);
 			}
+
+			// 20201208 注册表添加属性
 			dp.apply();
 		}
+
+		// 20201208 清空beanName-(注册表+属性名+属性值)缓存
 		this.deferredProperties.clear();
 	}
 
@@ -446,10 +530,16 @@ public class GroovyBeanDefinitionReader extends AbstractBeanDefinitionReader imp
 	 * @param callable the closure argument
 	 * @return this {@code GroovyBeanDefinitionReader} instance
 	 */
+	// 20201208 当方法参数只是一个闭包时，它是一组bean定义。
 	protected GroovyBeanDefinitionReader invokeBeanDefiningClosure(Closure<?> callable) {
+		// 20201208 委托bean源
 		callable.setDelegate(this);
 		callable.call();
+
+		// 20201208 注册beanName-(注册表+属性名+属性值)缓存里所有的bean
 		finalizeDeferredProperties();
+
+		// 20201208 返回当前GroovyBeanDefinitionReader实例
 		return this;
 	}
 
@@ -563,6 +653,7 @@ public class GroovyBeanDefinitionReader extends AbstractBeanDefinitionReader imp
 	 * @param map the original Map
 	 * @return either the original map or a managed copy of it
 	 */
+	// 20201208 检查{@link Map}中是否有任何{@link RuntimeBeanReference RuntimeBeanReferences}，并在必要时将其转换为{@link ManagedMap} -> 分类所有的RuntimeBeanReferences实例
 	private Object manageMapIfNecessary(Map<?, ?> map) {
 		boolean containsRuntimeRefs = false;
 		for (Object element : map.values()) {
@@ -585,6 +676,7 @@ public class GroovyBeanDefinitionReader extends AbstractBeanDefinitionReader imp
 	 * @param list the original List
 	 * @return either the original list or a managed copy of it
 	 */
+	// 20201208 检查{@link List}中是否有任何{@link RuntimeBeanReference RuntimeBeanReferences}，并在必要时将其转换为{@link ManagedList} -> 分类所有的RuntimeBeanReferences实例
 	private Object manageListIfNecessary(List<?> list) {
 		boolean containsRuntimeRefs = false;
 		for (Object element : list) {
@@ -720,12 +812,15 @@ public class GroovyBeanDefinitionReader extends AbstractBeanDefinitionReader imp
 	 * may not contain bean references at that point of assignment, but may later;
 	 * hence, it would need to be managed.
 	 */
+	// 20201208 此类用于推迟向Bean定义添加属性，直到以后。 这是为您将属性分配给列表的情况，该列表在该分配点可能不包含Bean引用，但以后可能会包含； 因此，将需要对其进行管理。
 	private static class DeferredProperty {
 
+		// 20201208 DeferredProperty注册表
 		private final GroovyBeanDefinitionWrapper beanDefinition;
 
 		private final String name;
 
+		// 20201208 属性值
 		public Object value;
 
 		public DeferredProperty(GroovyBeanDefinitionWrapper beanDefinition, String name, Object value) {
@@ -734,6 +829,7 @@ public class GroovyBeanDefinitionReader extends AbstractBeanDefinitionReader imp
 			this.value = value;
 		}
 
+		// 20201208 注册表添加属性
 		public void apply() {
 			this.beanDefinition.addProperty(this.name, this.value);
 		}

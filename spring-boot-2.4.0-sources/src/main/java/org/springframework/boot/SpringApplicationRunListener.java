@@ -87,6 +87,7 @@ public interface SpringApplicationRunListener {
 	 * before sources have been loaded.
 	 * @param context the application context
 	 */
+	// 20201208 一旦创建并准备好{@link ApplicationContext}，但在加载源之前调用。
 	default void contextPrepared(ConfigurableApplicationContext context) {
 	}
 

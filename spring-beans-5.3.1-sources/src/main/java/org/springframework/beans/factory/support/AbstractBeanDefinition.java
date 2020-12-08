@@ -39,10 +39,18 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201208
+ * A. 具体的，成熟的{@link BeanDefinition}类的基类，其中排除了{@link GenericBeanDefinition}，{@link RootBeanDefinition}和
+ *    {@link ChildBeanDefinition}的通用属性。
+ * B. 自动装配常数与{@link AutowireCapableBeanFactory}接口中定义的常数匹配。
+ */
+/**
+ * A.
  * Base class for concrete, full-fledged {@link BeanDefinition} classes,
  * factoring out common properties of {@link GenericBeanDefinition},
  * {@link RootBeanDefinition}, and {@link ChildBeanDefinition}.
  *
+ * B.
  * <p>The autowire constants match the ones defined in the
  * {@link AutowireCapableBeanFactory}
  * interface.
@@ -55,9 +63,9 @@ import org.springframework.util.StringUtils;
  * @see RootBeanDefinition
  * @see ChildBeanDefinition
  */
+// 20201208 具体的，成熟的{@link BeanDefinition}类的基类, 但没实现通用属性的方法: 跟踪定义源、具有属性值，构造函数参数值以及具体实现所提供的更多信息
 @SuppressWarnings("serial")
-public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccessor
-		implements BeanDefinition, Cloneable {
+public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccessor implements BeanDefinition, Cloneable {
 
 	/**
 	 * Constant for the default scope name: {@code ""}, equivalent to singleton
@@ -137,7 +145,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 */
 	public static final String INFER_METHOD = "(inferred)";
 
-
+	// 2020128 该注解的bean类
 	@Nullable
 	private volatile Object beanClass;
 
@@ -405,7 +413,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Specify the class for this bean.
 	 * @see #setBeanClassName(String)
 	 */
+	// 20201208 指定此bean的类。
 	public void setBeanClass(@Nullable Class<?> beanClass) {
+		// 20201208 注册该注解的bean类
 		this.beanClass = beanClass;
 	}
 
