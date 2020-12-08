@@ -28,26 +28,38 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * 20201208
+ * A. 用于填装策略确定其他注解的容器。 {@link #standardRepeatables（）}方法提供了一种默认策略，该策略尊重Java对{@link Repeatable @Repeatable}的支持，并且应该适合大多数情况。
+ * B. {@link #of}方法可用于注册不希望使用{@link Repeatable @Repeatable}的注解的关系。
+ * C. 要完全禁用可重复支持，请使用{@link #none（）}。
+ */
+/**
+ * A.
  * Strategy used to determine annotations that act as containers for other
  * annotations. The {@link #standardRepeatables()} method provides a default
  * strategy that respects Java's {@link Repeatable @Repeatable} support and
  * should be suitable for most situations.
  *
+ * B.
  * <p>The {@link #of} method can be used to register relationships for
  * annotations that do not wish to use {@link Repeatable @Repeatable}.
  *
+ * C.
  * <p>To completely disable repeatable support use {@link #none()}.
  *
  * @author Phillip Webb
  * @since 5.2
  */
+// 20201208 用于填装策略确定其他注解的容器
 public abstract class RepeatableContainers {
 
+	// 20201208 注解容器的父容器
 	@Nullable
 	private final RepeatableContainers parent;
 
-
+	// 20201208 RepeatableContainers
 	private RepeatableContainers(@Nullable RepeatableContainers parent) {
+		// 20201208 设置注解容器的父容器
 		this.parent = parent;
 	}
 
@@ -122,7 +134,9 @@ public abstract class RepeatableContainers {
 	 * repeatable annotations.
 	 * @return a {@link RepeatableContainers} instance
 	 */
+	// 20201208 创建一个{@link RepeatableContainers}实例，该实例不会扩展任何可重复的注释。
 	public static RepeatableContainers none() {
+		// 20201208 获取NoRepeatableContainers单例
 		return NoRepeatableContainers.INSTANCE;
 	}
 
@@ -262,10 +276,12 @@ public abstract class RepeatableContainers {
 	/**
 	 * No repeatable containers.
 	 */
+	// 20201208 没有可重复的容器。
 	private static class NoRepeatableContainers extends RepeatableContainers {
-
+		// 20201208 单例NoRepeatableContainers
 		private static NoRepeatableContainers INSTANCE = new NoRepeatableContainers();
 
+		// 20201208 构造RepeatableContainers
 		NoRepeatableContainers() {
 			super(null);
 		}

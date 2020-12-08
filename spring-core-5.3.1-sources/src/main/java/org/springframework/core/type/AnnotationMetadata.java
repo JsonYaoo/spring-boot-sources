@@ -99,23 +99,34 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	 * @param annotationName the fully qualified class name of the annotation
 	 * type to look for
 	 */
+	// 20201208 确定基础类是否具有使用给定注解类型进行注解（或元注解）的任何方法。
 	default boolean hasAnnotatedMethods(String annotationName) {
+		// 20201208 如果检索到的bean集合为空, 则说明没检索到, 返回false
 		return !getAnnotatedMethods(annotationName).isEmpty();
 	}
 
 	/**
+	 * 20201208
+	 * A. 检索使用给定注解类型进行注解（或元注解）的所有方法的方法元数据。
+	 * B. 对于任何返回的方法，{@ link MethodMetadata＃isAnnotated}将为给定的注解类型返回{@code true}。
+	 */
+	/**
+	 * A.
 	 * Retrieve the method metadata for all methods that are annotated
 	 * (or meta-annotated) with the given annotation type.
+	 *
+	 * B.
 	 * <p>For any returned method, {@link MethodMetadata#isAnnotated} will
 	 * return {@code true} for the given annotation type.
+	 *
 	 * @param annotationName the fully qualified class name of the annotation
 	 * type to look for
 	 * @return a set of {@link MethodMetadata} for methods that have a matching
 	 * annotation. The return value will be an empty set if no methods match
 	 * the annotation type.
 	 */
+	// 20201208 检索使用给定注解类型进行注解（或元注解）的所有方法的方法元数据。
 	Set<MethodMetadata> getAnnotatedMethods(String annotationName);
-
 
 	/**
 	 * Factory method to create a new {@link AnnotationMetadata} instance
@@ -125,7 +136,9 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	 * @since 5.2
 	 */
 	// 20201208 使用标准反射为给定类创建新的{@link AnnotationMetadata}实例的工厂方法。
+	// 20201208 为给定的类创建一个新的{@link StandardAnnotationMetadata}包装器, 以AnnotationAttributes形式返回任何嵌套注解或注解数组的选项实例
 	static AnnotationMetadata introspect(Class<?> type) {
+		// 20201208 为给定的类创建一个新的{@link StandardAnnotationMetadata}包装器, 以AnnotationAttributes形式返回任何嵌套注解或注解数组的选项实例
 		return StandardAnnotationMetadata.from(type);
 	}
 

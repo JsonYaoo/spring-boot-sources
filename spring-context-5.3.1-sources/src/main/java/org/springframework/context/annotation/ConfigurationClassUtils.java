@@ -63,6 +63,7 @@ abstract class ConfigurationClassUtils {
 
 	private static final Log logger = LogFactory.getLog(ConfigurationClassUtils.class);
 
+	// 20201208 经典注解列表: @Component, @ComponentScan, @Import, @ImportResource
 	private static final Set<String> candidateIndicators = new HashSet<>(8);
 
 	static {
@@ -148,21 +149,26 @@ abstract class ConfigurationClassUtils {
 	 * @return {@code true} if the given class is to be registered for
 	 * configuration class processing; {@code false} otherwise
 	 */
+	// 20201208 检查给定的元数据中是否有配置类候选对象（或在配置/组件类中声明的嵌套组件类）。
 	public static boolean isConfigurationCandidate(AnnotationMetadata metadata) {
 		// Do not consider an interface or an annotation...
+		// 20201208 不要考虑接口或注解...
 		if (metadata.isInterface()) {
 			return false;
 		}
 
 		// Any of the typical annotations found?
+		// 20201208 找到任何典型的注解吗？ -> 遍历经典注解列表: @Component, @ComponentScan, @Import, @ImportResource
 		for (String indicator : candidateIndicators) {
+			// 20201208 如果这些注解为元注解, 则说明有嵌套配置, 返回true
 			if (metadata.isAnnotated(indicator)) {
 				return true;
 			}
 		}
 
-		// Finally, let's look for @Bean methods...
+		// Finally, let's look for @Bean methods... // 20201208 最后，让我们寻找@Bean方法...
 		try {
+			// 20201208 确定基础类是否具有@Bean的任何方法, 如果有, 则说明存在嵌套配置
 			return metadata.hasAnnotatedMethods(Bean.class.getName());
 		}
 		catch (Throwable ex) {

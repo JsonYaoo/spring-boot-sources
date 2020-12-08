@@ -190,6 +190,7 @@ public class AnnotatedBeanDefinitionReader {
 	 */
 	// 20201208 从给定的bean类中注册一个bean，并从类声明的注释中派生其元数据。
 	public void registerBean(Class<?> beanClass) {
+		// 20201208 从给定的bean类中注册一个bean，并从类声明的注解中派生其元数据。
 		doRegisterBean(beanClass, null, null, null, null);
 	}
 
@@ -300,8 +301,10 @@ public class AnnotatedBeanDefinitionReader {
 									@Nullable Supplier<T> supplier,// 20201208 用于创建bean实例的回调（可以为{@code null}）
 									@Nullable BeanDefinitionCustomizer[] customizers// 20201208 一个或多个用于自定义工厂的{@link BeanDefinition}的回调，例如 设置惰性初始或主要标志
 	) {
-
+		// 20201208 为给定的bean类创建一个新的注解数据公开类AnnotatedGenericBeanDefinition —> 注册注解实例(但过滤"java.lang", "org.springframework.lang"下的注解)
 		AnnotatedGenericBeanDefinition abd = new AnnotatedGenericBeanDefinition(beanClass);
+
+		// 20201208 用于评估{@link Conditional}注解的内部类
 		if (this.conditionEvaluator.shouldSkip(abd.getMetadata())) {
 			return;
 		}

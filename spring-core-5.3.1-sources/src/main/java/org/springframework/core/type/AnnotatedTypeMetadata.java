@@ -52,18 +52,30 @@ public interface AnnotatedTypeMetadata {
 	 * @return merged annotations based on the direct annotations
 	 * @since 5.2
 	 */
+	// 20201208 根据基础元素的直接注解返回注解详细信息。
 	MergedAnnotations getAnnotations();
 
 	/**
+	 * 20201208
+	 * A. 确定基础元素是否具有已定义的给定类型的注解或元注解。
+	 * B. 如果此方法返回{@code true}，则{@link #getAnnotationAttributes}将返回非null的Map。
+	 */
+	/**
+	 * A.
 	 * Determine whether the underlying element has an annotation or meta-annotation
 	 * of the given type defined.
+	 *
+	 * B.
 	 * <p>If this method returns {@code true}, then
 	 * {@link #getAnnotationAttributes} will return a non-null Map.
+	 *
 	 * @param annotationName the fully qualified class name of the annotation
 	 * type to look for
 	 * @return whether a matching annotation is defined
 	 */
+	// 20201208 确定基础元素是否具有已定义的给定类型的注解或元注解
 	default boolean isAnnotated(String annotationName) {
+		// 20201208 返回注解详细信息确定指定的注解是直接存在还是元存在
 		return getAnnotations().isPresent(annotationName);
 	}
 

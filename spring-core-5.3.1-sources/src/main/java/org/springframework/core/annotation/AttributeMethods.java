@@ -34,14 +34,15 @@ import org.springframework.util.ReflectionUtils;
  * @author Phillip Webb
  * @since 5.2
  */
+// 20201208 提供一种以一致的顺序访问{@link Annotation}的属性方法的快速方法，以及一些有用的实用程序方法。
 final class AttributeMethods {
-
+	// 20201208 构造空的属性访问方法
 	static final AttributeMethods NONE = new AttributeMethods(null, new Method[0]);
 
+	// 20201208 注解类-属性访问方法缓存
+	private static final Map<Class<? extends Annotation>, AttributeMethods> cache = new ConcurrentReferenceHashMap<>();
 
-	private static final Map<Class<? extends Annotation>, AttributeMethods> cache =
-			new ConcurrentReferenceHashMap<>();
-
+	// 20201208 方法按名称排序器
 	private static final Comparator<Method> methodComparator = (m1, m2) -> {
 		if (m1 != null && m2 != null) {
 			return m1.getName().compareTo(m2.getName());
@@ -49,28 +50,44 @@ final class AttributeMethods {
 		return m1 != null ? -1 : 1;
 	};
 
-
+	// 20201208 注解类型
 	@Nullable
 	private final Class<? extends Annotation> annotationType;
 
+	// 20201208 方法数组
 	private final Method[] attributeMethods;
 
+	// 20201208 异常数组
 	private final boolean[] canThrowTypeNotPresentException;
 
 	private final boolean hasDefaultValueMethod;
 
 	private final boolean hasNestedAnnotation;
 
-
+	// 20201208 构造属性访问方法
 	private AttributeMethods(@Nullable Class<? extends Annotation> annotationType, Method[] attributeMethods) {
+		// 20201208 注册注解类型
 		this.annotationType = annotationType;
+
+		// 20201208 注册方法数组
 		this.attributeMethods = attributeMethods;
+
+		// 20201208 注册异常数组
 		this.canThrowTypeNotPresentException = new boolean[attributeMethods.length];
+
+		// 20201208 发现默认值方法, 默认为false
 		boolean foundDefaultValueMethod = false;
+
+		// 20201208 发现嵌套注解, 默认为false
 		boolean foundNestedAnnotation = false;
+
+		// 20201208 遍历方法数组
 		for (int i = 0; i < attributeMethods.length; i++) {
 			Method method = this.attributeMethods[i];
+			// 20201208 获取方法返回值
 			Class<?> type = method.getReturnType();
+
+			// 20201208
 			if (method.getDefaultValue() != null) {
 				foundDefaultValueMethod = true;
 			}
@@ -103,18 +120,25 @@ final class AttributeMethods {
 	 * @return {@code true} if all values are present
 	 * @see #validate(Annotation)
 	 */
+	// 20201208 确定是否可以安全地访问给定注解中的值，而不会引起任何{@link TypeNotPresentException TypeNotPresentExceptions}。
 	boolean isValid(Annotation annotation) {
+		// 20201208 断言是个注解
 		assertAnnotation(annotation);
+
+		// 20201208 遍历访问每个属性
 		for (int i = 0; i < size(); i++) {
 			if (canThrowTypeNotPresentException(i)) {
 				try {
 					get(i).invoke(annotation);
 				}
 				catch (Throwable ex) {
+					// 20201208 如果访问抛出异常, 则说明不安全
 					return false;
 				}
 			}
 		}
+
+		// 20201208 否则返回true, 说明安全
 		return true;
 	}
 
@@ -143,6 +167,7 @@ final class AttributeMethods {
 		}
 	}
 
+	// 20201208 断言是个注解
 	private void assertAnnotation(Annotation annotation) {
 		Assert.notNull(annotation, "Annotation must not be null");
 		if (this.annotationType != null) {
@@ -169,6 +194,7 @@ final class AttributeMethods {
 	 * @throws IndexOutOfBoundsException if the index is out of range
 	 * (<tt>index &lt; 0 || index &gt;= size()</tt>)
 	 */
+	// 20201208 获取指定索引处的属性。
 	Method get(int index) {
 		return this.attributeMethods[index];
 	}
@@ -245,30 +271,51 @@ final class AttributeMethods {
 	 * @param annotationType the annotation type
 	 * @return the attribute methods for the annotation type
 	 */
+	// 20201208 获取给定注释类型的属性方法。
 	static AttributeMethods forAnnotationType(@Nullable Class<? extends Annotation> annotationType) {
+		// 20201208 如果属性类型为空
 		if (annotationType == null) {
+			// 20201208 则返回空的属性访问方法
 			return NONE;
 		}
+
+		// 20201208 根据注解Class从注解类-属性访问方法缓存中获取属性访问方法 如果获取不到则根据注解类型计算属性访问方法
 		return cache.computeIfAbsent(annotationType, AttributeMethods::compute);
 	}
 
+	// 20201208 根据注解类型计算属性访问方法
 	private static AttributeMethods compute(Class<? extends Annotation> annotationType) {
+		// 20201208 获取注解属性的本类方法对象数组
 		Method[] methods = annotationType.getDeclaredMethods();
+
+		// 20201208 遍历该数组
 		int size = methods.length;
 		for (int i = 0; i < methods.length; i++) {
+			// 20201208 判断是否为属性方法 -> 如果参数个树为0 且返回值不为void类型, 则说明为属性方法
 			if (!isAttributeMethod(methods[i])) {
+				// 20201208 如果不是, 则剔除该方法
 				methods[i] = null;
 				size--;
 			}
 		}
+
+		// 20201208 如果剔除后的数组长度为0
 		if (size == 0) {
+			// 20201208 则返回空的属性访问方法
 			return NONE;
 		}
+
+		// 20201208 如果不为0, 则对根据方法名称进行数组排序
 		Arrays.sort(methods, methodComparator);
+
+		// 202001208 深复制该方法数组
 		Method[] attributeMethods = Arrays.copyOf(methods, size);
+
+		// 20201208 构造属性访问方法并返回
 		return new AttributeMethods(annotationType, attributeMethods);
 	}
 
+	// 20201208 判断是否为属性方法 -> 如果参数个树为0 且返回值不为void类型, 则说明为属性方法
 	private static boolean isAttributeMethod(Method method) {
 		return (method.getParameterCount() == 0 && method.getReturnType() != void.class);
 	}

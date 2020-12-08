@@ -29,25 +29,33 @@ import org.springframework.util.StringUtils;
  * @author Phillip Webb
  * @since 5.2
  */
+// 20201208 包路径注释过滤, 用于{@link AnnotationFilter＃packages（String ...）}的{@link AnnotationFilter}实现。
 final class PackagesAnnotationFilter implements AnnotationFilter {
-
+	// 20201208 包路径数组
 	private final String[] prefixes;
 
+	// 20201208 包路径数组的hashCode
 	private final int hashCode;
 
-
+	// 20201208 构造包路径注释过滤器
 	PackagesAnnotationFilter(String... packages) {
+		// 20201208 包路径不能为空
 		Assert.notNull(packages, "Packages array must not be null");
+
+		// 20201208 构建包路径数组 -> 每个包路径多加个.
 		this.prefixes = new String[packages.length];
 		for (int i = 0; i < packages.length; i++) {
 			String pkg = packages[i];
 			Assert.hasText(pkg, "Packages array must not have empty elements");
 			this.prefixes[i] = pkg + ".";
 		}
+
+		// 20201208 对包数组的每个包进行排序
 		Arrays.sort(this.prefixes);
+
+		// 20201208 设置包路径数组的hashCode = 31 * 1 + 每个元素的hashCode
 		this.hashCode = Arrays.hashCode(this.prefixes);
 	}
-
 
 	@Override
 	public boolean matches(String annotationType) {

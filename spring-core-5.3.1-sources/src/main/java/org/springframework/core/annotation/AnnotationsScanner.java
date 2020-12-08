@@ -42,15 +42,15 @@ import org.springframework.util.ReflectionUtils;
  * @since 5.2
  * @see AnnotationsProcessor
  */
+// 20201208 注解扫描程序, 可在{@link AnnotatedElement}的注释层次结构中搜索相关的注解。
 abstract class AnnotationsScanner {
-
+	// 20201208 空的注解列表
 	private static final Annotation[] NO_ANNOTATIONS = {};
 
 	private static final Method[] NO_METHODS = {};
 
-
-	private static final Map<AnnotatedElement, Annotation[]> declaredAnnotationCache =
-			new ConcurrentReferenceHashMap<>(256);
+	// 20201208 每个源本地的所有注解缓存列表
+	private static final Map<AnnotatedElement, Annotation[]> declaredAnnotationCache = new ConcurrentReferenceHashMap<>(256);
 
 	private static final Map<Class<?>, Method[]> baseTypeMethodsCache =
 			new ConcurrentReferenceHashMap<>(256);
@@ -444,88 +444,155 @@ abstract class AnnotationsScanner {
 		return null;
 	}
 
+	// 20201208 获取本类声明的所有注解
 	static Annotation[] getDeclaredAnnotations(AnnotatedElement source, boolean defensive) {
+		// 20201208 初始标记为还没获取缓存
 		boolean cached = false;
+
+		// 20201208 根据源Class从每个源本地的所有注解缓存列表获取所有注解
 		Annotation[] annotations = declaredAnnotationCache.get(source);
+
+		// 20201208 如果获取到则设置标记为true, 表示已经获取缓存
 		if (annotations != null) {
 			cached = true;
 		}
+
+		// 20201208 否则不存在缓存
 		else {
+			// 20201208 返回直接在此元素上出现的注解, 此方法将忽略继承的注解
 			annotations = source.getDeclaredAnnotations();
+
+			// 20201208 如果获取到的注解数组列表不为空
 			if (annotations.length != 0) {
+				// 20201208 标记为所有都忽略
 				boolean allIgnored = true;
+
+				// 20201208 遍历所有注解
 				for (int i = 0; i < annotations.length; i++) {
 					Annotation annotation = annotations[i];
+
+					// 20201208 判断是否默认忽略的注解 -> 如果注解类型为"java.lang", "org.springframework.lang"包路径中的注解, 则为true
 					if (isIgnorable(annotation.annotationType()) ||
+							// 20201208 或者 获取给定注释类型的属性方法, 如果该属性方法能够安全方法该注解, 则为false
 							!AttributeMethods.forAnnotationType(annotation.annotationType()).isValid(annotation)) {
+						// 20201208 如果该注解视为忽略的注解 或者 不能够安全访问, 则移除该注解
 						annotations[i] = null;
 					}
+
+					// 20201208 否则该注解标记为不该被忽略
 					else {
 						allIgnored = false;
 					}
 				}
+
+				// 20201208 如果所有注解数组中全部都应该被忽略, 则返回空的注解列表
 				annotations = (allIgnored ? NO_ANNOTATIONS : annotations);
+
+				// 20201208 如果源Class为Class类型或者Member类型
 				if (source instanceof Class || source instanceof Member) {
+					// 20201208 则添加该所有注解数组到每个源本地的所有注解缓存列表中
 					declaredAnnotationCache.put(source, annotations);
+
+					// 20201208 标记已缓存
 					cached = true;
 				}
 			}
 		}
+
+		// 20201208 如果不需要保护, 或者所有注解列表为空, 或者没有缓存时
 		if (!defensive || annotations.length == 0 || !cached) {
+			// 2020128 则直接返回所有注解列表引用
 			return annotations;
 		}
+
+		// 20201208 否则需要保护, 则返回深拷贝数组
 		return annotations.clone();
 	}
 
+	// 20201208 判断是否默认忽略的注解 -> 如果注解类型为"java.lang", "org.springframework.lang"包路径中的注解, 则为true
 	private static boolean isIgnorable(Class<?> annotationType) {
 		return AnnotationFilter.PLAIN.matches(annotationType);
 	}
 
+	// 20201208 判断当前源Class含有的注解是否为空
 	static boolean isKnownEmpty(AnnotatedElement source, SearchStrategy searchStrategy) {
+		// 20201208 判断注解是否只有一层java注解 -> 如果Class名称带Java开头, 或者为Ordered类型(注解都实现了Order接口?), 则说明为Java注解
 		if (hasPlainJavaAnnotationsOnly(source)) {
 			return true;
 		}
-		if (searchStrategy == SearchStrategy.DIRECT || isWithoutHierarchy(source, searchStrategy)) {
+
+		// 20201208 如果为直接查找 或者 层次查找时没找到层次时
+		if (searchStrategy == SearchStrategy.DIRECT
+				// 20201208 判断是否没有层次的接口 -> 常见: 如果父类类型就为Object类型 且 没有实现的接口列表, noSuperTypes为true
+				|| isWithoutHierarchy(source, searchStrategy)) {
+			// 20201208 如果源Class为Method类型, 且为桥接方法时, 则返回false
 			if (source instanceof Method && ((Method) source).isBridge()) {
 				return false;
 			}
+
+			// 20201208 否则获取本类声明的所有注解, 如果所有注解为空时, 则返回true
 			return getDeclaredAnnotations(source, false).length == 0;
 		}
+
+		// 20201208 否则返回false, 说明该源Class含有的注解不为空
 		return false;
 	}
 
+	// 20201208 判断注解是否只有一层java直注解 -> 如果Class名称带Java开头, 或者为Ordered类型(注解都实现了Order接口?), 则说明为Java注解
 	static boolean hasPlainJavaAnnotationsOnly(@Nullable Object annotatedElement) {
+		// 20201208 如果源元素为Class类型
 		if (annotatedElement instanceof Class) {
+			// 20201208 判断当前bean class是否只有一层java注解 -> 如果Class名称带Java开头, 或者为Ordered类型(注解都实现了Order接口?), 则说明为Java注解
 			return hasPlainJavaAnnotationsOnly((Class<?>) annotatedElement);
 		}
+
+		// 20201208 如果源元素为Member类型 -> 成员是反映有关单个成员（字段或方法）或构造函数的标识信息的接口。
 		else if (annotatedElement instanceof Member) {
+			// 20201208 则先根据成员获取本类类型再进行判断
 			return hasPlainJavaAnnotationsOnly(((Member) annotatedElement).getDeclaringClass());
 		}
+
+		// 20201208 否则如果是其他类型则返回false
 		else {
 			return false;
 		}
 	}
 
+	// 20201208 判断当前bean class是否只有一层java注解 -> 如果Class名称带Java开头, 或者为Ordered类型(注解都实现了Order接口?), 则说明为Java注解
 	static boolean hasPlainJavaAnnotationsOnly(Class<?> type) {
+		// 20201208 如果Class名称带Java开头, 或者为Ordered类型(注解都实现了Order接口?), 则说明为Java注解
 		return (type.getName().startsWith("java.") || type == Ordered.class);
 	}
 
+	// 20201208 判断是否没有层次的接口 -> 常见: 如果父类类型就为Object类型 且 没有实现的接口列表, noSuperTypes为true
 	private static boolean isWithoutHierarchy(AnnotatedElement source, SearchStrategy searchStrategy) {
+		// 20201208 如果源Class为Object类型, 则直接返回true, 因为顶级对象没有层次查找可说
 		if (source == Object.class) {
 			return true;
 		}
+
+		// 20201208 如果源Class为Class类型
 		if (source instanceof Class) {
 			Class<?> sourceClass = (Class<?>) source;
-			boolean noSuperTypes = (sourceClass.getSuperclass() == Object.class &&
-					sourceClass.getInterfaces().length == 0);
-			return (searchStrategy == SearchStrategy.TYPE_HIERARCHY_AND_ENCLOSING_CLASSES ? noSuperTypes &&
-					sourceClass.getEnclosingClass() == null : noSuperTypes);
+			// 20201208 如果父类类型就为Object类型 且 没有实现的接口列表, noSuperTypes为true
+			boolean noSuperTypes = (sourceClass.getSuperclass() == Object.class && sourceClass.getInterfaces().length == 0);
+			// 20201208 如果策略为类型层次与闭包查找
+			return (searchStrategy == SearchStrategy.TYPE_HIERARCHY_AND_ENCLOSING_CLASSES ?
+					// 20201208 则如果源Class没有父类和接口 且 不是基础类的直接封闭类, 则返回true
+					noSuperTypes && sourceClass.getEnclosingClass() == null :
+
+					// 20201208 如果不是按类型层次与闭包查找, 则判断是否有父类和接口就行了, 没有则为true
+					noSuperTypes);
 		}
+
+		// 20201208 如果源Class为Method类型
 		if (source instanceof Method) {
 			Method sourceMethod = (Method) source;
-			return (Modifier.isPrivate(sourceMethod.getModifiers()) ||
-					isWithoutHierarchy(sourceMethod.getDeclaringClass(), searchStrategy));
+			// 20201208 如果Method是私有的, 或者 递归判断方法的Class没有层次接口, 则为true
+			return (Modifier.isPrivate(sourceMethod.getModifiers()) || isWithoutHierarchy(sourceMethod.getDeclaringClass(), searchStrategy));
 		}
+
+		// 20201208 否则, 如果是其他类型则返回true
 		return true;
 	}
 

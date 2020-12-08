@@ -19,8 +19,16 @@ package org.springframework.core.annotation;
 import java.lang.annotation.Annotation;
 
 /**
+ * 20201208
+ * A. 可以用于过滤特定注释类型的回调接口。
+ * B. 请注意，{@link MergedAnnotations}模型（为此接口设计的模型）始终根据{@link #PLAIN}过滤器忽略lang注释（出于效率考虑）。
+ *    任何其他过滤器，甚至自定义过滤器实现都在此边界内应用，并且可能仅在此处缩小。
+ */
+/**
+ * A.
  * Callback interface that can be used to filter specific annotation types.
  *
+ * B.
  * <p>Note that the {@link MergedAnnotations} model (which this interface has been
  * designed for) always ignores lang annotations according to the {@link #PLAIN}
  * filter (for efficiency reasons). Any additional filters and even custom filter
@@ -31,15 +39,25 @@ import java.lang.annotation.Annotation;
  * @since 5.2
  * @see MergedAnnotations
  */
+// 20201208 可以用于过滤特定注释类型的回调接口
 @FunctionalInterface
 public interface AnnotationFilter {
 
 	/**
+	 * 20201208
+	 * A. {@link AnnotationFilter}与{@code java.lang}和{@code org.springframework.lang}包及其子包中的注释匹配。
+	 * B. 这是{@link MergedAnnotations}模型中的默认过滤器。
+	 */
+	/**
+	 * A.
 	 * {@link AnnotationFilter} that matches annotations in the
 	 * {@code java.lang} and {@code org.springframework.lang} packages
 	 * and their subpackages.
+	 *
+	 * B.
 	 * <p>This is the default filter in the {@link MergedAnnotations} model.
 	 */
+	// 20201208 {@link MergedAnnotations}模型中的默认过滤器, 构建含包路径数组的包路径注释过滤器
 	AnnotationFilter PLAIN = packages("java.lang", "org.springframework.lang");
 
 	/**
@@ -52,6 +70,7 @@ public interface AnnotationFilter {
 	 * {@link AnnotationFilter} that always matches and can be used when no
 	 * relevant annotation types are expected to be present at all.
 	 */
+	// 20201208 {@link AnnotationFilter}始终匹配，可以在根本不存在任何相关注释类型时使用。
 	AnnotationFilter ALL = new AnnotationFilter() {
 		@Override
 		public boolean matches(Annotation annotation) {
@@ -129,10 +148,12 @@ public interface AnnotationFilter {
 	/**
 	 * Create a new {@link AnnotationFilter} that matches annotations in the
 	 * specified packages.
-	 * @param packages the annotation packages that should match
+	 * @param packages the annotation packages that should match // 20201208 应该匹配的注释包
 	 * @return a new {@link AnnotationFilter} instance
 	 */
+	// 20201208 创建一个新的{@link AnnotationFilter}来匹配指定程序包中的注释。
 	static AnnotationFilter packages(String... packages) {
+		// 20201208 构造包路径注释过滤器
 		return new PackagesAnnotationFilter(packages);
 	}
 

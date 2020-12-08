@@ -52,7 +52,7 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implements AnnotatedBeanDefinition {
 
-	// 20201208 该注解的元数据
+	// 20201208 该注解实例
 	private final AnnotationMetadata metadata;
 
 	@Nullable
@@ -62,12 +62,12 @@ public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implem
 	 * Create a new AnnotatedGenericBeanDefinition for the given bean class.
 	 * @param beanClass the loaded bean class // 20201208 加载的Bean类
 	 */
-	// 20201208 为给定的bean类创建一个新的注解数据公开类AnnotatedGenericBeanDefinition。
+	// 20201208 为给定的bean类创建一个新的注解数据公开类AnnotatedGenericBeanDefinition —> 注册注解实例(但过滤"java.lang", "org.springframework.lang"下的注解)
 	public AnnotatedGenericBeanDefinition(Class<?> beanClass) {
 		// 20201208 注册该注解的bean类
 		setBeanClass(beanClass);
 
-		// 20201208 注册该注解的元数据
+		// 20201208 注册注解实例 -> 为给定的类创建一个新的{@link StandardAnnotationMetadata}包装器, 以AnnotationAttributes形式返回任何嵌套注解或注解数组的选项实例(过滤"java.lang", "org.springframework.lang"下的注解)
 		this.metadata = AnnotationMetadata.introspect(beanClass);
 	}
 

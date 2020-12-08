@@ -68,29 +68,38 @@ class ConditionEvaluator {
 	 * @param metadata the meta data
 	 * @return if the item should be skipped
 	 */
+	// 20201208 根据{@code @Conditional}注解确定是否应跳过一项。 {@link ConfigurationPhase}将根据项目的类型推导（即{@code @Configuration}类将是{@link ConfigurationPhase＃PARSE_CONFIGURATION}）
 	public boolean shouldSkip(AnnotatedTypeMetadata metadata) {
+		// 20201208 // 20201208 根据{@code @Conditional}注解确定是否应跳过一项。
 		return shouldSkip(metadata, null);
 	}
 
 	/**
 	 * Determine if an item should be skipped based on {@code @Conditional} annotations.
 	 * @param metadata the meta data
-	 * @param phase the phase of the call
+	 * @param phase the phase of the call	// 20201208 需要评估的阶段
 	 * @return if the item should be skipped
 	 */
+	// 20201208 注解评估: 根据{@code @Conditional}注解确定是否应跳过一项。
 	public boolean shouldSkip(@Nullable AnnotatedTypeMetadata metadata, @Nullable ConfigurationPhase phase) {
+		// 20201208 如果注解元素据为空, 或者如果注解不存在@Conditional注解, 则直接返回false
 		if (metadata == null || !metadata.isAnnotated(Conditional.class.getName())) {
 			return false;
 		}
 
+		// 20201208 如果还没确定需要评估的阶段
 		if (phase == null) {
-			if (metadata instanceof AnnotationMetadata &&
-					ConfigurationClassUtils.isConfigurationCandidate((AnnotationMetadata) metadata)) {
+			// 20201208 如果注解为AnnotationMetadata类型, 且有嵌套配置
+			if (metadata instanceof AnnotationMetadata && ConfigurationClassUtils.isConfigurationCandidate((AnnotationMetadata) metadata)) {
+				// 20201208 则递归进行注解评估, 且评估状态设置为配置阶段
 				return shouldSkip(metadata, ConfigurationPhase.PARSE_CONFIGURATION);
 			}
+
+			// 20201208 如果注解不存在嵌套配置, 则递归进行注解评估, 且评估状态设置为Bean注册阶段
 			return shouldSkip(metadata, ConfigurationPhase.REGISTER_BEAN);
 		}
 
+		// 20201208 如果指定了评估阶段
 		List<Condition> conditions = new ArrayList<>();
 		for (String[] conditionClasses : getConditionClasses(metadata)) {
 			for (String conditionClass : conditionClasses) {
@@ -114,8 +123,10 @@ class ConditionEvaluator {
 		return false;
 	}
 
+	// 20201208 获取匹配条件的Class
 	@SuppressWarnings("unchecked")
 	private List<String[]> getConditionClasses(AnnotatedTypeMetadata metadata) {
+
 		MultiValueMap<String, Object> attributes = metadata.getAllAnnotationAttributes(Conditional.class.getName(), true);
 		Object values = (attributes != null ? attributes.get("value") : null);
 		return (List<String[]>) (values != null ? values : Collections.emptyList());

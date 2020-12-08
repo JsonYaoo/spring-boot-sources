@@ -38,54 +38,89 @@ import org.springframework.lang.Nullable;
  * @author Phillip Webb
  * @since 5.2
  */
+// 20201208 {@link MergedAnnotations}实现，它使用{@link AnnotationTypeMappings}搜索并调整注解和元注解。
 final class TypeMappedAnnotations implements MergedAnnotations {
 
 	/**
 	 * Shared instance that can be used when there are no annotations.
 	 */
+	// 20201208 没有注释时可以使用的共享实例。
 	static final MergedAnnotations NONE = new TypeMappedAnnotations(
-			null, new Annotation[0], RepeatableContainers.none(), AnnotationFilter.ALL);
+			// 20201208 空的源Class
+			null,
+			// 20201208 空的注解数组
+			new Annotation[0],
+			// 20201208 空的注解容器
+			RepeatableContainers.none(),
+			// 20201208 匹配所有类型
+			AnnotationFilter.ALL);
 
-
+	// 20201208 源Class
 	@Nullable
 	private final Object source;
 
+	// 20201208 注解元素
 	@Nullable
 	private final AnnotatedElement element;
 
+	// 20201208 注解查找策略
 	@Nullable
 	private final SearchStrategy searchStrategy;
 
+	// 20201208 注解数组
 	@Nullable
 	private final Annotation[] annotations;
 
+	// 20201208 注解容器
 	private final RepeatableContainers repeatableContainers;
 
+	// 20201208 注解过滤器
 	private final AnnotationFilter annotationFilter;
 
 	@Nullable
 	private volatile List<Aggregate> aggregates;
 
-
+    // 20201208 构造TypeMappedAnnotations
 	private TypeMappedAnnotations(AnnotatedElement element, SearchStrategy searchStrategy,
 			RepeatableContainers repeatableContainers, AnnotationFilter annotationFilter) {
-
+        // 20201208 注册源Class
 		this.source = element;
+
+        // 20201208 注册注解元素
 		this.element = element;
+
+        // 20201208 注册注解查找策略
 		this.searchStrategy = searchStrategy;
+
+        // 20201208 注册空的注解数组
 		this.annotations = null;
+
+        // 20201208 注册注解容器
 		this.repeatableContainers = repeatableContainers;
+
+        // 20201208 注册注解过滤器
 		this.annotationFilter = annotationFilter;
 	}
 
+	// 20201208 构造TypeMappedAnnotations
 	private TypeMappedAnnotations(@Nullable Object source, Annotation[] annotations,
 			RepeatableContainers repeatableContainers, AnnotationFilter annotationFilter) {
-
+		// 20201208 注册源Class
 		this.source = source;
+
+		// 20201208 注册空的注解元素
 		this.element = null;
+
+		// 20201208 注册空的注解查找策略
 		this.searchStrategy = null;
+
+		// 20201208 注册注解数组
 		this.annotations = annotations;
+
+		// 20201208 注册注解容器
 		this.repeatableContainers = repeatableContainers;
+
+		// 20201208 注册注解过滤器
 		this.annotationFilter = annotationFilter;
 	}
 
@@ -244,13 +279,15 @@ final class TypeMappedAnnotations implements MergedAnnotations {
 		return null;
 	}
 
-
-	static MergedAnnotations from(AnnotatedElement element, SearchStrategy searchStrategy,
-			RepeatableContainers repeatableContainers, AnnotationFilter annotationFilter) {
-
+	// 20201208 创建一个新的{@link MergedAnnotations}实例，该实例包含指定元素中的所有注解和元注解，并取决于{@link SearchStrategy}，相关的继承元素。
+	static MergedAnnotations from(AnnotatedElement element, SearchStrategy searchStrategy, RepeatableContainers repeatableContainers, AnnotationFilter annotationFilter) {
+		// 20201208 判断当前源Class含有的注解是否为空
 		if (AnnotationsScanner.isKnownEmpty(element, searchStrategy)) {
+            // 20201208 返回空的注释共享实例
 			return NONE;
 		}
+
+		// 20201208 构造TypeMappedAnnotations, 注册指定的注解元素, 注解查找策略, 注解容器, 注解过滤器
 		return new TypeMappedAnnotations(element, searchStrategy, repeatableContainers, annotationFilter);
 	}
 

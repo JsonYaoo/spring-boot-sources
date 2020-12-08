@@ -47,8 +47,10 @@ import org.springframework.util.ReflectionUtils;
 // 20201208 {@link AnnotationMetadata}实现，该实现使用标准反射内省给定的{@link Class}, 该Class实例包装了注解数据。
 public class StandardAnnotationMetadata extends StandardClassMetadata implements AnnotationMetadata {
 
+	// 20201208 所有注解和元注解的合并注解
 	private final MergedAnnotations mergedAnnotations;
 
+	// 20201208 是否把嵌套的注解转换成Map
 	private final boolean nestedAnnotationsAsMap;
 
 	@Nullable
@@ -92,9 +94,16 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 		// 20201208 为给定的类创建一个新的StandardClassMetadata包装器。
 		super(introspectedClass);
 
-		// 20201208
-		this.mergedAnnotations = MergedAnnotations.from(introspectedClass,
-				SearchStrategy.INHERITED_ANNOTATIONS, RepeatableContainers.none());
+		// 20201208 注册所有注解和元注解的合并注解 -> 过滤"java.lang", "org.springframework.lang"下的注解
+		this.mergedAnnotations = MergedAnnotations.from(
+				// 20201208 给定的类
+				introspectedClass,
+				// 20201208 继承的注释查找
+				SearchStrategy.INHERITED_ANNOTATIONS,
+				// 20201208 获取NoRepeatableContainers单例
+				RepeatableContainers.none());
+
+		// 20201208 注册是否把嵌套的注解转换成Map -> Springboot启动时为true
 		this.nestedAnnotationsAsMap = nestedAnnotationsAsMap;
 	}
 
@@ -180,8 +189,9 @@ public class StandardAnnotationMetadata extends StandardClassMetadata implements
 				AnnotatedElementUtils.isAnnotated(method, annotationName);
 	}
 
-
+	// 20201208 为给定的类创建一个新的{@link StandardAnnotationMetadata}包装器, 以AnnotationAttributes形式返回任何嵌套注解或注解数组的选项实例
 	static AnnotationMetadata from(Class<?> introspectedClass) {
+		// 20201208 为给定的类创建一个新的{@link StandardAnnotationMetadata}包装器, 以AnnotationAttributes形式返回任何嵌套注解或注解数组的选项实例
 		return new StandardAnnotationMetadata(introspectedClass, true);
 	}
 
