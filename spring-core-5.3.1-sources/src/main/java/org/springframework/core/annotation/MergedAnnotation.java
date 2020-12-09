@@ -34,7 +34,7 @@ import org.springframework.lang.Nullable;
 
 /**
  * 20201208
- * A. 从{@link MergedAnnotations}集合返回的单个合并注释。 将视图显示在注释上，其中属性值可能已从不同的源值“合并”。
+ * A. 从{@link MergedAnnotations}集合返回的单个合并注解。 将视图显示在注解上，其中属性值可能已从不同的源值“合并”。
  * B. 可以使用各种{@code get}方法访问属性值。 例如，要访问{@code int}属性，将使用{@link #getInt（String）}方法。
  * C. 请注意，访问时不会转换属性值。 例如，如果基础属性是{@code int}，则无法调用{@link #getString（String）}。 该规则的唯一例外是{@code Class}和{@code Class []}值，
  *    可以分别通过{@code String}和{@code String []}来访问，以防止潜在的早期类初始化。
@@ -71,7 +71,7 @@ import org.springframework.lang.Nullable;
  * @see MergedAnnotations
  * @see MergedAnnotationPredicates
  */
-// 20201208 从{@link MergedAnnotations}集合返回的单个合并注释。 将视图显示在注释上，其中属性值可能已从不同的源值“合并”。
+// 20201208 从{@link MergedAnnotations}集合返回的单个合并注解。 将视图显示在注解上，其中属性值可能已从不同的源值“合并”。
 public interface MergedAnnotation<A extends Annotation> {
 
 	/**
@@ -170,14 +170,23 @@ public interface MergedAnnotation<A extends Annotation> {
 	MergedAnnotation<?> getRoot();
 
 	/**
+	 * 20201209
+	 * A. 获取从此注解到{@link #getRoot（）根}的注解层次结构中注解类型的完整列表。
+	 * B. 提供一种有用的方法来唯一标识合并的注解实例。
+	 */
+	/**
+	 * A.
 	 * Get the complete list of annotation types within the annotation hierarchy
 	 * from this annotation to the {@link #getRoot() root}.
+	 *
+	 * B.
 	 * <p>Provides a useful way to uniquely identify a merged annotation instance.
 	 * @return the meta types for the annotation
 	 * @see MergedAnnotationPredicates#unique(Function)
 	 * @see #getRoot()
 	 * @see #getMetaSource()
 	 */
+	// 20201209 获取从此注解到{@link #getRoot（）根}的注解层次结构中注解类型的完整列表
 	List<Class<? extends Annotation>> getMetaTypes();
 
 
@@ -455,12 +464,21 @@ public interface MergedAnnotation<A extends Annotation> {
 	MergedAnnotation<A> filterAttributes(Predicate<String> predicate);
 
 	/**
+	 * 20201209
+	 * A. 创建注解的新视图，以显示非合并的属性值。
+	 * B. 此视图中的方法将返回仅应用别名镜像规则的属性值。 {@link #getMetaSource（）meta-source}属性的别名将不会应用。
+	 */
+	/**
+	 * A.
 	 * Create a new view of the annotation that exposes non-merged attribute values.
+	 *
+	 * B.
 	 * <p>Methods from this view will return attribute values with only alias mirroring
 	 * rules applied. Aliases to {@link #getMetaSource() meta-source} attributes will
 	 * not be applied.
-	 * @return a non-merged view of the annotation
+	 * @return a non-merged view of the annotation // 20201209 注解的非合并视图
 	 */
+	// 20201209 创建注解的新视图，以显示非合并的属性值
 	MergedAnnotation<A> withNonMergedAttributes();
 
 	/**
@@ -629,17 +647,21 @@ public interface MergedAnnotation<A extends Annotation> {
 	 * {@linkplain MergedAnnotation#asMap(Adapt...) Maps} or
 	 * {@link MergedAnnotation#asAnnotationAttributes(Adapt...) AnnotationAttributes}.
 	 */
+	// 20201208 创建{@linkplain MergedAnnotation＃asMap（Adapt ...）map}或
+	// 20201208 {@link MergedAnnotation＃asAnnotationAttributes（Adapt ...）AnnotationAttributes}时可以应用于属性值的调整。
 	enum Adapt {
 
 		/**
 		 * Adapt class or class array attributes to strings.
 		 */
+		// 20201208 使类或类数组属性适应字符串。
 		CLASS_TO_STRING,
 
 		/**
 		 * Adapt nested annotation or annotation arrays to maps rather
 		 * than synthesizing the values.
 		 */
+		// 20201208 使嵌套的注解或注解数组适合于映射，而不是合成值。
 		ANNOTATION_TO_MAP;
 
 		protected final boolean isIn(Adapt... adaptations) {
@@ -653,17 +675,27 @@ public interface MergedAnnotation<A extends Annotation> {
 
 		/**
 		 * Factory method to create an {@link Adapt} array from a set of boolean flags.
-		 * @param classToString if {@link Adapt#CLASS_TO_STRING} is included
-		 * @param annotationsToMap if {@link Adapt#ANNOTATION_TO_MAP} is included
+		 *
+		 * @param classToString if {@link Adapt#CLASS_TO_STRING} is included // 20201208 使类或类数组属性适应字符串
+		 * @param annotationsToMap if {@link Adapt#ANNOTATION_TO_MAP} is included // 20201208 使嵌套的注解或注解数组适合于映射，而不是合成值。
 		 * @return a new {@link Adapt} array
 		 */
+		// 20201208 根据一组布尔标志创建{@link Adapt}数组的工厂方法。
 		public static Adapt[] values(boolean classToString, boolean annotationsToMap) {
+			// 20201209 用Adapt类型创建一个空的枚举集。
 			EnumSet<Adapt> result = EnumSet.noneOf(Adapt.class);
+
+			// 20201209 如果为指定了使类或类数组属性适应字符串, 则添加CLASS_TO_STRING到集合
 			addIfTrue(result, Adapt.CLASS_TO_STRING, classToString);
+
+			// 20201209 如果为指定了使嵌套的注解或注解数组适合于映射, 则添加ANNOTATION_TO_MAP到集合
 			addIfTrue(result, Adapt.ANNOTATION_TO_MAP, annotationsToMap);
+
+			// 20201209 返回Adapt数组
 			return result.toArray(new Adapt[0]);
 		}
 
+		// 20201209 如果为true则添加value值到result集合中
 		private static <T> void addIfTrue(Set<T> result, T value, boolean test) {
 			if (test) {
 				result.add(value);

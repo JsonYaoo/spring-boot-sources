@@ -34,6 +34,7 @@ public interface BeanNameGenerator {
 	 * is supposed to be registered with
 	 * @return the generated bean name
 	 */
+	// 20201209 为给定的bean定义生成一个bean名称。
 	String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry registry);
 
 }

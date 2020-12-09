@@ -24,9 +24,16 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.util.Assert;
 
 /**
+ * 20201209
+ * A. 一个{@link ScopeMetadataResolver}实现，默认情况下检查Bean类上是否存在Spring的{@link Scope @Scope}注解。
+ * B. 可通过{@link #setScopeAnnotationType（Class）}配置要检查的注解的确切类型。
+ */
+/**
+ * A.
  * A {@link ScopeMetadataResolver} implementation that by default checks for
  * the presence of Spring's {@link Scope @Scope} annotation on the bean class.
  *
+ * B.
  * <p>The exact type of annotation that is checked for is configurable via
  * {@link #setScopeAnnotationType(Class)}.
  *
@@ -36,8 +43,10 @@ import org.springframework.util.Assert;
  * @since 2.5
  * @see org.springframework.context.annotation.Scope
  */
+// 20201209 ScopeMetadataResolver的一个实现: 默认情况下检查Bean类上是否存在Spring的{@link Scope @Scope}注解
 public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 
+	// 20201209 枚举各种作用域代理选项
 	private final ScopedProxyMode defaultProxyMode;
 
 	protected Class<? extends Annotation> scopeAnnotationType = Scope.class;
@@ -48,7 +57,9 @@ public class AnnotationScopeMetadataResolver implements ScopeMetadataResolver {
 	 * @see #AnnotationScopeMetadataResolver(ScopedProxyMode)
 	 * @see ScopedProxyMode#NO
 	 */
+	// 20201209 构造一个新的{@code AnnotationScopeMetadataResolver}。
 	public AnnotationScopeMetadataResolver() {
+		// 20201209 设置枚举各种作用域代理选项为 不要创建作用域代理
 		this.defaultProxyMode = ScopedProxyMode.NO;
 	}
 

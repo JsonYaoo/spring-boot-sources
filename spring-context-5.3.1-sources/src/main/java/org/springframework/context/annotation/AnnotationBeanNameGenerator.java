@@ -87,10 +87,12 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 
 	private final Map<String, Set<String>> metaAnnotationTypesCache = new ConcurrentHashMap<>();
 
-
+	// 20201209 为给定的bean定义生成一个bean名称。
 	@Override
 	public String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {
+		// 20201029 如果bean定义器为注解Bean定义器AnnotatedBeanDefinition
 		if (definition instanceof AnnotatedBeanDefinition) {
+			// 20201209
 			String beanName = determineBeanNameFromAnnotation((AnnotatedBeanDefinition) definition);
 			if (StringUtils.hasText(beanName)) {
 				// Explicit bean name found.
@@ -106,8 +108,10 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 	 * @param annotatedDef the annotation-aware bean definition
 	 * @return the bean name, or {@code null} if none is found
 	 */
+	// 20201209 从类的注解之一中获取bean名称。
 	@Nullable
 	protected String determineBeanNameFromAnnotation(AnnotatedBeanDefinition annotatedDef) {
+		// 20201209
 		AnnotationMetadata amd = annotatedDef.getMetadata();
 		Set<String> types = amd.getAnnotationTypes();
 		String beanName = null;

@@ -150,6 +150,7 @@ public interface Environment extends PropertyResolver {
 	 * Return whether the {@linkplain #getActiveProfiles() active profiles}
 	 * match the given {@link Profiles} predicate.
 	 */
+	// 20201209 返回{@linkplain #getActiveProfiles（）活动配置文件}是否与给定的{@link Profiles}谓词匹配。
 	boolean acceptsProfiles(Profiles profiles);
 
 }

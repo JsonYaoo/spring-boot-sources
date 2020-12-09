@@ -49,11 +49,20 @@ import org.springframework.lang.Nullable;
 public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
 	/**
+	 * 20201209
+	 * A. 标准单例作用域的作用域标识符：{@value}。
+	 * B. 请注意，扩展的bean工厂可能支持更多范围。
+	 */
+	/**
+	 * A.
 	 * Scope identifier for the standard singleton scope: {@value}.
+	 *
+	 * B.
 	 * <p>Note that extended bean factories might support further scopes.
 	 * @see #setScope
 	 * @see ConfigurableBeanFactory#SCOPE_SINGLETON
 	 */
+	// 20201209 标准单例作用域的作用域标识符：{@value}。
 	String SCOPE_SINGLETON = ConfigurableBeanFactory.SCOPE_SINGLETON;
 
 	/**

@@ -20,9 +20,16 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.util.Assert;
 
 /**
+ * 20201209
+ * A. 描述Spring托管bean的范围特征，包括范围名称和scoped-proxy行为。
+ * B. 默认范围是“singleton”，默认是不创建范围代理。
+ */
+/**
+ * A.
  * Describes scope characteristics for a Spring-managed bean including the scope
  * name and the scoped-proxy behavior.
  *
+ * B.
  * <p>The default scope is "singleton", and the default is to <i>not</i> create
  * scoped-proxies.
  *
@@ -32,8 +39,10 @@ import org.springframework.util.Assert;
  * @see ScopeMetadataResolver
  * @see ScopedProxyMode
  */
+// 20201209 描述Spring托管bean的范围特征，包括范围名称和scoped-proxy行为 -> 默认范围是“singleton”，默认是不创建范围代理。
 public class ScopeMetadata {
 
+	// 20201209 bean范围的名称 -> 单例标识符
 	private String scopeName = BeanDefinition.SCOPE_SINGLETON;
 
 	private ScopedProxyMode scopedProxyMode = ScopedProxyMode.NO;
@@ -50,7 +59,9 @@ public class ScopeMetadata {
 	/**
 	 * Get the name of the scope.
 	 */
+	// 20201209 获取bea范围的名称。
 	public String getScopeName() {
+		// 20201209 获取bean范围的名称 -> 默认为单例标识符
 		return this.scopeName;
 	}
 

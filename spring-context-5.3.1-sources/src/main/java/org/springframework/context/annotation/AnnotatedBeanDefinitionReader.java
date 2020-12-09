@@ -61,6 +61,7 @@ public class AnnotatedBeanDefinitionReader {
 	// 20201208 用于为bean定义生成bean名称的策略接口实例, 默认为AnnotationBeanNameGenerator的实例常量, 用于组件扫描
 	private BeanNameGenerator beanNameGenerator = AnnotationBeanNameGenerator.INSTANCE;
 
+	// 20201208 解决bean定义范围的策略接口
 	private ScopeMetadataResolver scopeMetadataResolver = new AnnotationScopeMetadataResolver();
 
 	// 20201206 用于评估{@link Conditional}注解的内部类
@@ -304,14 +305,22 @@ public class AnnotatedBeanDefinitionReader {
 		// 20201208 为给定的bean类创建一个新的注解数据公开类AnnotatedGenericBeanDefinition —> 注册注解实例(但过滤"java.lang", "org.springframework.lang"下的注解)
 		AnnotatedGenericBeanDefinition abd = new AnnotatedGenericBeanDefinition(beanClass);
 
-		// 20201208 用于评估{@link Conditional}注解的内部类
+		// 20201208 用于评估{@link Conditional}注解的内部类, 确定是否应跳过该项注解的bean注册
 		if (this.conditionEvaluator.shouldSkip(abd.getMetadata())) {
+			// 20201209 如果注解与上下文匹配, 说明可以跳过该项注解的bean注册, 则直接返回不在注册
 			return;
 		}
 
+		// 20201209 否则需要进行注册, 注解数据公开类设置结果提供者, Springboot启动时设置为null, 表示bean实例创建后不进行任何回调
 		abd.setInstanceSupplier(supplier);
+
+		// 20201209 解决出适合于提供的bean定义器的bean的范围特征
 		ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(abd);
+
+		// 20201209 设置bean的目标作用域的名称为范围特征的bean范围的名称, 默认为单例标识符
 		abd.setScope(scopeMetadata.getScopeName());
+
+		// 20201209 如果指定的Bean的显式名称不为空, 在直接返回, 否则返回
 		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
 
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);

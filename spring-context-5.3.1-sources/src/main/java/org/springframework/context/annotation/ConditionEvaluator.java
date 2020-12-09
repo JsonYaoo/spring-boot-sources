@@ -66,11 +66,11 @@ class ConditionEvaluator {
 	 * The {@link ConfigurationPhase} will be deduced from the type of item (i.e. a
 	 * {@code @Configuration} class will be {@link ConfigurationPhase#PARSE_CONFIGURATION})
 	 * @param metadata the meta data
-	 * @return if the item should be skipped
+	 * @return if the item should be skipped	//	20201209 是否应跳过该项注解的bean注册
 	 */
-	// 20201208 根据{@code @Conditional}注解确定是否应跳过一项。 {@link ConfigurationPhase}将根据项目的类型推导（即{@code @Configuration}类将是{@link ConfigurationPhase＃PARSE_CONFIGURATION}）
+	// 20201208 根据{@code @Conditional}注解确定是否应跳过该项注解的bean注册。 {@link ConfigurationPhase}将根据项目的类型推导（即{@code @Configuration}类将是{@link ConfigurationPhase＃PARSE_CONFIGURATION}）
 	public boolean shouldSkip(AnnotatedTypeMetadata metadata) {
-		// 20201208 // 20201208 根据{@code @Conditional}注解确定是否应跳过一项。
+		// 20201208 根据{@code @Conditional}注解确定是否应跳过该项注解的bean注册。
 		return shouldSkip(metadata, null);
 	}
 
@@ -80,9 +80,9 @@ class ConditionEvaluator {
 	 * @param phase the phase of the call	// 20201208 需要评估的阶段
 	 * @return if the item should be skipped
 	 */
-	// 20201208 注解评估: 根据{@code @Conditional}注解确定是否应跳过一项。
+	// 20201208 注解评估: 根据{@code @Conditional}注解确定是否应跳过该项注解的bean注册。
 	public boolean shouldSkip(@Nullable AnnotatedTypeMetadata metadata, @Nullable ConfigurationPhase phase) {
-		// 20201208 如果注解元素据为空, 或者如果注解不存在@Conditional注解, 则直接返回false
+		// 20201208 如果注解元素据为空, 或者如果注解不存在@Conditional注解, 则直接返回false, 表示不该跳过该项注解的bean注册
 		if (metadata == null || !metadata.isAnnotated(Conditional.class.getName())) {
 			return false;
 		}
@@ -99,41 +99,64 @@ class ConditionEvaluator {
 			return shouldSkip(metadata, ConfigurationPhase.REGISTER_BEAN);
 		}
 
-		// 20201208 如果指定了评估阶段
+		// 20201208 如果指定了评估阶段, 则初始化Conditional实例集合
 		List<Condition> conditions = new ArrayList<>();
+
+		// 20201209 检索Conditional类型的所有注解的属性值
 		for (String[] conditionClasses : getConditionClasses(metadata)) {
+			// 20201209 遍历每个值中的每个属性
 			for (String conditionClass : conditionClasses) {
+				// 20201209 使用classloader类加载器实例化Class名称为conditionClassName的实例
 				Condition condition = getCondition(conditionClass, this.context.getClassLoader());
+
+				// 20201209 将实例添加到Conditional实例集合
 				conditions.add(condition);
 			}
 		}
 
+		// 20201209 根据注解顺序对实例集合进行排序
 		AnnotationAwareOrderComparator.sort(conditions);
 
+		// 20201209 遍历Conditional实例
 		for (Condition condition : conditions) {
+			// 20201209 初始化可以评估条件的各种配置阶段
 			ConfigurationPhase requiredPhase = null;
+
+			// 20201209 如果条件实例为ConfigurationCondition配置实例
 			if (condition instanceof ConfigurationCondition) {
+				// 20201209 则获取对应的获取评估阶段
 				requiredPhase = ((ConfigurationCondition) condition).getConfigurationPhase();
 			}
+
+			// 20201209 如果指定的阶段相同, 或者扫描到的条件实例的评估阶段为空, 且注解元数据与当前应用上下文配置的属性匹配, 则返回true, 表示该注解应跳过该项注解的bean注册
 			if ((requiredPhase == null || requiredPhase == phase) && !condition.matches(this.context, metadata)) {
 				return true;
 			}
 		}
 
+		// 20201209 否则返回false, 表示该注解不应跳过该项注解的bean注册
 		return false;
 	}
 
-	// 20201208 获取匹配条件的Class
+	// 20201209 检索Conditional类型的所有注解的属性值
 	@SuppressWarnings("unchecked")
 	private List<String[]> getConditionClasses(AnnotatedTypeMetadata metadata) {
-
+		// 20201209 检索Conditional类型的所有注解的所有属性（如果有）（即，如果在基础元素上定义为直接注解或元注解）
 		MultiValueMap<String, Object> attributes = metadata.getAllAnnotationAttributes(Conditional.class.getName(), true);
+
+		// 20201209 获取属性值列表
 		Object values = (attributes != null ? attributes.get("value") : null);
+
+		// 20201209 返回属性值列表
 		return (List<String[]>) (values != null ? values : Collections.emptyList());
 	}
 
+	// 20201209 使用classloader类加载器实例化Class名称为conditionClassName的实例
 	private Condition getCondition(String conditionClassName, @Nullable ClassLoader classloader) {
+		// 20201209 将给定的类名称解析为Class实例。 支持基元（例如“ int”）和数组类名称（例如“ String []”）
 		Class<?> conditionClass = ClassUtils.resolveClassName(conditionClassName, classloader);
+
+		// 20201208 使用其“主要”构造函数（对于Kotlin类，可能声明了默认参数）或其缺省构造函数（对于常规Java类，需要标准无参数设置）实例化一个类
 		return (Condition) BeanUtils.instantiateClass(conditionClass);
 	}
 

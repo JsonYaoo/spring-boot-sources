@@ -29,6 +29,7 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 4.0
  */
+// 20201209 供{@link Condition}实现使用的上下文信息。
 public interface ConditionContext {
 
 	/**
@@ -50,6 +51,7 @@ public interface ConditionContext {
 	/**
 	 * Return the {@link Environment} for which the current application is running.
 	 */
+	// 20201209 返回当前应用程序正在运行的{@link Environment}。
 	Environment getEnvironment();
 
 	/**

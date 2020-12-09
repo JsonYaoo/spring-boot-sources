@@ -54,7 +54,7 @@ import org.springframework.lang.Nullable;
  * @see TypeUtils
  * @see ReflectionUtils
  */
-// 20201130 其他{@code java.lang.Class}实用方法。主要用于框架内内部使用。
+// 20201130 其他{@code java.lang.Class}实用方法。主要用于框架内部使用。
 public abstract class ClassUtils {
 
 	/** Suffix for array class names: {@code "[]"}. */
@@ -326,23 +326,38 @@ public abstract class ClassUtils {
 	}
 
 	/**
+	 * 20201209
+	 * A. 将给定的类名称解析为Class实例。 支持基元（例如“ int”）和数组类名称（例如“ String []”）。
+	 * B. 这实际上等效于具有相同参数的{@code forName}方法，唯一的区别是在类加载失败的情况下引发异常。
+	 */
+	/**
+	 * A.
 	 * Resolve the given class name into a Class instance. Supports
 	 * primitives (like "int") and array class names (like "String[]").
+	 *
+	 * B.
 	 * <p>This is effectively equivalent to the {@code forName}
 	 * method with the same arguments, with the only difference being
 	 * the exceptions thrown in case of class loading failure.
+	 *
 	 * @param className the name of the Class
 	 * @param classLoader the class loader to use
 	 * (may be {@code null}, which indicates the default class loader)
 	 * @return a class instance for the supplied name
+	 *
+	 * // 20201209 如果类名不可解析（即找不到该类或无法加载该类文件）
 	 * @throws IllegalArgumentException if the class name was not resolvable
 	 * (that is, the class could not be found or the class file could not be loaded)
+	 *
+	 * // 20201209 如果对应的类是可解析的，但是在该类的继承层次结构中存在可读性不匹配的情况（通常是Jigsaw模块定义中缺少的依赖项声明，该声明由要在此处加载的类
+	 * // 20201209 实现的超类或接口在此处加载）@see #forName（String ，ClassLoader）
 	 * @throws IllegalStateException if the corresponding class is resolvable but
 	 * there was a readability mismatch in the inheritance hierarchy of the class
 	 * (typically a missing dependency declaration in a Jigsaw module definition
 	 * for a superclass or interface implemented by the class to be loaded here)
 	 * @see #forName(String, ClassLoader)
 	 */
+	// 20201209 将给定的类名称解析为Class实例。 支持基元（例如“ int”）和数组类名称（例如“ String []”）
 	public static Class<?> resolveClassName(String className, @Nullable ClassLoader classLoader)
 			throws IllegalArgumentException {
 

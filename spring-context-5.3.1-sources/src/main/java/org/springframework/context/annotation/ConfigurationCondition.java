@@ -34,8 +34,8 @@ public interface ConfigurationCondition extends Condition {
 	/**
 	 * Return the {@link ConfigurationPhase} in which the condition should be evaluated.
 	 */
+	// 20201209 返回{@link ConfigurationPhase}，其中应评估条件。
 	ConfigurationPhase getConfigurationPhase();
-
 
 	/**
 	 * The various configuration phases where the condition could be evaluated.

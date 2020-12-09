@@ -123,6 +123,7 @@ public interface AnnotatedTypeMetadata {
 	 * Retrieve all attributes of all annotations of the given type, if any (i.e. if
 	 * defined on the underlying element, as direct annotation or meta-annotation).
 	 * Note that this variant does <i>not</i> take attribute overrides into account.
+	 *
 	 * @param annotationName the fully qualified class name of the annotation
 	 * type to look for
 	 * @return a MultiMap of attributes, with the attribute name as key (e.g. "value")
@@ -130,8 +131,10 @@ public interface AnnotatedTypeMetadata {
 	 * be {@code null} if no matching annotation is defined.
 	 * @see #getAllAnnotationAttributes(String, boolean)
 	 */
+	// 20201209 检索给定类型的所有注释的所有属性（如果有）（即，如果在基础元素上定义为直接注释或元注释）。 请注意，此变体不考虑属性替代。
 	@Nullable
 	default MultiValueMap<String, Object> getAllAnnotationAttributes(String annotationName) {
+		// 20201209 检索Conditional类型的所有注解的所有属性（如果有）（即，如果在基础元素上定义为直接注解或元注解）
 		return getAllAnnotationAttributes(annotationName, false);
 	}
 
@@ -139,22 +142,30 @@ public interface AnnotatedTypeMetadata {
 	 * Retrieve all attributes of all annotations of the given type, if any (i.e. if
 	 * defined on the underlying element, as direct annotation or meta-annotation).
 	 * Note that this variant does <i>not</i> take attribute overrides into account.
+	 *
 	 * @param annotationName the fully qualified class name of the annotation
 	 * type to look for
 	 * @param classValuesAsString  whether to convert class references to String
+	 *
+	 * // 20201208 属性的MultiMap，属性名称为键（例如“值”），定义的属性值列表为Map值。 如果未定义匹配的注解，则此返回值为{@code null}。
 	 * @return a MultiMap of attributes, with the attribute name as key (e.g. "value")
 	 * and a list of the defined attribute values as Map value. This return value will
 	 * be {@code null} if no matching annotation is defined.
 	 * @see #getAllAnnotationAttributes(String)
 	 */
+	// 20201208 检索给定类型的所有注解的所有属性（如果有）（即，如果在基础元素上定义为直接注解或元注解）。 请注意，此变体不考虑属性替代。
 	@Nullable
-	default MultiValueMap<String, Object> getAllAnnotationAttributes(
-            String annotationName, boolean classValuesAsString) {
-
+	default MultiValueMap<String, Object> getAllAnnotationAttributes(String annotationName, boolean classValuesAsString) {
+		// 20201209 获取Adapt数组: 可以应用于属性值的调整 -> 指定使类或类数组属性适应字符串为Conditional名称, 且指定使嵌套的注解或注解数组适合于映射，而不是合成值为true
 		Adapt[] adaptations = Adapt.values(classValuesAsString, true);
+
+		// 20201209 收集那些没有层次结构的, 非合并属性的注解属性集合 -> 根据基础元素的直接注解返回注解详细信息
 		return getAnnotations().stream(annotationName)
+				// 20201209 过滤掉那些提取到的键唯一的注解, 其注解是到{@link #getRoot（）根}的注解层次结构中注解类型的完整列表
 				.filter(MergedAnnotationPredicates.unique(MergedAnnotation::getMetaTypes))
+				// 20201209 获取剩下的注解中非合并的属性值 -> 创建注解的新视图，以显示非合并的属性值
 				.map(MergedAnnotation::withNonMergedAttributes)
+				// 20201209 {@link Collector}收集注解并将其合成为{@link LinkedMultiValueMap}
 				.collect(MergedAnnotationCollectors.toMultiValueMap(map ->
 						map.isEmpty() ? null : map, adaptations));
 	}

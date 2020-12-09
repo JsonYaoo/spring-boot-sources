@@ -34,6 +34,7 @@ import org.springframework.util.ObjectUtils;
  * @author Phillip Webb
  * @since 5.2
  */
+// 20201209 为{@link MergedAnnotation MergedAnnotations}提供各种测试操作的谓词实现。
 public abstract class MergedAnnotationPredicates {
 
 	private MergedAnnotationPredicates() {
@@ -103,14 +104,16 @@ public abstract class MergedAnnotationPredicates {
 	 * annotations that are unique based on the extracted key. For example
 	 * {@code MergedAnnotationPredicates.unique(MergedAnnotation::getType)} will
 	 * match the first time a unique type is encountered.
+	 *
 	 * @param keyExtractor function used to extract the key used to test for
 	 * uniqueness
 	 * @return a {@link Predicate} that matches a unique annotation based on the
-	 * extracted key
+	 * extracted key // 20201209 一个{@link谓词}，它根据提取的密钥匹配唯一的注解
 	 */
+	// 20201209 创建一个新的有状态的，一次性使用的{@link谓词}，以匹配基于提取的键唯一的注解。 
+	// 20201209 例如，{@code MergedAnnotationPredicates.unique（MergedAnnotation :: getType）}将在首次遇到唯一类型时匹配。
 	public static <A extends Annotation, K> Predicate<MergedAnnotation<A>> unique(
 			Function<? super MergedAnnotation<A>, K> keyExtractor) {
-
 		return new UniquePredicate<>(keyExtractor);
 	}
 

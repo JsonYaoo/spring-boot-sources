@@ -61,10 +61,19 @@ import org.springframework.util.StringValueResolver;
 public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, SingletonBeanRegistry {
 
 	/**
+	 * 20201209
+	 * A. 标准单例作用域的作用域标识符：{@value}。
+	 * B. 可以通过{@code registerScope}添加自定义范围。
+	 */
+	/**
+	 * A.
 	 * Scope identifier for the standard singleton scope: {@value}.
+	 *
+	 * B.
 	 * <p>Custom scopes can be added via {@code registerScope}.
 	 * @see #registerScope
 	 */
+	// 20201209 标准单例作用域的作用域标识符：{@value}。
 	String SCOPE_SINGLETON = "singleton";
 
 	/**

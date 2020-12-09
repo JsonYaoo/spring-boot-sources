@@ -71,6 +71,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Constant for the default scope name: {@code ""}, equivalent to singleton
 	 * status unless overridden from a parent bean definition (if applicable).
 	 */
+	// 20201209 默认作用域名称的常量：{@code“”}，等同于单例状态，除非从父bean定义中覆盖（如果适用）。
 	public static final String SCOPE_DEFAULT = "";
 
 	/**
@@ -149,6 +150,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private volatile Object beanClass;
 
+	// 20201209 bean的目标作用域的名称 -> 默认为单例
 	@Nullable
 	private String scope = SCOPE_DEFAULT;
 
@@ -170,6 +172,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
 
+	// 20201209 结果提供者: 指定一个用于创建bean实例的回调，以替代声明式指定的工厂方法
 	@Nullable
 	private Supplier<?> instanceSupplier;
 
@@ -492,17 +495,29 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
+	 * 20201209
+	 * A. 设置bean的目标作用域的名称。
+	 * B. 缺省值为单例状态，尽管仅当bean定义在包含工厂中变为活动状态时才应用。 Bean定义最终可能会从父Bean定义继承其范围。 由于这个原因，默认作用域名称是一个空字符串
+	 *   （即{@code“”}），在设置可解析的作用域之前，将假定为单例状态。
+	 */
+	/**
+	 * A.
 	 * Set the name of the target scope for the bean.
+	 *
+	 * B.
 	 * <p>The default is singleton status, although this is only applied once
 	 * a bean definition becomes active in the containing factory. A bean
 	 * definition may eventually inherit its scope from a parent bean definition.
 	 * For this reason, the default scope name is an empty string (i.e., {@code ""}),
 	 * with singleton status being assumed until a resolved scope is set.
+	 *
 	 * @see #SCOPE_SINGLETON
 	 * @see #SCOPE_PROTOTYPE
 	 */
+	// 20201209 设置bean的目标作用域的名称
 	@Override
 	public void setScope(@Nullable String scope) {
+		// 20201209 设置bean的目标作用域的名称
 		this.scope = scope;
 	}
 
@@ -757,16 +772,27 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
+	 * 20201209
+	 * A. 指定一个用于创建bean实例的回调，以替代声明式指定的工厂方法。
+	 * B. 如果设置了此类回调，它将覆盖任何其他构造函数或工厂方法元数据。 但是，bean属性填充和潜在的注释驱动的注入将仍然照常应用。
+	 */
+	/**
+	 * A.
 	 * Specify a callback for creating an instance of the bean,
 	 * as an alternative to a declaratively specified factory method.
+	 *
+	 * B.
 	 * <p>If such a callback is set, it will override any other constructor
 	 * or factory method metadata. However, bean property population and
 	 * potential annotation-driven injection will still apply as usual.
+	 *
 	 * @since 5.0
 	 * @see #setConstructorArgumentValues(ConstructorArgumentValues)
 	 * @see #setPropertyValues(MutablePropertyValues)
 	 */
+	// 20201209 设置结果提供者: 指定一个用于创建bean实例的回调，以替代声明式指定的工厂方法
 	public void setInstanceSupplier(@Nullable Supplier<?> instanceSupplier) {
+		// 20201209 注册结果提供者: 指定一个用于创建bean实例的回调，以替代声明式指定的工厂方法
 		this.instanceSupplier = instanceSupplier;
 	}
 

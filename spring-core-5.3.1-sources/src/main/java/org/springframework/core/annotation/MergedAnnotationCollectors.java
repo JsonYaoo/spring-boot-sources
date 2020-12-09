@@ -38,6 +38,7 @@ import org.springframework.util.MultiValueMap;
  * @author Sam Brannen
  * @since 5.2
  */
+// 20201209 {@link Collector}实现为{@link MergedAnnotation}实例提供了各种简化操作。
 public abstract class MergedAnnotationCollectors {
 
 	private static final Characteristics[] NO_CHARACTERISTICS = {};
@@ -115,17 +116,24 @@ public abstract class MergedAnnotationCollectors {
 	}
 
 	/**
+	 * 20201209
+	 * 创建一个新的{@link Collector}，将合并的注解累积到{@link MultiValueMap}中，并从每个合并的注解作为map{@linkplain MergedAnnotation＃asMap（Adapt ...）添加项目
+	 * {@linkplain MultiValueMap＃add（Object，Object）}中。
+	 */
+	/**
 	 * Create a new {@link Collector} that accumulates merged annotations to a
 	 * {@link MultiValueMap} with items {@linkplain MultiValueMap#add(Object, Object)
 	 * added} from each merged annotation
 	 * {@linkplain MergedAnnotation#asMap(Adapt...) as a map}.
-	 * @param <A> the annotation type
-	 * @param finisher the finisher function for the new {@link MultiValueMap}
-	 * @param adaptations the adaptations that should be applied to the annotation values
+	 *
+	 * @param <A> the annotation type	//	20201209 注解类型
+	 * @param finisher the finisher function for the new {@link MultiValueMap}	//	20201209 新{@link MultiValueMap}的修整器功能
+	 * @param adaptations the adaptations that should be applied to the annotation values	//	20201209 应该应用于注解值的修改
 	 * @return a {@link Collector} which collects and synthesizes the
-	 * annotations into a {@link LinkedMultiValueMap}
+	 * annotations into a {@link LinkedMultiValueMap} // 20201209 {@link Collector}收集注解并将其合成为{@link LinkedMultiValueMap}
 	 * @see #toMultiValueMap(Adapt...)
 	 */
+	// 20201209 {@link Collector}收集注解并将其合成为{@link LinkedMultiValueMap}
 	public static <A extends Annotation> Collector<MergedAnnotation<A>, ?, MultiValueMap<String, Object>> toMultiValueMap(
 			Function<MultiValueMap<String, Object>, MultiValueMap<String, Object>> finisher,
 			Adapt... adaptations) {
