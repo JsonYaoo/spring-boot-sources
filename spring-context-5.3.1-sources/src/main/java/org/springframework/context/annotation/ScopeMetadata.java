@@ -45,8 +45,8 @@ public class ScopeMetadata {
 	// 20201209 bean范围的名称 -> 单例标识符
 	private String scopeName = BeanDefinition.SCOPE_SINGLETON;
 
+	// 20201209 枚举各种作用域代理选项 -> 默认不要创建作用域代理
 	private ScopedProxyMode scopedProxyMode = ScopedProxyMode.NO;
-
 
 	/**
 	 * Set the name of the scope.
@@ -76,7 +76,9 @@ public class ScopeMetadata {
 	/**
 	 * Get the proxy-mode to be applied to the scoped instance.
 	 */
+	// 20201209 获取要应用于作用域实例的代理模式。
 	public ScopedProxyMode getScopedProxyMode() {
+		// 20201209 返回枚举各种作用域代理选项 -> 默认不要创建作用域代理
 		return this.scopedProxyMode;
 	}
 

@@ -156,6 +156,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean abstractFlag = false;
 
+	// 20201029 是否懒加载
 	@Nullable
 	private Boolean lazyInit;
 
@@ -570,12 +571,22 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
+	 * 20201209
+	 * A. 设置是否应延迟初始化此bean。
+	 * B. 如果{@code false}，则将在执行启动单例初始化的bean工厂启动时实例化bean。
+	 */
+	/**
+	 * A.
 	 * Set whether this bean should be lazily initialized.
+	 *
+	 * B.
 	 * <p>If {@code false}, the bean will get instantiated on startup by bean
 	 * factories that perform eager initialization of singletons.
 	 */
+	// 20201209 设置是否应延迟初始化此bean
 	@Override
 	public void setLazyInit(boolean lazyInit) {
+		// 20201209 注册是否懒加载标志
 		this.lazyInit = lazyInit;
 	}
 
@@ -713,10 +724,19 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
+	 * 20201209
+	 * A. 设置此bean是否为自动装配的主要候选对象。
+	 * B. 如果对于多个匹配候选对象中的一个bean，此值为{@code true}，则它将作为平局。
+	 */
+	/**
+	 * A.
 	 * Set whether this bean is a primary autowire candidate.
+	 *
+	 * B.
 	 * <p>If this value is {@code true} for exactly one bean among multiple
 	 * matching candidates, it will serve as a tie-breaker.
 	 */
+	// 20201209 设置此bean是否为自动装配的主要候选对象
 	@Override
 	public void setPrimary(boolean primary) {
 		this.primary = primary;
@@ -735,6 +755,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * keyed by the qualifier's type name.
 	 * @see AutowireCandidateQualifier#getTypeName()
 	 */
+	// 20201209 注册要用于自动装配候选解析的限定符，该限定符由限定符的类型名称键入。
 	public void addQualifier(AutowireCandidateQualifier qualifier) {
 		this.qualifiers.put(qualifier.getTypeName(), qualifier);
 	}

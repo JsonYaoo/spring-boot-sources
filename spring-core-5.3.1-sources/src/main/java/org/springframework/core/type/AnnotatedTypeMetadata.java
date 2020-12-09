@@ -98,6 +98,7 @@ public interface AnnotatedTypeMetadata {
 	 * Retrieve the attributes of the annotation of the given type, if any (i.e. if
 	 * defined on the underlying element, as direct annotation or meta-annotation),
 	 * also taking attribute overrides on composed annotations into account.
+	 *
 	 * @param annotationName the fully qualified class name of the annotation
 	 * type to look for
 	 * @param classValuesAsString whether to convert class references to String
@@ -107,15 +108,25 @@ public interface AnnotatedTypeMetadata {
 	 * and the defined attribute value as Map value. This return value will be
 	 * {@code null} if no matching annotation is defined.
 	 */
+	// 20201209 检索给定类型的注解的属性（如果有的话）（即，如果在基础元素上定义为直接注解或元注解），也要考虑对组合注解的属性覆盖。
 	@Nullable
 	default Map<String, Object> getAnnotationAttributes(String annotationName,
                                                         boolean classValuesAsString) {
 
-		MergedAnnotation<Annotation> annotation = getAnnotations().get(annotationName,
-				null, MergedAnnotationSelectors.firstDirectlyDeclared());
+		// 20201209 获取合并的注解
+		MergedAnnotation<Annotation> annotation = getAnnotations().get(
+				annotationName,
+
+				null,
+				// 20201209 尽可能选择第一个直接声明的注释。 如果未声明直接注释，则选择最近的注释。
+				MergedAnnotationSelectors.firstDirectlyDeclared());
+
+		// 20201209 如果该注解是直接注解, 则直接返回
 		if (!annotation.isPresent()) {
 			return null;
 		}
+
+		// 20201209 从此合并的注解中创建一个新的可变{@link AnnotationAttributes}实例。
 		return annotation.asAnnotationAttributes(Adapt.values(classValuesAsString, true));
 	}
 
@@ -131,7 +142,7 @@ public interface AnnotatedTypeMetadata {
 	 * be {@code null} if no matching annotation is defined.
 	 * @see #getAllAnnotationAttributes(String, boolean)
 	 */
-	// 20201209 检索给定类型的所有注释的所有属性（如果有）（即，如果在基础元素上定义为直接注释或元注释）。 请注意，此变体不考虑属性替代。
+	// 20201209 检索给定类型的所有注解的所有属性（如果有）（即，如果在基础元素上定义为直接注解或元注解）。 请注意，此变体不考虑属性替代。
 	@Nullable
 	default MultiValueMap<String, Object> getAllAnnotationAttributes(String annotationName) {
 		// 20201209 检索Conditional类型的所有注解的所有属性（如果有）（即，如果在基础元素上定义为直接注解或元注解）

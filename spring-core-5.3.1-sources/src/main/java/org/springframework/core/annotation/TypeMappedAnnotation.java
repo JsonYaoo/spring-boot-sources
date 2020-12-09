@@ -85,7 +85,7 @@ final class TypeMappedAnnotation<A extends Annotation> extends AbstractMergedAnn
 		EMPTY_ARRAYS = Collections.unmodifiableMap(emptyArrays);
 	}
 
-
+	// 20201209 在根注解类型的上下文中为单个注解（或元注解）提供映射信息。
 	private final AnnotationTypeMapping mapping;
 
 	@Nullable
@@ -165,13 +165,17 @@ final class TypeMappedAnnotation<A extends Annotation> extends AbstractMergedAnn
 		return this.mapping.getMetaTypes();
 	}
 
+	// 20201209 确定注释是否在源上存在
 	@Override
 	public boolean isPresent() {
+		// 20201209 默认返回true
 		return true;
 	}
 
+	// 20201209 获取此注解与其用作元注解相关的距离
 	@Override
 	public int getDistance() {
+		// 20201209 获取此映射的距离。
 		return this.mapping.getDistance();
 	}
 

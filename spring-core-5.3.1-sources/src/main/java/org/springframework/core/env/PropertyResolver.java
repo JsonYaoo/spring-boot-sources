@@ -102,6 +102,7 @@ public interface PropertyResolver {
 	 * @throws IllegalArgumentException if given text is {@code null}
 	 * @see #resolveRequiredPlaceholders
 	 */
+	// 20201209 在给定的文本中解析$ {...}占位符，将其替换为{@link #getProperty}解析的相应属性值。 没有默认值的无法解析的占位符将被忽略，并按原样传递。
 	String resolvePlaceholders(String text);
 
 	/**

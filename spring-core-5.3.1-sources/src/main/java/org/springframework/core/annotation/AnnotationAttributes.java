@@ -27,11 +27,13 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * A.
  * {@link LinkedHashMap} subclass representing annotation attribute
  * <em>key-value</em> pairs as read by {@link AnnotationUtils},
  * {@link AnnotatedElementUtils}, and Spring's reflection- and ASM-based
  * {@link org.springframework.core.type.AnnotationMetadata} implementations.
  *
+ * B.
  * <p>Provides 'pseudo-reification' to avoid noisy Map generics in the calling
  * code as well as convenience methods for looking up annotation attributes
  * in a type-safe fashion.
@@ -43,14 +45,19 @@ import org.springframework.util.StringUtils;
  * @see AnnotationUtils#getAnnotationAttributes
  * @see AnnotatedElementUtils
  */
+// 20201209 {@link LinkedHashMap}子类，表示由{@link AnnotationUtils}，{@ link AnnotatedElementUtils}以及Spring基于反射和
+// 20201209 ASM的{@link org.springframework.core.type.AnnotationMetadata}实现读取的注释属性键值对 。
 @SuppressWarnings("serial")
 public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 
+	// 20201209 默认不出现的名称 => "unknown"
 	private static final String UNKNOWN = "unknown";
 
+	// 20201209 注解类型
 	@Nullable
 	private final Class<? extends Annotation> annotationType;
 
+	// 20201209 不出现的名称
 	final String displayName;
 
 	boolean validated = false;
@@ -81,9 +88,15 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	 * @param map original source of annotation attribute <em>key-value</em> pairs
 	 * @see #fromMap(Map)
 	 */
+	// 20201209 创建一个新的{@link AnnotationAttributes}实例，包装提供的map及其所有键值对。
 	public AnnotationAttributes(Map<String, Object> map) {
+		// 20201209 构造LinkedHashMap
 		super(map);
+
+		// 20201209 注册空的注解类型
 		this.annotationType = null;
+
+		// 20201209 注册不出现的名称
 		this.displayName = UNKNOWN;
 	}
 
@@ -410,23 +423,37 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 		return String.valueOf(value);
 	}
 
-
 	/**
+	 * 20201209
+	 * A. 根据给定的映射返回一个{@link AnnotationAttributes}实例。
+	 * B. 如果该映射已经是一个{@code AnnotationAttributes}实例，它将被强制转换并立即返回，而无需创建新实例。 否则，通过将提供的映射传递到
+	 *   {@link #AnnotationAttributes（Map）}构造函数来创建新实例。
+	 */
+	/**
+	 * A.
 	 * Return an {@link AnnotationAttributes} instance based on the given map.
+	 *
+	 * B.
 	 * <p>If the map is already an {@code AnnotationAttributes} instance, it
 	 * will be cast and returned immediately without creating a new instance.
 	 * Otherwise a new instance will be created by passing the supplied map
 	 * to the {@link #AnnotationAttributes(Map)} constructor.
 	 * @param map original source of annotation attribute <em>key-value</em> pairs
 	 */
+	// 20201209 根据给定的映射返回一个{@link AnnotationAttributes}实例。
 	@Nullable
 	public static AnnotationAttributes fromMap(@Nullable Map<String, Object> map) {
 		if (map == null) {
 			return null;
 		}
+
+		// 20201209 如果属于AnnotationAttributes注解属性map类型
 		if (map instanceof AnnotationAttributes) {
+			// 20201209 则强转后直接返回即可
 			return (AnnotationAttributes) map;
 		}
+
+		// 20201209 否则创建一个新的{@link AnnotationAttributes}实例，包装提供的map及其所有键值对。
 		return new AnnotationAttributes(map);
 	}
 

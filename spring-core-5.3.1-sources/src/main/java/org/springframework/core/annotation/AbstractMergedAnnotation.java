@@ -38,9 +38,10 @@ abstract class AbstractMergedAnnotation<A extends Annotation> implements MergedA
 	@Nullable
 	private volatile A synthesizedAnnotation;
 
-
+	// 20201209 确定注解是否直接出现在源上
 	@Override
 	public boolean isDirectlyPresent() {
+		// 20201209 如果根注解到此注解的距离为0, 说明为直接注解, 返回true
 		return isPresent() && getDistance() == 0;
 	}
 

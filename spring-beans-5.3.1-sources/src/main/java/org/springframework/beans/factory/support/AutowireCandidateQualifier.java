@@ -29,6 +29,7 @@ import org.springframework.util.Assert;
  * @since 2.5
  * @see org.springframework.beans.factory.annotation.Qualifier
  */
+// 20201209 解决自动装配候选的限定符。 包含一个或多个此类限定符的Bean定义使对要自动连接的字段或参数上的注释的细粒度匹配成为可能。
 @SuppressWarnings("serial")
 public class AutowireCandidateQualifier extends BeanMetadataAttributeAccessor {
 
@@ -45,6 +46,7 @@ public class AutowireCandidateQualifier extends BeanMetadataAttributeAccessor {
 	 * given type.
 	 * @param type the annotation type
 	 */
+	// 20201209 构造一个限定词以匹配给定类型的注解。
 	public AutowireCandidateQualifier(Class<?> type) {
 		this(type.getName());
 	}

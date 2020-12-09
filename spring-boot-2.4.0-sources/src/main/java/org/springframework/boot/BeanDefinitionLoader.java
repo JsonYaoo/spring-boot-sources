@@ -186,41 +186,53 @@ class BeanDefinitionLoader {
 	/**
 	 * Load the sources into the reader.
 	 */
-	// 20201208 将源加载到阅读器中。
+	// 20201208 将源加载到阅读器中 -> lass类型, Resource类型, Package类型, CharSequence类型
 	void load() {
 		// 20201208 遍历所有源
 		for (Object source : this.sources) {
-			// 20201208 加载每个源到阅读器中
+			// 20201208 加载每个源到阅读器中 -> lass类型, Resource类型, Package类型, CharSequence类型
 			load(source);
 		}
 	}
 
-	// 20201208 加载每个源到阅读器中
+	// 20201208 加载每个源到阅读器中 -> lass类型, Resource类型, Package类型, CharSequence类型
 	private void load(Object source) {
 		// 20201208 源不能为空
 		Assert.notNull(source, "Source must not be null");
 
 		// 20201208 如果源为Class类型
 		if (source instanceof Class<?>) {
-
+			// 20201029 加载bean源, 为从给定的bean类中注册一个bean，并从类声明的注释中派生其元数据。
 			load((Class<?>) source);
 			return;
 		}
+
+		// 20201209 如果源为Resource类型
 		if (source instanceof Resource) {
+			// 20201209 加载Resource源 -> 基于Groovy的bean定义阅读器 | xml的bean定义阅读器
 			load((Resource) source);
 			return;
 		}
+
+		// 20201209 如果源为Package类型
 		if (source instanceof Package) {
+			// 20201209 加载Package源 -> 使用bean定义扫描器在指定的基本程序包中执行扫描 -> 返回已注册的bean数目
 			load((Package) source);
 			return;
 		}
+
+		// 20201209 如果源属于CharSequence类型
 		if (source instanceof CharSequence) {
+			// 20201209 加载CharSequence源 -> 尝试加载bean源, 尝试加载Resources源, 尝试加载Package源
 			load((CharSequence) source);
 			return;
 		}
+
+		// 20201209 如果是其他类型, 则抛出异常
 		throw new IllegalArgumentException("Invalid source type " + source.getClass());
 	}
 
+	// 20201029 加载bean源, 为从给定的bean类中注册一个bean，并从类声明的注释中派生其元数据。
 	private void load(Class<?> source) {
 		// 20201208 如果groovy.lang.MetaClass能够加载, 且如果Groovy中定义的Bean定义的来源类型与source源类型相同
 		if (isGroovyPresent() && GroovyBeanDefinitionSource.class.isAssignableFrom(source)) {
@@ -240,57 +252,96 @@ class BeanDefinitionLoader {
 		}
 	}
 
+	// 20201209 加载Resource源 -> 基于Groovy的bean定义阅读器 | xml的bean定义阅读器
 	private void load(Resource source) {
+		// 20201209 文件名以".groovy结尾
 		if (source.getFilename().endsWith(".groovy")) {
+			// 20201209 如果没有基于Groovy的bean定义阅读器, 则抛出异常
 			if (this.groovyReader == null) {
 				throw new BeanDefinitionStoreException("Cannot load Groovy beans without Groovy on classpath");
 			}
+
+			// 20201209 否则从指定的资源加载bean定义。
 			this.groovyReader.loadBeanDefinitions(source);
 		}
+
+		// 20201209 如果为xml资源
 		else {
+			// 20201209 如果xml的bean定义阅读器为空, 则抛出异常
 			if (this.xmlReader == null) {
 				throw new BeanDefinitionStoreException("Cannot load XML bean definitions when XML support is disabled");
 			}
+
+			// 20201209 否则从指定的资源加载bean定义
 			this.xmlReader.loadBeanDefinitions(source);
 		}
 	}
 
+	// 20201209 加载Package源 -> 使用bean定义扫描器在指定的基本程序包中执行扫描 -> 返回已注册的bean数目
 	private void load(Package source) {
+		// 20201209 使用bean定义扫描器在指定的基本程序包中执行扫描 -> 返回已注册的bean数目
 		this.scanner.scan(source.getName());
 	}
 
+	// 20201209 加载CharSequence源 -> 尝试加载bean源, 尝试加载Resources源, 尝试加载Package源
 	private void load(CharSequence source) {
+		// 20201209 在给定的文本中解析$ {...}占位符，将其替换为{@link #getProperty}解析的相应属性值。 没有默认值的无法解析的占位符将被忽略，并按原样传递。
 		String resolvedSource = this.scanner.getEnvironment().resolvePlaceholders(source.toString());
+
+		// 20201209 尝试加载bean源
 		// Attempt as a Class
 		try {
+			// 20201029 根据解析出的属性值进行加载bean源, 为从给定的bean类中注册一个bean，并从类声明的注释中派生其元数据。
 			load(ClassUtils.forName(resolvedSource, null));
 			return;
 		}
 		catch (IllegalArgumentException | ClassNotFoundException ex) {
 			// swallow exception and continue
+			// 20201209 如果Bean源加载异常, 则吞下异常并继续
 		}
+
+		// 20201209 尝试加载Resources源
 		// Attempt as Resources
+		// 20201209 根据字符串加载Resouce源, 如果加载得到则返回true
 		if (loadAsResources(resolvedSource)) {
 			return;
 		}
+
+		// 20201209 尝试加载Package源
 		// Attempt as package
+		// 20201209 查找源的Package对象
 		Package packageResource = findPackage(resolvedSource);
+
+		// 20201209 如果找得到Package对象
 		if (packageResource != null) {
+			// 20201209 加载Package源 -> 使用bean定义扫描器在指定的基本程序包中执行扫描 -> 返回已注册的bean数目
 			load(packageResource);
 			return;
 		}
 		throw new IllegalArgumentException("Invalid source '" + resolvedSource + "'");
 	}
 
+	// 20201209 根据字符串加载Resouce源, 如果加载得到则返回true
 	private boolean loadAsResources(String resolvedSource) {
+		// 20201209 是否发现候选组件
 		boolean foundCandidate = false;
+
+		// 20201209 根据源字符串, 查找资源句柄数组
 		Resource[] resources = findResources(resolvedSource);
+
+		// 20201209 遍历资源句柄数组
 		for (Resource resource : resources) {
+			// 20201209 是否存在资源句柄 -> 存在则返回true
 			if (isLoadCandidate(resource)) {
+				// 20201209 标记确实发现了候选组件
 				foundCandidate = true;
+
+				// 20201209 加载Resource源 -> 基于Groovy的bean定义阅读器 | xml的bean定义阅读器
 				load(resource);
 			}
 		}
+
+		// 20201209 返回是否发现候选组件
 		return foundCandidate;
 	}
 
@@ -299,13 +350,18 @@ class BeanDefinitionLoader {
 		return ClassUtils.isPresent("groovy.lang.MetaClass", null);
 	}
 
+	// 20201209 根据源字符串, 查找资源句柄数组
 	private Resource[] findResources(String source) {
-		ResourceLoader loader = (this.resourceLoader != null) ? this.resourceLoader
-				: new PathMatchingResourcePatternResolver();
+		// 20201209 获取资源加载器
+		ResourceLoader loader = (this.resourceLoader != null) ? this.resourceLoader : new PathMatchingResourcePatternResolver();
 		try {
+			// 20201029 如果为ResourcePatternResolver类型
 			if (loader instanceof ResourcePatternResolver) {
+				// 20201209 则将给定的位置模式解析为Resource对象
 				return ((ResourcePatternResolver) loader).getResources(source);
 			}
+
+			// 20201209 否则属于其他类型的话, 则获取指定资源位置的资源句柄并返回
 			return new Resource[] { loader.getResource(source) };
 		}
 		catch (IOException ex) {
@@ -313,18 +369,25 @@ class BeanDefinitionLoader {
 		}
 	}
 
+	// 20201209 是否存在资源句柄 -> 存在则返回true
 	private boolean isLoadCandidate(Resource resource) {
+		// 20201209 如果资源句柄不存在, 则返回false
 		if (resource == null || !resource.exists()) {
 			return false;
 		}
+
+		// 20201209 如果资源句柄为ClassPathResource类型
 		if (resource instanceof ClassPathResource) {
 			// A simple package without a '.' may accidentally get loaded as an XML
 			// document if we're not careful. The result of getInputStream() will be
 			// a file list of the package content. We double check here that it's not
 			// actually a package.
+			// 20201209 没有“。”的简单包装。 如果我们不小心，可能会意外地将其加载为XML文档。 getInputStream（）的结果将是包内容的文件列表。 我们在这里再次检查它实际上不是软件包。
+			// 20201209 获取资源路径
 			String path = ((ClassPathResource) resource).getPath();
 			if (path.indexOf('.') == -1) {
 				try {
+					// 20201209 根据资源路径查找包对象, 如果不为空则返回true
 					return Package.getPackage(path) == null;
 				}
 				catch (Exception ex) {
@@ -332,28 +395,47 @@ class BeanDefinitionLoader {
 				}
 			}
 		}
+
+		// 20201209 如果是其他类型则返回true
 		return true;
 	}
 
+	// 20201209 查找源的Package对象
 	private Package findPackage(CharSequence source) {
+		// 20201209 获取Package对象
 		Package pkg = Package.getPackage(source.toString());
+
+		// 20201209 如果存在则直接返回
 		if (pkg != null) {
 			return pkg;
 		}
+		// 20201209 否则尝试在此包中找到一个类
 		try {
 			// Attempt to find a class in this package
+			// 20201209 根据类加载器构造路径模式资源处理器
 			ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(getClass().getClassLoader());
-			Resource[] resources = resolver
-					.getResources(ClassUtils.convertClassNameToResourcePath(source.toString()) + "/*.class");
+
+			// 20201209 根据Class全类名获取资源句柄数组
+			Resource[] resources = resolver.getResources(
+					// 20201209 将基于“。”的完全限定的类名称转换为基于“ /”的资源路径 -> 拼凑Class全类名
+					ClassUtils.convertClassNameToResourcePath(source.toString()) + "/*.class");
+
+			// 20201209 遍历资源句柄数组
 			for (Resource resource : resources) {
+				// 20201209 获取从给定的Java资源路径中删除文件扩展名的路径，例如 “ mypath / myfile.txt”->“ mypath / myfile”。
 				String className = StringUtils.stripFilenameExtension(resource.getFilename());
+
+				// 20201029 拼凑类的全类名 -> 加载该类的bean源, 为从给定的bean类中注册一个bean，并从类声明的注释中派生其元数据。
 				load(Class.forName(source.toString() + "." + className));
 				break;
 			}
 		}
 		catch (Exception ex) {
 			// swallow exception and continue
+			// 20201209 吞下异常并继续
 		}
+
+		// 20201209 根据该类获取Package对象并返回
 		return Package.getPackage(source.toString());
 	}
 

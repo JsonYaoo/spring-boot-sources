@@ -639,6 +639,7 @@ public abstract class StringUtils {
 	 * @param path the file path
 	 * @return the path with stripped filename extension
 	 */
+	// 20201209 获取从给定的Java资源路径中删除文件扩展名的路径，例如 “ mypath / myfile.txt”->“ mypath / myfile”。
 	public static String stripFilenameExtension(String path) {
 		int extIndex = path.lastIndexOf(EXTENSION_SEPARATOR);
 		if (extIndex == -1) {

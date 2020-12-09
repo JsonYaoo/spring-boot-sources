@@ -143,6 +143,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * @see #SCOPE_SINGLETON
 	 * @see #SCOPE_PROTOTYPE
 	 */
+	// 20201209 覆盖此bean的目标作用域，并指定一个新的作用域名称。
 	void setScope(@Nullable String scope);
 
 	/**
@@ -153,10 +154,19 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	String getScope();
 
 	/**
+	 * 20201209
+	 * A. 设置是否应延迟初始化此bean。
+	 * B. 如果{@code false}，则将在执行启动单例初始化的bean工厂启动时实例化bean。
+	 */
+	/**
+	 * A.
 	 * Set whether this bean should be lazily initialized.
+	 *
+	 * B.
 	 * <p>If {@code false}, the bean will get instantiated on startup by bean
 	 * factories that perform eager initialization of singletons.
 	 */
+	// 20201209 设置是否应延迟初始化此bean
 	void setLazyInit(boolean lazyInit);
 
 	/**
@@ -169,6 +179,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Set the names of the beans that this bean depends on being initialized.
 	 * The bean factory will guarantee that these beans get initialized first.
 	 */
+	// 20201209 设置该bean依赖于初始化的bean的名称。 Bean工厂将确保首先初始化这些Bean。
 	void setDependsOn(@Nullable String... dependsOn);
 
 	/**
@@ -192,10 +203,19 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	boolean isAutowireCandidate();
 
 	/**
+	 * 20201209
+	 * A. 设置此bean是否为自动装配的主要候选对象。
+	 * B. 如果对于多个匹配候选对象中的一个bean，此值为{@code true}，则它将作为平局。
+	 */
+	/**
+	 * A.
 	 * Set whether this bean is a primary autowire candidate.
+	 *
+	 * B.
 	 * <p>If this value is {@code true} for exactly one bean among multiple
 	 * matching candidates, it will serve as a tie-breaker.
 	 */
+	// 20201209 设置此bean是否为自动装配的主要候选对象
 	void setPrimary(boolean primary);
 
 	/**
@@ -297,6 +317,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * @see #ROLE_SUPPORT
 	 * @see #ROLE_INFRASTRUCTURE
 	 */
+	// 20201209 设置此{@code BeanDefinition}的角色提示。 角色提示为框架和工具提供了特定{@code BeanDefinition}的角色和重要性的指示。
 	void setRole(int role);
 
 	/**
@@ -313,6 +334,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Set a human-readable description of this bean definition.
 	 * @since 5.1
 	 */
+	// 20201209 设置此bean定义的可读描述。
 	void setDescription(@Nullable String description);
 
 	/**

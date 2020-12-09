@@ -55,26 +55,47 @@ public interface ResourceLoader {
 	/** Pseudo URL prefix for loading from the class path: "classpath:". */
 	String CLASSPATH_URL_PREFIX = ResourceUtils.CLASSPATH_URL_PREFIX;
 
-
 	/**
+	 * 20201209
+	 * A. 返回指定资源位置的资源句柄。
+	 * B. 该句柄应始终是可重用的资源描述符，并允许多个{@link Resource＃getInputStream（）}调用:
+	 * 		a. 必须支持完全限定的网址，例如 “文件：C：/test.dat”。
+	 * 		b. 必须支持classpath伪URL，例如 “ classpath：test.dat”。
+	 * 		c. 应该支持相对文件路径，例如 “ WEB-INF / test.dat”。 （这将是特定于实现的，通常由ApplicationContext实现提供。）
+	 * C. 请注意，资源句柄并不意味着现有资源； 您需要调用{@link Resource＃exists}来检查是否存在。
+	 */
+	/**
+	 * A.
 	 * Return a Resource handle for the specified resource location.
+	 *
+	 * B.
 	 * <p>The handle should always be a reusable resource descriptor,
 	 * allowing for multiple {@link Resource#getInputStream()} calls.
-	 * <p><ul>
+	 * <p>
+	 * <ul>
+	 * a.
 	 * <li>Must support fully qualified URLs, e.g. "file:C:/test.dat".
+	 *
+	 * b.
 	 * <li>Must support classpath pseudo-URLs, e.g. "classpath:test.dat".
+	 *
+	 * c.
 	 * <li>Should support relative file paths, e.g. "WEB-INF/test.dat".
 	 * (This will be implementation-specific, typically provided by an
 	 * ApplicationContext implementation.)
 	 * </ul>
+	 *
+	 * C.
 	 * <p>Note that a Resource handle does not imply an existing resource;
 	 * you need to invoke {@link Resource#exists} to check for existence.
+	 *
 	 * @param location the resource location
 	 * @return a corresponding Resource handle (never {@code null})
 	 * @see #CLASSPATH_URL_PREFIX
 	 * @see Resource#exists()
 	 * @see Resource#getInputStream()
 	 */
+	// 20201209 返回指定资源位置的资源句柄 -> 资源句柄并不意味着现有资源； 您需要调用{@link Resource＃exists}来检查是否存在
 	Resource getResource(String location);
 
 	/**

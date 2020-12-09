@@ -39,6 +39,7 @@ public interface AnnotatedBeanDefinition extends BeanDefinition {
 	 * for this bean definition's bean class.
 	 * @return the annotation metadata object (never {@code null})
 	 */
+	// 20201209 获取此bean定义的bean类的注解元数据（以及基本类元数据）。
 	AnnotationMetadata getMetadata();
 
 	/**

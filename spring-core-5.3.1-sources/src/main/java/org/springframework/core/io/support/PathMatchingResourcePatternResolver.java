@@ -306,6 +306,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * at the time of actual resource access
 	 * @see DefaultResourceLoader
 	 */
+	// 20201209 使用DefaultResourceLoader创建一个新的PathMatchingResourcePatternResolver。
 	public PathMatchingResourcePatternResolver(@Nullable ClassLoader classLoader) {
 		this.resourceLoader = new DefaultResourceLoader(classLoader);
 	}
@@ -314,6 +315,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	/**
 	 * Return the ResourceLoader that this pattern resolver works with.
 	 */
+	// 20201209 返回此模式解析器使用的ResourceLoader。
 	public ResourceLoader getResourceLoader() {
 		return this.resourceLoader;
 	}
@@ -337,6 +339,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	/**
 	 * Return the PathMatcher that this resource pattern resolver uses.
 	 */
+	// 20201209 返回此资源模式解析器使用的PathMatcher。
 	public PathMatcher getPathMatcher() {
 		return this.pathMatcher;
 	}
@@ -347,31 +350,48 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 		return getResourceLoader().getResource(location);
 	}
 
+	// 20201209 根据Class全类名获取资源句柄数组
 	@Override
 	public Resource[] getResources(String locationPattern) throws IOException {
+		// 20201209 Class全类名不能为空
 		Assert.notNull(locationPattern, "Location pattern must not be null");
+
+		// 20201209 如果含类路径前缀 -> classpath*:
 		if (locationPattern.startsWith(CLASSPATH_ALL_URL_PREFIX)) {
 			// a class path resource (multiple resources for same name possible)
+			// 20201209 一个类路径资源（可能有多个名称相同的资源）
+			// 20201209 如果类路径可以通过PathMatcher接口的实现匹配的模式
 			if (getPathMatcher().isPattern(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()))) {
-				// a class path resource pattern
+				// a class path resource pattern // 20201209 类路径资源模式
+				// 20201209 通过Ant样式的PathMatcher查找与给定位置模式匹配的所有资源。 支持jar文件和zip文件以及文件系统中的资源。
 				return findPathMatchingResources(locationPattern);
 			}
+
+			// 20201029 如果类路径不可以通过PathMatcher接口的实现匹配的模式
 			else {
-				// all class path resources with the given name
+				// all class path resources with the given name	// 20201209 具有给定名称的所有类路径资源
+				// 20201209 通过ClassLoader查找具有给定位置的所有类位置资源。委托给{@link #doFindAllClassPathResources（String）}。
 				return findAllClassPathResources(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()));
 			}
 		}
+
+		// 20201209 如果不含类路径前缀 -> classpath*:
 		else {
+			// 20201209 通常，这里仅在前缀之后寻找模式，而在Tomcat上仅在其“ war：”协议的“ * /”分隔符之后寻找模式。
 			// Generally only look for a pattern after a prefix here,
 			// and on Tomcat only after the "*/" separator for its "war:" protocol.
-			int prefixEnd = (locationPattern.startsWith("war:") ? locationPattern.indexOf("*/") + 1 :
-					locationPattern.indexOf(':') + 1);
+			// 20201209 获取war包路径
+			int prefixEnd = (locationPattern.startsWith("war:") ? locationPattern.indexOf("*/") + 1 : locationPattern.indexOf(':') + 1);
+
+			// 20201209 war包路径可以通过PathMatcher接口的实现匹配的模式？
 			if (getPathMatcher().isPattern(locationPattern.substring(prefixEnd))) {
-				// a file pattern
+				// a file pattern // 20201209 文件模式
+				// 20201209 通过Ant样式的PathMatcher查找与给定位置模式匹配的所有资源。 支持jar文件和zip文件以及文件系统中的资源。
 				return findPathMatchingResources(locationPattern);
 			}
 			else {
-				// a single resource with the given name
+				// a single resource with the given name // 20201209 具有给定名称的单个资源
+				// 20201209 否则返回指定资源位置的资源句柄
 				return new Resource[] {getResourceLoader().getResource(locationPattern)};
 			}
 		}
@@ -386,6 +406,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * @see ClassLoader#getResources
 	 * @see #convertClassLoaderURL
 	 */
+	// 20201209 通过ClassLoader查找具有给定位置的所有类位置资源。委托给{@link #doFindAllClassPathResources（String）}。
 	protected Resource[] findAllClassPathResources(String location) throws IOException {
 		String path = location;
 		if (path.startsWith("/")) {
@@ -561,6 +582,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * @see #doFindPathMatchingFileResources
 	 * @see PathMatcher
 	 */
+	// 20201209 通过Ant样式的PathMatcher查找与给定位置模式匹配的所有资源。 支持jar文件和zip文件以及文件系统中的资源。
 	protected Resource[] findPathMatchingResources(String locationPattern) throws IOException {
 		String rootDirPath = determineRootDir(locationPattern);
 		String subPattern = locationPattern.substring(rootDirPath.length());

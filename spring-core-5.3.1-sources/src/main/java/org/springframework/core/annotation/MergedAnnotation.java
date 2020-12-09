@@ -87,21 +87,36 @@ public interface MergedAnnotation<A extends Annotation> {
 	Class<A> getType();
 
 	/**
+	 * 20201209
+	 * 确定注解是否在源上存在。 在所使用的{@link SearchStrategy}的上下文中考虑{@linkplain #isDirectlyPresent（）直接存在}和{@linkplain #isMetaPresent（）元注解存在}。
+	 */
+	/**
 	 * Determine if the annotation is present on the source. Considers
 	 * {@linkplain #isDirectlyPresent() directly present} and
 	 * {@linkplain #isMetaPresent() meta-present} annotations within the context
 	 * of the {@link SearchStrategy} used.
+	 *
 	 * @return {@code true} if the annotation is present
 	 */
+	// 20201209 确定注解是否在源上存在
 	boolean isPresent();
 
 	/**
+	 * 20201209
+	 * A. 确定注解是否直接出现在源上。
+	 * B. 直接存在的注解是用户已明确声明的注解，而不是{@linkplain #isMetaPresent（）meta-present}或{@link Inherited @Inherited}的注解。
+	 */
+	/**
+	 * A.
 	 * Determine if the annotation is directly present on the source.
+	 *
+	 * B.
 	 * <p>A directly present annotation is one that the user has explicitly
 	 * declared and not one that is {@linkplain #isMetaPresent() meta-present}
 	 * or {@link Inherited @Inherited}.
 	 * @return {@code true} if the annotation is directly present
 	 */
+	// 20201209 确定注解是否直接出现在源上
 	boolean isDirectlyPresent();
 
 	/**
@@ -114,14 +129,24 @@ public interface MergedAnnotation<A extends Annotation> {
 	boolean isMetaPresent();
 
 	/**
+	 * 20201209
+	 * A. 获取此注解与其用作元注解相关的距离。
+	 * B. 直接声明的注解的距离为{@code 0}，元注解的距离为{@code 1}，元注解上的元注解的距离为{@code 2}，依此类推。A {@linkplain #missing（）missing}注解将始终返回{@code -1}的距离。
+	 */
+	/**
+	 * A.
 	 * Get the distance of this annotation related to its use as a
 	 * meta-annotation.
+	 *
+	 * B.
 	 * <p>A directly declared annotation has a distance of {@code 0}, a
 	 * meta-annotation has a distance of {@code 1}, a meta-annotation on a
 	 * meta-annotation has a distance of {@code 2}, etc. A {@linkplain #missing()
 	 * missing} annotation will always return a distance of {@code -1}.
+	 *
 	 * @return the annotation distance or {@code -1} if the annotation is missing
 	 */
+	// 20201209 获取此注解与其用作元注解相关的距离
 	int getDistance();
 
 	/**
@@ -482,13 +507,23 @@ public interface MergedAnnotation<A extends Annotation> {
 	MergedAnnotation<A> withNonMergedAttributes();
 
 	/**
+	 * 20201209
+	 * A. 从此合并的注解中创建一个新的可变{@link AnnotationAttributes}实例。
+	 * B. {@link Adapt适应}可以用于更改添加值的方式。
+	 */
+	/**
+	 * A.
 	 * Create a new mutable {@link AnnotationAttributes} instance from this
 	 * merged annotation.
+	 *
+	 * B.
 	 * <p>The {@link Adapt adaptations} may be used to change the way that values
 	 * are added.
+	 *
 	 * @param adaptations the adaptations that should be applied to the annotation values
 	 * @return an immutable map containing the attributes and values
 	 */
+	// 20201209 从此合并的注解中创建一个新的可变{@link AnnotationAttributes}实例。
 	AnnotationAttributes asAnnotationAttributes(Adapt... adaptations);
 
 	/**

@@ -20,12 +20,23 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
+ * 20201209
+ * A. 基于{@code String}的路径匹配的策略接口。
+ * B. 由{@link org.springframework.core.io.support.PathMatchingResourcePatternResolver}，
+ *    {@ link org.springframework.web.servlet.handler.AbstractUrlHandlerMapping}和
+ *    {@link org.springframework.web.servlet.mvc.WebContentInterceptor}使用 。
+ * C. 默认实现为{@link AntPathMatcher}，支持Ant样式的模式语法。
+ */
+/**
+ * A.
  * Strategy interface for {@code String}-based path matching.
  *
+ * B.
  * <p>Used by {@link org.springframework.core.io.support.PathMatchingResourcePatternResolver},
  * {@link org.springframework.web.servlet.handler.AbstractUrlHandlerMapping},
  * and {@link org.springframework.web.servlet.mvc.WebContentInterceptor}.
  *
+ * C.
  * <p>The default implementation is {@link AntPathMatcher}, supporting the
  * Ant-style pattern syntax.
  *
@@ -33,17 +44,28 @@ import java.util.Map;
  * @since 1.2
  * @see AntPathMatcher
  */
+// 20201209 基于{@code String}的路径匹配的策略接口
 public interface PathMatcher {
 
 	/**
+	 * 20201209
+	 * A. 给定的{@code path}是否表示可以通过此接口的实现匹配的模式？
+	 * B. 如果返回值为{@code false}，则不必使用{@link #match}方法，因为在静态路径Strings上进行直接相等比较将得到相同的结果。
+	 */
+	/**
+	 * A.
 	 * Does the given {@code path} represent a pattern that can be matched
 	 * by an implementation of this interface?
+	 *
+	 * B.
 	 * <p>If the return value is {@code false}, then the {@link #match}
 	 * method does not have to be used because direct equality comparisons
 	 * on the static path Strings will lead to the same result.
+	 *
 	 * @param path the path to check
 	 * @return {@code true} if the given {@code path} represents a pattern
 	 */
+	// 20201209 给定的{@code path}是否表示可以通过此接口的实现匹配的模式？
 	boolean isPattern(String path);
 
 	/**

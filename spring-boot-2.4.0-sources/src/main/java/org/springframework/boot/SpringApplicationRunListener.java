@@ -96,6 +96,7 @@ public interface SpringApplicationRunListener {
 	 * refreshed.
 	 * @param context the application context
 	 */
+	// 20201209 一旦应用程序上下文已加载但在刷新之前调用 -> 将ApplicationPreparedEvent事件多播到适当的侦听器 -> 应用上下文已准备齐全但未刷新时发布的事件
 	default void contextLoaded(ConfigurableApplicationContext context) {
 	}
 

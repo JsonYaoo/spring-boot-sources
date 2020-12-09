@@ -85,10 +85,11 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	// 20201208 用于为bean定义生成bean名称的策略接口实例
 	private BeanNameGenerator beanNameGenerator = AnnotationBeanNameGenerator.INSTANCE;
 
+	// 20201209 解决bean定义范围的策略接口 -> 设置枚举各种作用域代理选项为 不要创建作用域代理
 	private ScopeMetadataResolver scopeMetadataResolver = new AnnotationScopeMetadataResolver();
 
+	// 20201209 是否注册注解配置 -> 默认为true
 	private boolean includeAnnotationConfig = true;
-
 
 	/**
 	 * Create a new {@code ClassPathBeanDefinitionScanner} for the given bean factory.
@@ -323,49 +324,93 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	/**
 	 * Perform a scan within the specified base packages.
 	 * @param basePackages the packages to check for annotated classes
-	 * @return number of beans registered
+	 * @return number of beans registered	// 20201209 返回已注册的bean数目
 	 */
+	// 20201209 在指定的基本程序包中执行扫描 -> 返回已注册的bean数目
 	public int scan(String... basePackages) {
+		// 20201209 获取注册前的注册表中定义的bean数。
 		int beanCountAtScanStart = this.registry.getBeanDefinitionCount();
 
+		// 20201209 在指定的基本程序包中执行扫描，返回已注册的bean定义。
 		doScan(basePackages);
 
 		// Register annotation config processors, if necessary.
+		// 20201209 如有必要，注册注解配置处理器, 默认为true
 		if (this.includeAnnotationConfig) {
+			// 20201209 在给定的注册表中注册所有相关的注解后处理器。
 			AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 		}
 
+		// 20201209 获取注册前后的bean差值 -> 得到当前注册的bean数目
 		return (this.registry.getBeanDefinitionCount() - beanCountAtScanStart);
 	}
 
 	/**
+	 * 20201209
+	 * A. 在指定的基本程序包中执行扫描，返回已注册的bean定义。
+	 * B. 此方法不注册注解配置处理器，而是将其留给调用方。
+	 */
+	/**
+	 * A.
 	 * Perform a scan within the specified base packages,
 	 * returning the registered bean definitions.
+	 *
+	 * B.
 	 * <p>This method does <i>not</i> register an annotation config processor
 	 * but rather leaves this up to the caller.
 	 * @param basePackages the packages to check for annotated classes
+	 *
+	 * // 20201209 为工具注册目的而已注册的一组bean（永远{@code null}）
 	 * @return set of beans registered if any for tooling registration purposes (never {@code null})
 	 */
+	// 20201209 在指定的基本程序包中执行扫描，返回已注册的bean定义。
 	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
+		// 20201209 包路径不能为空
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
+
+		// 20201209 已注册列表
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
+
+		// 20201209 遍历包数组
 		for (String basePackage : basePackages) {
+			// 20201209 扫描类路径以查找候选组件。
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
+
+			// 20201209 遍历查找到的候选组件
 			for (BeanDefinition candidate : candidates) {
+				// 20201209 解决出适合于提供的bean定义器的bean的范围特征
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
+
+				// 20201209 覆盖此bean的目标作用域，并指定一个新的作用域名称
 				candidate.setScope(scopeMetadata.getScopeName());
+
+				// 20201209 用于为bean定义生成bean名称的策略接口实例 -> 为给定的bean定义生成一个bean名称
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
+
+				// 20201209 如果候选组件为AbstractBeanDefinition类型
 				if (candidate instanceof AbstractBeanDefinition) {
+					// 20201209 则将更多设置应用于给定的bean定义，而不是从扫描组件类检索到的内容。
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
+
+				// 20201209 如果候选组件为AnnotatedBeanDefinition类型
 				if (candidate instanceof AnnotatedBeanDefinition) {
+					// 20201209 则处理默认公共注解定义: Lazy, Primary, DependsOn, Role, Description
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
+
+				// 20201209 检查给定候选者的Bean名称，以确定是否需要注册相应的Bean定义或与现有定义冲突。
 				if (checkCandidate(beanName, candidate)) {
+					// 20201209 检查通过, Bean可以原样注册, 创建一个新的BeanDefinitionHolder
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
-					definitionHolder =
-							AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+
+					// 20201209 根据作用域代理模式创建实例 -> 不要创建作用域代理、创建一个JDK动态代理、创建一个基于类的代理（使用CGLIB）
+					definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+
+					// 20201209 已注册列表添加该BeanDefinitionHolder
 					beanDefinitions.add(definitionHolder);
+
+					// 20201209 使用给定的注册表注册该BeanDefinitionHolder
 					registerBeanDefinition(definitionHolder, this.registry);
 				}
 			}
@@ -379,6 +424,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @param beanDefinition the scanned bean definition
 	 * @param beanName the generated bean name for the given bean
 	 */
+	// 20201209 将更多设置应用于给定的bean定义，而不是从扫描组件类检索到的内容。
 	protected void postProcessBeanDefinition(AbstractBeanDefinition beanDefinition, String beanName) {
 		beanDefinition.applyDefaults(this.beanDefinitionDefaults);
 		if (this.autowireCandidatePatterns != null) {
@@ -387,13 +433,23 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	}
 
 	/**
+	 * 20201209
+	 * A. 使用给定的注册表注册指定的bean。
+	 * B. 可以在子类中覆盖，例如适应注册过程或为每个扫描的bean注册其他bean定义。
+	 */
+	/**
+	 * A.
 	 * Register the specified bean with the given registry.
+	 *
+	 * B.
 	 * <p>Can be overridden in subclasses, e.g. to adapt the registration
 	 * process or to register further bean definitions for each scanned bean.
 	 * @param definitionHolder the bean definition plus bean name for the bean
 	 * @param registry the BeanDefinitionRegistry to register the bean with
 	 */
+	// 20201209 使用给定的注册表注册指定的bean
 	protected void registerBeanDefinition(BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry) {
+		// 20201209 向给定的bean工厂注册给定的bean定义
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, registry);
 	}
 
@@ -403,12 +459,16 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * bean definition needs to be registered or conflicts with an existing definition.
 	 * @param beanName the suggested name for the bean
 	 * @param beanDefinition the corresponding bean definition
+	 *
+	 * // 20201209 {@code true}，如果bean可以原样注册； {@code false}如果由于指定名称已经存在兼容的bean定义而应跳过
 	 * @return {@code true} if the bean can be registered as-is;
 	 * {@code false} if it should be skipped because there is an
 	 * existing, compatible bean definition for the specified name
+	 *
 	 * @throws ConflictingBeanDefinitionException if an existing, incompatible
 	 * bean definition has been found for the specified name
 	 */
+	// 20201209 检查给定候选者的Bean名称，以确定是否需要注册相应的Bean定义或与现有定义冲突。
 	protected boolean checkCandidate(String beanName, BeanDefinition beanDefinition) throws IllegalStateException {
 		if (!this.registry.containsBeanDefinition(beanName)) {
 			return true;

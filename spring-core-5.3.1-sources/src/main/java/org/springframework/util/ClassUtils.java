@@ -644,6 +644,7 @@ public abstract class ClassUtils {
 	 * @param className the fully qualified class name
 	 * @return the corresponding resource path, pointing to the class
 	 */
+	// 20201209 将基于“。”的完全限定的类名称转换为基于“ /”的资源路径。
 	public static String convertClassNameToResourcePath(String className) {
 		Assert.notNull(className, "Class name must not be null");
 		return className.replace(PACKAGE_SEPARATOR, PATH_SEPARATOR);

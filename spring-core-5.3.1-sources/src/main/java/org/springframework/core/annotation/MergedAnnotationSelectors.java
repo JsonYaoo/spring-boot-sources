@@ -28,10 +28,12 @@ import java.util.function.Predicate;
  * @see MergedAnnotations#get(Class, Predicate, MergedAnnotationSelector)
  * @see MergedAnnotations#get(String, Predicate, MergedAnnotationSelector)
  */
+// 20201209 {@link MergedAnnotationSelector}实现为{@link MergedAnnotation}实例提供各种选项。
 public abstract class MergedAnnotationSelectors {
 
 	private static final MergedAnnotationSelector<?> NEAREST = new Nearest();
 
+	// 20201209 {@link MergedAnnotationSelector}选择第一个直接声明的注解选择器单例
 	private static final MergedAnnotationSelector<?> FIRST_DIRECTLY_DECLARED = new FirstDirectlyDeclared();
 
 
@@ -53,6 +55,7 @@ public abstract class MergedAnnotationSelectors {
 	 * annotations are declared then the nearest annotation is selected.
 	 * @return a selector that picks the first directly declared annotation whenever possible
 	 */
+	// 20201209 尽可能选择第一个直接声明的注释。 如果未声明直接注释，则选择最近的注释。
 	@SuppressWarnings("unchecked")
 	public static <A extends Annotation> MergedAnnotationSelector<A> firstDirectlyDeclared() {
 		return (MergedAnnotationSelector<A>) FIRST_DIRECTLY_DECLARED;
@@ -86,6 +89,7 @@ public abstract class MergedAnnotationSelectors {
 	 * {@link MergedAnnotationSelector} to select the first directly declared
 	 * annotation.
 	 */
+	// 20201209 {@link MergedAnnotationSelector}选择第一个直接声明的注解选择器
 	private static class FirstDirectlyDeclared implements MergedAnnotationSelector<Annotation> {
 
 		@Override

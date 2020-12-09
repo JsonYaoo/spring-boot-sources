@@ -333,6 +333,7 @@ public interface MergedAnnotations extends Iterable<MergedAnnotation<Annotation>
 	 * @see MergedAnnotationPredicates
 	 * @see MergedAnnotationSelectors
 	 */
+	// 20201209 获取指定类型的匹配注解或元注解；如果不存在，则获取{@link MergedAnnotation＃missing（）}。
 	<A extends Annotation> MergedAnnotation<A> get(String annotationType,
                                                    @Nullable Predicate<? super MergedAnnotation<A>> predicate,
                                                    @Nullable MergedAnnotationSelector<A> selector);

@@ -85,6 +85,7 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 
 	private static final String COMPONENT_ANNOTATION_CLASSNAME = "org.springframework.stereotype.Component";
 
+	// 20201209 注解全限定类名-注解全部全限定类名集合
 	private final Map<String, Set<String>> metaAnnotationTypesCache = new ConcurrentHashMap<>();
 
 	// 20201209 为给定的bean定义生成一个bean名称。
@@ -92,14 +93,14 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 	public String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {
 		// 20201029 如果bean定义器为注解Bean定义器AnnotatedBeanDefinition
 		if (definition instanceof AnnotatedBeanDefinition) {
-			// 20201209
+			// 20201209 从类的注解之一中获取bean名称 -> 注解树的名称都一样
 			String beanName = determineBeanNameFromAnnotation((AnnotatedBeanDefinition) definition);
 			if (StringUtils.hasText(beanName)) {
 				// Explicit bean name found.
 				return beanName;
 			}
 		}
-		// Fallback: generate a unique default bean name.
+		// Fallback: generate a unique default bean name. // 20201209 后备：生成唯一的默认bean名称 => “mypackage.MyJdbcDao”->“ myJdbcDao”
 		return buildDefaultBeanName(definition, registry);
 	}
 
@@ -108,23 +109,38 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 	 * @param annotatedDef the annotation-aware bean definition
 	 * @return the bean name, or {@code null} if none is found
 	 */
-	// 20201209 从类的注解之一中获取bean名称。
+	// 20201209 从类的注解之一中获取bean名称 -> 注解树的名称都一样
 	@Nullable
 	protected String determineBeanNameFromAnnotation(AnnotatedBeanDefinition annotatedDef) {
-		// 20201209
+		// 20201209 获取此bean定义的bean类的注解元数据（以及基本类元数据）。
 		AnnotationMetadata amd = annotatedDef.getMetadata();
+
+		// 20201209 获取基础类上存在的所有注解类型的全限定类名。
 		Set<String> types = amd.getAnnotationTypes();
+
+		// 20201209 初始化bean实例名称
 		String beanName = null;
+
+		// 20201209 遍历这些全限定类型名
 		for (String type : types) {
+			// 20201209 根据指定类型的注解以及元数据获取注解属性键值对
 			AnnotationAttributes attributes = AnnotationConfigUtils.attributesFor(amd, type);
+
+			// 20201209 如果存在键值对
 			if (attributes != null) {
+				// 20201209 根据注解全限定类型名获取注解全部全限定类名集合
 				Set<String> metaTypes = this.metaAnnotationTypesCache.computeIfAbsent(type, key -> {
 					Set<String> result = amd.getMetaAnnotationTypes(key);
 					return (result.isEmpty() ? Collections.emptySet() : result);
 				});
+
+				// 20201209 如果type类型的注解允许使用@value更改组件名
 				if (isStereotypeWithNameValue(type, metaTypes, attributes)) {
+					// 20201209 则先获取属性值
 					Object value = attributes.get("value");
+					// 20201209 如果属性值为String类型
 					if (value instanceof String) {
+						// 20201209 则替换掉当前循环里的bean名称, 保证该注解树的组件名称都一致
 						String strVal = (String) value;
 						if (StringUtils.hasLength(strVal)) {
 							if (beanName != null && !strVal.equals(beanName)) {
@@ -137,6 +153,8 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 				}
 			}
 		}
+
+		// 20201209 返回该组件名称
 		return beanName;
 	}
 
@@ -148,6 +166,7 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 	 * @param attributes the map of attributes for the given annotation
 	 * @return whether the annotation qualifies as a stereotype with component name
 	 */
+	// 20201209 检查给定的注解是否为允许通过其注解{@code value（）}来建议组件名称的构造型。
 	protected boolean isStereotypeWithNameValue(String annotationType,
 			Set<String> metaAnnotationTypes, @Nullable Map<String, Object> attributes) {
 
@@ -160,26 +179,49 @@ public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 	}
 
 	/**
+	 * 20201209
+	 * A. 从给定的bean定义中派生默认的bean名称。
+	 * B. 默认实现委托给{@link #buildDefaultBeanName（BeanDefinition）}。
+	 */
+	/**
+	 * A.
 	 * Derive a default bean name from the given bean definition.
+	 *
+	 * B.
 	 * <p>The default implementation delegates to {@link #buildDefaultBeanName(BeanDefinition)}.
 	 * @param definition the bean definition to build a bean name for
 	 * @param registry the registry that the given bean definition is being registered with
 	 * @return the default bean name (never {@code null})
 	 */
+	// 20201209 从给定的bean定义中派生默认的bean名称
 	protected String buildDefaultBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {
+		// 20201209 从给定的bean定义中派生默认的bean名称 => “mypackage.MyJdbcDao”->“ myJdbcDao”
 		return buildDefaultBeanName(definition);
 	}
 
 	/**
+	 * 20201209
+	 * A. 从给定的bean定义中派生默认的bean名称。
+	 * B. 默认实现只是构建简短的类名的大写形式：例如 “mypackage.MyJdbcDao”->“ myJdbcDao”。
+	 * C. 请注意，内部类将因此具有“ outerClassName.InnerClassName”形式的名称，如果按名称自动装配，则由于名称中的句点可能会出现问题。
+	 */
+	/**
+	 * A.
 	 * Derive a default bean name from the given bean definition.
+	 *
+	 * B.
 	 * <p>The default implementation simply builds a decapitalized version
 	 * of the short class name: e.g. "mypackage.MyJdbcDao" -> "myJdbcDao".
+	 *
+	 * C.
 	 * <p>Note that inner classes will thus have names of the form
 	 * "outerClassName.InnerClassName", which because of the period in the
 	 * name may be an issue if you are autowiring by name.
+	 *
 	 * @param definition the bean definition to build a bean name for
 	 * @return the default bean name (never {@code null})
 	 */
+	// 20201209 从给定的bean定义中派生默认的bean名称 => “mypackage.MyJdbcDao”->“ myJdbcDao”
 	protected String buildDefaultBeanName(BeanDefinition definition) {
 		String beanClassName = definition.getBeanClassName();
 		Assert.state(beanClassName != null, "No bean class name set");

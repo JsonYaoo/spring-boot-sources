@@ -26,8 +26,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 20201209
+ * A. 用于创建作用域代理的实用程序类。
+ * B. 由ScopedProxyBeanDefinitionDecorator和ClassPathBeanDefinitionScanner使用。
+ */
+/**
+ * A.
  * Utility class for creating a scoped proxy.
  *
+ * B.
  * <p>Used by ScopedProxyBeanDefinitionDecorator and ClassPathBeanDefinitionScanner.
  *
  * @author Mark Fisher
@@ -36,6 +43,7 @@ import org.springframework.util.Assert;
  * @author Sam Brannen
  * @since 2.5
  */
+// 20201209 用于创建作用域代理的实用程序类
 public abstract class ScopedProxyUtils {
 
 	private static final String TARGET_NAME_PREFIX = "scopedTarget.";
@@ -53,6 +61,7 @@ public abstract class ScopedProxyUtils {
 	 * @see #getTargetBeanName(String)
 	 * @see #getOriginalBeanName(String)
 	 */
+	// 20201209 为提供的目标bean生成作用域代理，用内部名称注册目标bean并在作用域代理上设置“ targetBeanName”。
 	public static BeanDefinitionHolder createScopedProxy(BeanDefinitionHolder definition,
 			BeanDefinitionRegistry registry, boolean proxyTargetClass) {
 

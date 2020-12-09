@@ -44,16 +44,17 @@ import org.springframework.util.StringUtils;
  * @since 5.2
  * @see AnnotationTypeMappings
  */
+// 20201209 在根注解类型的上下文中为单个注解（或元注解）提供映射信息。
 final class AnnotationTypeMapping {
 
 	private static final MirrorSet[] EMPTY_MIRROR_SETS = new MirrorSet[0];
-
 
 	@Nullable
 	private final AnnotationTypeMapping source;
 
 	private final AnnotationTypeMapping root;
 
+	// 20201209 根注解到此映射的距离
 	private final int distance;
 
 	private final Class<? extends Annotation> annotationType;
@@ -416,7 +417,9 @@ final class AnnotationTypeMapping {
 	 * Get the distance of this mapping.
 	 * @return the distance of the mapping
 	 */
+	// 20201209 获取此映射的距离。
 	int getDistance() {
+		// 20201209 获取根注解到此映射的距离
 		return this.distance;
 	}
 

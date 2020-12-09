@@ -46,10 +46,15 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	 * are <em>present</em> on the underlying class.
 	 * @return the annotation type names
 	 */
+	// 20201209 获取基础类上存在的所有注解类型的全限定类名。
 	default Set<String> getAnnotationTypes() {
+		// 20201209 获取过滤掉直接出现在源上的注解的类型名称的列表 -> 根据基础元素的直接注解返回注解详细信息
 		return getAnnotations().stream()
+				// 20201209 过滤掉直接出现在源上的注解
 				.filter(MergedAnnotation::isDirectlyPresent)
+				// 20201209 获取注解类型名称
 				.map(annotation -> annotation.getType().getName())
+				// 20201209 收集所有注解类型名称
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 
@@ -60,6 +65,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	 * type to look for
 	 * @return the meta-annotation type names, or an empty set if none found
 	 */
+	// 20201209 获取存在于基础类的给定注解类型上的所有元注解类型的完全限定的类名称。
 	default Set<String> getMetaAnnotationTypes(String annotationName) {
 		MergedAnnotation<?> annotation = getAnnotations().get(annotationName, MergedAnnotation::isDirectlyPresent);
 		if (!annotation.isPresent()) {

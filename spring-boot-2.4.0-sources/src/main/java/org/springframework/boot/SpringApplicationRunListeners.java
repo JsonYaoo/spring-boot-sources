@@ -70,7 +70,7 @@ class SpringApplicationRunListeners {
 				});
 	}
 
-	// 20201202 环境准备完毕事件 -> 将ApplicationEnvironmentPreparedEvent事件多播到适当的侦听器, 执行监听ApplicationEnvironmentPreparedEvent事件
+	// 20201202 监听环境准备完毕事件 -> 将ApplicationEnvironmentPreparedEvent事件多播到适当的侦听器, 执行监听ApplicationEnvironmentPreparedEvent事件
 	void environmentPrepared(ConfigurableBootstrapContext bootstrapContext, ConfigurableEnvironment environment) {
 		// 20201208 执行监听ApplicationEnvironmentPreparedEvent事件
 		doWithListeners("spring.boot.application.environment-prepared",
@@ -78,7 +78,7 @@ class SpringApplicationRunListeners {
 				(listener) -> listener.environmentPrepared(bootstrapContext, environment));
 	}
 
-	// 20201208 配置上线文准备完毕事件 -> 将ApplicationContextInitializedEvent事件多播到适当的侦听器, 执行监听ApplicationContextInitializedEvent事件
+	// 20201208 监听配置上下文准备完毕事件 -> 将ApplicationContextInitializedEvent事件多播到适当的侦听器, 执行监听ApplicationContextInitializedEvent事件
 	void contextPrepared(ConfigurableApplicationContext context) {
 		// 20201208 执行监听ApplicationContextInitializedEvent事件
 		doWithListeners("spring.boot.application.context-prepared",
@@ -86,8 +86,11 @@ class SpringApplicationRunListeners {
 				(listener) -> listener.contextPrepared(context));
 	}
 
+	// 20201208 监听应用上下文已准备齐全但未刷新时发布的事件 -> 将ApplicationPreparedEvent事件多播到适当的侦听器, 执行监听ApplicationPreparedEvent事件
 	void contextLoaded(ConfigurableApplicationContext context) {
+		// 20201202 执行监听ApplicationPreparedEvent事件
 		doWithListeners("spring.boot.application.context-loaded",
+				// 20201209 一旦应用程序上下文已加载但在刷新之前调用 -> 将ApplicationPreparedEvent事件多播到适当的侦听器 -> 应用上下文已准备齐全但未刷新时发布的事件
 				(listener) -> listener.contextLoaded(context));
 	}
 

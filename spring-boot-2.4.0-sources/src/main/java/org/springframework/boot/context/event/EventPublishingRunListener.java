@@ -99,15 +99,23 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 				new ApplicationContextInitializedEvent(this.application, this.args, context));
 	}
 
+	// 20201209 一旦应用程序上下文已加载但在刷新之前调用 -> 将ApplicationPreparedEvent事件多播到适当的侦听器 -> 应用上下文已准备齐全但未刷新时发布的事件
 	@Override
 	public void contextLoaded(ConfigurableApplicationContext context) {
+		// 20201209 遍历在上下文注册的监听器列表
 		for (ApplicationListener<?> listener : this.application.getListeners()) {
+			// 20201209 监听器设置上下文
 			if (listener instanceof ApplicationContextAware) {
 				((ApplicationContextAware) listener).setApplicationContext(context);
 			}
+			// 20201209 重新添加该监听器
 			context.addApplicationListener(listener);
 		}
-		this.initialMulticaster.multicastEvent(new ApplicationPreparedEvent(this.application, this.args, context));
+		// 20201208 将ApplicationPreparedEvent事件多播到适当的侦听器 -> 应用上下文已准备齐全但未刷新时发布的事件
+		this.initialMulticaster.multicastEvent(
+				// 20201209 构造应用上下文已准备齐全但未刷新时发布的事件
+				new ApplicationPreparedEvent(this.application, this.args, context)
+		);
 	}
 
 	@Override

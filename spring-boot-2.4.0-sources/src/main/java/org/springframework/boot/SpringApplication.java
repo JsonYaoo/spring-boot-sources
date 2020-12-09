@@ -434,8 +434,9 @@ public class SpringApplication {
 			// 20201206 GenericApplicationContext.setApplicationStartup(), 为ServletWeb应用程序配置上下文设置应用程序启动指标
 			context.setApplicationStartup(this.applicationStartup);
 
-			// 20201206 准备上下文
+			// 20201206 准备上下文 AnnotationConfigServletWebServerApplicationContext -> 将bean加载到应用程序上下文中
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
+
 			refreshContext(context);
 			afterRefresh(context, applicationArguments);
 			stopWatch.stop();
@@ -522,7 +523,7 @@ public class SpringApplication {
 		}
 	}
 
-	// 20201206 准备上下文 AnnotationConfigServletWebServerApplicationContext
+	// 20201206 准备上下文 AnnotationConfigServletWebServerApplicationContext -> 将bean加载到应用程序上下文中
 	private void prepareContext(DefaultBootstrapContext bootstrapContext,
 								ConfigurableApplicationContext context,
 								ConfigurableEnvironment environment,
@@ -543,7 +544,7 @@ public class SpringApplication {
 		// 20201207 WebServer服务器端口应用程序上下文初始化器: org.springframework.boot.web.context.ServerPortInfoApplicationContextInitializer
 		applyInitializers(context);
 
-		// 20201208 配置上线文准备完毕事件 -> 将ApplicationContextInitializedEvent事件多播到适当的侦听器, 执行监听ApplicationContextInitializedEvent事件
+		// 20201208 监听配置上线文准备完毕事件 -> 将ApplicationContextInitializedEvent事件多播到适当的侦听器, 执行监听ApplicationContextInitializedEvent事件
 		listeners.contextPrepared(context);
 
 		// 20201208 关闭引导上下文并配置上下文准备完毕 -> 构造BootstrapContextClosedEvent事件, 将BootstrapContextClosedEvent事件多播到适当的侦听器
@@ -599,6 +600,7 @@ public class SpringApplication {
 		// 20201208 将bean加载到应用程序上下文中
 		load(context, sources.toArray(new Object[0]));
 
+		// 20201208 监听应用上下文已准备齐全但未刷新时发布的事件 -> 将ApplicationPreparedEvent事件多播到适当的侦听器, 执行监听ApplicationPreparedEvent事件
 		listeners.contextLoaded(context);
 	}
 
@@ -1057,7 +1059,7 @@ public class SpringApplication {
 			loader.setEnvironment(this.environment);
 		}
 
-		// 20201208 将源加载到阅读器中。
+		// 20201208 将源加载到阅读器中 -> lass类型, Resource类型, Package类型, CharSequence类型
 		loader.load();
 	}
 
@@ -1672,6 +1674,7 @@ public class SpringApplication {
 	 * .
 	 * @return the listeners
 	 */
+	// 20201209 返回将应用到SpringApplication并在{@link ApplicationContext}中注册的{@link ApplicationListener}的只读排序集。
 	public Set<ApplicationListener<?>> getListeners() {
 		return asUnmodifiableOrderedSet(this.listeners);
 	}

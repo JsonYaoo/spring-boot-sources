@@ -58,7 +58,7 @@ import org.springframework.util.ClassUtils;
  * @see org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor
  */
 // 20201206 实用程序类，可以方便地注册通用的{@link org.springframework.beans.factory.config.BeanPostProcessor}和
-// 20201206 {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor}定义，以用于基于注释的配置。 还注册一个通用的
+// 20201206 {@link org.springframework.beans.factory.config.BeanFactoryPostProcessor}定义，以用于基于注解的配置。 还注册一个通用的
 // 20201206 {@link org.springframework.beans.factory.support.AutowireCandidateResolver}。
 public abstract class AnnotationConfigUtils {
 
@@ -138,6 +138,7 @@ public abstract class AnnotationConfigUtils {
 	 * Register all relevant annotation post processors in the given registry.
 	 * @param registry the registry to operate on
 	 */
+	// 20201209 在给定的注册表中注册所有相关的注解后处理器。
 	public static void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry) {
 		registerAnnotationConfigProcessors(registry, null);
 	}
@@ -235,15 +236,23 @@ public abstract class AnnotationConfigUtils {
 		}
 	}
 
+	// 20201209 处理默认公共注解定义: Lazy, Primary, DependsOn, Role, Description
 	public static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd) {
 		processCommonDefinitionAnnotations(abd, abd.getMetadata());
 	}
 
+	// 20201209 处理默认公共注解定义: Lazy, Primary, DependsOn, Role, Description
 	static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd, AnnotatedTypeMetadata metadata) {
+		// 20201209 根据Lazy类型的注解以及元数据获取注解属性键值对
 		AnnotationAttributes lazy = attributesFor(metadata, Lazy.class);
+
+		// 20201209 如果需要懒加载
 		if (lazy != null) {
+			// 20201209 如果指定了懒加载, 则设置是否应延迟初始化此bean
 			abd.setLazyInit(lazy.getBoolean("value"));
 		}
+
+		// 20201209 否则如果注解元数据相同, 则也设置懒加载
 		else if (abd.getMetadata() != metadata) {
 			lazy = attributesFor(abd.getMetadata(), Lazy.class);
 			if (lazy != null) {
@@ -251,43 +260,66 @@ public abstract class AnnotationConfigUtils {
 			}
 		}
 
+		// 20201209 如果元数据具有Primary注解
 		if (metadata.isAnnotated(Primary.class.getName())) {
+			// 20201209 设置此bean为自动装配的主要候选对象
 			abd.setPrimary(true);
 		}
+
+		// 20201209 根据DependsOn类型的注解以及元数据获取注解属性键值对
 		AnnotationAttributes dependsOn = attributesFor(metadata, DependsOn.class);
 		if (dependsOn != null) {
+			// 20201209 设置该bean依赖于初始化的bean的名称。 Bean工厂将确保首先初始化这些Bean。
 			abd.setDependsOn(dependsOn.getStringArray("value"));
 		}
 
+		// 20201209 根据Role类型的注解以及元数据获取注解属性键值对
 		AnnotationAttributes role = attributesFor(metadata, Role.class);
 		if (role != null) {
+			// 20201209 设置此{@code BeanDefinition}的角色提示。 角色提示为框架和工具提供了特定{@code BeanDefinition}的角色和重要性的指示。
 			abd.setRole(role.getNumber("value").intValue());
 		}
+
+		// 20201209 根据Description类型的注解以及元数据获取注解属性键值对
 		AnnotationAttributes description = attributesFor(metadata, Description.class);
 		if (description != null) {
+			// 20201209 设置此bean定义的可读描述。
 			abd.setDescription(description.getString("value"));
 		}
 	}
 
+	// 20201209 根据作用域代理模式创建实例 -> 不要创建作用域代理、创建一个JDK动态代理、创建一个基于类的代理（使用CGLIB）
 	static BeanDefinitionHolder applyScopedProxyMode(
 			ScopeMetadata metadata, BeanDefinitionHolder definition, BeanDefinitionRegistry registry) {
 
+		// 20201209 获取要应用于作用域实例的代理模式。
 		ScopedProxyMode scopedProxyMode = metadata.getScopedProxyMode();
+
+		// 2020129 如果为默认代理默认, 不要创建作用域代理
 		if (scopedProxyMode.equals(ScopedProxyMode.NO)) {
+			// 20201209 则直接返回具有名称和别名的BeanDefinition的持有人
 			return definition;
 		}
+
+		// 20201209 如果是创建一个基于类的代理（使用CGLIB）模式, 则为提供的目标bean生成作用域代理，用内部名称注册目标bean并在作用域代理上设置“ targetBeanName”。
 		boolean proxyTargetClass = scopedProxyMode.equals(ScopedProxyMode.TARGET_CLASS);
 		return ScopedProxyCreator.createScopedProxy(definition, registry, proxyTargetClass);
 	}
 
+	// 20201209 根据指定类型的注解以及元数据获取注解属性键值对
 	@Nullable
 	static AnnotationAttributes attributesFor(AnnotatedTypeMetadata metadata, Class<?> annotationClass) {
 		return attributesFor(metadata, annotationClass.getName());
 	}
 
+	// 20201209 根据指定类型的注解以及元数据获取注解属性键值对
 	@Nullable
 	static AnnotationAttributes attributesFor(AnnotatedTypeMetadata metadata, String annotationClassName) {
-		return AnnotationAttributes.fromMap(metadata.getAnnotationAttributes(annotationClassName, false));
+		// 20201209 根据给定的映射返回一个{@link AnnotationAttributes}实例。
+		return AnnotationAttributes.fromMap(
+				// 20201209 检索给定类型的注解的属性（如果有的话）（即，如果在基础元素上定义为直接注解或元注解），也要考虑对组合注解的属性覆盖。
+				metadata.getAnnotationAttributes(annotationClassName, false)
+		);
 	}
 
 	static Set<AnnotationAttributes> attributesForRepeatable(AnnotationMetadata metadata,

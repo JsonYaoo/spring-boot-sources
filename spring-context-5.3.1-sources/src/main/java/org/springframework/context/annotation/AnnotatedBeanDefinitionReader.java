@@ -320,31 +320,50 @@ public class AnnotatedBeanDefinitionReader {
 		// 20201209 设置bean的目标作用域的名称为范围特征的bean范围的名称, 默认为单例标识符
 		abd.setScope(scopeMetadata.getScopeName());
 
-		// 20201209 如果指定的Bean的显式名称不为空, 在直接返回, 否则返回
+		// 20201209 如果指定的Bean的显式名称不为空, 在直接返回, 否则返回给定的bean定义生成的一个bean名称。
 		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
 
+		// 20201209 处理默认公共注解定义: Lazy, Primary, DependsOn, Role, Description
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);
+
+		// 20201209 如果存在Bean类级别上的限定符
 		if (qualifiers != null) {
+			// 20201209 则遍历这些限定符
 			for (Class<? extends Annotation> qualifier : qualifiers) {
+				// 20201209 如果限定符为Primary类型
 				if (Primary.class == qualifier) {
+					// 20201209 设置此bean是否为自动装配的主要候选对象
 					abd.setPrimary(true);
 				}
+
+				// 20201209 如果限定符为Lazy类型
 				else if (Lazy.class == qualifier) {
+					// 20201209 设置是否应延迟初始化此bean
 					abd.setLazyInit(true);
 				}
 				else {
+					// 20201209 注册要用于自动装配候选解析的限定符，该限定符由限定符的类型名称键入。
 					abd.addQualifier(new AutowireCandidateQualifier(qualifier));
 				}
 			}
 		}
+
+		// 20201209 如果存在回调标志: 设置惰性初始或主要标志
 		if (customizers != null) {
+			// 20201209 则遍历这些回调编址
 			for (BeanDefinitionCustomizer customizer : customizers) {
+				// 20201209 自定义给定的bean定义。
 				customizer.customize(abd);
 			}
 		}
 
+		// 20201209 构造具有名称和别名的BeanDefinition的持有人
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(abd, beanName);
+
+		// 20201209 根据作用域代理模式创建该持有人实例 -> 不要创建作用域代理、创建一个JDK动态代理、创建一个基于类的代理（使用CGLIB）
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+
+		// 20201209 向给定的bean工厂注册该(代理)持有人定义。
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
 

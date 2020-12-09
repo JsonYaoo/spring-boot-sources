@@ -35,6 +35,7 @@ import org.springframework.util.StringUtils;
  * @see PropertiesBeanDefinitionReader
  * @see org.springframework.beans.factory.xml.DefaultBeanDefinitionDocumentReader
  */
+// 20201209 对bean定义阅读器实现有用的实用程序方法。 主要供内部使用。
 public abstract class BeanDefinitionReaderUtils {
 
 	/**
@@ -155,6 +156,7 @@ public abstract class BeanDefinitionReaderUtils {
 	 * @param registry the bean factory to register with
 	 * @throws BeanDefinitionStoreException if registration failed
 	 */
+	// 20201209 向给定的bean工厂注册给定的bean定义。
 	public static void registerBeanDefinition(
 			BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry)
 			throws BeanDefinitionStoreException {
