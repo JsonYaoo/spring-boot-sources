@@ -30,6 +30,8 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
  * @since 2.0.0
  * @see ApplicationContextAware
  */
+// 20201210 回调接口用于支持{@link SpringApplication}启动错误的自定义报告。 {@link SpringBootExceptionReporter Reports}是通过{@link SpringFactoriesLoader}加载的，
+// 20201210 并且必须使用单个{@link ConfigurableApplicationContext}参数声明一个公共构造函数。
 @FunctionalInterface
 public interface SpringBootExceptionReporter {
 
@@ -37,8 +39,9 @@ public interface SpringBootExceptionReporter {
 	 * Report a startup failure to the user.
 	 * @param failure the source failure
 	 * @return {@code true} if the failure was reported or {@code false} if default
-	 * reporting should occur.
+	 * reporting should occur. // 20201210 如果报告了故障，则为{@code true}，如果应进行默认报告，则为{@code false}。
 	 */
+	// 20201210 向用户报告启动失败, 如果报告了故障，则为{@code true}
 	boolean reportException(Throwable failure);
 
 }

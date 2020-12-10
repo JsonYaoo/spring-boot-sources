@@ -106,17 +106,28 @@ class SpringApplicationRunListeners {
 		doWithListeners("spring.boot.application.running", (listener) -> listener.running(context));
 	}
 
+	// 20201210 使用上下文启动监听器启动"spring.boot.application.failed"
 	void failed(ConfigurableApplicationContext context, Throwable exception) {
-		doWithListeners("spring.boot.application.failed",
-				(listener) -> callFailedListener(listener, context, exception), (step) -> {
+		// 20201210 使用上下文启动监听器启动"spring.boot.application.failed"
+		doWithListeners(
+				// 20201210 每步名称: "spring.boot.application.failed"
+				"spring.boot.application.failed",
+
+				// 20201210 每步监听器执行: 运行应用程序时发生故障时调用。
+				(listener) -> callFailedListener(listener, context, exception),
+
+				// 20201210 每步动作内容
+				(step) -> {
 					step.tag("exception", exception.getClass().toString());
 					step.tag("message", exception.getMessage());
 				});
 	}
 
+	// 20201210 运行应用程序时发生故障时调用。
 	private void callFailedListener(SpringApplicationRunListener listener, ConfigurableApplicationContext context,
 			Throwable exception) {
 		try {
+			// 20201210 运行应用程序时发生故障时调用。
 			listener.failed(context, exception);
 		}
 		catch (Throwable ex) {

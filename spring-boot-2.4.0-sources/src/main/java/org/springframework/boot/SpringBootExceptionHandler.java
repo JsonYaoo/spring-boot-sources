@@ -30,6 +30,7 @@ import java.util.Set;
  *
  * @author Phillip Webb
  */
+// 20201210 {@link UncaughtExceptionHandler}禁止处理已记录的异常和处理系统退出。
 class SpringBootExceptionHandler implements UncaughtExceptionHandler {
 
 	private static final Set<String> LOG_CONFIGURATION_MESSAGES;
@@ -40,6 +41,7 @@ class SpringBootExceptionHandler implements UncaughtExceptionHandler {
 		LOG_CONFIGURATION_MESSAGES = Collections.unmodifiableSet(messages);
 	}
 
+	// 20201210 用于附加和跟踪处理程序的线程本地。
 	private static LoggedExceptionHandlerThreadLocal handler = new LoggedExceptionHandlerThreadLocal();
 
 	private final UncaughtExceptionHandler parent;
@@ -56,6 +58,7 @@ class SpringBootExceptionHandler implements UncaughtExceptionHandler {
 		this.loggedExceptions.add(exception);
 	}
 
+	// 20201210 注册退出编码
 	void registerExitCode(int exitCode) {
 		this.exitCode = exitCode;
 	}
@@ -110,6 +113,7 @@ class SpringBootExceptionHandler implements UncaughtExceptionHandler {
 		return false;
 	}
 
+	// 20201210 从用于附加和跟踪处理程序的线程本地获取处理值
 	static SpringBootExceptionHandler forCurrentThread() {
 		return handler.get();
 	}
@@ -117,6 +121,7 @@ class SpringBootExceptionHandler implements UncaughtExceptionHandler {
 	/**
 	 * Thread local used to attach and track handlers.
 	 */
+	// 20201210 用于附加和跟踪处理程序的线程本地。
 	private static class LoggedExceptionHandlerThreadLocal extends ThreadLocal<SpringBootExceptionHandler> {
 
 		@Override

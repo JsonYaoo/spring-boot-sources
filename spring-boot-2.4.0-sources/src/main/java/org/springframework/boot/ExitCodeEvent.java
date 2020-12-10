@@ -25,6 +25,7 @@ import org.springframework.context.ApplicationEvent;
  * @author Phillip Webb
  * @since 1.3.2
  */
+// 20201210 从{@link ExitCodeGenerator}确定了应用程序退出代码后，就会触发事件。
 public class ExitCodeEvent extends ApplicationEvent {
 
 	private final int exitCode;
@@ -34,6 +35,7 @@ public class ExitCodeEvent extends ApplicationEvent {
 	 * @param source the source of the event
 	 * @param exitCode the exit code
 	 */
+	// 20201210 创建一个新的{@link ExitCodeEvent}实例。
 	public ExitCodeEvent(Object source, int exitCode) {
 		super(source);
 		this.exitCode = exitCode;

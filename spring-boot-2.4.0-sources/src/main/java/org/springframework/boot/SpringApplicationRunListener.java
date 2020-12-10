@@ -128,6 +128,7 @@ public interface SpringApplicationRunListener {
 	 * @param exception the failure
 	 * @since 2.0.0
 	 */
+	// 20201210 运行应用程序时发生故障时调用。
 	default void failed(ConfigurableApplicationContext context, Throwable exception) {
 	}
 

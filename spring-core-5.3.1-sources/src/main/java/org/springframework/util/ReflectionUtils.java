@@ -127,16 +127,26 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
+	 * 20201210
+	 * A. 重新抛出给定的{@link Throwable异常}，这大概是{@link InvocationTargetException}的目标异常。 仅当目标方法预期不会引发任何检查异常时，才应调用此方法。
+	 * B. 如果合适，将基础异常重新抛出为{@link RuntimeException}或{@link Error}； 否则，引发{@link UndeclaredThrowableException}。
+	 */
+	/**
+	 * A.
 	 * Rethrow the given {@link Throwable exception}, which is presumably the
 	 * <em>target exception</em> of an {@link InvocationTargetException}.
 	 * Should only be called if no checked exception is expected to be thrown
 	 * by the target method.
+	 *
+	 * B.
 	 * <p>Rethrows the underlying exception cast to a {@link RuntimeException} or
 	 * {@link Error} if appropriate; otherwise, throws an
 	 * {@link UndeclaredThrowableException}.
+	 *
 	 * @param ex the exception to rethrow
 	 * @throws RuntimeException the rethrown exception
 	 */
+	// 20201210 重新抛出给定的{@link Throwable异常}
 	public static void rethrowRuntimeException(Throwable ex) {
 		if (ex instanceof RuntimeException) {
 			throw (RuntimeException) ex;

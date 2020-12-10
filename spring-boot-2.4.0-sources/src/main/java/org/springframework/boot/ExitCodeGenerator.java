@@ -25,6 +25,7 @@ package org.springframework.boot;
  * @see SpringApplication#exit(org.springframework.context.ApplicationContext,
  * ExitCodeGenerator...)
  */
+// 20201210 用于从正在运行的命令行{@link SpringApplication}生成“退出代码”的界面。 既可以用于异常，也可以直接用于bean。
 @FunctionalInterface
 public interface ExitCodeGenerator {
 
@@ -32,6 +33,7 @@ public interface ExitCodeGenerator {
 	 * Returns the exit code that should be returned from the application.
 	 * @return the exit code.
 	 */
+	// 20201210 返回应从应用程序返回的退出代码
 	int getExitCode();
 
 }

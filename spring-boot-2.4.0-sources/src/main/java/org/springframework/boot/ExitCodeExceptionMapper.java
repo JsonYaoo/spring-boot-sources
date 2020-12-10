@@ -23,6 +23,7 @@ package org.springframework.boot;
  * @author Phillip Webb
  * @since 1.3.2
  */
+// 20201210 策略接口，可用于提供异常和退出代码之间的映射。
 @FunctionalInterface
 public interface ExitCodeExceptionMapper {
 
@@ -31,6 +32,7 @@ public interface ExitCodeExceptionMapper {
 	 * @param exception the exception causing the application to exit
 	 * @return the exit code or {@code 0}.
 	 */
+	// 2020121 返回应从应用程序返回的退出代码。
 	int getExitCode(Throwable exception);
 
 }

@@ -32,27 +32,37 @@ import org.springframework.util.Assert;
  * @see #getExitCode()
  * @see ExitCodeGenerator
  */
+// 20201210 维护{@link ExitCodeGenerator}实例的集合，并允许计算最终退出代码。
 class ExitCodeGenerators implements Iterable<ExitCodeGenerator> {
 
 	private List<ExitCodeGenerator> generators = new ArrayList<>();
 
+	// 20201210 添加所有策略接口(可用于提供异常和退出代码之间的映射)
 	void addAll(Throwable exception, ExitCodeExceptionMapper... mappers) {
 		Assert.notNull(exception, "Exception must not be null");
 		Assert.notNull(mappers, "Mappers must not be null");
+
+		// 20201210 添加所有策略接口(可用于提供异常和退出代码之间的映射)
 		addAll(exception, Arrays.asList(mappers));
 	}
 
+	// 20201210 添加所有策略接口(可用于提供异常和退出代码之间的映射)
 	void addAll(Throwable exception, Iterable<? extends ExitCodeExceptionMapper> mappers) {
 		Assert.notNull(exception, "Exception must not be null");
 		Assert.notNull(mappers, "Mappers must not be null");
+
+		// 20201210 添加MappedExitCodeGenerator, 使{@link ExitCodeExceptionMapper}适应{@link ExitCodeGenerator}。
 		for (ExitCodeExceptionMapper mapper : mappers) {
 			add(exception, mapper);
 		}
 	}
 
+	// 20201210 添加MappedExitCodeGenerator, 使{@link ExitCodeExceptionMapper}适应{@link ExitCodeGenerator}。
 	void add(Throwable exception, ExitCodeExceptionMapper mapper) {
 		Assert.notNull(exception, "Exception must not be null");
 		Assert.notNull(mapper, "Mapper must not be null");
+
+		// 20201210 添加MappedExitCodeGenerator, 使{@link ExitCodeExceptionMapper}适应{@link ExitCodeGenerator}。
 		add(new MappedExitCodeGenerator(exception, mapper));
 	}
 
@@ -82,6 +92,7 @@ class ExitCodeGenerators implements Iterable<ExitCodeGenerator> {
 	 * Get the final exit code that should be returned based on all contained generators.
 	 * @return the final exit code.
 	 */
+	// 20201210 获取应基于所有包含的生成器返回的最终退出代码。
 	int getExitCode() {
 		int exitCode = 0;
 		for (ExitCodeGenerator generator : this.generators) {
@@ -102,12 +113,14 @@ class ExitCodeGenerators implements Iterable<ExitCodeGenerator> {
 	/**
 	 * Adapts an {@link ExitCodeExceptionMapper} to an {@link ExitCodeGenerator}.
 	 */
+	// 20201210 使{@link ExitCodeExceptionMapper}适应{@link ExitCodeGenerator}。
 	private static class MappedExitCodeGenerator implements ExitCodeGenerator {
 
 		private final Throwable exception;
 
 		private final ExitCodeExceptionMapper mapper;
 
+		// 20201210 构造MappedExitCodeGenerator, 使{@link ExitCodeExceptionMapper}适应{@link ExitCodeGenerator}。
 		MappedExitCodeGenerator(Throwable exception, ExitCodeExceptionMapper mapper) {
 			this.exception = exception;
 			this.mapper = mapper;

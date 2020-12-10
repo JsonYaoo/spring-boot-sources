@@ -462,6 +462,7 @@ public class SpringApplication {
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
+			// 20201210 处理运行失败 -> 向用户报告启动失败, 关闭此应用程序上下文，释放实现可能持有的所有资源和锁(这包括销毁所有缓存的单例bean)
 			handleRunFailure(context, ex, listeners);
 			throw new IllegalStateException(ex);
 		}
@@ -1230,18 +1231,25 @@ public class SpringApplication {
 		}
 	}
 
+	// 20201210 处理运行失败 -> 向用户报告启动失败, 关闭此应用程序上下文，释放实现可能持有的所有资源和锁(这包括销毁所有缓存的单例bean)
 	private void handleRunFailure(ConfigurableApplicationContext context, Throwable exception,
 			SpringApplicationRunListeners listeners) {
 		try {
 			try {
+				// 20201210 处理退出编码(不为0的编码) -> 构建ExitCodeEvent: 从{@link ExitCodeGenerator}确定了应用程序退出代码后，就会触发事件
 				handleExitCode(context, exception);
 				if (listeners != null) {
+					// 20201210 使用上下文启动监听器启动"spring.boot.application.failed"
 					listeners.failed(context, exception);
 				}
 			}
 			finally {
+				// 20201210 向用户报告启动失败, 如果报告了故障, 则注册已记录给定异常。 默认情况下，如果在主线程中运行，则此方法将禁止额外打印堆栈跟踪信息。
 				reportFailure(getExceptionReporters(context), exception);
+
+				// 20201210 如果存在配置上下文
 				if (context != null) {
+					// 20201210 则关闭此应用程序上下文，释放实现可能持有的所有资源和锁。 这包括销毁所有缓存的单例bean。
 					context.close();
 				}
 			}
@@ -1249,6 +1257,8 @@ public class SpringApplication {
 		catch (Exception ex) {
 			logger.warn("Unable to close ApplicationContext", ex);
 		}
+
+		// 20201210 重新抛出给定的{@link Throwable异常}
 		ReflectionUtils.rethrowRuntimeException(exception);
 	}
 
@@ -1262,10 +1272,13 @@ public class SpringApplication {
 		}
 	}
 
+	// 20201210 向用户报告启动失败, 如果报告了故障, 则注册已记录给定异常。 默认情况下，如果在主线程中运行，则此方法将禁止额外打印堆栈跟踪信息。
 	private void reportFailure(Collection<SpringBootExceptionReporter> exceptionReporters, Throwable failure) {
 		try {
 			for (SpringBootExceptionReporter reporter : exceptionReporters) {
+				// 20201210 向用户报告启动失败, 如果报告了故障，则为{@code true}
 				if (reporter.reportException(failure)) {
+					// 20201210 注册已记录给定异常。 默认情况下，如果在主线程中运行，则此方法将禁止额外打印堆栈跟踪信息。
 					registerLoggedException(failure);
 					return;
 				}
@@ -1273,9 +1286,11 @@ public class SpringApplication {
 		}
 		catch (Throwable ex) {
 			// Continue with normal handling of the original failure
+			// 20201210 继续正常处理原始故障
 		}
 		if (logger.isErrorEnabled()) {
 			logger.error("Application run failed", failure);
+			// 20201210 注册已记录给定异常。 默认情况下，如果在主线程中运行，则此方法将禁止额外打印堆栈跟踪信息。
 			registerLoggedException(failure);
 		}
 	}
@@ -1285,6 +1300,7 @@ public class SpringApplication {
 	 * the main thread, this method will suppress additional printing of the stacktrace.
 	 * @param exception the exception that was logged
 	 */
+	// 20201210 注册已记录给定异常。 默认情况下，如果在主线程中运行，则此方法将禁止额外打印堆栈跟踪信息。
 	protected void registerLoggedException(Throwable exception) {
 		SpringBootExceptionHandler handler = getSpringBootExceptionHandler();
 		if (handler != null) {
@@ -1292,49 +1308,83 @@ public class SpringApplication {
 		}
 	}
 
+	// 20201210 处理退出编码(不为0的编码) -> 构建ExitCodeEvent: 从{@link ExitCodeGenerator}确定了应用程序退出代码后，就会触发事件
 	private void handleExitCode(ConfigurableApplicationContext context, Throwable exception) {
+		// 20201210 处理退出编码
 		int exitCode = getExitCodeFromException(context, exception);
 		if (exitCode != 0) {
+			// 20201210 如果确定要退出(编码不为0), 且配置上下文存在
 			if (context != null) {
-				context.publishEvent(new ExitCodeEvent(context, exitCode));
+				// 20201210 通知所有与此应用程序注册的匹配侦听器一个应用程序事件
+				context.publishEvent(
+						// 20201210 构建ExitCodeEvent: 从{@link ExitCodeGenerator}确定了应用程序退出代码后，就会触发事件
+						new ExitCodeEvent(context, exitCode)
+				);
 			}
+
+			// 20201210 获取用于附加和跟踪处理程序的线程本地获取处理值: 禁止处理已记录的异常和处理系统退出
 			SpringBootExceptionHandler handler = getSpringBootExceptionHandler();
+
+			// 20201210 如果存在系统退出处理值
 			if (handler != null) {
+				// 20201210 注册退出编码
 				handler.registerExitCode(exitCode);
 			}
 		}
 	}
 
+	// 20201210 从异常中获取退出编码
 	private int getExitCodeFromException(ConfigurableApplicationContext context, Throwable exception) {
+		// 20201210 从异常中获取退出编码
 		int exitCode = getExitCodeFromMappedException(context, exception);
 		if (exitCode == 0) {
+			// 20201210 根据异常获取退出编码
 			exitCode = getExitCodeFromExitCodeGeneratorException(exception);
 		}
+
+		// 20201210 返回退出编码
 		return exitCode;
 	}
 
+	// 20201210 从异常中获取退出编码
 	private int getExitCodeFromMappedException(ConfigurableApplicationContext context, Throwable exception) {
+		// 20201210 如果配置上下问为空, 或者不处于活动状态, 则直接返回0表示退出
 		if (context == null || !context.isActive()) {
 			return 0;
 		}
+
+		// 20201210 维护{@link ExitCodeGenerator}实例的集合，并允许计算最终退出编码。
 		ExitCodeGenerators generators = new ExitCodeGenerators();
+
+		// 20201210 根据FactoryBeans的bean定义或{@code getObjectType}的值判断，返回ExitCodeExceptionMapper类型（包括子类）匹配的bean实例 -> 匹配所有类型的bean，无论是单例，原型还是FactoryBeans
 		Collection<ExitCodeExceptionMapper> beans = context.getBeansOfType(ExitCodeExceptionMapper.class).values();
+
+		// 20201210 添加所有ExitCodeExceptionMappers实例(可用于提供异常和退出编码之间的映射)
 		generators.addAll(exception, beans);
+
+		// 20201210 获取应基于所有包含的生成器返回的最终退出编码。
 		return generators.getExitCode();
 	}
 
+	// 20201210 根据异常获取退出编码
 	private int getExitCodeFromExitCodeGeneratorException(Throwable exception) {
 		if (exception == null) {
 			return 0;
 		}
 		if (exception instanceof ExitCodeGenerator) {
+			// 20201210 返回应从应用程序返回的退出编码
 			return ((ExitCodeGenerator) exception).getExitCode();
 		}
+
+		// 20201210 根据异常递归获取退出编码
 		return getExitCodeFromExitCodeGeneratorException(exception.getCause());
 	}
 
+	// 20201210 获取用于附加和跟踪处理程序的线程本地获取处理值
 	SpringBootExceptionHandler getSpringBootExceptionHandler() {
+		// 20201210 如果当前线程为主线程
 		if (isMainThread(Thread.currentThread())) {
+			// 20201210 返回用于附加和跟踪处理程序的线程本地获取处理值
 			return SpringBootExceptionHandler.forCurrentThread();
 		}
 		return null;
