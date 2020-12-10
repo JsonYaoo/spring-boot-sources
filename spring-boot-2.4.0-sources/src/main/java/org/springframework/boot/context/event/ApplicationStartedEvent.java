@@ -29,6 +29,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @author Andy Wilkinson
  * @since 2.0.0
  */
+// 20201210 刷新应用程序上下文后，但在调用任何{@link ApplicationRunner应用程序}和{@link CommandLineRunner命令行}运行程序之前，发布事件。
 @SuppressWarnings("serial")
 public class ApplicationStartedEvent extends SpringApplicationEvent {
 
@@ -40,6 +41,7 @@ public class ApplicationStartedEvent extends SpringApplicationEvent {
 	 * @param args the arguments the application is running with
 	 * @param context the context that was being created
 	 */
+	// 20201210 创建一个新的{@link ApplicationStartedEvent}实例。
 	public ApplicationStartedEvent(SpringApplication application, String[] args,
 			ConfigurableApplicationContext context) {
 		super(application, args);

@@ -107,6 +107,7 @@ public interface SpringApplicationRunListener {
 	 * @param context the application context.
 	 * @since 2.0.0
 	 */
+	// 20201210 上下文已刷新，应用程序已启动，但尚未调用{@link CommandLineRunner CommandLineRunners}和{@link ApplicationRunner ApplicationRunners}。
 	default void started(ConfigurableApplicationContext context) {
 	}
 

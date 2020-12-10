@@ -400,6 +400,8 @@ public class SpringApplication {
 	public ConfigurableApplicationContext run(String... args) {
 		// 20201201 构造纳秒计时器
 		StopWatch stopWatch = new StopWatch();
+
+		// 20201201 纳秒计时器开始一个未命名的任务
 		stopWatch.start();
 
 		// 20201201 构造Springboot最初上下文对象实例
@@ -441,12 +443,22 @@ public class SpringApplication {
 			// 20201210 刷新上下文 AnnotationConfigServletWebServerApplicationContext -> 注册JVM关闭挂钩(该线程会发布ContextClosedEvent并销毁此应用程序上下文的bean工厂中的单例
 			refreshContext(context);
 
+			// 20201210 在刷新上下文后调用 -> 默认为空实现
 			afterRefresh(context, applicationArguments);
+
+			// 20201210 纳秒计时器停止当前任务
 			stopWatch.stop();
+
+			// 20201210 是否启动时打印日志, 默认为true
 			if (this.logStartupInfo) {
+				// 20201210 应用程序信息启动完毕日志打印 -> 打印计时记录ms
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), stopWatch);
 			}
+
+			// 20201210 监听上下文已刷新, 应用程序已启动事件, 但为调用CommandLineRunners和ApplicationRunners事件 -> 将ApplicationStartedEvent事件多播到适当的侦听器, 执行监听ApplicationStartedEvent事件
 			listeners.started(context);
+
+
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
@@ -1163,6 +1175,7 @@ public class SpringApplication {
 	 * @param context the application context
 	 * @param args the application arguments
 	 */
+	// 20201210 在刷新上下文后调用 -> 默认为空实现
 	protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {
 	}
 

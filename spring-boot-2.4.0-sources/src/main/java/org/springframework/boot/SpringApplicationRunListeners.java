@@ -94,8 +94,12 @@ class SpringApplicationRunListeners {
 				(listener) -> listener.contextLoaded(context));
 	}
 
+	// 20201210 监听上下文已刷新, 应用程序已启动事件, 但为调用CommandLineRunners和ApplicationRunners事件 -> 将ApplicationStartedEvent事件多播到适当的侦听器, 执行监听ApplicationStartedEvent事件
 	void started(ConfigurableApplicationContext context) {
-		doWithListeners("spring.boot.application.started", (listener) -> listener.started(context));
+		// 20201202 执行监听ApplicationStartedEvent事件
+		doWithListeners("spring.boot.application.started",
+				// 20201210 上下文已刷新，应用程序已启动，但尚未调用{@link CommandLineRunner CommandLineRunners}和{@link ApplicationRunner ApplicationRunners}。
+				(listener) -> listener.started(context));
 	}
 
 	void running(ConfigurableApplicationContext context) {

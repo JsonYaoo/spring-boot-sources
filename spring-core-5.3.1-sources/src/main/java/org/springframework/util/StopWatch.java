@@ -160,12 +160,21 @@ public class StopWatch {
 	}
 
 	/**
+	 * 20201210
+	 * A. 停止当前任务。
+	 * B. 如果在不调用至少一对{@code start（）} / {@code stop（）}方法的情况下调用计时方法，则结果不确定。
+	 */
+	/**
+	 * A.
 	 * Stop the current task.
+	 *
+	 * B.
 	 * <p>The results are undefined if timing methods are called without invoking
 	 * at least one pair of {@code start()} / {@code stop()} methods.
 	 * @see #start()
 	 * @see #start(String)
 	 */
+	// 20201210 停止当前任务
 	public void stop() throws IllegalStateException {
 		if (this.currentTaskName == null) {
 			throw new IllegalStateException("Can't stop StopWatch: it's not running");

@@ -62,9 +62,15 @@ class StartupInfoLogger {
 		applicationLog.debug(LogMessage.of(this::getRunningMessage));
 	}
 
+	// 20201210 应用程序信息启动完毕日志打印 -> 打印计时记录ms
 	void logStarted(Log applicationLog, StopWatch stopWatch) {
+		// 20201210 如果在基础记录器中启用了信息，则为true。
 		if (applicationLog.isInfoEnabled()) {
-			applicationLog.info(getStartedMessage(stopWatch));
+			// 20201210 记录具有信息日志级别的消息。
+			applicationLog.info(
+					// 20201210 打印计时记录ms
+					getStartedMessage(stopWatch)
+			);
 		}
 	}
 
@@ -89,8 +95,12 @@ class StartupInfoLogger {
 		return message;
 	}
 
+	// 20201210 打印计时记录ms
 	private CharSequence getStartedMessage(StopWatch stopWatch) {
+		// 20201210 初始化结果字符串
 		StringBuilder message = new StringBuilder();
+
+		// 20201210 拼凑打印信息
 		message.append("Started ");
 		appendApplicationName(message);
 		message.append(" in ");
@@ -102,6 +112,7 @@ class StartupInfoLogger {
 		}
 		catch (Throwable ex) {
 			// No JVM time available
+			// 20201210 没有可用的JVM时间
 		}
 		return message;
 	}

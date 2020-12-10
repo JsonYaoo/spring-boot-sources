@@ -118,10 +118,20 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 		);
 	}
 
+	// 20201210 上下文已刷新，应用程序已启动，但尚未调用{@link CommandLineRunner CommandLineRunners}和{@link ApplicationRunner ApplicationRunners}。
 	@Override
 	public void started(ConfigurableApplicationContext context) {
-		context.publishEvent(new ApplicationStartedEvent(this.application, this.args, context));
-		AvailabilityChangeEvent.publish(context, LivenessState.CORRECT);
+		// 20201210 通知所有与此应用程序注册的匹配侦听器事件
+		context.publishEvent(
+				// 20201210 刷新应用程序上下文后，但在调用任何ApplicationRunner应用程序和CommandLineRunner命令行运行程序之前，发布事件
+				new ApplicationStartedEvent(this.application, this.args, context)
+		);
+
+		// 20201210 可用于将{@link AvailabilityChangeEvent}发布到给定应用程序上下文的便捷方法。
+		AvailabilityChangeEvent.publish(
+				context,
+				// 20201210 该应用程序正在运行，并且其内部状态正确。
+				LivenessState.CORRECT);
 	}
 
 	@Override

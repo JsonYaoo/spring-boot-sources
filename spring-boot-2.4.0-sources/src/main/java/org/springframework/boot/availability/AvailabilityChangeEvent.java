@@ -24,8 +24,16 @@ import org.springframework.core.ResolvableType;
 import org.springframework.util.Assert;
 
 /**
+ * 20201210
+ * A. 当应用程序的{@link AvailabilityState}更改时发送的{@link ApplicationEvent}。
+ * B. 任何应用程序组件都可以发送此类事件以更新应用程序的状态。
+ */
+/**
+ * A.
  * {@link ApplicationEvent} sent when the {@link AvailabilityState} of the application
  * changes.
+ *
+ * B.
  * <p>
  * Any application component can send such events to update the state of the application.
  *
@@ -34,6 +42,7 @@ import org.springframework.util.Assert;
  * @author Phillip Webb
  * @since 2.3.0
  */
+// 20201210 当应用程序的{@link AvailabilityState}更改时发送的{@link ApplicationEvent}。
 public class AvailabilityChangeEvent<S extends AvailabilityState> extends PayloadApplicationEvent<S> {
 
 	/**
@@ -73,6 +82,7 @@ public class AvailabilityChangeEvent<S extends AvailabilityState> extends Payloa
 	 * @param context the context used to publish the event
 	 * @param state the changed availability state
 	 */
+	// 20201210 可用于将{@link AvailabilityChangeEvent}发布到给定应用程序上下文的便捷方法。
 	public static <S extends AvailabilityState> void publish(ApplicationContext context, S state) {
 		Assert.notNull(context, "Context must not be null");
 		publish(context, context, state);
@@ -86,6 +96,7 @@ public class AvailabilityChangeEvent<S extends AvailabilityState> extends Payloa
 	 * @param source the source of the event
 	 * @param state the changed availability state
 	 */
+	// 20201210 可用于将{@link AvailabilityChangeEvent}发布到给定应用程序上下文的便捷方法。
 	public static <S extends AvailabilityState> void publish(ApplicationEventPublisher publisher, Object source,
 			S state) {
 		Assert.notNull(publisher, "Publisher must not be null");

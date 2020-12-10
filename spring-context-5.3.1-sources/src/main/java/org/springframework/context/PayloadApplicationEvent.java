@@ -21,14 +21,22 @@ import org.springframework.core.ResolvableTypeProvider;
 import org.springframework.util.Assert;
 
 /**
+ * 20201210
+ * A. 携带任意有效载荷的{@link ApplicationEvent}。
+ * B. 主要供框架内部使用。
+ */
+/**
+ * A.
  * An {@link ApplicationEvent} that carries an arbitrary payload.
  *
+ * B.
  * <p>Mainly intended for internal use within the framework.
  *
  * @author Stephane Nicoll
  * @since 4.2
  * @param <T> the payload type of the event
  */
+// 20201210 携带任意有效载荷的{@link ApplicationEvent}, 主要供框架内部使用
 @SuppressWarnings("serial")
 public class PayloadApplicationEvent<T> extends ApplicationEvent implements ResolvableTypeProvider {
 

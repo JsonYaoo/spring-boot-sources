@@ -195,6 +195,7 @@ public interface Log {
 	 * Logs a message with info log level.
 	 * @param message log this message
 	 */
+	// 20201210 记录具有信息日志级别的消息。
 	void info(Object message);
 
 	/**

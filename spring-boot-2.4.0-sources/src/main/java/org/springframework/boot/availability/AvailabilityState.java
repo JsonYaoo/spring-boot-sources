@@ -25,6 +25,7 @@ package org.springframework.boot.availability;
  * @see LivenessState
  * @see ReadinessState
  */
+// 20201210 在{@link ApplicationAvailability}状态上使用的标记接口。 此接口通常以{@code枚举}类型实现。
 public interface AvailabilityState {
 
 }
