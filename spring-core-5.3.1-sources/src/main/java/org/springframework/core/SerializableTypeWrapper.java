@@ -79,7 +79,6 @@ final class SerializableTypeWrapper {
 
 	static final ConcurrentReferenceHashMap<Type, Type> cache = new ConcurrentReferenceHashMap<>(256);
 
-
 	private SerializableTypeWrapper() {
 	}
 

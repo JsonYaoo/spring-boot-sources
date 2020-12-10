@@ -93,11 +93,19 @@ public interface StartupStep {
 	Tags getTags();
 
 	/**
+	 * 20201210
+	 * A. 记录步骤的状态以及可能的其他度量，例如执行时间。
+	 * B. 一旦结束，就不能更改步进状态。
+	 */
+	/**
+	 * A.
 	 * Record the state of the step and possibly other metrics like execution time.
+	 *
+	 * B.
 	 * <p>Once ended, changes on the step state are not allowed.
 	 */
+	// 20201210 记录步骤的状态以及可能的其他度量，例如执行时间。
 	void end();
-
 
 	/**
 	 * Immutable collection of {@link Tag}.

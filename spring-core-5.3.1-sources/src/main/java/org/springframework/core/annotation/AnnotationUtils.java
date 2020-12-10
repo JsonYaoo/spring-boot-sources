@@ -1286,8 +1286,12 @@ public abstract class AnnotationUtils {
 	 * Clear the internal annotation metadata cache.
 	 * @since 4.3.15
 	 */
+	// 20201210 清除内部注释元数据缓存。
 	public static void clearCache() {
+		// 20201210 清除单个源注解信息缓存
 		AnnotationTypeMappings.clearCache();
+
+		// 20201210 清除注解扫描程序
 		AnnotationsScanner.clearCache();
 	}
 

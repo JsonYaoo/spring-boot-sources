@@ -127,6 +127,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	 */
 	public static final String DISPATCHER_SERVLET_NAME = "dispatcherServlet";
 
+	// 20201210 表示完全配置的Web服务器的简单实例（例如Tomcat，Jetty，Netty）
 	private volatile WebServer webServer;
 
 	private ServletConfig servletConfig;
@@ -159,16 +160,24 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		registerWebApplicationScopes();
 	}
 
+	// 20201210 加载或刷新配置的持久性表示形式, 如果失败，它应该销毁已创建的单例，以避免悬挂资源
 	@Override
 	public final void refresh() throws BeansException, IllegalStateException {
 		try {
+			// 20201210 加载或刷新配置的持久性表示形式, 如果失败，它应该销毁已创建的单例，以避免悬挂资源
 			super.refresh();
 		}
 		catch (RuntimeException ex) {
+			// 20201210 获取已注册的表示完全配置的Web服务器的简单实例（例如Tomcat，Jetty，Netty）
 			WebServer webServer = this.webServer;
+
+			// 20201210 刷新上下文出现异常时, 如果该服务器实例不为空
 			if (webServer != null) {
+				// 20201210 停止Web服务器。 在已停止的服务器上调用此方法无效。
 				webServer.stop();
 			}
+
+			// 20201210 继续抛出异常
 			throw ex;
 		}
 	}

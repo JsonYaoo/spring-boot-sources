@@ -637,6 +637,7 @@ public class SpringApplication {
 				//在某些环境中不允许使用。
 			}
 		}
+
 		// 20201210 刷新基础的{@link ApplicationContext} -> 加载或刷新配置的持久性表示形式
 		refresh((ApplicationContext) context);
 	}

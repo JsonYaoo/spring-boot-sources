@@ -1720,8 +1720,12 @@ public class ResolvableType implements Serializable {
 	 * Clear the internal {@code ResolvableType}/{@code SerializableTypeWrapper} cache.
 	 * @since 4.2
 	 */
+	// 20201210 清除内部{@code ResolvableType} / {@ code SerializableTypeWrapper}缓存。
 	public static void clearCache() {
+		// 20201210 清除ResolvableType缓存
 		cache.clear();
+
+		// 20201210 清除序列化包装器缓存
 		SerializableTypeWrapper.cache.clear();
 	}
 

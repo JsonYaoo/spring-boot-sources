@@ -184,6 +184,7 @@ public final class CachedIntrospectionResults {
 	 * removing the ClassLoader (and its children) from the acceptance list.
 	 * @param classLoader the ClassLoader to clear the cache for
 	 */
+	// 20201210 清除给定ClassLoader的自省缓存，删除该ClassLoader下所有类的自省结果，并从接受列表中删除ClassLoader（及其子级）。
 	public static void clearClassLoader(@Nullable ClassLoader classLoader) {
 		acceptedClassLoaders.removeIf(registeredLoader ->
 				isUnderneathClassLoader(registeredLoader, classLoader));

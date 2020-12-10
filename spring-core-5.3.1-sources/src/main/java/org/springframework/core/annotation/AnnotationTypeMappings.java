@@ -27,15 +27,24 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
 /**
+ * 20201210
+ * A. 为单个源注解类型提供{@link AnnotationTypeMapping}信息。 对所有元注解执行递归广度优先爬网，以最终提供一种快速的方法来映射根{@link Annotation}的属性。
+ * B. 支持基于约定的元注解以及隐式和显式{@link AliasFor @AliasFor}别名的合并。 还提供有关镜像属性的信息。
+ * C. 此类设计为可缓存的，因此无论实际使用了多少次，元注解都只需搜索一次。
+ */
+/**
+ * A.
  * Provides {@link AnnotationTypeMapping} information for a single source
  * annotation type. Performs a recursive breadth first crawl of all
  * meta-annotations to ultimately provide a quick way to map the attributes of
  * a root {@link Annotation}.
  *
+ * B.
  * <p>Supports convention based merging of meta-annotations as well as implicit
  * and explicit {@link AliasFor @AliasFor} aliases. Also provides information
  * about mirrored attributes.
  *
+ * C.
  * <p>This class is designed to be cached so that meta-annotations only need to
  * be searched once, regardless of how many times they are actually used.
  *
@@ -43,6 +52,7 @@ import org.springframework.util.ConcurrentReferenceHashMap;
  * @since 5.2
  * @see AnnotationTypeMapping
  */
+// 20201210 为单个源注解类型提供{@link AnnotationTypeMapping}信息 -> 此类设计为可缓存的，因此无论实际使用了多少次，元注解都只需搜索一次。
 final class AnnotationTypeMappings {
 
 	private static final IntrospectionFailureLogger failureLogger = IntrospectionFailureLogger.DEBUG;

@@ -25,6 +25,7 @@ package org.springframework.boot.web.server;
  * @author Dave Syer
  * @since 2.0.0
  */
+// 20201210 表示完全配置的Web服务器的简单接口（例如Tomcat，Jetty，Netty）。 允许服务器{@link #start（）启动}和{@link #stop（）停止}。
 public interface WebServer {
 
 	/**
@@ -39,6 +40,7 @@ public interface WebServer {
 	 * effect.
 	 * @throws WebServerException if the server cannot be stopped
 	 */
+	// 20201210 停止Web服务器。 在已停止的服务器上调用此方法无效。
 	void stop() throws WebServerException;
 
 	/**

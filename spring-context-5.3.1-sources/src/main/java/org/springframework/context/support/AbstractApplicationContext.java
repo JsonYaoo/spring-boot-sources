@@ -627,51 +627,69 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		return this.applicationListeners;
 	}
 
+	// 20201210 加载或刷新配置的持久性表示形式, 如果失败，它应该销毁已创建的单例，以避免悬挂资源
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
+		// 20201210 同步监视器上锁，用于“刷新”和“销毁”。
 		synchronized (this.startupShutdownMonitor) {
+			// 20201210 创建新步骤并标记其开始, 步骤名称描述当前操作或阶段 -> "spring.context.refresh"
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
 			// Prepare this context for refreshing.
+			// 20201210 准备此上下文以进行刷新。
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
+			// 20201210 告诉子类刷新内部bean工厂。
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
+			// 20201210 准备在这种情况下使用的bean工厂。
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
+				// 20201210 允许在上下文子类中对bean工厂进行后处理。
 				postProcessBeanFactory(beanFactory);
 
+				// 20201210 创建新步骤并标记其开始, 步骤名称描述当前操作或阶段 -> "spring.context.beans.post-process"
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
+
 				// Invoke factory processors registered as beans in the context.
+				// 20201210 调用在上下文中注册为bean的工厂处理器。
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				// 20201210 注册拦截Bean创建的Bean处理器。
 				registerBeanPostProcessors(beanFactory);
 				beanPostProcess.end();
 
 				// Initialize message source for this context.
+				// 20201210 为此上下文初始化消息源。
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
+				// 20201210 为此上下文初始化事件多播器。
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
+				// 20201210 在特定上下文子类中初始化其他特殊bean。
 				onRefresh();
 
 				// Check for listener beans and register them.
+				// 20201210 检查侦听器bean并注册它们。
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
+				// 20201210 实例化所有剩余的（非延迟初始化）单例。
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
+				// 20201210 最后一步：发布相应的事件。
 				finishRefresh();
 			}
 
+			// 20201210 如果期间抛出异常
 			catch (BeansException ex) {
 				if (logger.isWarnEnabled()) {
 					logger.warn("Exception encountered during context initialization - " +
@@ -679,19 +697,27 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				}
 
 				// Destroy already created singletons to avoid dangling resources.
+				// 20201210 销毁已创建的单例以避免资源悬空。
 				destroyBeans();
 
 				// Reset 'active' flag.
+				// 20201210 重置“有效”标志。
 				cancelRefresh(ex);
 
 				// Propagate exception to caller.
+				// 20201210 将异常传播给调用方。
 				throw ex;
 			}
 
+			// 20201210 最后执行
 			finally {
 				// Reset common introspection caches in Spring's core, since we
 				// might not ever need metadata for singleton beans anymore...
+				// 20201210 在Spring的核心中重置常见的自省缓存，因为我们可能不再需要单例bean的元数据...
+				// 20201210 重置Spring的公共反射元数据缓存，尤其是{@link ReflectionUtils}，{@ link AnnotationUtils}，{@ link ResolvableType}和{@link CachedIntrospectionResults}缓存。
 				resetCommonCaches();
+
+				// 20201210 记录步骤的状态以及可能的其他度量，例如执行时间。
 				contextRefresh.end();
 			}
 		}
@@ -1050,10 +1076,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * @see ResolvableType#clearCache()
 	 * @see CachedIntrospectionResults#clearClassLoader(ClassLoader)
 	 */
+	// 20201210 重置Spring的公共反射元数据缓存，尤其是{@link ReflectionUtils}，{@ link AnnotationUtils}，{@ link ResolvableType}和{@link CachedIntrospectionResults}缓存。
 	protected void resetCommonCaches() {
+		// 20201210 清除ReflectionUtils相关类的内部方法/字段缓存。
 		ReflectionUtils.clearCache();
+
+		// 20201210 清除AnnotationUtils相关类的内部注释元数据缓存。
 		AnnotationUtils.clearCache();
+
+		// 20201210 清除内部{@code ResolvableType} / {@ code SerializableTypeWrapper}缓存。
 		ResolvableType.clearCache();
+
+		// 20201210 清除给定ClassLoader的自省缓存，删除该ClassLoader下所有类的自省结果，并从接受列表中删除ClassLoader（及其子级）。
 		CachedIntrospectionResults.clearClassLoader(getClassLoader());
 	}
 
