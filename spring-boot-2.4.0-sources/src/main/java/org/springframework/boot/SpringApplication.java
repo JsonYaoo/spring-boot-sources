@@ -458,7 +458,7 @@ public class SpringApplication {
 			// 20201210 监听上下文已刷新, 应用程序已启动事件, 但为调用CommandLineRunners和ApplicationRunners事件 -> 将ApplicationStartedEvent事件多播到适当的侦听器, 执行监听ApplicationStartedEvent事件
 			listeners.started(context);
 
-
+			// 20201210 调用ApplicationRunner以及CommandLineRunner -> 用于运行bean的回调
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
@@ -1179,23 +1179,39 @@ public class SpringApplication {
 	protected void afterRefresh(ConfigurableApplicationContext context, ApplicationArguments args) {
 	}
 
+	// 20201210 调用ApplicationRunner以及CommandLineRunner -> 用于运行bean的回调
 	private void callRunners(ApplicationContext context, ApplicationArguments args) {
 		List<Object> runners = new ArrayList<>();
+
+		// 20201210 根据FactoryBeans的bean定义或{@code getObjectType}的值判断，返回ApplicationRunner类型（包括子类）匹配的bean实例 -> 匹配所有类型的bean，无论是单例，原型还是FactoryBeans
 		runners.addAll(context.getBeansOfType(ApplicationRunner.class).values());
+
+		// 20201210 根据FactoryBeans的bean定义或{@code getObjectType}的值判断，返回CommandLineRunner类型（包括子类）匹配的bean实例 -> 匹配所有类型的bean，无论是单例，原型还是FactoryBeans
 		runners.addAll(context.getBeansOfType(CommandLineRunner.class).values());
+
+		// 20201210 根据注解对 用于指示Bean包含在{@link SpringApplication}中时应运行的接口实例 进行排序
 		AnnotationAwareOrderComparator.sort(runners);
+
+		// 20201210 对这些 用于指示Bean包含在{@link SpringApplication}中时应运行的接口实例 进行遍历
 		for (Object runner : new LinkedHashSet<>(runners)) {
+			// 20201210 如果为ApplicationRunner实例
 			if (runner instanceof ApplicationRunner) {
+				// 20201210 调用ApplicationRunner -> 用于运行bean的回调
 				callRunner((ApplicationRunner) runner, args);
 			}
+
+			// 20201210 如果为CommandLineRunner实例
 			if (runner instanceof CommandLineRunner) {
+				// 20201210 调用CommandLineRunner -> 用于运行bean的回调
 				callRunner((CommandLineRunner) runner, args);
 			}
 		}
 	}
 
+	// 20201210 调用ApplicationRunner -> 用于运行bean的回调
 	private void callRunner(ApplicationRunner runner, ApplicationArguments args) {
 		try {
+			// 20201210 用于运行bean的回调。
 			(runner).run(args);
 		}
 		catch (Exception ex) {
@@ -1203,8 +1219,10 @@ public class SpringApplication {
 		}
 	}
 
+	// 20201210 调用CommandLineRunner -> 用于运行bean的回调
 	private void callRunner(CommandLineRunner runner, ApplicationArguments args) {
 		try {
+			// 20201210 用于运行bean的回调
 			(runner).run(args.getSourceArgs());
 		}
 		catch (Exception ex) {

@@ -29,6 +29,8 @@ import org.springframework.core.annotation.Order;
  * @since 1.3.0
  * @see CommandLineRunner
  */
+// 20201210 用于指示Bean包含在{@link SpringApplication}中时应运行的接口。 可以在同一应用程序上下文中定义多个{@link ApplicationRunner} bean，并可以使用
+// 20201210 {@link Ordered}接口或{@link Order @Order}注解进行排序。
 @FunctionalInterface
 public interface ApplicationRunner {
 
@@ -37,6 +39,7 @@ public interface ApplicationRunner {
 	 * @param args incoming application arguments
 	 * @throws Exception on error
 	 */
+	// 20201210 用于运行bean的回调。
 	void run(ApplicationArguments args) throws Exception;
 
 }

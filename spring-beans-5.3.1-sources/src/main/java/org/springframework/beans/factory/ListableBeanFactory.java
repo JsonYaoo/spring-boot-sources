@@ -265,25 +265,49 @@ public interface ListableBeanFactory extends BeanFactory {
 	String[] getBeanNamesForType(@Nullable Class<?> type, boolean includeNonSingletons, boolean allowEagerInit);
 
 	/**
+	 * 20201210
+	 * A. 根据FactoryBeans的bean定义或{@code getObjectType}的值判断，返回与给定对象类型（包括子类）匹配的bean实例。
+	 * B. 注意：此方法仅自检顶级bean。 它不检查可能也与指定类型匹配的嵌套bean。
+	 * C. 是否考虑由FactoryBeans创建的对象，这意味着将初始化FactoryBeans。 如果由FactoryBean创建的对象不匹配，则原始FactoryBean本身将与该类型匹配。
+	 * D. 不考虑该工厂可能参与的任何层次结构。也可以使用BeanFactoryUtils的{@code beansOfTypeIn includedAncestors}将Bean包括在祖先工厂中。
+	 * E. 注意：不要忽略通过bean定义以外的其他方式注册的单例bean。
+	 * F. 此版本的getBeansOfType匹配所有类型的bean，无论是单例，原型还是FactoryBeans。 在大多数实现中，结果将与{@code getBeansOfType（type，true，true）}的结果相同。
+	 * G. 此方法返回的Map应该始终尽可能在后端配置中按定义顺序返回bean名称和相应的bean实例。
+	 */
+	/**
+	 * A.
 	 * Return the bean instances that match the given object type (including
 	 * subclasses), judging from either bean definitions or the value of
 	 * {@code getObjectType} in the case of FactoryBeans.
+	 *
+	 * B.
 	 * <p><b>NOTE: This method introspects top-level beans only.</b> It does <i>not</i>
 	 * check nested beans which might match the specified type as well.
+	 *
+	 * C.
 	 * <p>Does consider objects created by FactoryBeans, which means that FactoryBeans
 	 * will get initialized. If the object created by the FactoryBean doesn't match,
 	 * the raw FactoryBean itself will be matched against the type.
+	 *
+	 * D.
 	 * <p>Does not consider any hierarchy this factory may participate in.
 	 * Use BeanFactoryUtils' {@code beansOfTypeIncludingAncestors}
 	 * to include beans in ancestor factories too.
+	 *
+	 * E.
 	 * <p>Note: Does <i>not</i> ignore singleton beans that have been registered
 	 * by other means than bean definitions.
+	 *
+	 * F.
 	 * <p>This version of getBeansOfType matches all kinds of beans, be it
 	 * singletons, prototypes, or FactoryBeans. In most implementations, the
 	 * result will be the same as for {@code getBeansOfType(type, true, true)}.
+	 *
+	 * G.
 	 * <p>The Map returned by this method should always return bean names and
 	 * corresponding bean instances <i>in the order of definition</i> in the
 	 * backend configuration, as far as possible.
+	 *
 	 * @param type the class or interface to match, or {@code null} for all concrete beans
 	 * @return a Map with the matching beans, containing the bean names as
 	 * keys and the corresponding bean instances as values
@@ -292,6 +316,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @see FactoryBean#getObjectType
 	 * @see BeanFactoryUtils#beansOfTypeIncludingAncestors(ListableBeanFactory, Class)
 	 */
+	// 20201210 根据FactoryBeans的bean定义或{@code getObjectType}的值判断，返回与给定对象类型（包括子类）匹配的bean实例 -> 匹配所有类型的bean，无论是单例，原型还是FactoryBeans
 	<T> Map<String, T> getBeansOfType(@Nullable Class<T> type) throws BeansException;
 
 	/**

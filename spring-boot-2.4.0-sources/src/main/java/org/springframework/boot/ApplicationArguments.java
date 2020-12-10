@@ -32,6 +32,7 @@ public interface ApplicationArguments {
 	 * Return the raw unprocessed arguments that were passed to the application.
 	 * @return the arguments
 	 */
+	// 20201210 返回传递给应用程序的原始未处理参数
 	String[] getSourceArgs();
 
 	/**
