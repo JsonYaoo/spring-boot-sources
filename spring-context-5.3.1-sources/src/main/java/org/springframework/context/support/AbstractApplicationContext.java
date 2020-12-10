@@ -727,12 +727,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * Prepare this context for refreshing, setting its startup date and
 	 * active flag as well as performing any initialization of property sources.
 	 */
+	// 20201210 准备此上下文以进行刷新，设置其启动日期和活动标志以及执行属性源的任何初始化。
 	protected void prepareRefresh() {
 		// Switch to active.
+		// 20201210 切换到活动状态。
 		this.startupDate = System.currentTimeMillis();
 		this.closed.set(false);
 		this.active.set(true);
 
+		// 20201210 打印应用程序刷新日志
 		if (logger.isDebugEnabled()) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Refreshing " + this);
@@ -743,17 +746,21 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 
 		// Initialize any placeholder property sources in the context environment.
+		// 20201210 初始化上下文环境中的所有占位符属性源
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
+		// 20201210 验证标记为必需的所有属性都是可解析的：请参见ConfigurablePropertyResolver＃setRequiredProperties
 		getEnvironment().validateRequiredProperties();
 
 		// Store pre-refresh ApplicationListeners...
+		// 20201210 存储预刷新的ApplicationListeners ...
 		if (this.earlyApplicationListeners == null) {
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		}
 		else {
+			// 20201210 将本地应用程序侦听器重置为预刷新状态。
 			// Reset local application listeners to pre-refresh state.
 			this.applicationListeners.clear();
 			this.applicationListeners.addAll(this.earlyApplicationListeners);
@@ -761,6 +768,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 		// Allow for the collection of early ApplicationEvents,
 		// to be published once the multicaster is available...
+		// 20201210 允许收集早期的ApplicationEvent，一旦多播器可用，便会发布...
 		this.earlyApplicationEvents = new LinkedHashSet<>();
 	}
 
@@ -769,8 +777,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * @see org.springframework.core.env.PropertySource.StubPropertySource
 	 * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources
 	 */
+	// 20201210 用实际实例替换任何存根属性源。
 	protected void initPropertySources() {
 		// For subclasses: do nothing by default.
+		// 20201210 对于子类：默认情况下不执行任何操作。
 	}
 
 	/**
