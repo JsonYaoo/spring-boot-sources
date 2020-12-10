@@ -179,6 +179,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * ignore SpEL, i.e. to not initialize the SpEL infrastructure.
 	 * <p>The default is "false".
 	 */
+	// 20201210 由{@code spring.spel.ignore}系统属性控制的布尔值标志，指示Spring忽略SpEL，即不初始化SpEL基础架构。 默认值为“ false”。
 	private static final boolean shouldIgnoreSpel = SpringProperties.getFlag("spring.spel.ignore");
 
 	/**
@@ -637,10 +638,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 			// Prepare this context for refreshing.
 			// 20201210 准备此上下文以进行刷新。
+			// 20201210 准备此上下文以进行刷新，设置其启动日期和活动标志以及执行属性源的任何初始化。
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			// 20201210 告诉子类刷新内部bean工厂。
+			// 20201210 告诉子类刷新内部bean工厂 -> 子类将创建一个新的bean工厂并保留对其的引用，或者返回它持有的单个BeanFactory实例
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
@@ -789,8 +791,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * @see #refreshBeanFactory()
 	 * @see #getBeanFactory()
 	 */
+	// 20201210 告诉子类刷新内部bean工厂 -> 子类将创建一个新的bean工厂并保留对其的引用，或者返回它持有的单个BeanFactory实例
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+		// 20201210 子类将创建一个新的bean工厂并保留对其的引用，或者返回它持有的单个BeanFactory实例。
 		refreshBeanFactory();
+
+		// 20201210 子类必须在此处返回其内部bean工厂。 他们应该有效地实现查找，以便可以重复调用它而不会影响性能。
 		return getBeanFactory();
 	}
 
@@ -799,16 +805,27 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * such as the context's ClassLoader and post-processors.
 	 * @param beanFactory the BeanFactory to configure
 	 */
+	// 20201210 配置工厂的标准上下文特征，例如上下文的ClassLoader和后处理器。
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		// Tell the internal bean factory to use the context's class loader etc.
+		// 20201210 告诉内部bean工厂使用上下文的类加载器等。
 		beanFactory.setBeanClassLoader(getClassLoader());
+
+		// 20201210 需要初始化SpEL基础架构
 		if (!shouldIgnoreSpel) {
+			// 20201210 为bean定义值中的表达式指定解析策略 -> SpringEL表达式
 			beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
 		}
+
+		// 20201210 添加一个PropertyEditorRegistrar以应用于所有bean创建过程 -> 资源编辑注册器
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
 		// Configure the bean factory with context callbacks.
+		// 20201210 使用上下文回调配置bean工厂。
+		// 20201210 添加一个新的上下文加工后处理器BeanPostProcessor，它将应用于该工厂创建的bean。 在出厂配置期间调用
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
+
+		// 20201210 忽略给定的依赖接口进行自动装配 -> 应用程序上下文通常会使用它来注册以其他方式解决的依赖关系
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
 		beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
 		beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);
@@ -1628,15 +1645,25 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	//---------------------------------------------------------------------
 
 	/**
+	 * 20201210
+	 * A. 子类必须实现此方法才能执行实际的配置加载。在进行任何其他初始化工作之前，该方法由{@link #refresh（）}调用。
+	 * B. 子类将创建一个新的bean工厂并保留对其的引用，或者返回它持有的单个BeanFactory实例。 在后一种情况下，如果多次刷新上下文，通常会抛出IllegalStateException。
+	 */
+	/**
+	 * A.
 	 * Subclasses must implement this method to perform the actual configuration load.
 	 * The method is invoked by {@link #refresh()} before any other initialization work.
+	 *
+	 * B.
 	 * <p>A subclass will either create a new bean factory and hold a reference to it,
 	 * or return a single BeanFactory instance that it holds. In the latter case, it will
 	 * usually throw an IllegalStateException if refreshing the context more than once.
+	 *
 	 * @throws BeansException if initialization of the bean factory failed
 	 * @throws IllegalStateException if already initialized and multiple refresh
 	 * attempts are not supported
 	 */
+	// 20201210 子类将创建一个新的bean工厂并保留对其的引用，或者返回它持有的单个BeanFactory实例。
 	protected abstract void refreshBeanFactory() throws BeansException, IllegalStateException;
 
 	/**
@@ -1677,6 +1704,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * @see #refreshBeanFactory()
 	 * @see #closeBeanFactory()
 	 */
+	// 20201210 子类必须在此处返回其内部bean工厂。 他们应该有效地实现查找，以便可以重复调用它而不会影响性能。
 	@Override
 	public abstract ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException;
 

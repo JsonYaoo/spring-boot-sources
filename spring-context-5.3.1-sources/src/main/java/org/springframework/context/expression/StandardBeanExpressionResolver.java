@@ -37,10 +37,17 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201210
+ * A. {@link org.springframework.beans.factory.config.BeanExpressionResolver}接口的标准实现，使用Spring的表达式模块解析和评估Spring EL。
+ * B. 包含{@code BeanFactory}中的所有bean都可以使用其公共bean名称作为预定义变量使用，包括标准上下文bean，例如“ environment”，“ systemProperties”和“ systemEnvironment”。
+ */
+/**
+ * A.
  * Standard implementation of the
  * {@link org.springframework.beans.factory.config.BeanExpressionResolver}
  * interface, parsing and evaluating Spring EL using Spring's expression module.
  *
+ * B.
  * <p>All beans in the containing {@code BeanFactory} are made available as
  * predefined variables with their common bean name, including standard context
  * beans such as "environment", "systemProperties" and "systemEnvironment".
@@ -52,6 +59,7 @@ import org.springframework.util.StringUtils;
  * @see org.springframework.expression.spel.standard.SpelExpressionParser
  * @see org.springframework.expression.spel.support.StandardEvaluationContext
  */
+// 20201210 {@link org.springframework.beans.factory.config.BeanExpressionResolver}接口的标准实现，使用Spring的表达式模块解析和评估Spring EL。
 public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 
 	/** Default expression prefix: "#{". */
@@ -99,6 +107,7 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 	 * using it as the basis for expression compilation.
 	 * @param beanClassLoader the factory's bean class loader
 	 */
+	// 20201210 使用给定的bean类加载器创建一个新的{@code StandardBeanExpressionResolver}，并将其用作表达式编译的基础。
 	public StandardBeanExpressionResolver(@Nullable ClassLoader beanClassLoader) {
 		this.expressionParser = new SpelExpressionParser(new SpelParserConfiguration(null, beanClassLoader));
 	}

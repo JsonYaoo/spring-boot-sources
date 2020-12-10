@@ -27,6 +27,7 @@ import org.springframework.core.env.Environment;
  * @since 3.1
  * @see org.springframework.core.env.EnvironmentCapable
  */
+// 20201210 任何希望在其运行的{@link Environment}收到通知的bean都将实现的接口。
 public interface EnvironmentAware extends Aware {
 
 	/**

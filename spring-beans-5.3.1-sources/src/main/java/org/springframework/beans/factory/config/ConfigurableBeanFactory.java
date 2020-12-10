@@ -150,12 +150,21 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	boolean isCacheBeanMetadata();
 
 	/**
+	 * 20201210
+	 * A. 为bean定义值中的表达式指定解析策略
+	 * B. 默认情况下，BeanFactory中不支持任何表达式支持。 ApplicationContext通常会在此处设置标准的表达策略，以统一EL兼容样式支持“＃{...}”表达。
+	 */
+	/**
+	 * A.
 	 * Specify the resolution strategy for expressions in bean definition values.
+	 *
+	 * B.
 	 * <p>There is no expression support active in a BeanFactory by default.
 	 * An ApplicationContext will typically set a standard expression strategy
 	 * here, supporting "#{...}" expressions in a Unified EL compatible style.
 	 * @since 3.0
 	 */
+	// 20201210 为bean定义值中的表达式指定解析策略 SpringEL表达式
 	void setBeanExpressionResolver(@Nullable BeanExpressionResolver resolver);
 
 	/**
@@ -181,13 +190,23 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	ConversionService getConversionService();
 
 	/**
+	 * 20201210
+	 * A. 添加一个PropertyEditorRegistrar以应用于所有bean创建过程。
+	 * B. 这样的注册商会创建新的PropertyEditor实例，并在给定的注册表中注册它们，对于每次创建bean的尝试都是新鲜的。 这样可以避免在自定义编辑器上进行同步。
+	 *    因此，通常最好使用此方法代替{@link #registerCustomEditor}。
+	 */
+	/**
+	 * A.
 	 * Add a PropertyEditorRegistrar to be applied to all bean creation processes.
+	 *
+	 * B.
 	 * <p>Such a registrar creates new PropertyEditor instances and registers them
 	 * on the given registry, fresh for each bean creation attempt. This avoids
 	 * the need for synchronization on custom editors; hence, it is generally
 	 * preferable to use this method instead of {@link #registerCustomEditor}.
 	 * @param registrar the PropertyEditorRegistrar to register
 	 */
+	// 20201210 添加一个PropertyEditorRegistrar以应用于所有bean创建过程
 	void addPropertyEditorRegistrar(PropertyEditorRegistrar registrar);
 
 	/**
@@ -253,15 +272,26 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	String resolveEmbeddedValue(String value);
 
 	/**
+	 * 20201210
+	 * A. 添加一个新的BeanPostProcessor，它将应用于该工厂创建的bean。 在出厂配置期间调用。
+	 * B. 注意：此处提交的后处理器将按照注册顺序应用； 通过实现{@link org.springframework.core.Ordered}接口表达的任何排序语义都将被忽略。 请注意，自动检测到的后处理器
+	 *   （例如，作为ApplicationContext中的bean）将始终以编程方式注册后的处理器。
+	 */
+	/**
+	 * A.
 	 * Add a new BeanPostProcessor that will get applied to beans created
 	 * by this factory. To be invoked during factory configuration.
+	 *
+	 * B.
 	 * <p>Note: Post-processors submitted here will be applied in the order of
 	 * registration; any ordering semantics expressed through implementing the
 	 * {@link org.springframework.core.Ordered} interface will be ignored. Note
 	 * that autodetected post-processors (e.g. as beans in an ApplicationContext)
 	 * will always be applied after programmatically registered ones.
+	 *
 	 * @param beanPostProcessor the post-processor to register
 	 */
+	// 20201210 添加一个新的BeanPostProcessor，它将应用于该工厂创建的bean。 在出厂配置期间调用
 	void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 
 	/**

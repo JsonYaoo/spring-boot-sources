@@ -20,20 +20,35 @@ import org.springframework.beans.BeansException;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201210
+ * A. 工厂挂钩，允许自定义修改新bean实例＆mdash; 例如，检查标记界面或使用代理包装bean。
+ * B. 通常，通过标记接口等填充bean的后处理器将实现{@link #postProcessBeforeInitialization}，而使用代理包装bean的后处理器通常将实现{@link #postProcessAfterInitialization}。
+ * C. 注册: {@code ApplicationContext}可以在其bean定义中自动检测{@code BeanPostProcessor} bean，并将这些后处理器应用于随后创建的任何bean。 普通的{@code BeanFactory}允许
+ *    以编程方式注册后处理器，并将其应用于通过bean工厂创建的所有bean。
+ * D. 顺序: 在{@code ApplicationContext}中自动检测到的{@code BeanPostProcessor} bean将根据{@link org.springframework.core.PriorityOrdered}和
+ *    {@link org.springframework.core.Ordered}语义进行排序。 相反，以{@code BeanFactory}编程方式注册的{@code BeanPostProcessor} bean将按照注册顺序应用；
+ *    以编程方式注册的后处理器将忽略通过实现{@code PriorityOrdered}或{@code Ordered}接口表示的任何排序语义。 此外，{@code BeanPostProcessor} bean不考虑
+ *    {@link org.springframework.core.annotation.Order @Order}注解。
+ */
+/**
+ * A.
  * Factory hook that allows for custom modification of new bean instances &mdash;
  * for example, checking for marker interfaces or wrapping beans with proxies.
  *
+ * B.
  * <p>Typically, post-processors that populate beans via marker interfaces
  * or the like will implement {@link #postProcessBeforeInitialization},
  * while post-processors that wrap beans with proxies will normally
  * implement {@link #postProcessAfterInitialization}.
  *
+ * C.
  * <h3>Registration</h3>
  * <p>An {@code ApplicationContext} can autodetect {@code BeanPostProcessor} beans
  * in its bean definitions and apply those post-processors to any beans subsequently
  * created. A plain {@code BeanFactory} allows for programmatic registration of
  * post-processors, applying them to all beans created through the bean factory.
  *
+ * D.
  * <h3>Ordering</h3>
  * <p>{@code BeanPostProcessor} beans that are autodetected in an
  * {@code ApplicationContext} will be ordered according to
@@ -55,6 +70,7 @@ import org.springframework.lang.Nullable;
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
  */
+// 20201210 工厂挂钩，允许自定义修改新bean实例
 public interface BeanPostProcessor {
 
 	/**

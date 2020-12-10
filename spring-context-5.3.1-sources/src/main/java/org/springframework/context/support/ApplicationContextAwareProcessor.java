@@ -35,6 +35,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringValueResolver;
 
 /**
+ * 20201210
+ * A. {@link BeanPostProcessor}实现为{@code ApplicationContext}提供{@code ApplicationContext}，{@link org.springframework.core.env.Environment Environment}或
+ *    {@link StringValueResolver}到实现{@link EnvironmentAware}，{@link EmbeddedValueResolverAware}，{@link ResourceLoaderAware}，{@link ApplicationEventPublisherAware}，
+ *    {@link MessageSourceAware}或{@link ApplicationContextAware}接口。
+ * B. 按照上面提到的顺序满足已实现的接口。
+ * C. 应用程序上下文将自动在其基础bean工厂中注册它。 应用程序不直接使用它。
+ */
+/**
+ * A.
  * {@link BeanPostProcessor} implementation that supplies the {@code ApplicationContext},
  * {@link org.springframework.core.env.Environment Environment}, or
  * {@link StringValueResolver} for the {@code ApplicationContext} to beans that
@@ -42,9 +51,11 @@ import org.springframework.util.StringValueResolver;
  * {@link ResourceLoaderAware}, {@link ApplicationEventPublisherAware},
  * {@link MessageSourceAware}, and/or {@link ApplicationContextAware} interfaces.
  *
+ * B.
  * <p>Implemented interfaces are satisfied in the order in which they are
  * mentioned above.
  *
+ * C.
  * <p>Application contexts will automatically register this with their
  * underlying bean factory. Applications do not use this directly.
  *
@@ -60,6 +71,7 @@ import org.springframework.util.StringValueResolver;
  * @see org.springframework.context.ApplicationContextAware
  * @see org.springframework.context.support.AbstractApplicationContext#refresh()
  */
+// 20201210 上下文加工后处理器: 应用程序上下文将自动在其基础bean工厂中注册它。 应用程序不直接使用它
 class ApplicationContextAwareProcessor implements BeanPostProcessor {
 
 	private final ConfigurableApplicationContext applicationContext;
@@ -70,6 +82,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 	/**
 	 * Create a new ApplicationContextAwareProcessor for the given context.
 	 */
+	// 20201210 为给定上下文创建一个新的ApplicationContextAwareProcessor。
 	public ApplicationContextAwareProcessor(ConfigurableApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 		this.embeddedValueResolver = new EmbeddedValueResolver(applicationContext.getBeanFactory());

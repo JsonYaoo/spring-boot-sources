@@ -58,16 +58,27 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory, Au
 	void ignoreDependencyType(Class<?> type);
 
 	/**
+	 * 20201210
+	 * A. 忽略给定的依赖接口进行自动装配。
+	 * B. 应用程序上下文通常会使用它来注册以其他方式解决的依赖关系，例如通过BeanFactoryAware的BeanFactory或通过ApplicationContextAware的ApplicationContext。
+	 */
+	/**
+	 * A.
 	 * Ignore the given dependency interface for autowiring.
+	 *
+	 * B.
 	 * <p>This will typically be used by application contexts to register
 	 * dependencies that are resolved in other ways, like BeanFactory through
 	 * BeanFactoryAware or ApplicationContext through ApplicationContextAware.
+	 *
+	 * C.
 	 * <p>By default, only the BeanFactoryAware interface is ignored.
 	 * For further types to ignore, invoke this method for each type.
 	 * @param ifc the dependency interface to ignore
 	 * @see org.springframework.beans.factory.BeanFactoryAware
 	 * @see org.springframework.context.ApplicationContextAware
 	 */
+	// 20201210 忽略给定的依赖接口进行自动装配 -> 应用程序上下文通常会使用它来注册以其他方式解决的依赖关系
 	void ignoreDependencyInterface(Class<?> ifc);
 
 	/**

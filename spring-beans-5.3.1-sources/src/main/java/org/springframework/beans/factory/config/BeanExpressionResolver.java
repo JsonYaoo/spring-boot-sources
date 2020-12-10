@@ -20,9 +20,16 @@ import org.springframework.beans.BeansException;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201210
+ * A. 策略接口，用于通过将值作为表达式求值来解析值（如果适用）。
+ * B. 原始{@link org.springframework.beans.factory.BeanFactory}不包含此策略的默认实现。 但是，{@ link org.springframework.context.ApplicationContext}实现将提供现成的表达支持。
+ */
+/**
+ * A.
  * Strategy interface for resolving a value through evaluating it
  * as an expression, if applicable.
  *
+ * B.
  * <p>A raw {@link org.springframework.beans.factory.BeanFactory} does not
  * contain a default implementation of this strategy. However,
  * {@link org.springframework.context.ApplicationContext} implementations
@@ -31,6 +38,7 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 3.0
  */
+// 20201210 策略接口，用于通过将值作为表达式求值来解析值（如果适用）
 public interface BeanExpressionResolver {
 
 	/**
