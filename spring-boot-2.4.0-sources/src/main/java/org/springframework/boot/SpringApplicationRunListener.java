@@ -118,6 +118,7 @@ public interface SpringApplicationRunListener {
 	 * @param context the application context.
 	 * @since 2.0.0
 	 */
+	// 20201210 在刷新应用程序上下文并已调用所有{@link CommandLineRunner CommandLineRunners}和{@link ApplicationRunner ApplicationRunners}之前，在run方法完成之前立即调用。
 	default void running(ConfigurableApplicationContext context) {
 	}
 

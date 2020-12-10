@@ -102,8 +102,16 @@ class SpringApplicationRunListeners {
 				(listener) -> listener.started(context));
 	}
 
+	// 20201210 在刷新应用程序上下文并已调用所有{@link CommandLineRunner CommandLineRunners}和{@link ApplicationRunner ApplicationRunners}之前，在run方法完成之前立即调用。
 	void running(ConfigurableApplicationContext context) {
-		doWithListeners("spring.boot.application.running", (listener) -> listener.running(context));
+		// 20201202 没有指定主类的监听事件
+		doWithListeners(
+				// 20201210 每步名称: "spring.boot.application.failed"
+				"spring.boot.application.running",
+
+				// 20201210 每步监听器执行: 在刷新应用程序上下文并已调用所有{@link CommandLineRunner CommandLineRunners}和{@link ApplicationRunner ApplicationRunners}之前，在run方法完成之前立即调用。
+				(listener) -> listener.running(context)
+		);
 	}
 
 	// 20201210 使用上下文启动监听器启动"spring.boot.application.failed"

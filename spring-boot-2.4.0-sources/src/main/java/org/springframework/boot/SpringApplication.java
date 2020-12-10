@@ -396,7 +396,7 @@ public class SpringApplication {
 	 * @param args the application arguments (usually passed from a Java main method)
 	 * @return a running {@link ApplicationContext} // 20201201 返回一个应用程序上下文对象
 	 */
-	// 20201201 运行Spring应用程序，创建并刷新一个新的{@link ApplicationContext}.
+	// 20201201 运行Spring应用程序，创建并刷新一个新的AnnotationConfigServletWebServerApplicationContext ServletWeb应用程序配置上下文
 	public ConfigurableApplicationContext run(String... args) {
 		// 20201201 构造纳秒计时器
 		StopWatch stopWatch = new StopWatch();
@@ -468,12 +468,16 @@ public class SpringApplication {
 		}
 
 		try {
+			// 20201210 在刷新应用程序上下文并已调用所有{@link CommandLineRunner CommandLineRunners}和{@link ApplicationRunner ApplicationRunners}之前，在run方法完成之前立即调用。
 			listeners.running(context);
 		}
 		catch (Throwable ex) {
+			// 20201210 处理运行失败 -> 向用户报告启动失败, 关闭此应用程序上下文，释放实现可能持有的所有资源和锁(这包括销毁所有缓存的单例bean)
 			handleRunFailure(context, ex, null);
 			throw new IllegalStateException(ex);
 		}
+
+		// 20201210 返回AnnotationConfigServletWebServerApplicationContext ServletWeb应用程序配置上下文
 		return context;
 	}
 
