@@ -109,8 +109,8 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * @since 5.2
 	 * @see #registerShutdownHook()
 	 */
+	// 20201210 虚拟机关闭挂钩线程名称 -> {@linkplain #registerShutdownHook（）shutdown hook}线程的{@link Thread＃getName（）名称}：{@ value}。
 	String SHUTDOWN_HOOK_THREAD_NAME = "SpringContextShutdownHook";
-
 
 	/**
 	 * Set the unique id of this application context.
@@ -231,15 +231,28 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	void refresh() throws BeansException, IllegalStateException;
 
 	/**
+	 * 20201210
+	 * A. 在JVM运行时中注册一个关闭挂钩，除非当时已关闭该上下文，否则在JVM关闭时将其关闭。
+	 * B. 可以多次调用此方法。 每个上下文实例仅注册一个关闭挂钩（最大数量）。
+	 * C. 从Spring Framework 5.2开始，关闭挂钩线程的{@linkplain Thread＃getName（）}名称应该是{@link #SHUTDOWN_HOOK_THREAD_NAME}。
+	 */
+	/**
+	 * A.
 	 * Register a shutdown hook with the JVM runtime, closing this context
 	 * on JVM shutdown unless it has already been closed at that time.
+	 *
+	 * B.
 	 * <p>This method can be called multiple times. Only one shutdown hook
 	 * (at max) will be registered for each context instance.
+	 *
+	 * C.
 	 * <p>As of Spring Framework 5.2, the {@linkplain Thread#getName() name} of
 	 * the shutdown hook thread should be {@link #SHUTDOWN_HOOK_THREAD_NAME}.
+	 *
 	 * @see java.lang.Runtime#addShutdownHook
 	 * @see #close()
 	 */
+	// 202012010 在JVM运行时中注册一个关闭挂钩，除非当时已关闭该上下文，否则在JVM关闭时将其关闭。
 	void registerShutdownHook();
 
 	/**

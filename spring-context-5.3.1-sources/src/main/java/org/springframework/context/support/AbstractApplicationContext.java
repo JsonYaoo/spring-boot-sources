@@ -186,6 +186,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * Exposed as a private static field rather than in a {@code NativeImageDetector.inNativeImage()} static method due to https://github.com/oracle/graal/issues/2594.
 	 * @see <a href="https://github.com/oracle/graal/blob/master/sdk/src/org.graalvm.nativeimage/src/org/graalvm/nativeimage/ImageInfo.java">ImageInfo.java</a>
 	 */
+	// 20201210 此环境是否存在于本地映像中。-> "org.graalvm.nativeimage.imagecode
+	// 20201210 由于https://github.com/oracle/graal/issues/2594，它作为一个私有静态字段而不是在{@code NativeImageDetector.inNativeImage（）}静态方法中公开。
 	private static final boolean IN_NATIVE_IMAGE = (System.getProperty("org.graalvm.nativeimage.imagecode") != null);
 
 
@@ -222,15 +224,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	/** System time in milliseconds when this context started. */
 	private long startupDate;
 
+	// 20201210 指示此上下文当前是否处于活动状态的标志。
 	/** Flag that indicates whether this context is currently active. */
 	private final AtomicBoolean active = new AtomicBoolean();
 
+	// 20201210 指示此上下文是否已经关闭的标志。
 	/** Flag that indicates whether this context has been closed already. */
 	private final AtomicBoolean closed = new AtomicBoolean();
 
+	// 20201210 同步监视器，用于“刷新”和“销毁”。
 	/** Synchronization monitor for the "refresh" and "destroy". */
 	private final Object startupShutdownMonitor = new Object();
 
+	// 20201210 虚拟机关闭挂钩 -> 如果已注册，请参考JVM关闭钩子。
 	/** Reference to the JVM shutdown hook, if registered. */
 	@Nullable
 	private Thread shutdownHook;
@@ -238,6 +244,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	/** ResourcePatternResolver used by this context. */
 	private ResourcePatternResolver resourcePatternResolver;
 
+	// 20201210 LifecycleProcessor，用于在此上下文中管理bean的生命周期。
 	/** LifecycleProcessor for managing the lifecycle of beans within this context. */
 	@Nullable
 	private LifecycleProcessor lifecycleProcessor;
@@ -255,8 +262,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	private ApplicationStartup applicationStartup = ApplicationStartup.DEFAULT;
 
 	/** Statically specified listeners. */
+	// 20201210 静态指定的侦听器。
 	private final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
+	// 20201210 刷新之前已注册本地侦听器。
 	/** Local listeners registered before refresh. */
 	@Nullable
 	private Set<ApplicationListener<?>> earlyApplicationListeners;
@@ -426,13 +435,22 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 	/**
+	 * 20201210
+	 * A. 将给定事件发布给所有侦听器。
+	 * B. 注意：侦听器在MessageSource之后初始化，以便能够在侦听器实现中访问它。 因此，MessageSource实现无法发布事件。
+	 */
+	/**
+	 * A.
 	 * Publish the given event to all listeners.
+	 *
+	 * B.
 	 * <p>Note: Listeners get initialized after the MessageSource, to be able
 	 * to access it within listener implementations. Thus, MessageSource
 	 * implementations cannot publish events.
 	 * @param event the event to publish (may be application-specific or a
 	 * standard framework event)
 	 */
+	// 20201210 将给定事件发布给所有侦听器
 	@Override
 	public void publishEvent(ApplicationEvent event) {
 		publishEvent(event, null);
@@ -1039,29 +1057,43 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		CachedIntrospectionResults.clearClassLoader(getClassLoader());
 	}
 
-
 	/**
+	 * 20201210
+	 * A. 在JVM运行时中注册一个关闭钩子{@linkplain Thread＃getName（）} {@code SpringContextShutdownHook}，在JVM关闭时关闭该上下文，除非当时尚未关闭它。
+	 * B. 代表{@code doClose（）}进行实际的关闭过程。
+	 */
+	/**
+	 * A.
 	 * Register a shutdown hook {@linkplain Thread#getName() named}
 	 * {@code SpringContextShutdownHook} with the JVM runtime, closing this
 	 * context on JVM shutdown unless it has already been closed at that time.
+	 *
+	 * B.
 	 * <p>Delegates to {@code doClose()} for the actual closing procedure.
+	 *
 	 * @see Runtime#addShutdownHook
 	 * @see ConfigurableApplicationContext#SHUTDOWN_HOOK_THREAD_NAME
 	 * @see #close()
 	 * @see #doClose()
 	 */
+	// 20201210 在JVM运行时中注册一个关闭钩子{@linkplain Thread＃getName（）} {@code SpringContextShutdownHook}，在JVM关闭时关闭该上下文，除非当时尚未关闭它。
 	@Override
 	public void registerShutdownHook() {
+		// 20201210 如果虚拟机关闭挂钩还没注册
 		if (this.shutdownHook == null) {
 			// No shutdown hook registered yet.
+			// 20201210 构建"SpringContextShutdownHook"线程 -> 该虚拟机关闭挂钩
 			this.shutdownHook = new Thread(SHUTDOWN_HOOK_THREAD_NAME) {
 				@Override
 				public void run() {
 					synchronized (startupShutdownMonitor) {
+						// 20201210 实际上执行上下文关闭：发布ContextClosedEvent并销毁此应用程序上下文的bean工厂中的单例。
 						doClose();
 					}
 				}
 			};
+
+			// 20201210 获取该应用的运行时环境 -> 注册一个新的虚拟机关闭挂钩
 			Runtime.getRuntime().addShutdownHook(this.shutdownHook);
 		}
 	}
@@ -1103,37 +1135,54 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 	/**
+	 * 20201210
+	 * A. 实际上执行上下文关闭：发布ContextClosedEvent并销毁此应用程序上下文的bean工厂中的单例。
+	 * B. 由{@code close（）}和JVM关闭钩子（如果有）调用。
+	 */
+	/**
+	 * A.
 	 * Actually performs context closing: publishes a ContextClosedEvent and
 	 * destroys the singletons in the bean factory of this application context.
+	 *
+	 * B.
 	 * <p>Called by both {@code close()} and a JVM shutdown hook, if any.
 	 * @see org.springframework.context.event.ContextClosedEvent
 	 * @see #destroyBeans()
 	 * @see #close()
 	 * @see #registerShutdownHook()
 	 */
+	// 20201210 实际上执行上下文关闭：发布ContextClosedEvent并销毁此应用程序上下文的bean工厂中的单例
 	@SuppressWarnings("deprecation")
 	protected void doClose() {
+		// 20201210 检查是否需要实际的关闭尝试...
 		// Check whether an actual close attempt is necessary...
+		// 20201210 更新关闭状态为true
 		if (this.active.get() && this.closed.compareAndSet(false, true)) {
+			// 20201210 打印关闭日志
 			if (logger.isDebugEnabled()) {
 				logger.debug("Closing " + this);
 			}
 
+			// 20201210 此环境不存在于本地映像中。-> "org.graalvm.nativeimage.imagecode
 			if (!IN_NATIVE_IMAGE) {
+				// 20201210 注销应用程序上下文, 注销Beans
 				LiveBeansView.unregisterApplicationContext(this);
 			}
 
 			try {
 				// Publish shutdown event.
+				// 20201210 发布关闭事件。
 				publishEvent(new ContextClosedEvent(this));
 			}
 			catch (Throwable ex) {
 				logger.warn("Exception thrown from ApplicationListener handling ContextClosedEvent", ex);
 			}
 
+			// 20201210 停止所有Lifecycle bean，以避免在单个销毁期间造成延迟。
 			// Stop all Lifecycle beans, to avoid delays during individual destruction.
 			if (this.lifecycleProcessor != null) {
 				try {
+					// 20201210 上下文关闭阶段的通知，例如 用于自动停止组件。
 					this.lifecycleProcessor.onClose();
 				}
 				catch (Throwable ex) {
@@ -1142,50 +1191,76 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			}
 
 			// Destroy all cached singletons in the context's BeanFactory.
+			// 20201210 销毁上下文的BeanFactory中所有缓存的单例。
 			destroyBeans();
 
 			// Close the state of this context itself.
+			// 20201210 关闭此上下文本身的状态 -> 能释放其内部bean工厂
 			closeBeanFactory();
 
 			// Let subclasses do some final clean-up if they wish...
+			// 20201210 如果希望的话，让子类做一些最后的清理... -> 默认实现为空。
 			onClose();
 
 			// Reset local application listeners to pre-refresh state.
+			// 20201210 将本地应用程序侦听器重置为预刷新状态 -> 初始化监听器列表为刷新前的监听器列表
 			if (this.earlyApplicationListeners != null) {
 				this.applicationListeners.clear();
 				this.applicationListeners.addAll(this.earlyApplicationListeners);
 			}
 
 			// Switch to inactive.
+			// 20201210 切换为非活动状态。
 			this.active.set(false);
 		}
 	}
 
 	/**
+	 * 20201210
+	 * A. 用于销毁此上下文管理的所有bean的模板方法。 默认实现在此上下文中销毁所有缓存的单例，并调用{@code DisposableBean.destroy（）}和/或指定的“ destroy-method”。
+	 * B. 可以重写以在标准单例销毁之前或之后添加特定于上下文的Bean销毁步骤，而上下文的BeanFactory仍处于活动状态。
+	 */
+	/**
+	 * A.
 	 * Template method for destroying all beans that this context manages.
 	 * The default implementation destroy all cached singletons in this context,
 	 * invoking {@code DisposableBean.destroy()} and/or the specified
 	 * "destroy-method".
+	 *
+	 * B.
 	 * <p>Can be overridden to add context-specific bean destruction steps
 	 * right before or right after standard singleton destruction,
 	 * while the context's BeanFactory is still active.
 	 * @see #getBeanFactory()
 	 * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#destroySingletons()
 	 */
+	// 20201210 用于销毁此上下文管理的所有bean的模板方法。 默认实现在此上下文中销毁所有缓存的单例，
 	protected void destroyBeans() {
+		// 20201210 销毁该工厂中的所有Beans，包括已注册为一次性的Bean。 在工厂关闭时被调用。
 		getBeanFactory().destroySingletons();
 	}
 
 	/**
+	 * 20201210
+	 * A. 可以重写的模板方法以添加特定于上下文的关闭工作。 默认实现为空。
+	 * B. 在关闭此上下文的BeanFactory之后，在{@link #doClose}的关闭过程结束时调用此方法。 如果在BeanFactory仍处于活动状态时需要执行自定义关闭逻辑，请改用
+	 *    {@link #destroyBeans（）}方法。
+	 */
+	/**
+	 * A.
 	 * Template method which can be overridden to add context-specific shutdown work.
 	 * The default implementation is empty.
+	 *
+	 * B.
 	 * <p>Called at the end of {@link #doClose}'s shutdown procedure, after
 	 * this context's BeanFactory has been closed. If custom shutdown logic
 	 * needs to execute while the BeanFactory is still active, override
 	 * the {@link #destroyBeans()} method instead.
 	 */
+	// 20201210 可以重写的模板方法以添加特定于上下文的关闭工作。 默认实现为空。
 	protected void onClose() {
 		// For subclasses: do nothing by default.
+		// 20201210 对于子类：默认情况下不执行任何操作。
 	}
 
 	@Override
@@ -1521,10 +1596,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	protected abstract void refreshBeanFactory() throws BeansException, IllegalStateException;
 
 	/**
+	 * 20201210
+	 * A. 子类必须实现此方法才能释放其内部bean工厂。 在所有其他关闭工作之后，{@link #close（）}将调用此方法。
+	 * B. 永远不要抛出异常，而应该记录日志关闭失败。
+	 */
+	/**
+	 * A.
 	 * Subclasses must implement this method to release their internal bean factory.
 	 * This method gets invoked by {@link #close()} after all other shutdown work.
+	 *
+	 * B.
 	 * <p>Should never throw an exception but rather log shutdown failures.
 	 */
+	// 20201210 子类必须实现此方法才能释放其内部bean工厂。 在所有其他关闭工作之后，{@link #close（）}将调用此方法
 	protected abstract void closeBeanFactory();
 
 	/**

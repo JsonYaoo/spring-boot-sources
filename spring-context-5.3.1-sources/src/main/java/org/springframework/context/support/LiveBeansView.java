@@ -49,19 +49,24 @@ import org.springframework.util.StringUtils;
  * @see org.springframework.web.context.support.LiveBeansViewServlet
  * @deprecated as of 5.3, in favor of using Spring Boot actuators for such needs
  */
+// 20201210 用于实时bean的适配器查看公开信息，从本地{@code ApplicationContext}（具有本地{@code LiveBeansView} bean定义）或所有已注册的ApplicationContext
+// 20201210 （由{@value #MBEAN_DOMAIN_PROPERTY_NAME驱动）中构建当前bean及其依赖关系的快照 }环境属性）。
 @Deprecated
 public class LiveBeansView implements LiveBeansViewMBean, ApplicationContextAware {
 
 	/**
 	 * The "MBean Domain" property name.
 	 */
+	// 20201210 “ MBean域”属性名称。
 	public static final String MBEAN_DOMAIN_PROPERTY_NAME = "spring.liveBeansView.mbeanDomain";
 
 	/**
 	 * The MBean application key.
 	 */
+	// 20201210 MBean应用程序密钥。
 	public static final String MBEAN_APPLICATION_KEY = "application";
 
+	// 20201210 配置上下文集合
 	private static final Set<ConfigurableApplicationContext> applicationContexts = new LinkedHashSet<>();
 
 	@Nullable
@@ -88,13 +93,22 @@ public class LiveBeansView implements LiveBeansViewMBean, ApplicationContextAwar
 		}
 	}
 
+	// 20201210 注销应用程序上下文, 注销Beans
 	static void unregisterApplicationContext(ConfigurableApplicationContext applicationContext) {
+		// 20201210 配置上下文集合上锁
 		synchronized (applicationContexts) {
+			// 20201210 删除指定的配置上下文, 如果删除配置上下文集合为空
 			if (applicationContexts.remove(applicationContext) && applicationContexts.isEmpty()) {
 				try {
+					// 2021210 将此平台MBeanServer也用于注册除平台MXBean之外的其他应用程序托管的Bean
 					MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+
+					// 20201210 “ MBean域”属性名称。
 					String mbeanDomain = applicationContext.getEnvironment().getProperty(MBEAN_DOMAIN_PROPERTY_NAME);
+
+					// 20201210 如果“ MBean域”属性名称不为空
 					if (mbeanDomain != null) {
+						// 20201210 如果此方法成功注销了MBean，则按照<a href="#notif">以上</a>中所述发送通知。
 						server.unregisterMBean(new ObjectName(mbeanDomain, MBEAN_APPLICATION_KEY, applicationName));
 					}
 				}
@@ -102,6 +116,7 @@ public class LiveBeansView implements LiveBeansViewMBean, ApplicationContextAwar
 					throw new ApplicationContextException("Failed to unregister LiveBeansView MBean", ex);
 				}
 				finally {
+					// 20201210 最后清空应用程序名称 -> 通知GC回收
 					applicationName = null;
 				}
 			}

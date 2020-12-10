@@ -334,6 +334,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * Not much to do: We hold a single internal BeanFactory that will never
 	 * get released.
 	 */
+	// 20201210 没什么可做的：我们拥有一个永远不会被释放的内部BeanFactory。
 	@Override
 	protected final void closeBeanFactory() {
 		this.beanFactory.setSerializationId(null);

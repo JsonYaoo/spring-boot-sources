@@ -444,11 +444,20 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	void destroyScopedBean(String beanName);
 
 	/**
+	 * 20201210
+	 * A. 销毁该工厂中的所有Beans，包括已注册为一次性的Bean。 在工厂关闭时被调用。
+	 * B. 销毁期间发生的任何异常都应捕获并记录下来，而不是传播给此方法的调用者。
+	 */
+	/**
+	 * A.
 	 * Destroy all singleton beans in this factory, including inner beans that have
 	 * been registered as disposable. To be called on shutdown of a factory.
+	 *
+	 * B.
 	 * <p>Any exception that arises during destruction should be caught
 	 * and logged instead of propagated to the caller of this method.
 	 */
+	// 20201210 销毁该工厂中的所有Beans，包括已注册为一次性的Bean。 在工厂关闭时被调用。
 	void destroySingletons();
 
 }

@@ -23,6 +23,7 @@ package org.springframework.context.support;
  * @since 3.2
  * @deprecated as of 5.3, in favor of using Spring Boot actuators for such needs
  */
+// 20201210 {@link LiveBeansView}功能的MBean操作界面。
 @Deprecated
 public interface LiveBeansViewMBean {
 

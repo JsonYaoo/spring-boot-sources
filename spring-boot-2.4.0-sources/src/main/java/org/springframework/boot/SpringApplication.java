@@ -280,6 +280,7 @@ public class SpringApplication {
 
 	private boolean headless = true;
 
+	// 20201210 虚拟机关闭挂钩, 默认为true
 	private boolean registerShutdownHook = true;
 
 	// 20201207 应用程序上下文初始化器列表
@@ -437,7 +438,9 @@ public class SpringApplication {
 			// 20201206 准备上下文 AnnotationConfigServletWebServerApplicationContext -> 将bean加载到应用程序上下文中
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
 
+			// 20201210 刷新上下文 AnnotationConfigServletWebServerApplicationContext -> 注册JVM关闭挂钩(该线程会发布ContextClosedEvent并销毁此应用程序上下文的bean工厂中的单例
 			refreshContext(context);
+
 			afterRefresh(context, applicationArguments);
 			stopWatch.stop();
 			if (this.logStartupInfo) {
@@ -604,15 +607,20 @@ public class SpringApplication {
 		listeners.contextLoaded(context);
 	}
 
+	// 20201210 刷新上下文 AnnotationConfigServletWebServerApplicationContext -> 注册JVM关闭挂钩(该线程会发布ContextClosedEvent并销毁此应用程序上下文的bean工厂中的单例)
 	private void refreshContext(ConfigurableApplicationContext context) {
+		// 20201210 虚拟机关闭挂钩, 默认为true
 		if (this.registerShutdownHook) {
 			try {
+				// 202012010 在JVM运行时中注册一个关闭挂钩，除非当时已关闭该上下文，否则在JVM关闭时将其关闭。
 				context.registerShutdownHook();
 			}
 			catch (AccessControlException ex) {
 				// Not allowed in some environments.
+				//在某些环境中不允许使用。
 			}
 		}
+		// 20201210 刷新基础的{@link ApplicationContext} -> 加载或刷新配置的持久性表示形式
 		refresh((ApplicationContext) context);
 	}
 
@@ -1131,9 +1139,12 @@ public class SpringApplication {
 	 * @deprecated since 2.3.0 in favor of
 	 * {@link #refresh(ConfigurableApplicationContext)}
 	 */
+	// 20201210 刷新基础的{@link ApplicationContext} -> 加载或刷新配置的持久性表示形式
 	@Deprecated
 	protected void refresh(ApplicationContext applicationContext) {
 		Assert.isInstanceOf(ConfigurableApplicationContext.class, applicationContext);
+
+		// 20201210 刷新基础的{@link ApplicationContext} -> 加载或刷新配置的持久性表示形式
 		refresh((ConfigurableApplicationContext) applicationContext);
 	}
 
@@ -1141,7 +1152,9 @@ public class SpringApplication {
 	 * Refresh the underlying {@link ApplicationContext}.
 	 * @param applicationContext the application context to refresh
 	 */
+	// 20201210 刷新基础的{@link ApplicationContext} -> 加载或刷新配置的持久性表示形式
 	protected void refresh(ConfigurableApplicationContext applicationContext) {
+		// 20201210 加载或刷新配置的持久性表示形式, 如果失败，它应该销毁已创建的单例，以避免悬挂资源
 		applicationContext.refresh();
 	}
 
