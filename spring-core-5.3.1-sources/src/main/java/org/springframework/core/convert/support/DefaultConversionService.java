@@ -26,9 +26,16 @@ import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201211
+ * A. {@link GenericConversionService}的一种特殊设置，默认情况下使用适用于大多数环境的转换器进行配置。
+ * B. 专为直接实例化而设计，但还公开了静态的{@link #addDefaultConverters（ConverterRegistry）}实用程序方法，可临时用于任何{@code ConverterRegistry}实例。
+ */
+/**
+ * A.
  * A specialization of {@link GenericConversionService} configured by default
  * with converters appropriate for most environments.
  *
+ * B.
  * <p>Designed for direct instantiation but also exposes the static
  * {@link #addDefaultConverters(ConverterRegistry)} utility method for ad-hoc
  * use against any {@code ConverterRegistry} instance.
@@ -38,6 +45,7 @@ import org.springframework.lang.Nullable;
  * @author Stephane Nicoll
  * @since 3.1
  */
+// 20201211 默认情况下使用适用于大多数环境的转换器进行配置
 public class DefaultConversionService extends GenericConversionService {
 
 	@Nullable
@@ -52,18 +60,27 @@ public class DefaultConversionService extends GenericConversionService {
 		addDefaultConverters(this);
 	}
 
-
 	/**
+	 * 20201211
+	 * A. 返回共享的默认{@code ConversionService}实例，并在需要时延迟构建它。
+	 * B. 注意：我们强烈建议出于自定义目的构造单个{@code ConversionService}实例。 此访问器仅用作代码路径的后备，这些代码路径需要简单的类型强制，但无法访问寿命较长的代码
+	 */
+	/**
+	 * A.
 	 * Return a shared default {@code ConversionService} instance,
 	 * lazily building it once needed.
+	 *
+	 * B.
 	 * <p><b>NOTE:</b> We highly recommend constructing individual
 	 * {@code ConversionService} instances for customization purposes.
 	 * This accessor is only meant as a fallback for code paths which
 	 * need simple type coercion but cannot access a longer-lived
+	 *
 	 * {@code ConversionService} instance any other way.
 	 * @return the shared {@code ConversionService} instance (never {@code null})
 	 * @since 4.3.5
 	 */
+	// 20201211 返回共享的默认{@code ConversionService}实例，并在需要时延迟构建它
 	public static ConversionService getSharedInstance() {
 		DefaultConversionService cs = sharedInstance;
 		if (cs == null) {

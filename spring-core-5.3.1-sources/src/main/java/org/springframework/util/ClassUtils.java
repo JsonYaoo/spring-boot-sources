@@ -622,8 +622,9 @@ public abstract class ClassUtils {
 	 * as assignable to the corresponding primitive types.
 	 * @param type the target type
 	 * @param value the value that should be assigned to the type
-	 * @return if the type is assignable from the value
+	 * @return if the type is assignable from the value	//	20201211 如果类型是可从值分配的
 	 */
+	// 20201211 假定通过反射进行设置，确定给定类型是否可从给定值分配。 将原始包装器类视为可分配给相应的原始类型。
 	public static boolean isAssignableValue(Class<?> type, @Nullable Object value) {
 		Assert.notNull(type, "Type must not be null");
 		return (value != null ? isAssignable(type, value.getClass()) : !type.isPrimitive());

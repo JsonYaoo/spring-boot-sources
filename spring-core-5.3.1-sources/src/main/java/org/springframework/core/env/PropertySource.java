@@ -138,9 +138,9 @@ public abstract class PropertySource<T> {
 	 * @param name the property to find
 	 * @see PropertyResolver#getRequiredProperty(String)
 	 */
+	// 20201210 返回与给定名称关联的值；如果找不到，则返回{@code null}。
 	@Nullable
 	public abstract Object getProperty(String name);
-
 
 	/**
 	 * This {@code PropertySource} object is equal to the given object if:

@@ -44,6 +44,7 @@ public interface PropertyResolver {
 	 * @see #getProperty(String, Class)
 	 * @see #getRequiredProperty(String)
 	 */
+	// 20201211 返回与给定键关联的属性值；如果键无法解析，则返回{@code null}。
 	@Nullable
 	String getProperty(String key);
 
@@ -65,6 +66,7 @@ public interface PropertyResolver {
 	 * @param targetType the expected type of the property value
 	 * @see #getRequiredProperty(String, Class)
 	 */
+	// 20201211 返回与给定键关联的属性值；如果键无法解析，则返回{@code null}。
 	@Nullable
 	<T> T getProperty(String key, Class<T> targetType);
 

@@ -28,13 +28,16 @@ import java.util.Set;
  * @see ConfigurablePropertyResolver#validateRequiredProperties()
  * @see org.springframework.context.support.AbstractApplicationContext#prepareRefresh()
  */
+// 20201210 未找到所需属性时引发异常。
 @SuppressWarnings("serial")
 public class MissingRequiredPropertiesException extends IllegalStateException {
 
+	// 20201211 必须属性缺失集合
 	private final Set<String> missingRequiredProperties = new LinkedHashSet<>();
 
-
+	// 20201211 标记找不到属性值的属性
 	void addMissingRequiredProperty(String key) {
+		// 20201211 添加到必须属性缺失集合
 		this.missingRequiredProperties.add(key);
 	}
 

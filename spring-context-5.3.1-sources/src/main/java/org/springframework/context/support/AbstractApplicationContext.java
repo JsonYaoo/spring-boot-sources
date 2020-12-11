@@ -637,8 +637,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
 			// Prepare this context for refreshing.
-			// 20201210 准备此上下文以进行刷新。
-			// 20201210 准备此上下文以进行刷新，设置其启动日期和活动标志以及执行属性源的任何初始化。
+			// 20201210 准备此上下文以进行刷新，设置其启动日期和活动标志以及执行属性源的任何初始化
+			// 20201210 切换到活动状态、初始化上下文环境中的所有占位符属性源、验证是否存在{@link #setRequiredProperties}指定的每个属性、收集早期的ApplicationEvent
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
@@ -748,16 +748,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		}
 
 		// Initialize any placeholder property sources in the context environment.
-		// 20201210 初始化上下文环境中的所有占位符属性源
+		// 20201210 初始化上下文环境中的所有占位符属性源, 空实现
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
-		// 20201210 验证标记为必需的所有属性都是可解析的：请参见ConfigurablePropertyResolver＃setRequiredProperties
+		// 20201211 验证是否存在{@link #setRequiredProperties}指定的每个属性，并将其解析为非{@code null}值 -> 如果存在找不到属性值的属性, 则抛出异常
 		getEnvironment().validateRequiredProperties();
 
 		// Store pre-refresh ApplicationListeners...
-		// 20201210 存储预刷新的ApplicationListeners ...
+		// 20201210 存储预刷新的ApplicationListeners ... -> 收集早期的ApplicationEvent
 		if (this.earlyApplicationListeners == null) {
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		}

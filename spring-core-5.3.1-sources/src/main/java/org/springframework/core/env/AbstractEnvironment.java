@@ -643,9 +643,11 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		return this.propertyResolver.getProperty(key, defaultValue);
 	}
 
+	// 20201211 返回与给定键关联的属性值；如果键无法解析，则返回{@code null}。
 	@Override
 	@Nullable
 	public <T> T getProperty(String key, Class<T> targetType) {
+		// 20201211 返回与给定键关联的属性值；如果键无法解析，则返回{@code null}。
 		return this.propertyResolver.getProperty(key, targetType);
 	}
 
