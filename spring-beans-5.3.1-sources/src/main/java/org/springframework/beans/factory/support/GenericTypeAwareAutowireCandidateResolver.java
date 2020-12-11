@@ -31,10 +31,17 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 20201211
+ * A. 如果将依赖项声明为通用类型，则基本{@link AutowireCandidateResolver}与候选人的类型进行完全通用类型匹配（例如Repository<Customer>）。
+ * B. 这是{@link org.springframework.beans.factory.annotation.QualifierAnnotationAutowireCandidateResolver}的基类，在此级别提供了所有基于非注释的解析步骤的实现。
+ */
+/**
+ * A.
  * Basic {@link AutowireCandidateResolver} that performs a full generic type
  * match with the candidate's type if the dependency is declared as a generic type
  * (e.g. Repository&lt;Customer&gt;).
  *
+ * B.
  * <p>This is the base class for
  * {@link org.springframework.beans.factory.annotation.QualifierAnnotationAutowireCandidateResolver},
  * providing an implementation all non-annotation-based resolution steps at this level.
@@ -42,8 +49,8 @@ import org.springframework.util.ClassUtils;
  * @author Juergen Hoeller
  * @since 4.0
  */
-public class GenericTypeAwareAutowireCandidateResolver extends SimpleAutowireCandidateResolver
-		implements BeanFactoryAware, Cloneable {
+// 20201211 通用知道注解类型组件解析器: 在此级别提供了所有基于非注释的解析步骤的实现
+public class GenericTypeAwareAutowireCandidateResolver extends SimpleAutowireCandidateResolver implements BeanFactoryAware, Cloneable {
 
 	@Nullable
 	private BeanFactory beanFactory;

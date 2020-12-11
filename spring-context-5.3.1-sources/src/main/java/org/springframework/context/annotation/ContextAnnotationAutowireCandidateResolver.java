@@ -38,6 +38,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 20201211
+ * 完整实现{@link org.springframework.beans.factory.support.AutowireCandidateResolver}策略界面，为限定符注释以及由{@code context.annotation中的
+ * {@link Lazy}注释驱动的延迟解析提供支持。 }套件。
+ */
+/**
  * Complete implementation of the
  * {@link org.springframework.beans.factory.support.AutowireCandidateResolver} strategy
  * interface, providing support for qualifier annotations as well as for lazy resolution
@@ -46,6 +51,7 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @since 4.0
  */
+// 20201211 知道上下文自动装配注解类型组件解析器:  注释驱动的延迟解析提供支持
 public class ContextAnnotationAutowireCandidateResolver extends QualifierAnnotationAutowireCandidateResolver {
 
 	@Override

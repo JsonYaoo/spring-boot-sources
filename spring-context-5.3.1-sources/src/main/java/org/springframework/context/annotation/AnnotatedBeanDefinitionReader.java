@@ -53,9 +53,10 @@ import org.springframework.util.Assert;
  * @since 3.0
  * @see AnnotationConfigApplicationContext#register
  */
-// 20201204 方便的适配器, 用于以编程方式注册Bean类。
+// 20201204 注解BeanDefinitionReader
 public class AnnotatedBeanDefinitionReader {
 
+	// 20201211 BeanDefinition注册表
 	private final BeanDefinitionRegistry registry;
 
 	// 20201208 用于为bean定义生成bean名称的策略接口实例, 默认为AnnotationBeanNameGenerator的实例常量, 用于组件扫描
@@ -96,17 +97,25 @@ public class AnnotatedBeanDefinitionReader {
 	/**
 	 * Create a new {@code AnnotatedBeanDefinitionReader} for the given registry,
 	 * using the given {@link Environment}.
+	 *
 	 * @param registry the {@code BeanFactory} to load bean definitions into,
 	 * in the form of a {@code BeanDefinitionRegistry}
 	 * @param environment the {@code Environment} to use when evaluating bean definition
 	 * profiles.
 	 * @since 3.1
 	 */
+	// 20201211 使用给定的{@link Environment}为给定的注册表创建一个新的{@code AnnotatedBeanDefinitionReader}。
 	public AnnotatedBeanDefinitionReader(BeanDefinitionRegistry registry, Environment environment) {
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		Assert.notNull(environment, "Environment must not be null");
+
+		// 20201211 设置BeanDefinition注册表
 		this.registry = registry;
+
+		// 20201211 用于评估{@link Conditional}注解的内部类, 含注册表、环境
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, null);
+
+		// 20201209 在给定的注册表中注册所有相关的注解后处理器。
 		AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 	}
 

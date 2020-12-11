@@ -44,7 +44,7 @@ package org.springframework.beans.factory;
  * @see BeanFactoryAware
  * @see InitializingBean
  */
-// 20201207 Aware Bean类加载器: 使用当前bean工厂的类加载器来加载bean类
+// 20201207 知道Bean类加载器接口: Aware Bean类加载器: 使用当前bean工厂的类加载器来加载bean类
 public interface BeanClassLoaderAware extends Aware {
 
 	/**

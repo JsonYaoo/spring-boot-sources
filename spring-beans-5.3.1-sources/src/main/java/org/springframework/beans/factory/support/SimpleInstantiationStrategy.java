@@ -32,8 +32,15 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201211
+ * A. 在BeanFactory中使用的简单对象实例化策略。
+ * B. 不支持方法注入，尽管它为子类提供了挂钩，以覆盖它们以添加方法注入支持，例如通过覆盖方法。
+ */
+/**
+ * A.
  * Simple object instantiation strategy for use in a BeanFactory.
  *
+ * B.
  * <p>Does not support Method Injection, although it provides hooks for subclasses
  * to override to add Method Injection support, for example by overriding methods.
  *
@@ -41,6 +48,7 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @since 1.1
  */
+// 20201211 Bean实例化策略简单实现 -> 不支持方法注入
 public class SimpleInstantiationStrategy implements InstantiationStrategy {
 
 	private static final ThreadLocal<Method> currentlyInvokedFactoryMethod = new ThreadLocal<>();

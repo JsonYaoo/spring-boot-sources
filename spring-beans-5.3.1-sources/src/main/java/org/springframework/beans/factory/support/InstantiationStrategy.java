@@ -24,8 +24,15 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201211
+ * A. 负责创建与根bean定义相对应的实例的接口。
+ * B. 尽可能采用各种方法将其引入策略中，包括使用CGLIB动态创建子类以支持方法注入。
+ */
+/**
+ * A.
  * Interface responsible for creating instances corresponding to a root bean definition.
  *
+ * B.
  * <p>This is pulled out into a strategy as various approaches are possible,
  * including using CGLIB to create subclasses on the fly to support Method Injection.
  *
@@ -33,6 +40,7 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 1.1
  */
+// 20201211 Bean实例化策略接口 ->  尽可能采用各种方法将其引入策略中，包括使用CGLIB动态创建子类以支持方法注入
 public interface InstantiationStrategy {
 
 	/**

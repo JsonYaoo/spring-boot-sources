@@ -151,15 +151,24 @@ public abstract class AnnotationConfigUtils {
 	 * @return a Set of BeanDefinitionHolders, containing all bean definitions
 	 * that have actually been registered by this call
 	 */
+	// 20201211 在给定的注册表中注册所有相关的注释后处理器。
 	public static Set<BeanDefinitionHolder> registerAnnotationConfigProcessors(
 			BeanDefinitionRegistry registry, @Nullable Object source) {
 
+		// 20201211 获取没有包装的DefaultListableBeanFactory -> 此上下文的基础bean工厂，可用于注册bean定义
 		DefaultListableBeanFactory beanFactory = unwrapDefaultListableBeanFactory(registry);
+
+		// 20201211 如果获取得到
 		if (beanFactory != null) {
+			// 20201211 如果根据注解排序, 在添加AnnotationAwareOrderComparator比较器实例
 			if (!(beanFactory.getDependencyComparator() instanceof AnnotationAwareOrderComparator)) {
+				// 20201211 为依赖项列表和数组设置一个{@link Comparator}。
 				beanFactory.setDependencyComparator(AnnotationAwareOrderComparator.INSTANCE);
 			}
+
+			// 20201211 如果BeanFactory的自动装配候选解析器为 知道上下文自动装配注解类型组件解析器
 			if (!(beanFactory.getAutowireCandidateResolver() instanceof ContextAnnotationAutowireCandidateResolver)) {
+				// 20201211 设置此BeanFactory的自定义自动装配候选解析器，以在决定是否应将bean定义视为自动装配的候选者时使用。
 				beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
 			}
 		}
@@ -223,12 +232,15 @@ public abstract class AnnotationConfigUtils {
 		return new BeanDefinitionHolder(definition, beanName);
 	}
 
+	// 20201211 获取没有包装的DefaultListableBeanFactory -> 此上下文的基础bean工厂，可用于注册bean定义
 	@Nullable
 	private static DefaultListableBeanFactory unwrapDefaultListableBeanFactory(BeanDefinitionRegistry registry) {
 		if (registry instanceof DefaultListableBeanFactory) {
+			// 20201211 返回此上下文的基础bean工厂，可用于注册bean定义
 			return (DefaultListableBeanFactory) registry;
 		}
 		else if (registry instanceof GenericApplicationContext) {
+			// 20201211 返回此上下文的基础bean工厂，可用于注册bean定义
 			return ((GenericApplicationContext) registry).getDefaultListableBeanFactory();
 		}
 		else {

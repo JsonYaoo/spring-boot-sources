@@ -171,21 +171,36 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 		Collections.addAll(this.basePackages, basePackages);
 	}
 
-
 	/**
+	 * 20201211
+	 * A. 为{@link #register（Class ...）}指定的任何类注册{@link org.springframework.beans.factory.config.BeanDefinition}并扫描{@link #scan（String ... ）}。
+	 * B. 对于{@link #setConfigLocation（String）}或{@link #setConfigLocations（String []）}指定的任何值，请先尝试将每个位置加载为一个类，如果类加载成功，
+	 *    则注册一个{@code BeanDefinition}， 如果类加载失败（即引发{@code ClassNotFoundException}），则假定该值是一个包，并尝试对其进行扫描以查找组件类。
+	 * C. 启用注释配置后处理器的默认集合，例如，可以使用{@code @Autowired}，{@ code @Required}和关联的注释。
+	 * D. 除非为构造型注释提供{@code value}属性，否则配置类Bean定义将使用生成的Bean定义名称进行注册。
+	 */
+	/**
+	 * A.
 	 * Register a {@link org.springframework.beans.factory.config.BeanDefinition} for
 	 * any classes specified by {@link #register(Class...)} and scan any packages
 	 * specified by {@link #scan(String...)}.
+	 *
+	 * B.
 	 * <p>For any values specified by {@link #setConfigLocation(String)} or
 	 * {@link #setConfigLocations(String[])}, attempt first to load each location as a
 	 * class, registering a {@code BeanDefinition} if class loading is successful,
 	 * and if class loading fails (i.e. a {@code ClassNotFoundException} is raised),
 	 * assume the value is a package and attempt to scan it for component classes.
+	 *
+	 * C.
 	 * <p>Enables the default set of annotation configuration post processors, such that
 	 * {@code @Autowired}, {@code @Required}, and associated annotations can be used.
+	 *
+	 * D.
 	 * <p>Configuration class bean definitions are registered with generated bean
 	 * definition names unless the {@code value} attribute is provided to the stereotype
 	 * annotation.
+	 *
 	 * @param beanFactory the bean factory to load bean definitions into
 	 * @see #register(Class...)
 	 * @see #scan(String...)
@@ -194,6 +209,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 	 * @see AnnotatedBeanDefinitionReader
 	 * @see ClassPathBeanDefinitionScanner
 	 */
+	// 20201211 使用任意BeanDefinition读取Bean的定义信息, 配置类Bean定义将使用生成的Bean定义名称进行注册。
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) {
 		AnnotatedBeanDefinitionReader reader = getAnnotatedBeanDefinitionReader(beanFactory);
@@ -252,9 +268,16 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 		}
 	}
 
-
 	/**
+	 * 20201211
+	 * A. 为给定的bean工厂构建一个{@link AnnotatedBeanDefinitionReader}。
+	 * B. 应该使用{@code Environment}（如果需要）进行预配置，但尚未使用{@code BeanNameGenerator}或{@code ScopeMetadataResolver}进行预配置。
+	 */
+	/**
+	 * A.
 	 * Build an {@link AnnotatedBeanDefinitionReader} for the given bean factory.
+	 *
+	 * B.
 	 * <p>This should be pre-configured with the {@code Environment} (if desired)
 	 * but not with a {@code BeanNameGenerator} or {@code ScopeMetadataResolver} yet.
 	 * @param beanFactory the bean factory to load bean definitions into
@@ -263,7 +286,9 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 	 * @see #getBeanNameGenerator()
 	 * @see #getScopeMetadataResolver()
 	 */
+	// 20201211  为给定的bean工厂构建一个{@link AnnotatedBeanDefinitionReader}
 	protected AnnotatedBeanDefinitionReader getAnnotatedBeanDefinitionReader(DefaultListableBeanFactory beanFactory) {
+		//
 		return new AnnotatedBeanDefinitionReader(beanFactory, getEnvironment());
 	}
 

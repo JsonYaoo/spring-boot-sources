@@ -315,12 +315,15 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * to register beans through our public methods (or the BeanFactory's).
 	 * @see #registerBeanDefinition
 	 */
+	// 20201211 不执行任何操作：我们拥有一个内部BeanFactory，并依靠调用者通过我们的公共方法（或BeanFactory的方法）注册Bean。
 	@Override
 	protected final void refreshBeanFactory() throws IllegalStateException {
 		if (!this.refreshed.compareAndSet(false, true)) {
 			throw new IllegalStateException(
 					"GenericApplicationContext does not support multiple refresh attempts: just call 'refresh' once");
 		}
+
+		// 20201211 指定一个ID以进行序列化，如果需要的话，允许将该BeanFactory从该ID反序列化回BeanFactory对象。
 		this.beanFactory.setSerializationId(getId());
 	}
 
@@ -351,13 +354,23 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	}
 
 	/**
+	 * 20201211
+	 * A. 返回此上下文的基础bean工厂，可用于注册bean定义。
+	 * B. 注意：您需要调用{@link #refresh（）}以使用应用程序上下文语义（自动检测BeanFactoryPostProcessors等）初始化bean工厂及其包含的bean。
+	 */
+	/**
+	 * A.
 	 * Return the underlying bean factory of this context,
 	 * available for registering bean definitions.
+	 *
+	 * B.
 	 * <p><b>NOTE:</b> You need to call {@link #refresh()} to initialize the
 	 * bean factory and its contained beans with application context semantics
 	 * (autodetecting BeanFactoryPostProcessors, etc).
+	 *
 	 * @return the internal bean factory (as DefaultListableBeanFactory)
 	 */
+	// 20201211 返回此上下文的基础bean工厂，可用于注册bean定义
 	public final DefaultListableBeanFactory getDefaultListableBeanFactory() {
 		return this.beanFactory;
 	}

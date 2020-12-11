@@ -642,7 +642,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			// 20201210 告诉子类刷新内部bean工厂 -> 子类将创建一个新的bean工厂并保留对其的引用，或者返回它持有的单个BeanFactory实例
+			// 20201210 告诉子类刷新内部BeanFactory -> 子类将创建一个新的BeanFactory并保留对其的引用，或者返回它持有的单个BeanFactory实例
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
@@ -791,12 +791,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * @see #refreshBeanFactory()
 	 * @see #getBeanFactory()
 	 */
-	// 20201210 告诉子类刷新内部bean工厂 -> 子类将创建一个新的bean工厂并保留对其的引用，或者返回它持有的单个BeanFactory实例
+	// 20201210 告诉子类刷新内部BeanFactory -> 子类将创建一个新的BeanFactory并保留对其的引用，或者返回它持有的单个BeanFactory实例
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
-		// 20201210 子类将创建一个新的bean工厂并保留对其的引用，或者返回它持有的单个BeanFactory实例。
+		// 20201210 子类将创建一个新的BeanFactory并保留对其的引用，或者返回它持有的单个BeanFactory实例。
 		refreshBeanFactory();
 
-		// 20201210 子类必须在此处返回其内部bean工厂。 他们应该有效地实现查找，以便可以重复调用它而不会影响性能。
+		// 20201210 子类必须在此处返回其内部BeanFactory。 他们应该有效地实现查找，以便可以重复调用它而不会影响性能。
 		return getBeanFactory();
 	}
 
@@ -1558,8 +1558,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * ConfigurableApplicationContext; else, return the parent context itself.
 	 * @see org.springframework.context.ConfigurableApplicationContext#getBeanFactory
 	 */
+	// 20201211 如果实现了ConfigurableApplicationContext，则返回父上下文的内部bean工厂；否则，返回false。 否则，返回父上下文本身。
 	@Nullable
 	protected BeanFactory getInternalParentBeanFactory() {
+		// 20201211 如果实现了ConfigurableApplicationContext，则返回父上下文的内部bean工厂；否则，返回false。 否则，返回父上下文本身。
 		return (getParent() instanceof ConfigurableApplicationContext ?
 				((ConfigurableApplicationContext) getParent()).getBeanFactory() : getParent());
 	}
@@ -1663,7 +1665,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * @throws IllegalStateException if already initialized and multiple refresh
 	 * attempts are not supported
 	 */
-	// 20201210 子类将创建一个新的bean工厂并保留对其的引用，或者返回它持有的单个BeanFactory实例。
+	// 20201210 子类将创建一个新的BeanFactory并保留对其的引用，或者返回它持有的单个BeanFactory实例。
 	protected abstract void refreshBeanFactory() throws BeansException, IllegalStateException;
 
 	/**

@@ -139,14 +139,21 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
 
 	/**
+	 * 20201211
+	 * 此环境是否存在于本地映像中。 由于https://github.com/oracle/graal/issues/2594，它作为一个私有静态字段而不是在
+	 * {@code NativeImageDetector.inNativeImage（）}静态方法中公开。
+	 * @see <a href="https://github.com/oracle/graal/blob/master/sdk/src/org.graalvm.nativeimage/src/org/graalvm/nativeimage/ImageInfo.java"> ImageInfo.java < / a>
+	 */
+	/**
 	 * Whether this environment lives within a native image.
 	 * Exposed as a private static field rather than in a {@code NativeImageDetector.inNativeImage()} static method due to https://github.com/oracle/graal/issues/2594.
 	 * @see <a href="https://github.com/oracle/graal/blob/master/sdk/src/org.graalvm.nativeimage/src/org/graalvm/nativeimage/ImageInfo.java">ImageInfo.java</a>
 	 */
+	// 20201211 此环境是否存在于本地映像中
 	private static final boolean IN_NATIVE_IMAGE = (System.getProperty("org.graalvm.nativeimage.imagecode") != null);
 
-
 	/** Strategy for creating bean instances. */
+	// 20201211 创建bean实例的策略。
 	private InstantiationStrategy instantiationStrategy;
 
 	/** Resolver strategy for method parameter names. */
@@ -172,6 +179,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * Dependency interfaces to ignore on dependency check and autowire, as Set of
 	 * Class objects. By default, only the BeanFactory interface is ignored.
 	 */
+	// 20201211 依赖关系接口将忽略作为类对象集的依赖关系检查和自动装配。 默认情况下，仅BeanFactory接口被忽略。
 	private final Set<Class<?>> ignoredDependencyInterfaces = new HashSet<>();
 
 	/**
@@ -194,15 +202,27 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	/**
 	 * Create a new AbstractAutowireCapableBeanFactory.
 	 */
+	// 20201211 创建一个新的AbstractAutowireCapableBeanFactory -> 注册Cglib动态代理Bean实例化策略
 	public AbstractAutowireCapableBeanFactory() {
+		// 20201211 创建一个新的AbstractBeanFactory。
 		super();
+
+		// 20201211 依赖关系接口将忽略作为BeanNameAware类对象集的依赖关系检查和自动装配。 默认情况下，仅BeanFactory接口被忽略。
 		ignoreDependencyInterface(BeanNameAware.class);
+
+		// 20201211 依赖关系接口将忽略作为BeanFactoryAware类对象集的依赖关系检查和自动装配。 默认情况下，仅BeanFactory接口被忽略。
 		ignoreDependencyInterface(BeanFactoryAware.class);
+
+		// 20201211 依赖关系接口将忽略作为BeanClassLoaderAware类对象集的依赖关系检查和自动装配。 默认情况下，仅BeanFactory接口被忽略。
 		ignoreDependencyInterface(BeanClassLoaderAware.class);
+
+		// 20201211 此环境是否存在于本地映像中 -> "org.graalvm.nativeimage.imagecode"是否存在
 		if (IN_NATIVE_IMAGE) {
+			// 20201211 是, 注册Bean实例化策略简单实现
 			this.instantiationStrategy = new SimpleInstantiationStrategy();
 		}
 		else {
+			// 20201211 否, 注册Cglib动态代理Bean实例化策略: 在BeanFactories中使用的默认对象实例化策略
 			this.instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 		}
 	}
@@ -211,8 +231,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * Create a new AbstractAutowireCapableBeanFactory with the given parent.
 	 * @param parentBeanFactory parent bean factory, or {@code null} if none
 	 */
+	// 20201211 使用给定的父级创建一个新的AbstractAutowireCapableBeanFactor -> 注册Cglib动态代理Bean实例化策略、设置父级Bean工厂
 	public AbstractAutowireCapableBeanFactory(@Nullable BeanFactory parentBeanFactory) {
+		// 20201211 创建一个新的AbstractAutowireCapableBeanFactory -> 注册Cglib动态代理Bean实例化策略
 		this();
+
+		// 20201211 设置父级Bean工厂
 		setParentBeanFactory(parentBeanFactory);
 	}
 
@@ -252,18 +276,33 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 20201211
+	 * A. 设置是否在bean之间允许循环引用-并自动尝试解决它们。
+	 * B. 注意，循环引用解析意味着其中一个涉及的bean将收到对另一个尚未完全初始化的bean的引用。 这可能导致初始化方面的细微和不太细微的副作用。 不过，它在许多情况下都可以正常工作。
+	 * C. 默认值为“ true”。 遇到循环引用时，请将其关闭以引发异常，从而完全禁止它们。
+	 * D. 注意：通常建议不要在您的bean之间使用循环引用。 重构您的应用程序逻辑，以使涉及的两个bean委托给封装了它们共同逻辑的第三个bean。
+	 */
+	/**
+	 * A.
 	 * Set whether to allow circular references between beans - and automatically
 	 * try to resolve them.
+	 *
+	 * B.
 	 * <p>Note that circular reference resolution means that one of the involved beans
 	 * will receive a reference to another bean that is not fully initialized yet.
 	 * This can lead to subtle and not-so-subtle side effects on initialization;
 	 * it does work fine for many scenarios, though.
+	 *
+	 * C.
 	 * <p>Default is "true". Turn this off to throw an exception when encountering
 	 * a circular reference, disallowing them completely.
+	 *
+	 * D.
 	 * <p><b>NOTE:</b> It is generally recommended to not rely on circular references
 	 * between your beans. Refactor your application logic to have the two beans
 	 * involved delegate to a third bean that encapsulates their common logic.
 	 */
+	// 20201211 设置是否在bean之间允许循环引用 -> 通常建议不要在您的bean之间使用循环引用
 	public void setAllowCircularReferences(boolean allowCircularReferences) {
 		this.allowCircularReferences = allowCircularReferences;
 	}
@@ -295,16 +334,29 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 20201211
+	 * A. 忽略给定的依赖接口进行自动装配。
+	 * B. 应用程序上下文通常会使用它来注册以其他方式解决的依赖关系，例如通过BeanFactoryAware的BeanFactory或通过ApplicationContextAware的ApplicationContext。
+	 */
+	/**
+	 * A.
 	 * Ignore the given dependency interface for autowiring.
+	 *
+	 * B.
 	 * <p>This will typically be used by application contexts to register
 	 * dependencies that are resolved in other ways, like BeanFactory through
 	 * BeanFactoryAware or ApplicationContext through ApplicationContextAware.
+	 *
+	 * C.
 	 * <p>By default, only the BeanFactoryAware interface is ignored.
 	 * For further types to ignore, invoke this method for each type.
+	 *
 	 * @see BeanFactoryAware
 	 * @see org.springframework.context.ApplicationContextAware
 	 */
+	// 20201211 忽略给定的依赖接口进行自动装配
 	public void ignoreDependencyInterface(Class<?> ifc) {
+		// 20201211 依赖关系接口将忽略作为类对象集的依赖关系检查和自动装配。 默认情况下，仅BeanFactory接口被忽略。
 		this.ignoredDependencyInterfaces.add(ifc);
 	}
 

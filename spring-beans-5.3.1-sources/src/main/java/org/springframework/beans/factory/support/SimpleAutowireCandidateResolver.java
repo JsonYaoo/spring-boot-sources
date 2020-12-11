@@ -28,6 +28,7 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 2.5
  */
+// 20201211 知道自动装配类型组件解析器简单实现: 此实现仅检查bean定义。
 public class SimpleAutowireCandidateResolver implements AutowireCandidateResolver {
 
 	/**

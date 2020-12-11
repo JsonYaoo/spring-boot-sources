@@ -166,10 +166,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private boolean allowEagerClassLoading = true;
 
 	/** Optional OrderComparator for dependency Lists and arrays. */
+	// 20201211 依赖关系列表和数组的可选OrderComparator。
 	@Nullable
 	private Comparator<Object> dependencyComparator;
 
 	/** Resolver to use for checking if a bean definition is an autowire candidate. */
+	// 20201211 用于检查bean定义是否为自动装配候选的解析程序， 默认为知道自动装配类型组件解析器简单实现
 	private AutowireCandidateResolver autowireCandidateResolver = SimpleAutowireCandidateResolver.INSTANCE;
 
 	/** Map from dependency type to corresponding autowired value. */
@@ -216,7 +218,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 * Create a new DefaultListableBeanFactory with the given parent.
 	 * @param parentBeanFactory the parent BeanFactory
 	 */
+	// 20201211 使用给定的父级创建一个新的DefaultListableBeanFactory -> 注册Cglib动态代理Bean实例化策略、设置父级Bean工厂
 	public DefaultListableBeanFactory(@Nullable BeanFactory parentBeanFactory) {
+		// 20201211 使用给定的父级创建一个新的AbstractAutowireCapableBeanFactor -> 注册Cglib动态代理Bean实例化策略、设置父级Bean工厂
 		super(parentBeanFactory);
 	}
 
@@ -225,6 +229,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 * Specify an id for serialization purposes, allowing this BeanFactory to be
 	 * deserialized from this id back into the BeanFactory object, if needed.
 	 */
+	// 20201211 指定一个ID以进行序列化，如果需要的话，允许将该BeanFactory从该ID反序列化回BeanFactory对象。
 	public void setSerializationId(@Nullable String serializationId) {
 		if (serializationId != null) {
 			serializableFactories.put(serializationId, new WeakReference<>(this));
@@ -312,6 +317,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 * Return the dependency comparator for this BeanFactory (may be {@code null}.
 	 * @since 4.0
 	 */
+	// 20201211 返回此BeanFactory的依赖关系比较器（可以为{@code null}。
 	@Nullable
 	public Comparator<Object> getDependencyComparator() {
 		return this.dependencyComparator;
@@ -322,8 +328,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 * when deciding whether a bean definition should be considered as a
 	 * candidate for autowiring.
 	 */
+	// 20201211 设置此BeanFactory的自定义自动装配候选解析器，以在决定是否应将bean定义视为自动装配的候选者时使用。
 	public void setAutowireCandidateResolver(AutowireCandidateResolver autowireCandidateResolver) {
 		Assert.notNull(autowireCandidateResolver, "AutowireCandidateResolver must not be null");
+
+		// 20201211 自动装配候选解析器知道BeanFactory, 则将当前工厂提供给Bean实例的回调
 		if (autowireCandidateResolver instanceof BeanFactoryAware) {
 			if (System.getSecurityManager() != null) {
 				AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
@@ -335,13 +344,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				((BeanFactoryAware) autowireCandidateResolver).setBeanFactory(this);
 			}
 		}
+
+		// 20201211 设置用于检查bean定义是否为自动装配候选的解析程序 -> 自动装配候选解析器
 		this.autowireCandidateResolver = autowireCandidateResolver;
 	}
 
 	/**
 	 * Return the autowire candidate resolver for this BeanFactory (never {@code null}).
 	 */
+	// 20201211 返回此BeanFactory的自动装配候选解析器（不要{@code null}）。
 	public AutowireCandidateResolver getAutowireCandidateResolver() {
+		// 20201211 注册BeanFactory的自动装配候选解析器
 		return this.autowireCandidateResolver;
 	}
 

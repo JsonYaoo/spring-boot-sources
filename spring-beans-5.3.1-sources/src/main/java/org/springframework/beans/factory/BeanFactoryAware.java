@@ -47,19 +47,28 @@ import org.springframework.beans.BeansException;
  * @see InitializingBean
  * @see org.springframework.context.ApplicationContextAware
  */
-// 20201207 Aware beans自己的bean工厂
+// 20201207 知道BeanFactory接口, Aware beans自己的bean工厂
 public interface BeanFactoryAware extends Aware {
 
 	/**
+	 * 20201211
+	 * A. 将拥有的工厂提供给Bean实例的回调。
+	 * B. 在填充正常的bean属性之后但在初始化回调（例如{@link InitializingBean＃afterPropertiesSet（）}或自定义的init方法）之前调用。
+	 */
+	/**
+	 * A.
 	 * Callback that supplies the owning factory to a bean instance.
+	 *
+	 * B.
 	 * <p>Invoked after the population of normal bean properties
 	 * but before an initialization callback such as
 	 * {@link InitializingBean#afterPropertiesSet()} or a custom init-method.
+	 *
 	 * @param beanFactory owning BeanFactory (never {@code null}).
-	 * The bean can immediately call methods on the factory.
 	 * @throws BeansException in case of initialization errors
 	 * @see BeanInitializationException
 	 */
+	// 20201211 将拥有的工厂提供给Bean实例的回调
 	void setBeanFactory(BeanFactory beanFactory) throws BeansException;
 
 }

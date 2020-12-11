@@ -40,8 +40,15 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201211
+ * A. 在BeanFactories中使用的默认对象实例化策略。
+ * B. 如果方法需要被容器覆盖以实现方法注入，则使用CGLIB动态生成子类。
+ */
+/**
+ * A.
  * Default object instantiation strategy for use in BeanFactories.
  *
+ * B.
  * <p>Uses CGLIB to generate subclasses dynamically if methods need to be
  * overridden by the container to implement <em>Method Injection</em>.
  *
@@ -50,6 +57,7 @@ import org.springframework.util.StringUtils;
  * @author Sam Brannen
  * @since 1.1
  */
+// 20201211 Cglib动态代理Bean实例化策略: 在BeanFactories中使用的默认对象实例化策略
 public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationStrategy {
 
 	/**
