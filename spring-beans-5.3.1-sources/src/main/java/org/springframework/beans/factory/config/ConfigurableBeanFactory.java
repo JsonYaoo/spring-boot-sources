@@ -314,6 +314,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	 * @param scopeName the scope identifier
 	 * @param scope the backing Scope implementation
 	 */
+	// 20201212 注册由给定范围实现支持的给定范围。
 	void registerScope(String scopeName, Scope scope);
 
 	/**
@@ -326,13 +327,23 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 	String[] getRegisteredScopeNames();
 
 	/**
+	 * 20201212
+	 * A. 返回给定作用域名称的作用域实现（如果有）。
+	 * B. 这只会返回显式注册的范围。 内置作用域（例如“ singleton”和“ prototype”）不会公开。
+	 */
+	/**
+	 * A.
 	 * Return the Scope implementation for the given scope name, if any.
+	 *
+	 * B.
 	 * <p>This will only return explicitly registered scopes.
 	 * Built-in scopes such as "singleton" and "prototype" won't be exposed.
+	 *
 	 * @param scopeName the name of the scope
 	 * @return the registered Scope implementation, or {@code null} if none
 	 * @see #registerScope
 	 */
+	// 20201212 根据作用域名称返回已显示注册的作用域实现
 	@Nullable
 	Scope getRegisteredScope(String scopeName);
 

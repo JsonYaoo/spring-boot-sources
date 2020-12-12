@@ -153,10 +153,16 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	 * Register ServletContextAwareProcessor.
 	 * @see ServletContextAwareProcessor
 	 */
+	// 20201212 注册ServletContextAwareProcessor。
 	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		// 20201212 beanFactory添加Web应用程序上下文&Servlet应用程序上下文自觉BeanPostProcessor
 		beanFactory.addBeanPostProcessor(new WebApplicationContextServletContextAwareProcessor(this));
+
+		// 20201212 忽略ServletContext自觉接口进行自动装配
 		beanFactory.ignoreDependencyInterface(ServletContextAware.class);
+
+		// 20201212 注册Web应用程序范围
 		registerWebApplicationScopes();
 	}
 
@@ -272,9 +278,15 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		servletContext.setAttribute(ServletContextScope.class.getName(), appScope);
 	}
 
+	// 20201212 注册Web应用程序范围
 	private void registerWebApplicationScopes() {
+		// 20201212 构造Web应用程序作用域实例
 		ExistingWebApplicationScopes existingScopes = new ExistingWebApplicationScopes(getBeanFactory());
+
+		// 20201212 根据beanFactory注册特定于Web的范围（“请求”，“会话”，“ globalSession”，“应用程序”）
 		WebApplicationContextUtils.registerWebApplicationScopes(getBeanFactory());
+
+		// 20201212 beanFactory重新注册给定范围
 		existingScopes.restore();
 	}
 
@@ -365,10 +377,15 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	}
 
 	/**
+	 * 20201212
+	 * 实用程序类，用于存储和还原任何用户定义的范围。 这允许范围以与在传统的非嵌入式Web应用程序上下文中相同的方式在ApplicationContextInitializer中注册。
+	 */
+	/**
 	 * Utility class to store and restore any user defined scopes. This allow scopes to be
 	 * registered in an ApplicationContextInitializer in the same way as they would in a
 	 * classic non-embedded web application context.
 	 */
+	// 20201212 Web应用程序作用域类
 	public static class ExistingWebApplicationScopes {
 
 		private static final Set<String> SCOPES;
@@ -382,11 +399,14 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 
 		private final ConfigurableListableBeanFactory beanFactory;
 
+		// 20201212 Web应用程序作用域集合: 作用域名称-作用域实现
 		private final Map<String, Scope> scopes = new HashMap<>();
 
+		// 20201212 构造Web应用程序作用域实例
 		public ExistingWebApplicationScopes(ConfigurableListableBeanFactory beanFactory) {
 			this.beanFactory = beanFactory;
 			for (String scopeName : SCOPES) {
+				// 20201212 根据作用域名称返回已显示注册的作用域实现
 				Scope scope = beanFactory.getRegisteredScope(scopeName);
 				if (scope != null) {
 					this.scopes.put(scopeName, scope);
@@ -394,6 +414,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 			}
 		}
 
+		// 20201212 beanFactory重新注册给定范围
 		public void restore() {
 			this.scopes.forEach((key, value) -> {
 				if (logger.isInfoEnabled()) {

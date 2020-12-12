@@ -649,8 +649,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			prepareBeanFactory(beanFactory);
 
 			try {
-				// Allows post-processing of the bean factory in context subclasses.
-				// 20201210 允许在上下文子类中对bean工厂进行后处理。
+				// Allows post-processing of the bean factory in context subclasses. // 20201210 允许在上下文子类中对bean工厂进行后处理。
+				// 20201212 BeanFactor后置处理: 注册ServletContextAwareProcessor、扫描并注册包路径下的BeanDefinitionHolder
 				postProcessBeanFactory(beanFactory);
 
 				// 20201210 创建新步骤并标记其开始, 步骤名称描述当前操作或阶段 -> "spring.context.beans.post-process"
@@ -898,12 +898,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 	/**
+	 * 20201212
+	 * 标准初始化后，修改应用程序上下文的内部bean工厂。 所有bean定义都将被加载，但是尚未实例化任何bean。 这允许在某些ApplicationContext实现中注册特殊的BeanPostProcessor等。
+	 */
+	/**
 	 * Modify the application context's internal bean factory after its standard
 	 * initialization. All bean definitions will have been loaded, but no beans
 	 * will have been instantiated yet. This allows for registering special
 	 * BeanPostProcessors etc in certain ApplicationContext implementations.
 	 * @param beanFactory the bean factory used by the application context
 	 */
+	// 20201212 标准初始化后，修改应用程序上下文的内部bean工厂
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 	}
 

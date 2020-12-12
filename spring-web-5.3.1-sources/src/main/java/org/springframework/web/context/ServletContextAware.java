@@ -21,6 +21,10 @@ import javax.servlet.ServletContext;
 import org.springframework.beans.factory.Aware;
 
 /**
+ * 20201212
+ * 希望通过其运行在其中的{@link ServletContext}（通常由{@link WebApplicationContext}通知）的任何对象实现的接口。
+ */
+/**
  * Interface to be implemented by any object that wishes to be notified of the
  * {@link ServletContext} (typically determined by the {@link WebApplicationContext})
  * that it runs in.
@@ -30,6 +34,7 @@ import org.springframework.beans.factory.Aware;
  * @since 12.03.2004
  * @see ServletConfigAware
  */
+// 20201212 ServletContext自觉接口
 public interface ServletContextAware extends Aware {
 
 	/**

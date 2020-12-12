@@ -326,18 +326,18 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @param basePackages the packages to check for annotated classes
 	 * @return number of beans registered	// 20201209 返回已注册的bean数目
 	 */
-	// 20201209 在指定的基本程序包中执行扫描 -> 返回已注册的bean数目
+	// 20201212 在指定的基本程序包中执行扫描 -> 返回已注册的BeanDefinitionHolder(beanDefinition包装类)数目
 	public int scan(String... basePackages) {
 		// 20201209 获取注册前的注册表中定义的bean数。
 		int beanCountAtScanStart = this.registry.getBeanDefinitionCount();
 
-		// 20201209 在指定的基本程序包中执行扫描，返回已注册的bean定义。
+		// 20201209 在指定的基本程序包中执行扫描，返回已注册的BeanDefinitionHolder(beanDefinition包装类)。
 		doScan(basePackages);
 
 		// Register annotation config processors, if necessary.
 		// 20201209 如有必要，注册注解配置处理器, 默认为true
 		if (this.includeAnnotationConfig) {
-			// 20201209 在给定的注册表中注册所有相关的注解后处理器。
+			// 20201211 给registry添加后置处理器
 			AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 		}
 
@@ -363,7 +363,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * // 20201209 为工具注册目的而已注册的一组bean（永远{@code null}）
 	 * @return set of beans registered if any for tooling registration purposes (never {@code null})
 	 */
-	// 20201209 在指定的基本程序包中执行扫描，返回已注册的bean定义。
+	// 20201209 在指定的基本程序包中执行扫描，返回已注册的BeanDefinitionHolder(beanDefinition包装类)。
 	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
 		// 20201209 包路径不能为空
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
@@ -373,7 +373,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 
 		// 20201209 遍历包数组
 		for (String basePackage : basePackages) {
-			// 20201209 扫描类路径以查找候选组件。
+			// 20201212 设置扫描候选组件(ScannedGenericBeanDefinition)
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
 
 			// 20201209 遍历查找到的候选组件
@@ -389,7 +389,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 
 				// 20201209 如果候选组件为AbstractBeanDefinition类型
 				if (candidate instanceof AbstractBeanDefinition) {
-					// 20201209 则将更多设置应用于给定的bean定义，而不是从扫描组件类检索到的内容。
+					// 20201209 BeanDefinition后置处理器: 设置beanDefinition是否自动装配组件
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
 
@@ -424,10 +424,11 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @param beanDefinition the scanned bean definition
 	 * @param beanName the generated bean name for the given bean
 	 */
-	// 20201209 将更多设置应用于给定的bean定义，而不是从扫描组件类检索到的内容。
+	// 20201209 BeanDefinition后置处理器: 设置beanDefinition是否自动装配组件
 	protected void postProcessBeanDefinition(AbstractBeanDefinition beanDefinition, String beanName) {
 		beanDefinition.applyDefaults(this.beanDefinitionDefaults);
 		if (this.autowireCandidatePatterns != null) {
+			// 20201212 设置beanDefinition是否自动装配组件
 			beanDefinition.setAutowireCandidate(PatternMatchUtils.simpleMatch(this.autowireCandidatePatterns, beanName));
 		}
 	}

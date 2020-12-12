@@ -92,9 +92,12 @@ public class CandidateComponentsIndex {
 	 * @return the candidate types associated with the specified {@code stereotype}
 	 * or an empty set if none has been found for the specified {@code basePackage}
 	 */
+	// 20201212 只返回指定包路径的候选组件Class名称
 	public Set<String> getCandidateTypes(String basePackage, String stereotype) {
+		// 20201212 根据注解Class名称获取所有索引到的候选组件Class名称
 		List<Entry> candidates = this.index.get(stereotype);
 		if (candidates != null) {
+			// 20201212 只返回指定包路径的候选组件Class名称
 			return candidates.parallelStream()
 					.filter(t -> t.match(basePackage))
 					.map(t -> t.type)

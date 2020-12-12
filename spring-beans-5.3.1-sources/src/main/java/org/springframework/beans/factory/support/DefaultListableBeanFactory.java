@@ -417,6 +417,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return this.beanDefinitionMap.containsKey(beanName);
 	}
 
+	// 20201212 获取BeanDefinitionMap实际大小
 	@Override
 	public int getBeanDefinitionCount() {
 		return this.beanDefinitionMap.size();

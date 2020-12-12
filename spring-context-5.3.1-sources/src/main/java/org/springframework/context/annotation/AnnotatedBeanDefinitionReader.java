@@ -184,11 +184,11 @@ public class AnnotatedBeanDefinitionReader {
 	 * @param componentClasses one or more component classes,
 	 * e.g. {@link Configuration @Configuration} classes // 20201208 一个或多个组件类，例如 {@link Configuration @Configuration}类
 	 */
-	// 20201208 注册一个或多个要处理的组件类
+	// 20201208 注册一个或多个要处理的组件类: 从给定的bean类中注册一个bean，并从类声明的注解中派生其元数据 -> 这里只注册BeanDefinition
 	public void register(Class<?>... componentClasses) {
 		// 20201208 遍历组件bean类列表
 		for (Class<?> componentClass : componentClasses) {
-			// 20201208 注册每个一个组件bean类
+			// 20201208 从给定的bean类中注册一个bean，并从类声明的注解中派生其元数据 -> 这里只注册BeanDefinition
 			registerBean(componentClass);
 		}
 	}
@@ -198,9 +198,9 @@ public class AnnotatedBeanDefinitionReader {
 	 * class-declared annotations.
 	 * @param beanClass the class of the bean
 	 */
-	// 20201208 从给定的bean类中注册一个bean，并从类声明的注释中派生其元数据。
+	// 20201208 从给定的bean类中注册一个bean，并从类声明的注解中派生其元数据 -> 这里只注册BeanDefinition
 	public void registerBean(Class<?> beanClass) {
-		// 20201208 从给定的bean类中注册一个bean，并从类声明的注解中派生其元数据。
+		// 20201208 从给定的bean类中注册一个bean，并从类声明的注解中派生其元数据 -> 这里只注册BeanDefinition
 		doRegisterBean(beanClass, null, null, null, null);
 	}
 
@@ -304,7 +304,7 @@ public class AnnotatedBeanDefinitionReader {
 	 * {@link BeanDefinition}, e.g. setting a lazy-init or primary flag
 	 * @since 5.0
 	 */
-	// 20201208 从给定的bean类中注册一个bean，并从类声明的注解中派生其元数据。
+	// 20201208 从给定的bean类中注册一个bean，并从类声明的注解中派生其元数据 -> 这里只注册BeanDefinition
 	private <T> void doRegisterBean(Class<T> beanClass,// 20201208 待处理的bean类
 									@Nullable String name,// 20201208 Bean的显式名称
 									@Nullable Class<? extends Annotation>[] qualifiers,// 20201208 Bean类级别上的限定符，如果有的话，还要考虑特定的限定符注解
@@ -372,7 +372,7 @@ public class AnnotatedBeanDefinitionReader {
 		// 20201209 根据作用域代理模式创建该持有人实例 -> 不要创建作用域代理、创建一个JDK动态代理、创建一个基于类的代理（使用CGLIB）
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 
-		// 20201209 向给定的bean工厂注册该(代理)持有人定义。
+		// 20201209 向registry注册definitionHolder。
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
 

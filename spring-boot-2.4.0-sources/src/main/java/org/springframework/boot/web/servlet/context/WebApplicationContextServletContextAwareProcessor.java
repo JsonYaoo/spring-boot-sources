@@ -24,6 +24,11 @@ import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.support.ServletContextAwareProcessor;
 
 /**
+ * 20201212
+ * {@link ServletContextAwareProcessor}的变体，与{@link ConfigurableWebApplicationContext}一起使用。 可以在初始化{@link ServletContext}或
+ * {@link ServletConfig}之前进行处理器注册时使用。
+ */
+/**
  * Variant of {@link ServletContextAwareProcessor} for use with a
  * {@link ConfigurableWebApplicationContext}. Can be used when registering the processor
  * can occur before the {@link ServletContext} or {@link ServletConfig} have been
@@ -32,10 +37,12 @@ import org.springframework.web.context.support.ServletContextAwareProcessor;
  * @author Phillip Webb
  * @since 1.0.0
  */
+// 20201212 Web应用程序上下文&Servlet应用程序上下文自觉BeanPostProcessor
 public class WebApplicationContextServletContextAwareProcessor extends ServletContextAwareProcessor {
 
 	private final ConfigurableWebApplicationContext webApplicationContext;
 
+	// 20201212 注册Web应用程序上下文为ServletWebServerApplicationContext
 	public WebApplicationContextServletContextAwareProcessor(ConfigurableWebApplicationContext webApplicationContext) {
 		Assert.notNull(webApplicationContext, "WebApplicationContext must not be null");
 		this.webApplicationContext = webApplicationContext;

@@ -702,14 +702,25 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
+	 * 20201212
+	 * A. 设置此bean是否适合自动装配到其他bean。
+	 * B. 请注意，此标志旨在仅影响基于类型的自动装配。 它不会影响名称的显式引用，即使指定的bean未标记为自动装配候选，名称也将得到解析。 结果，如果名称匹配，
+	 *    按名称自动装配仍将注入Bean。
+	 */
+	/**
+	 * A.
 	 * Set whether this bean is a candidate for getting autowired into some other bean.
+	 *
+	 * B.
 	 * <p>Note that this flag is designed to only affect type-based autowiring.
 	 * It does not affect explicit references by name, which will get resolved even
 	 * if the specified bean is not marked as an autowire candidate. As a consequence,
 	 * autowiring by name will nevertheless inject a bean if the name matches.
+	 *
 	 * @see #AUTOWIRE_BY_TYPE
 	 * @see #AUTOWIRE_BY_NAME
 	 */
+	// 20201212 设置beanDefinition是否自动装配组件
 	@Override
 	public void setAutowireCandidate(boolean autowireCandidate) {
 		this.autowireCandidate = autowireCandidate;

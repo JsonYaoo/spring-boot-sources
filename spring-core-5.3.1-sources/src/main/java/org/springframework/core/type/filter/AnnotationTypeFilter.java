@@ -122,6 +122,7 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 	 * candidates.
 	 * @since 5.0
 	 */
+	// 20201212 返回此实例用于过滤的{@link Annotation}
 	public final Class<? extends Annotation> getAnnotationType() {
 		return this.annotationType;
 	}

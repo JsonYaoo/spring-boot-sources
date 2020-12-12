@@ -48,10 +48,17 @@ import org.springframework.web.context.request.SessionScope;
 import org.springframework.web.context.request.WebRequest;
 
 /**
+ * 20201212
+ * A. 检索给定{@link ServletContext}的根{@link WebApplicationContext}的便捷方法。 这对于在自定义Web视图或MVC操作中以编程方式访问Spring应用程序上下文很有用。
+ * B. 请注意，对于许多Web框架（Spring的一部分或作为外部库可用），有更方便的访问根上下文的方法。 此类是访问根上下文的最通用方法。
+ */
+/**
+ * A.
  * Convenience methods for retrieving the root {@link WebApplicationContext} for
  * a given {@link ServletContext}. This is useful for programmatically accessing
  * a Spring application context from within custom web views or MVC actions.
  *
+ * B.
  * <p>Note that there are more convenient ways of accessing the root context for
  * many web frameworks, either part of Spring or available as an external library.
  * This helper class is just the most generic way to access the root context.
@@ -63,6 +70,7 @@ import org.springframework.web.context.request.WebRequest;
  * @see org.springframework.web.jsf.FacesContextUtils
  * @see org.springframework.web.jsf.el.SpringBeanFacesELResolver
  */
+// 20201212 Web应用程序上下文工具类: 此类是访问根上下文的最通用方法
 public abstract class WebApplicationContextUtils {
 
 	private static final boolean jsfPresent =
@@ -164,7 +172,10 @@ public abstract class WebApplicationContextUtils {
 		return wac;
 	}
 
-
+	/**
+	 * 20201212
+	 * 根据WebApplicationContext的使用，使用给定的BeanFactory注册特定于Web的范围（“请求”，“会话”，“ globalSession”）。
+	 */
 	/**
 	 * Register web-specific scopes ("request", "session", "globalSession")
 	 * with the given BeanFactory, as used by the WebApplicationContext.
@@ -175,11 +186,16 @@ public abstract class WebApplicationContextUtils {
 	}
 
 	/**
+	 * 20201212
+	 * 根据WebApplicationContext的使用，使用给定的BeanFactory注册特定于Web的范围（“请求”，“会话”，“ globalSession”，“应用程序”）。
+	 */
+	/**
 	 * Register web-specific scopes ("request", "session", "globalSession", "application")
 	 * with the given BeanFactory, as used by the WebApplicationContext.
 	 * @param beanFactory the BeanFactory to configure
 	 * @param sc the ServletContext that we're running within
 	 */
+	// 20201212 根据beanFactory注册特定于Web的范围（“请求”，“会话”，“ globalSession”，“应用程序”）
 	public static void registerWebApplicationScopes(ConfigurableListableBeanFactory beanFactory,
 			@Nullable ServletContext sc) {
 

@@ -71,8 +71,10 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	// 20201206 bean定义扫描器: 扫描@Component、@Repository、@Service、@Controller
 	private final ClassPathBeanDefinitionScanner scanner;
 
+	// 20201212 已经添加的注解Class集合
 	private final Set<Class<?>> annotatedClasses = new LinkedHashSet<>();
 
+	// 20201212 基础包路径
 	private String[] basePackages;
 
 	/**
@@ -216,13 +218,17 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 		super.prepareRefresh();
 	}
 
+	// 20201212 BeanFactor后置处理
 	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		// 20201212 注册ServletContextAwareProcessor。
 		super.postProcessBeanFactory(beanFactory);
 		if (this.basePackages != null && this.basePackages.length > 0) {
+			// 20201212 在指定的基本程序包中执行扫描 -> 返回已注册的BeanDefinitionHolder(beanDefinition包装类)数目
 			this.scanner.scan(this.basePackages);
 		}
 		if (!this.annotatedClasses.isEmpty()) {
+			// 20201208 注册一个或多个要处理的组件类: 从给定的bean类中注册一个bean，并从类声明的注解中派生其元数据 -> 这里只注册BeanDefinition
 			this.reader.register(ClassUtils.toClassArray(this.annotatedClasses));
 		}
 	}

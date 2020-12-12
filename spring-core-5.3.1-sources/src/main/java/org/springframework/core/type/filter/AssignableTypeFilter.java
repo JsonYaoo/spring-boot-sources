@@ -45,6 +45,7 @@ public class AssignableTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 	 * Return the {@code type} that this instance is using to filter candidates.
 	 * @since 5.0
 	 */
+	// 20201212 返回此实例用来过滤候选者的{@code type}。
 	public final Class<?> getTargetType() {
 		return this.targetType;
 	}

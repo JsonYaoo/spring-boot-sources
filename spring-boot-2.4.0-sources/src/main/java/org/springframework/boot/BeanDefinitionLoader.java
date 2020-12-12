@@ -279,7 +279,7 @@ class BeanDefinitionLoader {
 
 	// 20201209 加载Package源 -> 使用bean定义扫描器在指定的基本程序包中执行扫描 -> 返回已注册的bean数目
 	private void load(Package source) {
-		// 20201209 使用bean定义扫描器在指定的基本程序包中执行扫描 -> 返回已注册的bean数目
+		// 20201209 在指定的基本程序包中执行扫描 -> 返回已注册的BeanDefinitionHolder(beanDefinition包装类)数目
 		this.scanner.scan(source.getName());
 	}
 

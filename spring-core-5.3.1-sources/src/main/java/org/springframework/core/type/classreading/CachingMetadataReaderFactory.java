@@ -47,11 +47,11 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 	@Nullable
 	private Map<Resource, MetadataReader> metadataReaderCache;
 
-
 	/**
 	 * Create a new CachingMetadataReaderFactory for the default class loader,
 	 * using a local resource cache.
 	 */
+	// 20201212 使用本地资源缓存为默认的类加载器创建一个新的CachingMetadataReaderFactory。
 	public CachingMetadataReaderFactory() {
 		super();
 		setCacheLimit(DEFAULT_CACHE_LIMIT);

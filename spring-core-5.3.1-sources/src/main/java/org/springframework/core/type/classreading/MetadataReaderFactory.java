@@ -38,6 +38,7 @@ public interface MetadataReaderFactory {
 	 * @return a holder for the ClassReader instance (never {@code null})
 	 * @throws IOException in case of I/O failure
 	 */
+	// 20201212 获取给定类名称的MetadataReader: SimpleMetadataReader
 	MetadataReader getMetadataReader(String className) throws IOException;
 
 	/**

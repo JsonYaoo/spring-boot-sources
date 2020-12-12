@@ -366,6 +366,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	/**
 	 * Return the MetadataReaderFactory used by this component provider.
 	 */
+	// 20201212 返回此组件提供者使用的MetadataReaderFactory。
 	public final MetadataReaderFactory getMetadataReaderFactory() {
 		if (this.metadataReaderFactory == null) {
 			this.metadataReaderFactory = new CachingMetadataReaderFactory();
@@ -379,12 +380,14 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @param basePackage the package to check for annotated classes
 	 * @return a corresponding Set of autodetected bean definitions
 	 */
-	// 20201209 扫描类路径以查找候选组件。
+	// 20201212 设置扫描候选组件(ScannedGenericBeanDefinition)
 	public Set<BeanDefinition> findCandidateComponents(String basePackage) {
 		if (this.componentsIndex != null && indexSupportsIncludeFilters()) {
+			// 20201212 从候选组件索引中添加候选组件(ScannedGenericBeanDefinition)
 			return addCandidateComponentsFromIndex(this.componentsIndex, basePackage);
 		}
 		else {
+			// 20201212 设置扫描候选组件(ScannedGenericBeanDefinition)
 			return scanCandidateComponents(basePackage);
 		}
 	}
@@ -431,32 +434,43 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @since 5.0
 	 * @see #indexSupportsIncludeFilter(TypeFilter)
 	 */
+	// 20201212 根据过滤器提取注解Class名称。
 	@Nullable
 	private String extractStereotype(TypeFilter filter) {
 		if (filter instanceof AnnotationTypeFilter) {
+			// 20201212 根据过滤器提取注解Class名称
 			return ((AnnotationTypeFilter) filter).getAnnotationType().getName();
 		}
 		if (filter instanceof AssignableTypeFilter) {
+			// 20201212 根据过滤器提取注解Class名称
 			return ((AssignableTypeFilter) filter).getTargetType().getName();
 		}
 		return null;
 	}
 
+	// 20201212 从候选组件索引中添加候选组件(ScannedGenericBeanDefinition)
 	private Set<BeanDefinition> addCandidateComponentsFromIndex(CandidateComponentsIndex index, String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<>();
 		try {
 			Set<String> types = new HashSet<>();
+			// 20201212 遍历类型过滤的基本接口列表
 			for (TypeFilter filter : this.includeFilters) {
+				// 20201212 根据过滤器提取注解Class名称
 				String stereotype = extractStereotype(filter);
 				if (stereotype == null) {
 					throw new IllegalArgumentException("Failed to extract stereotype from " + filter);
 				}
+
+				// 20201212 只返回指定包路径、指定Class类型的注解Class名称
 				types.addAll(index.getCandidateTypes(basePackage, stereotype));
 			}
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
 			for (String type : types) {
+				// 20201212 使用元注解Reader SimpleMetadataReader
 				MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(type);
+
+				// 20201212 确定该SimpleMetadataReader是否有资格作为候选组件
 				if (isCandidateComponent(metadataReader)) {
 					ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 					sbd.setSource(metadataReader.getResource());
@@ -485,6 +499,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 		return candidates;
 	}
 
+	// 20201212 设置扫描候选组件(ScannedGenericBeanDefinition)
 	private Set<BeanDefinition> scanCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<>();
 		try {
@@ -553,19 +568,23 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	}
 
 	/**
+	 * // 20201212
 	 * Determine whether the given class does not match any exclude filter
 	 * and does match at least one include filter.
 	 * @param metadataReader the ASM ClassReader for the class
-	 * @return whether the class qualifies as a candidate component
+	 * @return whether the class qualifies as a candidate component	// 20201212 该类是否符合候选资格
 	 */
+	// 20201212 确定给定的类是否不匹配任何排除过滤器并且是否匹配至少一个包含过滤器。
 	protected boolean isCandidateComponent(MetadataReader metadataReader) throws IOException {
 		for (TypeFilter tf : this.excludeFilters) {
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
+				// 20201212 如果metadataReader匹配了排除类型, 则直接返回false
 				return false;
 			}
 		}
 		for (TypeFilter tf : this.includeFilters) {
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
+				// 20201212 否则再匹配包含类型列表, 如果注解元数据与当前应用上下文配置的属性匹配, 则返回true, 表示该注解应跳过该项注解的bean注册
 				return isConditionMatch(metadataReader);
 			}
 		}
@@ -578,6 +597,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @param metadataReader the ASM ClassReader for the class
 	 * @return whether the class qualifies as a candidate component
 	 */
+	// 20201212 根据任何{@code @Conditional}批注确定给定的类是否为候选组件
 	private boolean isConditionMatch(MetadataReader metadataReader) {
 		if (this.conditionEvaluator == null) {
 			this.conditionEvaluator =

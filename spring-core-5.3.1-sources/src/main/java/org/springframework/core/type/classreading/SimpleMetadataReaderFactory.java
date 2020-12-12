@@ -74,7 +74,7 @@ public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
 		return this.resourceLoader;
 	}
 
-
+	// 20201212 获取给定类名称的MetadataReader: SimpleMetadataReader
 	@Override
 	public MetadataReader getMetadataReader(String className) throws IOException {
 		try {
@@ -101,6 +101,7 @@ public class SimpleMetadataReaderFactory implements MetadataReaderFactory {
 		}
 	}
 
+	// 20201212 获取给定类名称的MetadataReader: SimpleMetadataReader
 	@Override
 	public MetadataReader getMetadataReader(Resource resource) throws IOException {
 		return new SimpleMetadataReader(resource, this.resourceLoader.getClassLoader());
