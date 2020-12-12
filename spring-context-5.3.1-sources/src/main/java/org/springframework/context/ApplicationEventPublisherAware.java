@@ -19,6 +19,10 @@ package org.springframework.context;
 import org.springframework.beans.factory.Aware;
 
 /**
+ * 20201212
+ * 希望由希望在其运行的ApplicationEventPublisher（通常是ApplicationContext）得到通知的任何对象实现的接口
+ */
+/**
  * Interface to be implemented by any object that wishes to be notified
  * of the ApplicationEventPublisher (typically the ApplicationContext)
  * that it runs in.
@@ -28,6 +32,7 @@ import org.springframework.beans.factory.Aware;
  * @since 1.1.1
  * @see ApplicationContextAware
  */
+// 20201212 ApplicationEventPublisher自觉接口
 public interface ApplicationEventPublisherAware extends Aware {
 
 	/**

@@ -17,7 +17,15 @@
 package org.springframework.core.metrics;
 
 /**
+ * 20201212
+ * A. 使用{@link startupbesteps}指令应用程序启动阶段
+ * B. 核心容器及其基础结构组件可以使用{@code applicationstartup}标记应用程序启动期间的步骤， 并收集有关执行上下文或其处理时间的数据。
+ */
+/**
+ * A.
  * Instruments the application startup phase using {@link StartupStep steps}.
+ *
+ * B.
  * <p>The core container and its infrastructure components can use the {@code ApplicationStartup}
  * to mark steps during the application startup and collect data about the execution context
  * or their processing time.
@@ -25,8 +33,7 @@ package org.springframework.core.metrics;
  * @author Brian Clozel
  * @since 5.3
  */
-// 20201201 使用{@link startupbesteps}指令应用程序启动阶段。核心容器及其基础结构组件可以使用{@code applicationstartup}标记应用程序启动期间的步骤，
-// 20201201 并收集有关执行上下文或其处理时间的数据。
+// 20201212 应用程序启动收集器
 public interface ApplicationStartup {
 
 	/**

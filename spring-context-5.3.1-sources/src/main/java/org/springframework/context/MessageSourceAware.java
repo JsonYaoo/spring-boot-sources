@@ -19,9 +19,15 @@ package org.springframework.context;
 import org.springframework.beans.factory.Aware;
 
 /**
+ * 20201212
+ * A. 希望通过其运行在其中的MessageSource（通常是ApplicationContext）得到通知的任何对象所实现的接口。
+ */
+/**
+ * A.
  * Interface to be implemented by any object that wishes to be notified
  * of the MessageSource (typically the ApplicationContext) that it runs in.
  *
+ * B.
  * <p>Note that the MessageSource can usually also be passed on as bean
  * reference (to arbitrary bean properties or constructor arguments), because
  * it is defined as bean with name "messageSource" in the application context.
@@ -31,6 +37,7 @@ import org.springframework.beans.factory.Aware;
  * @since 1.1.1
  * @see ApplicationContextAware
  */
+// 20201212 MessageSource自觉接口
 public interface MessageSourceAware extends Aware {
 
 	/**

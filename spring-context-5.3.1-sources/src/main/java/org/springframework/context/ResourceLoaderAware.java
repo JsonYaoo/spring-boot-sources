@@ -78,7 +78,7 @@ import org.springframework.core.io.ResourceLoader;
  * @see org.springframework.core.io.ResourceLoader
  * @see org.springframework.core.io.support.ResourcePatternResolver
  */
-// 20201204 替代完全ApplicationContext依赖项 -> 通过ApplicationContext得到通知的任何对象所要实现的接口
+// 20201204 资源加载器自觉接口: 替代完全ApplicationContext依赖项 -> 通过ApplicationContext得到通知的任何对象所要实现的接口
 public interface ResourceLoaderAware extends Aware {
 
 	/**

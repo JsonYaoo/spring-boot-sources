@@ -47,7 +47,7 @@ import org.springframework.beans.BeansException;
  * @see InitializingBean
  * @see org.springframework.context.ApplicationContextAware
  */
-// 20201207 知道BeanFactory接口, Aware beans自己的bean工厂
+// 20201207 BeanFactory自觉接口, Aware beans自己的bean工厂
 public interface BeanFactoryAware extends Aware {
 
 	/**

@@ -40,12 +40,13 @@ import org.springframework.util.StringValueResolver;
  * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#getBeanExpressionResolver()
  * @see org.springframework.beans.factory.config.EmbeddedValueResolver
  */
-// 20201202 该接口由任何希望收到{@code StringValueResolver}通知的对象实现
+// 20201202 嵌入式值处理器自觉接口: 该接口由任何希望收到{@code StringValueResolver}通知的对象实现
 public interface EmbeddedValueResolverAware extends Aware {
 
 	/**
 	 * Set the StringValueResolver to use for resolving embedded definition values.
 	 */
+	// 20201212 设置StringValueResolver以用于解析嵌入式定义值。
 	void setEmbeddedValueResolver(StringValueResolver resolver);
 
 }

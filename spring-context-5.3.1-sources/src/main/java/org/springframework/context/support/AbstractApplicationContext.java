@@ -636,17 +636,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			// 20201210 创建新步骤并标记其开始, 步骤名称描述当前操作或阶段 -> "spring.context.refresh"
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
-			// Prepare this context for refreshing.
-			// 20201210 准备此上下文以进行刷新，设置其启动日期和活动标志以及执行属性源的任何初始化
-			// 20201210 切换到活动状态、初始化上下文环境中的所有占位符属性源、验证是否存在{@link #setRequiredProperties}指定的每个属性、收集早期的ApplicationEvent
+			// Prepare this context for refreshing. // 20201212 备此上下文以进行刷新，设置其启动日期和活动标志以及执行属性源的任何初始化
+			// 20201212 切换到活动状态、初始化上下文环境中的所有占位符属性源、验证是否存在必要属性、收集早期的ApplicationEvent
 			prepareRefresh();
 
-			// Tell the subclass to refresh the internal bean factory.
-			// 20201210 告诉子类刷新内部BeanFactory -> 子类将创建一个新的BeanFactory并保留对其的引用，或者返回它持有的单个BeanFactory实例
+			// Tell the subclass to refresh the internal bean factory. // 20201212 告诉子类刷新内部BeanFactory
+			// 20201212 获取在GenericApplicationContext注册的DefaultListableBeanFactory
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
-			// 20201210 准备在这种情况下使用的bean工厂。
+			// 20201212 准备beanFactory: BeanClassLoader、BeanExpressionResolver、PropertyEditorRegistrar、BeanPostProcessor、注册"environment"、"systemProperties"、"systemEnvironment"、"applicationStartup"单例
 			prepareBeanFactory(beanFactory);
 
 			try {
@@ -809,6 +808,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		// Tell the internal bean factory to use the context's class loader etc.
 		// 20201210 告诉内部bean工厂使用上下文的类加载器等。
+		// 20201212 设置类加载器以用于加载bean类, 默认值为线程上下文类加载器 -> Bean定义仅带有Bean类名
 		beanFactory.setBeanClassLoader(getClassLoader());
 
 		// 20201210 需要初始化SpEL基础架构
@@ -822,45 +822,76 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 		// Configure the bean factory with context callbacks.
 		// 20201210 使用上下文回调配置bean工厂。
-		// 20201210 添加一个新的上下文加工后处理器BeanPostProcessor，它将应用于该工厂创建的bean。 在出厂配置期间调用
+		// 20201210 添加一个新的上下文加工后处理器BeanPostProcessor，它将应用于该工厂创建的bean。 在出厂配置期间调用 -> 属于BeanPostProcessor
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 
 		// 20201210 忽略给定的依赖接口进行自动装配 -> 应用程序上下文通常会使用它来注册以其他方式解决的依赖关系
+		// 20201212 beanFactory忽略 环境自觉接口 的自动装配
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
+
+		// 20201212 beanFactory忽略 嵌入式值处理器自觉接口 的自动装配
 		beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
+
+		// 20201212 beanFactory忽略 资源加载器自觉接口 的自动装配
 		beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);
+
+		// 20201212 beanFactory忽略 ApplicationEventPublisher自觉接口 的自动装配
 		beanFactory.ignoreDependencyInterface(ApplicationEventPublisherAware.class);
+
+		// 20201212 beanFactory忽略 MessageSource自觉接口 的自动装配
 		beanFactory.ignoreDependencyInterface(MessageSourceAware.class);
+
+		// 20201212 beanFactory忽略 ApplicationContext自觉接口 的自动装配
 		beanFactory.ignoreDependencyInterface(ApplicationContextAware.class);
+
+		// 20201212 beanFactory忽略 应用程序启动收集器 的自动装配
 		beanFactory.ignoreDependencyInterface(ApplicationStartup.class);
 
 		// BeanFactory interface not registered as resolvable type in a plain factory.
 		// MessageSource registered (and found for autowiring) as a bean.
+		// 20201212 BeanFactory接口未在普通工厂中注册为可解析类型。 MessageSource注册为Bean（并发现用于自动装配）。
+		// 20201212 在beanFactory中注册一个BeanFactory类型, 值为当前beanFactory
 		beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
+
+		// 20201212 在beanFactory中注册一个ResourceLoader类型, 值为当前beanFactory
 		beanFactory.registerResolvableDependency(ResourceLoader.class, this);
+
+		// 20201212 在beanFactory中注册一个ApplicationEventPublisher类型, 值为当前beanFactory
 		beanFactory.registerResolvableDependency(ApplicationEventPublisher.class, this);
+
+		// 20201212 在beanFactory中注册一个ApplicationContext类型, 值为当前beanFactory
 		beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 
 		// Register early post-processor for detecting inner beans as ApplicationListeners.
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found.
+		// 20201212 如果发现LoadTimeWeaver，请准备编织。
 		if (!IN_NATIVE_IMAGE && beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) {
 			beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));
 			// Set a temporary ClassLoader for type matching.
+			// 202012212 设置一个临时的ClassLoader以进行类型匹配。
 			beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
 		}
 
 		// Register default environment beans.
+		// 20201212 注册默认环境bean。
+		// 20201212 如果beanFactory中不包含"environment", 则注册"environment"单例
 		if (!beanFactory.containsLocalBean(ENVIRONMENT_BEAN_NAME)) {
 			beanFactory.registerSingleton(ENVIRONMENT_BEAN_NAME, getEnvironment());
 		}
+
+		// 20201212 如果beanFactory中不包含"systemProperties", 则注册"systemProperties"单例
 		if (!beanFactory.containsLocalBean(SYSTEM_PROPERTIES_BEAN_NAME)) {
 			beanFactory.registerSingleton(SYSTEM_PROPERTIES_BEAN_NAME, getEnvironment().getSystemProperties());
 		}
+
+		// 20201212 如果beanFactory中不包含"systemEnvironment", 则注册"systemEnvironment"单例
 		if (!beanFactory.containsLocalBean(SYSTEM_ENVIRONMENT_BEAN_NAME)) {
 			beanFactory.registerSingleton(SYSTEM_ENVIRONMENT_BEAN_NAME, getEnvironment().getSystemEnvironment());
 		}
+
+		// 20201212 如果beanFactory中不包含"applicationStartup", 则注册"applicationStartup"单例
 		if (!beanFactory.containsLocalBean(APPLICATION_STARTUP_BEAN_NAME)) {
 			beanFactory.registerSingleton(APPLICATION_STARTUP_BEAN_NAME, getApplicationStartup());
 		}

@@ -70,7 +70,7 @@ import org.springframework.lang.Nullable;
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
  */
-// 20201210 工厂挂钩，允许自定义修改新bean实例
+// 20201210 BeanPostProcessor：允许自定义修改新bean实例, 在Bean生产之前或者之后
 public interface BeanPostProcessor {
 
 	/**

@@ -26,14 +26,23 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 20201212
+ * A. {@link org.springframework.beans.factory.config.BeanPostProcessor}实现，它将上下文的默认{@link LoadTimeWeaver}传递给实现{@link LoadTimeWeaverAware}接口的bean。
+ * B. {@link org.springframework.context.ApplicationContext应用程序上下文}会自动在其基础{@link BeanFactory bean factory}中进行注册，前提是实际上可以使用默认的{@code LoadTimeWeaver}。
+ * C. 应用程序不应直接使用此类。
+ */
+/**
+ * A.
  * {@link org.springframework.beans.factory.config.BeanPostProcessor}
  * implementation that passes the context's default {@link LoadTimeWeaver}
  * to beans that implement the {@link LoadTimeWeaverAware} interface.
  *
+ * B.
  * <p>{@link org.springframework.context.ApplicationContext Application contexts}
  * will automatically register this with their underlying {@link BeanFactory bean factory},
  * provided that a default {@code LoadTimeWeaver} is actually available.
  *
+ * C.
  * <p>Applications should not use this class directly.
  *
  * @author Juergen Hoeller
@@ -41,6 +50,7 @@ import org.springframework.util.Assert;
  * @see LoadTimeWeaverAware
  * @see org.springframework.context.ConfigurableApplicationContext#LOAD_TIME_WEAVER_BEAN_NAME
  */
+// 2020 加载时间自觉接口处理器
 public class LoadTimeWeaverAwareProcessor implements BeanPostProcessor, BeanFactoryAware {
 
 	@Nullable

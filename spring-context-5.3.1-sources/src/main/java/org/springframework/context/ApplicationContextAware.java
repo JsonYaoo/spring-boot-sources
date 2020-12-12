@@ -73,7 +73,7 @@ import org.springframework.beans.factory.Aware;
  * @see org.springframework.context.support.ApplicationObjectSupport
  * @see org.springframework.beans.factory.BeanFactoryAware
  */
-// 20201210 希望由其运行在其中的{@link ApplicationContext}通知的任何对象所实现的接口 -> 当对象需要访问一组协作bean时，实现此接口就很有意义
+// 20201210 ApplicationContext自觉接口: 希望由其运行在其中的{@link ApplicationContext}通知的任何对象所实现的接口 -> 当对象需要访问一组协作bean时，实现此接口就很有意义
 public interface ApplicationContextAware extends Aware {
 
 	/**

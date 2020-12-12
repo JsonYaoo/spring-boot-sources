@@ -40,7 +40,7 @@ package org.springframework.beans.factory;
  * @author Juergen Hoeller
  * @since 3.1
  */
-// 20201204 一个标记超接口，指示bean有资格通过回调样式的方法由Spring容器通知特定的框架对象。
+// 20201204 自觉接口: 一个标记超接口，指示bean有资格通过回调样式的方法由Spring容器通知特定的框架对象。
 public interface Aware {
 
 }

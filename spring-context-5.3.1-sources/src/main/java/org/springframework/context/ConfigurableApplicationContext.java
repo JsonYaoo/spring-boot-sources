@@ -83,24 +83,28 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * Name of the {@link Environment} bean in the factory.
 	 * @since 3.1
 	 */
+	// 20201212 工厂中{@link Environment} bean的名称。
 	String ENVIRONMENT_BEAN_NAME = "environment";
 
 	/**
 	 * Name of the System properties bean in the factory.
 	 * @see java.lang.System#getProperties()
 	 */
+	// 20201212 工厂中系统属性Bean的名称。
 	String SYSTEM_PROPERTIES_BEAN_NAME = "systemProperties";
 
 	/**
 	 * Name of the System environment bean in the factory.
 	 * @see java.lang.System#getenv()
 	 */
+	// 20201212 工厂中系统环境bean的名称。
 	String SYSTEM_ENVIRONMENT_BEAN_NAME = "systemEnvironment";
 
 	/**
 	 * Name of the {@link ApplicationStartup} bean in the factory.
 	 * @since 5.3
 	 */
+	// 20201212 工厂中{@link ApplicationStartup} bean的名称。
 	String APPLICATION_STARTUP_BEAN_NAME = "applicationStartup";
 
 	/**
