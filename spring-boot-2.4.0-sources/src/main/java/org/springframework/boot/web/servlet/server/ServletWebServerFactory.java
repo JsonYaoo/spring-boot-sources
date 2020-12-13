@@ -30,6 +30,8 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
 public interface ServletWebServerFactory {
 
 	/**
+	 * // 20201213 获取一个新的完全配置但暂停的{@link WebServer}实例。 在调用{@link WebServer＃start（）}之前（在完全刷新{@code ApplicationContext}之后，
+	 *    客户端才应该能够连接到返回的服务器）。
 	 * Gets a new fully configured but paused {@link WebServer} instance. Clients should
 	 * not be able to connect to the returned server until {@link WebServer#start()} is
 	 * called (which happens when the {@code ApplicationContext} has been fully
@@ -39,6 +41,7 @@ public interface ServletWebServerFactory {
 	 * @return a fully configured and started {@link WebServer}
 	 * @see WebServer#stop()
 	 */
+	// 20201213 获取一个新的完全配置但暂停的{@link WebServer}实例
 	WebServer getWebServer(ServletContextInitializer... initializers);
 
 }

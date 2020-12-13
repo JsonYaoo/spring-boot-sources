@@ -171,23 +171,45 @@ public interface ListableBeanFactory extends BeanFactory {
 	String[] getBeanNamesForType(ResolvableType type);
 
 	/**
+	 * 20201213
+	 * A. 根据FactoryBeans的bean定义或{@code getObjectType}的值判断，返回与给定类型（包括子类）匹配的bean名称。
+	 * B. 注意：此方法仅自检顶级bean。 它不检查可能也与指定类型匹配的嵌套bean。
+	 * C. 如果设置了“ allowEagerInit”标志，是否考虑了FactoryBeans创建的对象，这意味着将初始化FactoryBeans。 如果由FactoryBean创建的对象不匹配，则原始FactoryBean本身将与该类型匹配。
+	 *    如果未设置“ allowEagerInit”，则仅检查原始FactoryBean（不需要初始化每个FactoryBean）。
+	 * D. 不考虑该工厂可能参与的任何层次结构。也可以使用BeanFactoryUtils的{@code beanNamesForTypeIn includedAncestors}将Bean包括在祖先工厂中。
+	 * E. 注意：不要忽略通过bean定义以外的其他方式注册的单例bean。
+	 * F. 此方法返回的Bean名称应始终尽可能按后端配置中定义的顺序返回Bean名称。
+	 */
+	/**
+	 * A.
 	 * Return the names of beans matching the given type (including subclasses),
 	 * judging from either bean definitions or the value of {@code getObjectType}
 	 * in the case of FactoryBeans.
+	 *
+	 * B.
 	 * <p><b>NOTE: This method introspects top-level beans only.</b> It does <i>not</i>
 	 * check nested beans which might match the specified type as well.
+	 *
+	 * C.
 	 * <p>Does consider objects created by FactoryBeans if the "allowEagerInit" flag is set,
 	 * which means that FactoryBeans will get initialized. If the object created by the
 	 * FactoryBean doesn't match, the raw FactoryBean itself will be matched against the
 	 * type. If "allowEagerInit" is not set, only raw FactoryBeans will be checked
 	 * (which doesn't require initialization of each FactoryBean).
+	 *
+	 * D.
 	 * <p>Does not consider any hierarchy this factory may participate in.
 	 * Use BeanFactoryUtils' {@code beanNamesForTypeIncludingAncestors}
 	 * to include beans in ancestor factories too.
+	 *
+	 * E.
 	 * <p>Note: Does <i>not</i> ignore singleton beans that have been registered
 	 * by other means than bean definitions.
+	 *
+	 * F.
 	 * <p>Bean names returned by this method should always return bean names <i>in the
 	 * order of definition</i> in the backend configuration, as far as possible.
+	 *
 	 * @param type the generically typed class or interface to match
 	 * @param includeNonSingletons whether to include prototype or scoped beans too
 	 * or just singletons (also applies to FactoryBeans)
@@ -202,6 +224,7 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @see FactoryBean#getObjectType
 	 * @see BeanFactoryUtils#beanNamesForTypeIncludingAncestors(ListableBeanFactory, ResolvableType, boolean, boolean)
 	 */
+	// 20201213 根据FactoryBeans的bean定义或{@code getObjectType}的值判断，返回与给定类型（包括子类）匹配的bean名称。
 	String[] getBeanNamesForType(ResolvableType type, boolean includeNonSingletons, boolean allowEagerInit);
 
 	/**

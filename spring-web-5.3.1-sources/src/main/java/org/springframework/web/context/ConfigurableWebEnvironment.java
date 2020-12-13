@@ -37,6 +37,8 @@ import org.springframework.lang.Nullable;
 public interface ConfigurableWebEnvironment extends ConfigurableEnvironment {
 
 	/**
+	 * // 20201213 替换任何{@linkplain org.springframework.core.env.PropertySource.StubPropertySource stub属性source实例使用给定的参数充当具有
+	 *   实际servlet上下文/配置属性源的占位符。
 	 * Replace any {@linkplain
 	 * org.springframework.core.env.PropertySource.StubPropertySource stub property source}
 	 * instances acting as placeholders with real servlet context/config property sources
@@ -46,6 +48,7 @@ public interface ConfigurableWebEnvironment extends ConfigurableEnvironment {
 	 * @see org.springframework.web.context.support.WebApplicationContextUtils#initServletPropertySources(
 	 * org.springframework.core.env.MutablePropertySources, ServletContext, ServletConfig)
 	 */
+	// 20201213 替换任何StubPropertySource属性, 使用给定的参数充当具有实际servlet上下文/配置属性源的占位符
 	void initPropertySources(@Nullable ServletContext servletContext, @Nullable ServletConfig servletConfig);
 
 }

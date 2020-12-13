@@ -624,6 +624,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	/**
 	 * Return the list of statically specified ApplicationListeners.
 	 */
+	// 20201213 返回静态指定的ApplicationListeners列表。
 	public Collection<ApplicationListener<?>> getApplicationListeners() {
 		return this.applicationListeners;
 	}
@@ -650,7 +651,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses. // 20201210 允许在上下文子类中对bean工厂进行后处理。
-				// 20201212 【重点】BeanFactory处理(Springboot扩展): 注册ServletContextAwareProcessor、扫描并注册包路径下的BeanDefinition
+				// 20201212 【重点】BeanFactory处理【Springboot扩展】: 注册ServletContextAwareProcessor、扫描并注册包路径下的BeanDefinition
 				postProcessBeanFactory(beanFactory);
 
 				// 20201210 创建新步骤并标记其开始, 步骤名称描述当前操作或阶段 -> "spring.context.beans.post-process"
@@ -667,16 +668,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				// 20201212 BeanFactoryPostProcessors执行完毕, BeanPostProcessors注册完毕
 				beanPostProcess.end();
 
-				// Initialize message source for this context.
-				// 20201210 为此上下文初始化消息源。
+				// Initialize message source for this context. // 20201210 为此上下文初始化消息源
+				// 20201210 初始化MessageSource, 如果在此上下文中未定义父项，则使用父项: 国际化操作
 				initMessageSource();
 
-				// Initialize event multicaster for this context.
-				// 20201210 为此上下文初始化事件多播器。
+				// Initialize event multicaster for this context. // 20201210 为此上下文初始化事件多播器。
+				// 20201213 初始化ApplicationEventMulticaster。 如果上下文中未定义，则使用SimpleApplicationEventMulticaster。
 				initApplicationEventMulticaster();
 
-				// Initialize other special beans in specific context subclasses.
-				// 20201210 在特定上下文子类中初始化其他特殊bean。
+				// Initialize other special beans in specific context subclasses. // 20201210 在特定上下文子类中初始化其他特殊bean。
+				// 20201213 【Springboot扩展】【Tomcat源码】 启动Tomcat服务器, 替换与{@code Servlet}相关的属性源
 				onRefresh();
 
 				// Check for listener beans and register them.
@@ -965,16 +966,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * Initialize the MessageSource.
 	 * Use parent's if none defined in this context.
 	 */
+	// 20201213 初始化MessageSource。 如果在此上下文中未定义父项，则使用父项。
 	protected void initMessageSource() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 		if (beanFactory.containsLocalBean(MESSAGE_SOURCE_BEAN_NAME)) {
 			this.messageSource = beanFactory.getBean(MESSAGE_SOURCE_BEAN_NAME, MessageSource.class);
-			// Make MessageSource aware of parent MessageSource.
+			// Make MessageSource aware of parent MessageSource. // 20201213 使MessageSource了解父MessageSource。
 			if (this.parent != null && this.messageSource instanceof HierarchicalMessageSource) {
 				HierarchicalMessageSource hms = (HierarchicalMessageSource) this.messageSource;
 				if (hms.getParentMessageSource() == null) {
 					// Only set parent context as parent MessageSource if no parent MessageSource
-					// registered already.
+					// registered already. // 20201213 如果尚未注册父MessageSource，则仅将父上下文设置为父MessageSource。
 					hms.setParentMessageSource(getInternalParentMessageSource());
 				}
 			}
@@ -983,7 +985,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			}
 		}
 		else {
-			// Use empty MessageSource to be able to accept getMessage calls.
+			// Use empty MessageSource to be able to accept getMessage calls. // 20201213 使用空的MessageSource可以接受getMessage调用。
 			DelegatingMessageSource dms = new DelegatingMessageSource();
 			dms.setParentMessageSource(getInternalParentMessageSource());
 			this.messageSource = dms;
@@ -999,6 +1001,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * Uses SimpleApplicationEventMulticaster if none defined in the context.
 	 * @see org.springframework.context.event.SimpleApplicationEventMulticaster
 	 */
+	// 20201213 初始化ApplicationEventMulticaster。 如果上下文中未定义，则使用SimpleApplicationEventMulticaster。
 	protected void initApplicationEventMulticaster() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
@@ -1047,34 +1050,47 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 	/**
+	 * 20201213
+	 * A. 可以重写的模板方法以添加特定于上下文的刷新工作。 在实例化单例之前，调用特殊bean的初始化。
+	 * B. 此实现为空。
+	 */
+	/**
+	 * A.
 	 * Template method which can be overridden to add context-specific refresh work.
 	 * Called on initialization of special beans, before instantiation of singletons.
+	 *
+	 * B.
 	 * <p>This implementation is empty.
 	 * @throws BeansException in case of errors
 	 * @see #refresh()
 	 */
 	protected void onRefresh() throws BeansException {
-		// For subclasses: do nothing by default.
+		// For subclasses: do nothing by default. // 20201213 对于子类：默认情况下不执行任何操作。
 	}
 
 	/**
 	 * Add beans that implement ApplicationListener as listeners.
 	 * Doesn't affect other listeners, which can be added without being beans.
 	 */
+	// 20201213 添加将ApplicationListener实现为侦听器的bean。 不会影响其他侦听器，可以将它们添加为非bean。
 	protected void registerListeners() {
-		// Register statically specified listeners first.
+		// Register statically specified listeners first. // 20201213 首先注册静态指定的侦听器。
 		for (ApplicationListener<?> listener : getApplicationListeners()) {
+			// 20201213 添加一个侦听器以通知所有事件。
 			getApplicationEventMulticaster().addApplicationListener(listener);
 		}
 
+		// 20201213 不要在这里初始化FactoryBeans：我们需要保留所有未初始化的常规bean，以便后处理器对其应用！
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let post-processors apply to them!
+		// 20201213 根据ApplicationListener判断，返回与给定类型（包括子类）匹配的bean名称。
 		String[] listenerBeanNames = getBeanNamesForType(ApplicationListener.class, true, false);
 		for (String listenerBeanName : listenerBeanNames) {
+			// 20201213 添加一个侦听器bean，以通知所有事件。
 			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);
 		}
 
-		// Publish early application events now that we finally have a multicaster...
+		// Publish early application events now that we finally have a multicaster... // 20201213 现在我们终于有了多播器，可以发布早期的应用程序事件。
 		Set<ApplicationEvent> earlyEventsToProcess = this.earlyApplicationEvents;
 		this.earlyApplicationEvents = null;
 		if (!CollectionUtils.isEmpty(earlyEventsToProcess)) {
@@ -1390,14 +1406,26 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 	/**
+	 * 20201213
+	 * A. 断言该上下文的BeanFactory当前处于活动状态，如果不是，则抛出{@link IllegalStateException}。
+	 * B. 由所有依赖于活动上下文的{@link BeanFactory}委派方法调用，特别是所有bean访问器方法。
+	 * C. 默认实现会整体检查此上下文的{@link #isActive（）'active'}状态。 如果更具体的检查，或者如果{@link #getBeanFactory（）}本身在这种情况下引发异常，则可能会被覆盖以禁止操作。
+	 */
+	/**
+	 * A.
 	 * Assert that this context's BeanFactory is currently active,
 	 * throwing an {@link IllegalStateException} if it isn't.
+	 *
+	 * B.
 	 * <p>Invoked by all {@link BeanFactory} delegation methods that depend
 	 * on an active context, i.e. in particular all bean accessor methods.
+	 *
+	 * C.
 	 * <p>The default implementation checks the {@link #isActive() 'active'} status
 	 * of this context overall. May be overridden for more specific checks, or for a
 	 * no-op if {@link #getBeanFactory()} itself throws an exception in such a case.
 	 */
+	// 20201213 断言该上下文的BeanFactory当前处于活动状态
 	protected void assertBeanFactoryActive() {
 		if (!this.active.get()) {
 			if (this.closed.get()) {
@@ -1542,9 +1570,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		return getBeanFactory().getBeanNamesForType(type);
 	}
 
+	// 20201213 根据FactoryBeans的bean定义或{@code getObjectType}的值判断，返回与给定类型（包括子类）匹配的bean名称。
 	@Override
 	public String[] getBeanNamesForType(ResolvableType type, boolean includeNonSingletons, boolean allowEagerInit) {
+		// 20201213 断言该上下文的BeanFactory当前处于活动状态
 		assertBeanFactoryActive();
+
+		// 20201213 根据FactoryBeans的bean定义或{@code getObjectType}的值判断，返回与给定类型（包括子类）匹配的bean名称。
 		return getBeanFactory().getBeanNamesForType(type, includeNonSingletons, allowEagerInit);
 	}
 
@@ -1554,9 +1586,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 		return getBeanFactory().getBeanNamesForType(type);
 	}
 
+	// 20201213 断言该上下文的BeanFactory当前处于活动状态
 	@Override
 	public String[] getBeanNamesForType(@Nullable Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
 		assertBeanFactoryActive();
+		// 20201213 根据FactoryBeans的bean定义或{@code getObjectType}的值判断，返回与给定类型（包括子类）匹配的bean名称。
 		return getBeanFactory().getBeanNamesForType(type, includeNonSingletons, allowEagerInit);
 	}
 

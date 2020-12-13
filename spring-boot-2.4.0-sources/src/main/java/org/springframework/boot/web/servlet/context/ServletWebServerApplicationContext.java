@@ -188,10 +188,13 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		}
 	}
 
+	// 20201213 可以重写的模板方法以添加特定于上下文的刷新工作
 	@Override
 	protected void onRefresh() {
+		// 20201213 初始化主题功能。
 		super.onRefresh();
 		try {
+			// 20201213 启动Web服务器, 替换与{@code Servlet}相关的属性源
 			createWebServer();
 		}
 		catch (Throwable ex) {
@@ -207,28 +210,37 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		super.doClose();
 	}
 
+	// 20201213 启动Web服务器, 替换与{@code Servlet}相关的属性源
 	private void createWebServer() {
 		WebServer webServer = this.webServer;
 		ServletContext servletContext = getServletContext();
 		if (webServer == null && servletContext == null) {
 			StartupStep createWebServer = this.getApplicationStartup().start("spring.boot.webserver.create");
+			// 20201213 【Tomcat源码】获取一个新的完全配置但暂停的{@link WebServer}实例
 			ServletWebServerFactory factory = getWebServerFactory();
 			createWebServer.tag("factory", factory.getClass().toString());
 			this.webServer = factory.getWebServer(getSelfInitializer());
 			createWebServer.end();
+
+			// 20201213 注册webServerGracefulShutdown单例
 			getBeanFactory().registerSingleton("webServerGracefulShutdown",
 					new WebServerGracefulShutdownLifecycle(this.webServer));
+
+			// 20201213 注册webServerStartStop单例
 			getBeanFactory().registerSingleton("webServerStartStop",
 					new WebServerStartStopLifecycle(this, this.webServer));
 		}
 		else if (servletContext != null) {
 			try {
+				// 20201213 使用初始化所需的所有Servlet，过滤器，侦听器上下文参数和属性配置给定的{@link ServletContext}。
 				getSelfInitializer().onStartup(servletContext);
 			}
 			catch (ServletException ex) {
 				throw new ApplicationContextException("Cannot initialize servlet context", ex);
 			}
 		}
+
+		// 20201213 替换与{@code Servlet}相关的属性源。
 		initPropertySources();
 	}
 
@@ -258,6 +270,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	 * @return the self initializer
 	 * @see #prepareWebApplicationContext(ServletContext)
 	 */
+	// 20201213 返回{@link ServletContextInitializer}，它将用于完成此{@link WebApplicationContext}的设置。
 	private org.springframework.boot.web.servlet.ServletContextInitializer getSelfInitializer() {
 		return this::selfInitialize;
 	}

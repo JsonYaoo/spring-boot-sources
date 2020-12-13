@@ -49,12 +49,14 @@ public interface ApplicationEventMulticaster {
 	 * Add a listener to be notified of all events.
 	 * @param listener the listener to add
 	 */
+	// 20201213 添加一个侦听器以通知所有事件。
 	void addApplicationListener(ApplicationListener<?> listener);
 
 	/**
 	 * Add a listener bean to be notified of all events.
 	 * @param listenerBeanName the name of the listener bean to add
 	 */
+	// 20201213 添加一个侦听器bean，以通知所有事件。
 	void addApplicationListenerBean(String listenerBeanName);
 
 	/**

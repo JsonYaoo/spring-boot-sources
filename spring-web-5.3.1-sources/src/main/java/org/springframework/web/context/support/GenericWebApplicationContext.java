@@ -193,6 +193,7 @@ public class GenericWebApplicationContext extends GenericApplicationContext impl
 	/**
 	 * Initialize the theme capability.
 	 */
+	// 20201213 初始化主题功能。
 	@Override
 	protected void onRefresh() {
 		this.themeSource = UiApplicationContextUtils.initThemeSource(this);
@@ -202,10 +203,12 @@ public class GenericWebApplicationContext extends GenericApplicationContext impl
 	 * {@inheritDoc}
 	 * <p>Replace {@code Servlet}-related property sources.
 	 */
+	// 20201213 替换与{@code Servlet}相关的属性源。
 	@Override
 	protected void initPropertySources() {
 		ConfigurableEnvironment env = getEnvironment();
 		if (env instanceof ConfigurableWebEnvironment) {
+			// 20201213 替换任何StubPropertySource属性, 使用给定的参数充当具有实际servlet上下文/配置属性源的占位符
 			((ConfigurableWebEnvironment) env).initPropertySources(this.servletContext, null);
 		}
 	}

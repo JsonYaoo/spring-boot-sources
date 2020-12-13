@@ -50,6 +50,7 @@ public interface ServletContextInitializer {
 	 * @throws ServletException if any call against the given {@code ServletContext}
 	 * throws a {@code ServletException}
 	 */
+	// 20201213 使用初始化所需的所有Servlet，过滤器，侦听器上下文参数和属性配置给定的{@link ServletContext}。
 	void onStartup(ServletContext servletContext) throws ServletException;
 
 }
