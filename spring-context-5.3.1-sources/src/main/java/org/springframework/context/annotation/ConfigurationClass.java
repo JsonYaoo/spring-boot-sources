@@ -163,6 +163,7 @@ final class ConfigurationClass {
 	 * @since 3.1.1
 	 * @see #getImportedBy()
 	 */
+	// 20201213 返回此配置类是通过{@ link Import}注册还是由于嵌套在另一个配置类中而自动注册。
 	public boolean isImported() {
 		return !this.importedBy.isEmpty();
 	}

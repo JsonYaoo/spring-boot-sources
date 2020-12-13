@@ -31,10 +31,18 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 20201213
+ * A. {@code BeanPostProcessor}用于检测实现{@code ApplicationListener}接口的bean。 这会捕获{@code getBeanNamesForType}和仅对顶级bean有效的相关操作无法可靠检测到的bean。
+ * B. 使用标准Java序列化，该后处理器不会作为{@code DisposableBeanAdapter}的一部分进行序列化。 但是，在使用替代序列化机制的情况下，
+ *    @code DisposableBeanAdapter.writeReplace}可能根本无法使用，因此我们将此后处理器的字段状态标记为{@code transient}。
+ */
+/**
+ * A.
  * {@code BeanPostProcessor} that detects beans which implement the {@code ApplicationListener}
  * interface. This catches beans that can't reliably be detected by {@code getBeanNamesForType}
  * and related operations which only work against top-level beans.
  *
+ * B.
  * <p>With standard Java serialization, this post-processor won't get serialized as part of
  * {@code DisposableBeanAdapter} to begin with. However, with alternative serialization
  * mechanisms, {@code DisposableBeanAdapter.writeReplace} might not get used at all, so we
@@ -43,6 +51,7 @@ import org.springframework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @since 4.3.4
  */
+// 202012103 用于检测实现{@code ApplicationListener}接口的BeanPostProcessor
 class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, MergedBeanDefinitionPostProcessor {
 
 	private static final Log logger = LogFactory.getLog(ApplicationListenerDetector.class);

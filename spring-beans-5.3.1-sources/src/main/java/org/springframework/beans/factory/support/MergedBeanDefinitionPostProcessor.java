@@ -19,11 +19,20 @@ package org.springframework.beans.factory.support;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
+ * 20201213
+ * A. 在运行时用于合并bean定义的后处理器回调接口。 {@link BeanPostProcessor}实现可以实现此子接口，以便对Spring {@code BeanFactory}用于创建bean实例的合并bean定义
+ *   （原始bean定义的已处理副本）进行后处理。
+ * B. {@link #postProcessMergedBeanDefinition}方法例如可以对bean定义进行内部检查，以便在对bean的实际实例进行后处理之前准备一些缓存的元数据。 还允许修改bean定义，
+ *    但只允许修改实际上用于并行修改的定义属性。 本质上，这仅适用于在{@link RootBeanDefinition}本身上定义的操作，而不适用于其基类的属性。
+ */
+/**
+ * A.
  * Post-processor callback interface for <i>merged</i> bean definitions at runtime.
  * {@link BeanPostProcessor} implementations may implement this sub-interface in order
  * to post-process the merged bean definition (a processed copy of the original bean
  * definition) that the Spring {@code BeanFactory} uses to create a bean instance.
  *
+ * B.
  * <p>The {@link #postProcessMergedBeanDefinition} method may for example introspect
  * the bean definition in order to prepare some cached metadata before post-processing
  * actual instances of a bean. It is also allowed to modify the bean definition but
@@ -35,6 +44,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * @since 2.5
  * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#getMergedBeanDefinition
  */
+// 20201213 BeanDefinition合并的BeanPostProcessor
 public interface MergedBeanDefinitionPostProcessor extends BeanPostProcessor {
 
 	/**

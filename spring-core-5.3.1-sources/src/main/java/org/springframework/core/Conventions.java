@@ -245,10 +245,15 @@ public final class Conventions {
 	}
 
 	/**
+	 * 20201212
+	 * 返回由给定的{@link Class}限定的属性名称。 例如，由{@link Class}'{@code com.myapp.SomeClass}'限定的属性名称'{@code foo}'将是'{@code com.myapp.SomeClass.foo}'
+	 */
+	/**
 	 * Return an attribute name qualified by the given enclosing {@link Class}.
 	 * For example the attribute name '{@code foo}' qualified by {@link Class}
 	 * '{@code com.myapp.SomeClass}' would be '{@code com.myapp.SomeClass.foo}'
 	 */
+	// 20201212 返回由给定的{@link Class}限定的属性名称
 	public static String getQualifiedAttributeName(Class<?> enclosingClass, String attributeName) {
 		Assert.notNull(enclosingClass, "'enclosingClass' must not be null");
 		Assert.notNull(attributeName, "'attributeName' must not be null");

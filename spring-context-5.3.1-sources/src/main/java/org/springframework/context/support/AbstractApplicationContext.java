@@ -650,19 +650,21 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses. // 20201210 允许在上下文子类中对bean工厂进行后处理。
-				// 20201212 BeanFactor后置处理: 注册ServletContextAwareProcessor、扫描并注册包路径下的BeanDefinitionHolder
+				// 20201212 【重点】BeanFactory处理(Springboot扩展): 注册ServletContextAwareProcessor、扫描并注册包路径下的BeanDefinition
 				postProcessBeanFactory(beanFactory);
 
 				// 20201210 创建新步骤并标记其开始, 步骤名称描述当前操作或阶段 -> "spring.context.beans.post-process"
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
 
-				// Invoke factory processors registered as beans in the context.
-				// 20201210 调用在上下文中注册为bean的工厂处理器。
+				// Invoke factory processors registered as beans in the context. // 20201210 调用在上下文中注册为bean的工厂处理器。
+				// 20201212 【重点】执行BeanDefinitionRegistryPostProcessor -> BeanFactoryPostProcessor: PriorityOrdered -> Ordered -> 其余优先级
 				invokeBeanFactoryPostProcessors(beanFactory);
 
-				// Register bean processors that intercept bean creation.
-				// 20201210 注册拦截Bean创建的Bean处理器。
+				// Register bean processors that intercept bean creation. // 20201210 注册拦截Bean创建的Bean处理器。
+				// 20201213 【重点】注册BeanPostProcessor: PriorityOrdered -> Ordered -> 其余优先级以及ApplicationListenerDetector
 				registerBeanPostProcessors(beanFactory);
+
+				// 20201212 BeanFactoryPostProcessors执行完毕, BeanPostProcessors注册完毕
 				beanPostProcess.end();
 
 				// Initialize message source for this context.
@@ -682,7 +684,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
-				// 20201210 实例化所有剩余的（非延迟初始化）单例。
+				// 20201210 【重点】实例化所有剩余的（非延迟初始化）单例。
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -913,27 +915,49 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	}
 
 	/**
+	 * 20201212
+	 * A. 实例化并调用所有注册的BeanFactoryPostProcessor Bean，并遵循显式顺序（如果给定）。
+	 * B. 必须在单例实例化之前调用。
+	 */
+	/**
+	 * A.
 	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,
 	 * respecting explicit order if given.
+	 *
+	 * B.
 	 * <p>Must be called before singleton instantiation.
 	 */
+	// 20201213 执行BeanDefinitionRegistryPostProcessor -> BeanFactoryPostProcessor: PriorityOrdered -> Ordered -> 其余优先级
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+		// 20201212 委托给PostProcessorRegistrationDelegate, 执行BeanDefinitionRegistryPostProcessor -> BeanFactoryPostProcessor: PriorityOrdered -> Ordered -> 其余优先级
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
+		// 20201212 检测LoadTimeWeaver并准备编织（如果在此期间发现）（例如，通过ConfigurationClassPostProcessor注册的@Bean方法）
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
 		// (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)
 		if (!IN_NATIVE_IMAGE && beanFactory.getTempClassLoader() == null && beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) {
+			// 20201212 beanFactory添加BeanPostProcessor: LoadTimeWeaverAwareProcessor
 			beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));
 			beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
 		}
 	}
 
 	/**
+	 * 20201213
+	 * A. 实例化并注册所有BeanPostProcessor Bean，并遵循显式顺序（如果有）。
+	 * B. 必须在应用程序bean的任何实例化之前调用。
+	 */
+	/**
+	 * A.
 	 * Instantiate and register all BeanPostProcessor beans,
 	 * respecting explicit order if given.
+	 *
+	 * B.
 	 * <p>Must be called before any instantiation of application beans.
 	 */
+	// 20201213 注册BeanPostProcessor: PriorityOrdered -> Ordered -> 其余优先级以及ApplicationListenerDetector
 	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+		// 20201213 注册BeanPostProcessor: PriorityOrdered -> Ordered -> 其余优先级以及ApplicationListenerDetector
 		PostProcessorRegistrationDelegate.registerBeanPostProcessors(beanFactory, this);
 	}
 
