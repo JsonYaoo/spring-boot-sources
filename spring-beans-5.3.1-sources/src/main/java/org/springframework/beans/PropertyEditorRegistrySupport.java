@@ -79,6 +79,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 20201213
+ * {@link PropertyEditorRegistry}接口的基本实现。 提供默认编辑器和自定义编辑器的管理。 主要用作{@link BeanWrapperImpl}的基类。
+ */
+/**
  * Base implementation of the {@link PropertyEditorRegistry} interface.
  * Provides management of default editors and custom editors.
  * Mainly serves as base class for {@link BeanWrapperImpl}.
@@ -91,6 +95,7 @@ import org.springframework.util.ClassUtils;
  * @see java.beans.PropertyEditorSupport#setAsText
  * @see java.beans.PropertyEditorSupport#setValue
  */
+// 20201213 属性注册编辑器支持: 提供默认编辑器和自定义编辑器的管理
 public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 
 	/**
@@ -128,6 +133,7 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 	 * Specify a Spring 3.0 ConversionService to use for converting
 	 * property values, as an alternative to JavaBeans PropertyEditors.
 	 */
+	// 20201213 指定一个Spring 3.0 ConversionService来转换属性值，以替代JavaBeans PropertyEditor。
 	public void setConversionService(@Nullable ConversionService conversionService) {
 		this.conversionService = conversionService;
 	}
@@ -154,12 +160,21 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 	}
 
 	/**
+	 * 20201213
+	 * A. 激活仅用于配置目的的配置值编辑器，例如{@link StringArrayPropertyEditor}。
+	 * B. 这些编辑器默认情况下不会被注册，原因仅在于它们通常不适用于数据绑定。 当然，无论如何，您都可以通过{@link #registerCustomEditor}分别注册它们。
+	 */
+	/**
+	 * A.
 	 * Activate config value editors which are only intended for configuration purposes,
 	 * such as {@link StringArrayPropertyEditor}.
+	 *
+	 * B.
 	 * <p>Those editors are not registered by default simply because they are in
 	 * general inappropriate for data binding purposes. Of course, you may register
 	 * them individually in any case, through {@link #registerCustomEditor}.
 	 */
+	// 20201213 激活仅用于配置目的的配置值编辑器
 	public void useConfigValueEditors() {
 		this.configValueEditorsActive = true;
 	}

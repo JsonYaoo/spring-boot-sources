@@ -74,11 +74,21 @@ import org.springframework.lang.Nullable;
 public interface BeanPostProcessor {
 
 	/**
+	 * 20201213
+	 * A. 在任何bean初始化回调（例如InitializingBean的{@code afterPropertiesSet}或自定义的初始化方法）之前，将此{@code BeanPostProcessor}应用于给定的新bean实例。
+	 *    该bean将已经用属性值填充。 返回的Bean实例可能是原始实例的包装。
+	 * B. 默认实现按原样返回给定的{@code bean}。
+	 */
+	/**
+	 * A.
 	 * Apply this {@code BeanPostProcessor} to the given new bean instance <i>before</i> any bean
 	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
 	 * or a custom init-method). The bean will already be populated with property values.
 	 * The returned bean instance may be a wrapper around the original.
+	 *
+	 * B.
 	 * <p>The default implementation returns the given {@code bean} as-is.
+	 *
 	 * @param bean the new bean instance
 	 * @param beanName the name of the bean
 	 * @return the bean instance to use, either the original or a wrapped one;
@@ -86,24 +96,42 @@ public interface BeanPostProcessor {
 	 * @throws BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 */
+	// 20201213 BeanPostProcessor: bean实例化后初始化前增强方法
 	@Nullable
 	default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
 
 	/**
+	 * 20201213
+	 * A. 在任何bean初始化回调（例如InitializingBean的{@code afterPropertiesSet}或自定义的初始化方法）之后，将此{@code BeanPostProcessor}应用于给定的新bean实例。
+	 *    该bean将已经用属性值填充。 返回的Bean实例可能是原始实例的包装。
+	 * B. 对于FactoryBean，将为FactoryBean实例和由FactoryBean创建的对象（从Spring 2.0开始）调用此回调。 后处理器可以通过相应的{@code bean instanceof FactoryBean}
+	 *    检查来决定是应用到FactoryBean还是创建的对象，还是两者都应用。
+	 * C. 与所有其他{@code BeanPostProcessor}回调相反，此回调还将在{@link InstantiationAwareBeanPostProcessor＃postProcessBeforeInstantiation}方法触发短路后被调用。
+	 * D. 默认实现按原样返回给定的{@code bean}。
+	 */
+	/**
+	 * A.
 	 * Apply this {@code BeanPostProcessor} to the given new bean instance <i>after</i> any bean
 	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
 	 * or a custom init-method). The bean will already be populated with property values.
 	 * The returned bean instance may be a wrapper around the original.
+	 *
+	 * B.
 	 * <p>In case of a FactoryBean, this callback will be invoked for both the FactoryBean
 	 * instance and the objects created by the FactoryBean (as of Spring 2.0). The
 	 * post-processor can decide whether to apply to either the FactoryBean or created
 	 * objects or both through corresponding {@code bean instanceof FactoryBean} checks.
+	 *
+	 * C.
 	 * <p>This callback will also be invoked after a short-circuiting triggered by a
 	 * {@link InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation} method,
 	 * in contrast to all other {@code BeanPostProcessor} callbacks.
+	 *
+	 * D.
 	 * <p>The default implementation returns the given {@code bean} as-is.
+	 *
 	 * @param bean the new bean instance
 	 * @param beanName the name of the bean
 	 * @return the bean instance to use, either the original or a wrapped one;
@@ -112,6 +140,7 @@ public interface BeanPostProcessor {
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 * @see org.springframework.beans.factory.FactoryBean
 	 */
+	// 20201213 BeanPostProcessor: bean实例化后初始化后增强方法
 	@Nullable
 	default Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;

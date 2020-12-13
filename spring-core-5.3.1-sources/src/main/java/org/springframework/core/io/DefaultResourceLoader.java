@@ -170,6 +170,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 	 * @since 5.0
 	 * @see #getResourceCache
 	 */
+	// 20201213 清除此资源加载器中的所有资源缓存
 	public void clearResourceCaches() {
 		this.resourceCaches.clear();
 	}

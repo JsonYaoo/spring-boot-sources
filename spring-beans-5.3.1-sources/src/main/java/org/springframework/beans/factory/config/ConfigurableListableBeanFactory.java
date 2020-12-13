@@ -184,6 +184,7 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory, Au
 	boolean isConfigurationFrozen();
 
 	/**
+	 * // 20201213 确保所有非延迟初始单例都实例化，同时考虑{@link org.springframework.beans.factory.FactoryBean FactoryBeans}。 如果需要，通常在工厂设置结束时调用。
 	 * Ensure that all non-lazy-init singletons are instantiated, also considering
 	 * {@link org.springframework.beans.factory.FactoryBean FactoryBeans}.
 	 * Typically invoked at the end of factory setup, if desired.
@@ -192,6 +193,7 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory, Au
 	 * Call {@link #destroySingletons()} for full cleanup in this case.
 	 * @see #destroySingletons()
 	 */
+	// 20201213 确保所有非延迟初始单例都实例化
 	void preInstantiateSingletons() throws BeansException;
 
 }

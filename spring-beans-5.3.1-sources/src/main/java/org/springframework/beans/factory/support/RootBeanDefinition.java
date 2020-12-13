@@ -60,6 +60,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	private AnnotatedElement qualifiedElement;
 
+	// 20201213 确定是否需要重新合并定义。
 	/** Determines if the definition needs to be re-merged. */
 	volatile boolean stale;
 
@@ -86,13 +87,16 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	volatile Method factoryMethodToIntrospect;
 
+	// 20201213 以下四个构造函数字段的通用锁。
 	/** Common lock for the four constructor fields below. */
 	final Object constructorArgumentLock = new Object();
 
+	// 20201213 程序包可见的字段，用于缓存已解析的构造函数或工厂方法。
 	/** Package-visible field for caching the resolved constructor or factory method. */
 	@Nullable
 	Executable resolvedConstructorOrFactoryMethod;
 
+	// 20201213 包可见的字段，用于标记构造函数参数为已解决。
 	/** Package-visible field that marks the constructor arguments as resolved. */
 	boolean constructorArgumentsResolved = false;
 
@@ -369,6 +373,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	 * (in which case the regular no-arg default constructor will be called)
 	 * @since 5.1
 	 */
+	// 20201213 确定用于默认构造的首选构造函数（如果有）。 如有必要，构造函数参数将自动装配。
 	@Nullable
 	public Constructor<?>[] getPreferredConstructors() {
 		return null;

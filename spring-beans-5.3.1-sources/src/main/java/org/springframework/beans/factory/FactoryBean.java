@@ -95,24 +95,40 @@ public interface FactoryBean<T> {
 	 */
 	String OBJECT_TYPE_ATTRIBUTE = "factoryBeanObjectType";
 
-
 	/**
+	 * 20201213
+	 * A. 返回此工厂管理的对象的实例（可能是共享的或独立的）。
+	 * B. 与{@link BeanFactory}一样，这允许同时支持Singleton和Prototype设计模式。
+	 * C. 如果在调用时尚未完全初始化此FactoryBean（例如，因为它包含在循环引用中），则抛出相应的{@link FactoryBeanNotInitializedException}。
+	 * D. 从Spring 2.0开始，FactoryBeans被允许返回{@code null}对象。 工厂会将其视为正常值使用； 在这种情况下，它将不再抛出FactoryBeanNotInitializedException。
+	 *    鼓励FactoryBean实现现在酌情自行抛出FactoryBeanNotInitializedException。
+	 */
+	/**
+	 * A.
 	 * Return an instance (possibly shared or independent) of the object
 	 * managed by this factory.
+	 *
+	 * B.
 	 * <p>As with a {@link BeanFactory}, this allows support for both the
 	 * Singleton and Prototype design pattern.
+	 *
+	 * C.
 	 * <p>If this FactoryBean is not fully initialized yet at the time of
 	 * the call (for example because it is involved in a circular reference),
 	 * throw a corresponding {@link FactoryBeanNotInitializedException}.
+	 *
+	 * D.
 	 * <p>As of Spring 2.0, FactoryBeans are allowed to return {@code null}
 	 * objects. The factory will consider this as normal value to be used; it
 	 * will not throw a FactoryBeanNotInitializedException in this case anymore.
 	 * FactoryBean implementations are encouraged to throw
 	 * FactoryBeanNotInitializedException themselves now, as appropriate.
+	 *
 	 * @return an instance of the bean (can be {@code null})
 	 * @throws Exception in case of creation errors
 	 * @see FactoryBeanNotInitializedException
 	 */
+	// 20201213 返回此工厂管理的对象的实例（可能是共享的或独立的）
 	@Nullable
 	T getObject() throws Exception;
 

@@ -51,9 +51,9 @@ import org.springframework.lang.Nullable;
 // 20201206 支持需要处理{@link FactoryBean}实例的单例注册表的基类, 用作{@link AbstractBeanFactory}的基类。
 public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanRegistry {
 
+	// 20201213 由FactoryBeans创建的单例对象的高速缓存：对象的FactoryBean名称。
 	/** Cache of singleton objects created by FactoryBeans: FactoryBean name to object. */
 	private final Map<String, Object> factoryBeanObjectCache = new ConcurrentHashMap<>(16);
-
 
 	/**
 	 * Determine the type for the given FactoryBean.
@@ -88,6 +88,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 * @return the object obtained from the FactoryBean,
 	 * or {@code null} if not available
 	 */
+	// 20201213 如果可以使用缓存形式，则从给定的FactoryBean获取要暴露的对象。 快速检查以最小化同步。
 	@Nullable
 	protected Object getCachedObjectForFactoryBean(String beanName) {
 		return this.factoryBeanObjectCache.get(beanName);
@@ -102,8 +103,10 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 * @throws BeanCreationException if FactoryBean object creation failed
 	 * @see FactoryBean#getObject()
 	 */
+	// 20201213 获取一个对象以从给定的FactoryBean中公开。
 	protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanName, boolean shouldPostProcess) {
 		if (factory.isSingleton() && containsSingleton(beanName)) {
+			// 20201213 从单例对象的高速缓存集合: bean名称到bean实例, 并上锁
 			synchronized (getSingletonMutex()) {
 				Object object = this.factoryBeanObjectCache.get(beanName);
 				if (object == null) {
@@ -141,6 +144,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 			}
 		}
 		else {
+			// 20201213 获取一个对象以从给定的FactoryBean中公开。
 			Object object = doGetObjectFromFactoryBean(factory, beanName);
 			if (shouldPostProcess) {
 				try {
@@ -162,6 +166,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 * @throws BeanCreationException if FactoryBean object creation failed
 	 * @see FactoryBean#getObject()
 	 */
+	// 20201213 获取一个对象以从给定的FactoryBean中公开。
 	private Object doGetObjectFromFactoryBean(FactoryBean<?> factory, String beanName) throws BeanCreationException {
 		Object object;
 		try {
@@ -175,6 +180,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 				}
 			}
 			else {
+				// 20201213 返回此工厂管理的对象的实例（可能是共享的或独立的）
 				object = factory.getObject();
 			}
 		}
@@ -185,6 +191,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 			throw new BeanCreationException(beanName, "FactoryBean threw exception on object creation", ex);
 		}
 
+		// 20201213 不接受尚未完全初始化的FactoryBean的null值：然后，许多FactoryBeans仅返回null。
 		// Do not accept a null value for a FactoryBean that's not fully
 		// initialized yet: Many FactoryBeans just return null then.
 		if (object == null) {

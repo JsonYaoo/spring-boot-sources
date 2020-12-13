@@ -170,19 +170,34 @@ public interface BeanFactory {
 	 */
 	String FACTORY_BEAN_PREFIX = "&";
 
-
 	/**
+	 * 20201213
+	 * A. 返回一个实例，该实例可以是指定bean的共享或独立的。
+	 * B. 该方法允许使用Spring BeanFactory替代Singleton或Prototype设计模式。 对于Singleton bean，调用者可以保留对返回对象的引用。
+	 * C. 将别名转换回相应的规范bean名称。
+	 * D. 将询问父工厂是否在该工厂实例中找不到该bean。
+	 */
+	/**
+	 * A.
 	 * Return an instance, which may be shared or independent, of the specified bean.
+	 *
+	 * B.
 	 * <p>This method allows a Spring BeanFactory to be used as a replacement for the
 	 * Singleton or Prototype design pattern. Callers may retain references to
 	 * returned objects in the case of Singleton beans.
+	 *
+	 * C.
 	 * <p>Translates aliases back to the corresponding canonical bean name.
+	 *
+	 * D.
 	 * <p>Will ask the parent factory if the bean cannot be found in this factory instance.
+	 *
 	 * @param name the name of the bean to retrieve
 	 * @return an instance of the bean
 	 * @throws NoSuchBeanDefinitionException if there is no bean with the specified name
 	 * @throws BeansException if the bean could not be obtained
 	 */
+	// 20201213 返回一个实例，该实例可以是指定bean的共享或独立的
 	Object getBean(String name) throws BeansException;
 
 	/**
@@ -220,9 +235,18 @@ public interface BeanFactory {
 	<T> T getBean(String name, Class<T> requiredType) throws BeansException;
 
 	/**
+	 * 20201213
+	 * A. 返回一个实例，该实例可以是指定bean的共享或独立的。
+	 * B. 允许指定显式构造函数自变量/工厂方法自变量，并覆盖Bean定义中指定的默认自变量（如果有）。
+	 */
+	/**
+	 * A.
 	 * Return an instance, which may be shared or independent, of the specified bean.
+	 *
+	 * B.
 	 * <p>Allows for specifying explicit constructor arguments / factory method arguments,
 	 * overriding the specified default arguments (if any) in the bean definition.
+	 *
 	 * @param name the name of the bean to retrieve
 	 * @param args arguments to use when creating a bean instance using explicit arguments
 	 * (only applied when creating a new instance as opposed to retrieving an existing one)
@@ -233,6 +257,7 @@ public interface BeanFactory {
 	 * @throws BeansException if the bean could not be created
 	 * @since 2.5
 	 */
+	// 20201213 返回一个实例，该实例可以是指定bean的共享或独立的
 	Object getBean(String name, Object... args) throws BeansException;
 
 	/**

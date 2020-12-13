@@ -695,6 +695,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/**
 	 * Return the bean names that this bean depends on.
 	 */
+	// 20201213 返回该bean依赖的bean名称。
 	@Override
 	@Nullable
 	public String[] getDependsOn() {
@@ -832,6 +833,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Return a callback for creating an instance of the bean, if any.
 	 * @since 5.0
 	 */
+	// 20201213 返回用于创建bean实例的回调（如果有）。
 	@Nullable
 	public Supplier<?> getInstanceSupplier() {
 		return this.instanceSupplier;
@@ -911,6 +913,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/**
 	 * Return a factory method, if any.
 	 */
+	// 20201213 返回工厂方法（如果有）。
 	@Override
 	@Nullable
 	public String getFactoryMethodName() {
@@ -1085,6 +1088,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Return whether this bean definition is 'synthetic', that is,
 	 * not defined by the application itself.
 	 */
+	// 20201213 返回此bean定义是否是“合成的”，即不是由应用程序本身定义的。
 	public boolean isSynthetic() {
 		return this.synthetic;
 	}
@@ -1196,7 +1200,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Checks for existence of a method with the specified name.
 	 * @throws BeanDefinitionValidationException in case of validation failure
 	 */
+	// 20201213 验证并准备为此bean定义的方法替代。 检查是否存在具有指定名称的方法。
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
+		// 20201213 检查查找方法是否存在，并确定其重载状态。
 		// Check that lookup methods exist and determine their overloaded status.
 		if (hasMethodOverrides()) {
 			getMethodOverrides().getOverrides().forEach(this::prepareMethodOverride);

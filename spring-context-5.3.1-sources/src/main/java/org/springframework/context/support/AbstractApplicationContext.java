@@ -164,6 +164,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * @see org.springframework.context.LifecycleProcessor
 	 * @see org.springframework.context.support.DefaultLifecycleProcessor
 	 */
+	// 20201213 工厂中LifecycleProcessor bean的名称。 如果没有提供，则使用DefaultLifecycleProcessor。
 	public static final String LIFECYCLE_PROCESSOR_BEAN_NAME = "lifecycleProcessor";
 
 	/**
@@ -684,12 +685,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				// 20201210 检查侦听器bean并注册它们。
 				registerListeners();
 
-				// Instantiate all remaining (non-lazy-init) singletons.
-				// 20201210 【重点】实例化所有剩余的（非延迟初始化）单例。
+				// Instantiate all remaining (non-lazy-init) singletons. // 20201210 实例化所有剩余的（非延迟初始化）单例。
+				// 20201213 【重点】完成此上下文的bean工厂的初始化，初始化所有剩余的单例bean
 				finishBeanFactoryInitialization(beanFactory);
 
-				// Last step: publish corresponding event.
-				// 20201210 最后一步：发布相应的事件。
+				// Last step: publish corresponding event. // 20201210 最后一步：发布相应的事件。
+				// 20201213 清除上下文级别的资源缓存、更新生命周期处理器、上下文刷新通知、发布ContextRefreshedEvent最终事件
 				finishRefresh();
 			}
 
@@ -700,24 +701,22 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 							"cancelling refresh attempt: " + ex);
 				}
 
-				// Destroy already created singletons to avoid dangling resources.
-				// 20201210 销毁已创建的单例以避免资源悬空。
+				// Destroy already created singletons to avoid dangling resources. // 20201210 销毁已创建的单例以避免资源悬空。
 				destroyBeans();
 
-				// Reset 'active' flag.
-				// 20201210 重置“有效”标志。
+				// Reset 'active' flag. // 20201210 重置“有效”标志。
+				// 20201213 取消此上下文的刷新尝试，在引发异常后重置{@code active}标志
 				cancelRefresh(ex);
 
-				// Propagate exception to caller.
-				// 20201210 将异常传播给调用方。
+				// Propagate exception to caller. // 20201210 将异常传播给调用方。
 				throw ex;
 			}
 
 			// 20201210 最后执行
 			finally {
+				// 20201210 在Spring的核心中重置常见的自省缓存，因为我们可能不再需要单例bean的元数据...
 				// Reset common introspection caches in Spring's core, since we
 				// might not ever need metadata for singleton beans anymore...
-				// 20201210 在Spring的核心中重置常见的自省缓存，因为我们可能不再需要单例bean的元数据...
 				// 20201210 重置Spring的公共反射元数据缓存，尤其是{@link ReflectionUtils}，{@ link AnnotationUtils}，{@ link ResolvableType}和{@link CachedIntrospectionResults}缓存。
 				resetCommonCaches();
 
@@ -1028,9 +1027,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * Uses DefaultLifecycleProcessor if none defined in the context.
 	 * @see org.springframework.context.support.DefaultLifecycleProcessor
 	 */
+	// 20201213 初始化LifecycleProcessor。 如果上下文中未定义，则使用DefaultLifecycleProcessor。
 	protected void initLifecycleProcessor() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 		if (beanFactory.containsLocalBean(LIFECYCLE_PROCESSOR_BEAN_NAME)) {
+			// 20201213 lifecycleProcessor: 实例化LifecycleProcessor.class
 			this.lifecycleProcessor =
 					beanFactory.getBean(LIFECYCLE_PROCESSOR_BEAN_NAME, LifecycleProcessor.class);
 			if (logger.isTraceEnabled()) {
@@ -1038,6 +1039,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			}
 		}
 		else {
+			// 20201213 {@link LifecycleProcessor}策略的默认实现。
 			DefaultLifecycleProcessor defaultProcessor = new DefaultLifecycleProcessor();
 			defaultProcessor.setBeanFactory(beanFactory);
 			this.lifecycleProcessor = defaultProcessor;
@@ -1104,14 +1106,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * Finish the initialization of this context's bean factory,
 	 * initializing all remaining singleton beans.
 	 */
+	// 20201213 完成此上下文的bean工厂的初始化，初始化所有剩余的单例bean。
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
-		// Initialize conversion service for this context.
+		// Initialize conversion service for this context. // 20201213 为此上下文初始化转换服务。
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(
 					beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
 		}
 
+		// 20201213 如果之前没有任何bean post-processor（例如，PropertyPlaceholderConfigurer Bean）进行注册，请注册默认的嵌入式值解析器：此时，主要用于注释属性值的解析。
 		// Register a default embedded value resolver if no bean post-processor
 		// (such as a PropertyPlaceholderConfigurer bean) registered any before:
 		// at this point, primarily for resolution in annotation attribute values.
@@ -1119,19 +1123,22 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
 
+		// 20201213 尽早初始化LoadTimeWeaverAware Bean，以便尽早注册其转换器。
 		// Initialize LoadTimeWeaverAware beans early to allow for registering their transformers early.
+		// 20201213 根据LoadTimeWeaverAware.class判断，返回与给定类型（包括子类）匹配的bean名称。
 		String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
 		for (String weaverAwareName : weaverAwareNames) {
+			// 20201213 返回一个实例，该实例可以是指定bean的共享或独立的
 			getBean(weaverAwareName);
 		}
 
-		// Stop using the temporary ClassLoader for type matching.
+		// Stop using the temporary ClassLoader for type matching. // 20201213 停止使用临时的ClassLoader进行类型匹配。
 		beanFactory.setTempClassLoader(null);
 
-		// Allow for caching all bean definition metadata, not expecting further changes.
+		// Allow for caching all bean definition metadata, not expecting further changes. // 20201213 允许缓存所有bean定义元数据，而不期望进一步的更改。
 		beanFactory.freezeConfiguration();
 
-		// Instantiate all remaining (non-lazy-init) singletons.
+		// Instantiate all remaining (non-lazy-init) singletons. // 20201213 实例化所有剩余的（非延迟初始化）单例。
 		beanFactory.preInstantiateSingletons();
 	}
 
@@ -1140,21 +1147,25 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * onRefresh() method and publishing the
 	 * {@link org.springframework.context.event.ContextRefreshedEvent}.
 	 */
+	// 20201213 完成此上下文的刷新，调用LifecycleProcessor的onRefresh（）方法并发布
 	@SuppressWarnings("deprecation")
 	protected void finishRefresh() {
-		// Clear context-level resource caches (such as ASM metadata from scanning).
+		// Clear context-level resource caches (such as ASM metadata from scanning). // 20201213 清除上下文级别的资源缓存（例如来自扫描的ASM元数据）。
 		clearResourceCaches();
 
-		// Initialize lifecycle processor for this context.
+		// Initialize lifecycle processor for this context. // 20201213 为此上下文初始化生命周期处理器。
+		// 20201213 初始化LifecycleProcessor。 如果上下文中未定义，则使用DefaultLifecycleProcessor。
 		initLifecycleProcessor();
 
-		// Propagate refresh to lifecycle processor first.
+		// Propagate refresh to lifecycle processor first. // 20201213 首先将刷新传播到生命周期处理器。
+		// 20201213 上下文刷新的通知，例如 用于自动启动组件。
 		getLifecycleProcessor().onRefresh();
 
-		// Publish the final event.
+		// Publish the final event. // 20201213 发布最终事件。
+		// 20201213 将ContextRefreshedEvent事件发布给所有侦听器
 		publishEvent(new ContextRefreshedEvent(this));
 
-		// Participate in LiveBeansView MBean, if active.
+		// Participate in LiveBeansView MBean, if active. // 20201213 如果活动，请参加LiveBeansView MBean。
 		if (!IN_NATIVE_IMAGE) {
 			LiveBeansView.registerApplicationContext(this);
 		}
@@ -1165,6 +1176,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * after an exception got thrown.
 	 * @param ex the exception that led to the cancellation
 	 */
+	// 20201213 取消此上下文的刷新尝试，在引发异常后重置{@code active}标志。
 	protected void cancelRefresh(BeansException ex) {
 		this.active.set(false);
 	}
@@ -1441,10 +1453,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	//---------------------------------------------------------------------
 	// Implementation of BeanFactory interface
 	//---------------------------------------------------------------------
-
+	// 20201213 返回一个实例，该实例可以是指定bean的共享或独立的
 	@Override
 	public Object getBean(String name) throws BeansException {
+		// 20201213 断言该上下文的BeanFactory当前处于活动状态
 		assertBeanFactoryActive();
+
+		// 20201213 返回一个实例，该实例可以是指定bean的共享或独立的
 		return getBeanFactory().getBean(name);
 	}
 

@@ -141,10 +141,13 @@ public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements
 	 * @since 4.3
 	 * @see #setWrappedInstance(Object)
 	 */
+	// 20201213 将一个bean实例设置为可容纳，而无需解包{@link java.util.Optional}。
 	public void setBeanInstance(Object object) {
 		this.wrappedObject = object;
 		this.rootObject = object;
 		this.typeConverterDelegate = new TypeConverterDelegate(this, this.wrappedObject);
+
+		// 20201213 将class设置为自省。 当目标对象更改时需要调用。
 		setIntrospectionClass(object.getClass());
 	}
 
@@ -159,6 +162,7 @@ public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements
 	 * Needs to be called when the target object changes.
 	 * @param clazz the class to introspect
 	 */
+	// 20201213 将class设置为自省。 当目标对象更改时需要调用。
 	protected void setIntrospectionClass(Class<?> clazz) {
 		if (this.cachedIntrospectionResults != null && this.cachedIntrospectionResults.getBeanClass() != clazz) {
 			this.cachedIntrospectionResults = null;

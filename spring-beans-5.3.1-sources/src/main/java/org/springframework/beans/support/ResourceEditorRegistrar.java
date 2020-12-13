@@ -82,11 +82,19 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 		this.propertyResolver = propertyResolver;
 	}
 
-
 	/**
+	 * 20201213
+	 * A. 使用以下资源编辑器填充给定的{@code registry}：
+	 *    ResourceEditor，InputStreamEditor，InputSourceEditor，FileEditor，URLEditor，URIEditor，ClassEditor，ClassArrayEditor。
+	 * B. 如果此注册商已配置了{@link ResourcePatternResolver}，则还将注册ResourceArrayPropertyEditor。
+	 */
+	/**
+	 * A.
 	 * Populate the given {@code registry} with the following resource editors:
 	 * ResourceEditor, InputStreamEditor, InputSourceEditor, FileEditor, URLEditor,
 	 * URIEditor, ClassEditor, ClassArrayEditor.
+	 *
+	 * B.
 	 * <p>If this registrar has been configured with a {@link ResourcePatternResolver},
 	 * a ResourceArrayPropertyEditor will be registered as well.
 	 * @see ResourceEditor
@@ -99,6 +107,7 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 	 * @see ClassArrayEditor
 	 * @see ResourceArrayPropertyEditor
 	 */
+	// 20201213 注册自定义注册表
 	@Override
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
 		ResourceEditor baseEditor = new ResourceEditor(this.resourceLoader, this.propertyResolver);

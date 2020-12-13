@@ -66,7 +66,15 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201213
+ * A. 代表解析构造函数和工厂方法。
+ * C. 通过参数匹配执行构造函数解析。
+ */
+/**
+ * A.
  * Delegate for resolving constructors and factory methods.
+ *
+ * B.
  * <p>Performs constructor resolution through argument matching.
  *
  * @author Juergen Hoeller
@@ -80,6 +88,7 @@ import org.springframework.util.StringUtils;
  * @see #instantiateUsingFactoryMethod
  * @see AbstractAutowireCapableBeanFactory
  */
+// 20201213 代表解析构造函数和工厂方法
 class ConstructorResolver {
 
 	private static final Object[] EMPTY_ARGS = new Object[0];
@@ -108,11 +117,18 @@ class ConstructorResolver {
 		this.logger = beanFactory.getLogger();
 	}
 
-
 	/**
+	 * 20201213
+	 * A. “自动装配构造函数”（按类型带有构造函数参数）的行为。 如果指定了显式构造函数自变量值，则将所有剩余自变量与Bean工厂中的Bean进行匹配时也适用。
+	 * B. 这对应于构造函数注入：在这种模式下，Spring Bean工厂能够托管需要基于构造函数的依赖关系解析的组件。
+	 */
+	/**
+	 * A.
 	 * "autowire constructor" (with constructor arguments by type) behavior.
 	 * Also applied if explicit constructor argument values are specified,
 	 * matching all remaining arguments with beans from the bean factory.
+	 *
+	 * B.
 	 * <p>This corresponds to constructor injection: In this mode, a Spring
 	 * bean factory is able to host components that expect constructor-based
 	 * dependency resolution.
@@ -121,12 +137,15 @@ class ConstructorResolver {
 	 * @param chosenCtors chosen candidate constructors (or {@code null} if none)
 	 * @param explicitArgs argument values passed in programmatically via the getBean method,
 	 * or {@code null} if none (-> use constructor argument values from bean definition)
-	 * @return a BeanWrapper for the new instance
+	 * @return a BeanWrapper for the new instance // 20201213 新实例的BeanWrapper
 	 */
+	// 20201213 “自动装配构造函数”（按类型带有构造函数参数）的行为
 	public BeanWrapper autowireConstructor(String beanName, RootBeanDefinition mbd,
 			@Nullable Constructor<?>[] chosenCtors, @Nullable Object[] explicitArgs) {
 
 		BeanWrapperImpl bw = new BeanWrapperImpl();
+
+		// 20201213 自定义ConversionService来转换属性值, 自定义注册表
 		this.beanFactory.initBeanWrapper(bw);
 
 		Constructor<?> constructorToUse = null;
@@ -141,7 +160,7 @@ class ConstructorResolver {
 			synchronized (mbd.constructorArgumentLock) {
 				constructorToUse = (Constructor<?>) mbd.resolvedConstructorOrFactoryMethod;
 				if (constructorToUse != null && mbd.constructorArgumentsResolved) {
-					// Found a cached constructor...
+					// Found a cached constructor... // 20201213 找到了一个缓存的构造函数...
 					argsToUse = mbd.resolvedConstructorArguments;
 					if (argsToUse == null) {
 						argsToResolve = mbd.preparedConstructorArguments;
@@ -149,16 +168,18 @@ class ConstructorResolver {
 				}
 			}
 			if (argsToResolve != null) {
+				// 20201213 解决存储在给定bean定义中的准备好的参数。
 				argsToUse = resolvePreparedArguments(beanName, mbd, bw, constructorToUse, argsToResolve, true);
 			}
 		}
 
 		if (constructorToUse == null || argsToUse == null) {
-			// Take specified constructors, if any.
+			// Take specified constructors, if any. // 20201213 采用指定的构造函数（如果有）。
 			Constructor<?>[] candidates = chosenCtors;
 			if (candidates == null) {
 				Class<?> beanClass = mbd.getBeanClass();
 				try {
+					// 20201213 获取Bean的构造函数
 					candidates = (mbd.isNonPublicAccessAllowed() ?
 							beanClass.getDeclaredConstructors() : beanClass.getConstructors());
 				}
@@ -173,16 +194,19 @@ class ConstructorResolver {
 				Constructor<?> uniqueCandidate = candidates[0];
 				if (uniqueCandidate.getParameterCount() == 0) {
 					synchronized (mbd.constructorArgumentLock) {
+						// 20201213 设置构造函数缓存
 						mbd.resolvedConstructorOrFactoryMethod = uniqueCandidate;
 						mbd.constructorArgumentsResolved = true;
 						mbd.resolvedConstructorArguments = EMPTY_ARGS;
 					}
+
+					// 20201213 将一个bean实例设置为可容纳，而无需解包{@link java.util.Optional}。
 					bw.setBeanInstance(instantiate(beanName, mbd, uniqueCandidate, EMPTY_ARGS));
 					return bw;
 				}
 			}
 
-			// Need to resolve the constructor.
+			// Need to resolve the constructor. // 20201213 需要解决构造函数。
 			boolean autowiring = (chosenCtors != null ||
 					mbd.getResolvedAutowireMode() == AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR);
 			ConstructorArgumentValues resolvedValues = null;
@@ -206,6 +230,7 @@ class ConstructorResolver {
 				int parameterCount = candidate.getParameterCount();
 
 				if (constructorToUse != null && argsToUse != null && argsToUse.length > parameterCount) {
+					// 20201213 已经发现可以满足的贪婪构造函数 -> 看起来不再赘述，只剩下更少的贪婪构造函数。
 					// Already found greedy constructor that can be satisfied ->
 					// do not look any further, there are only less greedy constructors left.
 					break;
@@ -241,6 +266,7 @@ class ConstructorResolver {
 					}
 				}
 				else {
+					// 20201213 给定的显式参数->参数长度必须完全匹配。
 					// Explicit arguments given -> arguments length must match exactly.
 					if (parameterCount != explicitArgs.length) {
 						continue;
@@ -250,6 +276,7 @@ class ConstructorResolver {
 
 				int typeDiffWeight = (mbd.isLenientConstructorResolution() ?
 						argsHolder.getTypeDifferenceWeight(paramTypes) : argsHolder.getAssignabilityWeight(paramTypes));
+				// 20201213 如果它代表最接近的匹配，请选择此构造函数。
 				// Choose this constructor if it represents the closest match.
 				if (typeDiffWeight < minTypeDiffWeight) {
 					constructorToUse = candidate;
@@ -292,6 +319,8 @@ class ConstructorResolver {
 		}
 
 		Assert.state(argsToUse != null, "Unresolved constructor arguments");
+
+		// 20201213 将一个bean实例设置为可容纳，而无需解包{@link java.util.Optional}。
 		bw.setBeanInstance(instantiate(beanName, mbd, constructorToUse, argsToUse));
 		return bw;
 	}
@@ -815,6 +844,7 @@ class ConstructorResolver {
 	/**
 	 * Resolve the prepared arguments stored in the given bean definition.
 	 */
+	// 20201213 解决存储在给定bean定义中的准备好的参数。
 	private Object[] resolvePreparedArguments(String beanName, RootBeanDefinition mbd, BeanWrapper bw,
 			Executable executable, Object[] argsToResolve, boolean fallback) {
 

@@ -51,6 +51,7 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @since 3.0
  */
+// 20201213 {@link LifecycleProcessor}策略的默认实现。
 public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactoryAware {
 
 	private final Log logger = LogFactory.getLog(getClass());

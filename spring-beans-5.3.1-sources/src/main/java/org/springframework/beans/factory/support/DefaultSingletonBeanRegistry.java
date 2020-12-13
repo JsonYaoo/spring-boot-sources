@@ -124,9 +124,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Map between containing bean names: bean name to Set of bean names that the bean contains. */
 	private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<>(16);
 
+	// 20201213 在从属bean名称之间映射：从bean名称到从属bean名称集。
 	/** Map between dependent bean names: bean name to Set of dependent bean names. */
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
+	// 20201213 在相关的Bean名称之间映射：Bean名称到Bean依赖项的Bean名称集。
 	/** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
 
@@ -189,13 +191,22 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 20201213
+	 * A. 如有必要，添加给定的单例工厂以构建指定的单例。
+	 * B. 渴望注册，例如 能够解析循环引用。
+	 */
+	/**
+	 * A.
 	 * Add the given singleton factory for building the specified singleton
 	 * if necessary.
+	 *
+	 * B.
 	 * <p>To be called for eager registration of singletons, e.g. to be able to
 	 * resolve circular references.
 	 * @param beanName the name of the bean
 	 * @param singletonFactory the factory for the singleton object
 	 */
+	// 20201213 添加给定的单例工厂以构建指定的单例
 	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {
@@ -455,9 +466,12 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param beanName the name of the bean
 	 * @param dependentBeanName the name of the dependent bean
 	 */
+	// 20201213 为给定的bean注册一个从属bean，要在给定的bean被销毁之前销毁。
 	public void registerDependentBean(String beanName, String dependentBeanName) {
+		// 20201213 确定原始名称，将别名解析为规范名称。
 		String canonicalName = canonicalName(beanName);
 
+		// 20201213 设置在从属bean名称之间映射：从bean名称到从属bean名称集
 		synchronized (this.dependentBeanMap) {
 			Set<String> dependentBeans =
 					this.dependentBeanMap.computeIfAbsent(canonicalName, k -> new LinkedHashSet<>(8));
@@ -466,6 +480,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			}
 		}
 
+		// 20201213 设置在相关的Bean名称之间映射：Bean名称到Bean依赖项的Bean名称集
 		synchronized (this.dependenciesForBeanMap) {
 			Set<String> dependenciesForBean =
 					this.dependenciesForBeanMap.computeIfAbsent(dependentBeanName, k -> new LinkedHashSet<>(8));
@@ -480,6 +495,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param dependentBeanName the name of the dependent bean
 	 * @since 4.0
 	 */
+	// 20201213 确定指定的依赖bean是否已注册为依赖于给定bean或其任何传递依赖。
 	protected boolean isDependent(String beanName, String dependentBeanName) {
 		synchronized (this.dependentBeanMap) {
 			return isDependent(beanName, dependentBeanName, null);
@@ -667,14 +683,24 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * 20201213
+	 * A. 将单例互斥暴露给子类和外部协作者。
+	 * B. 如果子类执行任何扩展的单例创建阶段，则它们应在给定的Object上同步。 特别是，子类不应在单例创建中涉及自己的互斥体，以避免在惰性初始化情况下出现死锁的可能性。
+	 */
+	/**
+	 * A.
 	 * Exposes the singleton mutex to subclasses and external collaborators.
+	 *
+	 * B.
 	 * <p>Subclasses should synchronize on the given Object if they perform
 	 * any sort of extended singleton creation phase. In particular, subclasses
 	 * should <i>not</i> have their own mutexes involved in singleton creation,
 	 * to avoid the potential for deadlocks in lazy-init situations.
 	 */
+	// 20201213 从单例对象的高速缓存集合: bean名称到bean实例。
 	@Override
 	public final Object getSingletonMutex() {
+		// 20201213 单例对象的高速缓存：bean名称到bean实例。
 		return this.singletonObjects;
 	}
 

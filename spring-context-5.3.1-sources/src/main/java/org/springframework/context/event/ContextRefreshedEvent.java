@@ -25,6 +25,7 @@ import org.springframework.context.ApplicationContext;
  * @since 04.03.2003
  * @see ContextClosedEvent
  */
+// 20201213 {@code ApplicationContext}初始化或刷新时引发的事件。
 @SuppressWarnings("serial")
 public class ContextRefreshedEvent extends ApplicationContextEvent {
 
