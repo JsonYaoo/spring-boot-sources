@@ -17,6 +17,10 @@
 package org.springframework.aop.framework;
 
 /**
+ * 20201214
+ * 标记接口，指示作为Spring AOP基础结构一部分的bean。 特别是，这意味着即使切入点匹配，任何此类bean也不会进行自动代理。
+ */
+/**
  * Marker interface that indicates a bean that is part of Spring's
  * AOP infrastructure. In particular, this implies that any such bean
  * is not subject to auto-proxying, even if a pointcut would match.
@@ -26,6 +30,7 @@ package org.springframework.aop.framework;
  * @see org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator
  * @see org.springframework.aop.scope.ScopedProxyFactoryBean
  */
+// 20201214 Spring AOP部分基础结构指示接口
 public interface AopInfrastructureBean {
 
 }

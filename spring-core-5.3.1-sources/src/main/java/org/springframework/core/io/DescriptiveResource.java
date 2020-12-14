@@ -23,15 +23,23 @@ import java.io.InputStream;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201214
+ * A. 简单的{@link Resource}实现，其中包含资源描述，但不指向实际可读的资源。
+ * B. 如果API需要{@code Resource}参数，但不一定用于实际读取，则用作占位符。
+ */
+/**
+ * A.
  * Simple {@link Resource} implementation that holds a resource description
  * but does not point to an actually readable resource.
  *
+ * B.
  * <p>To be used as placeholder if a {@code Resource} argument is
  * expected by an API but not necessarily used for actual reading.
  *
  * @author Juergen Hoeller
  * @since 1.2.6
  */
+// 20201214 简单Resource实现: 其中包含资源描述，但不指向实际可读的资源
 public class DescriptiveResource extends AbstractResource {
 
 	private final String description;

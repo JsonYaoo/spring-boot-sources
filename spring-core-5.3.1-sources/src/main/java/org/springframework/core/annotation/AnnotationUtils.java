@@ -752,9 +752,17 @@ public abstract class AnnotationUtils {
 	}
 
 	/**
+	 * 20201214
+	 * A. 检查给定批注的声明属性，特别是检查Google App Engine迟到的{@code TypeNotPresentExceptionProxy}的{@code Class}值（而不是早期的{@code Class.getAnnotations（）失败}）。
+	 * B. 此方法未失败表示{@link #getAnnotationAttributes（Annotation）}也不会失败（稍后尝试）。
+	 */
+	/**
+	 * A.
 	 * Check the declared attributes of the given annotation, in particular covering
 	 * Google App Engine's late arrival of {@code TypeNotPresentExceptionProxy} for
 	 * {@code Class} values (instead of early {@code Class.getAnnotations() failure}.
+	 *
+	 * B.
 	 * <p>This method not failing indicates that {@link #getAnnotationAttributes(Annotation)}
 	 * won't failure either (when attempted later on).
 	 * @param annotation the annotation to validate
@@ -763,6 +771,7 @@ public abstract class AnnotationUtils {
 	 * @see Class#getAnnotations()
 	 * @see #getAnnotationAttributes(Annotation)
 	 */
+	// 20201214 检查给定批注的声明属性
 	public static void validateAnnotation(Annotation annotation) {
 		AttributeMethods.forAnnotationType(annotation.annotationType()).validate(annotation);
 	}

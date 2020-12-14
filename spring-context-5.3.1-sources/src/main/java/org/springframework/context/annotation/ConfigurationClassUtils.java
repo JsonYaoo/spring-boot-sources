@@ -76,6 +76,7 @@ abstract class ConfigurationClassUtils {
 
 
 	/**
+	 * // 20201214 检查给定的bean定义是否适合配置类（或在配置/组件类中声明的嵌套组件类，也要自动注册），并进行相应标记。
 	 * Check whether the given bean definition is a candidate for a configuration class
 	 * (or a nested component class declared within a configuration/component class,
 	 * to be auto-registered as well), and mark it accordingly.
@@ -83,28 +84,44 @@ abstract class ConfigurationClassUtils {
 	 * @param metadataReaderFactory the current factory in use by the caller
 	 * @return whether the candidate qualifies as (any kind of) configuration class
 	 */
+	// 20201214 检查当前组件是否为配置类@ConfigurationClass
 	public static boolean checkConfigurationClassCandidate(
 			BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
 
+		// 20201214 根据当前BeanDefinition获取Bean的Class名称
 		String className = beanDef.getBeanClassName();
+
+		// 20201214 如果根据当前BeanDefinition获取Bean的Class名称为空 或者  如果根据当前BeanDefinition获取工厂方法存在(表示是个FactoryBean)
 		if (className == null || beanDef.getFactoryMethodName() != null) {
+			// 20201214 则代表不是个配置类
 			return false;
 		}
 
+		// 20201214 初始化注解元数据
 		AnnotationMetadata metadata;
-		if (beanDef instanceof AnnotatedBeanDefinition &&
-				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
+
+		// 20201214 如果为AnnotatedBeanDefinition(ConfigurationClassPostProcessor是RootBeanDefinition)
+		if (beanDef instanceof AnnotatedBeanDefinition && className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
+			// 20201214 可以重用来自给定BeanDefinition的预先解析的元数据...
 			// Can reuse the pre-parsed metadata from the given BeanDefinition...
 			metadata = ((AnnotatedBeanDefinition) beanDef).getMetadata();
 		}
+
+		// 20201214 ConfigurationClassPostProcessor是RootBeanDefinition, 且此Definition指定bean类了
 		else if (beanDef instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) beanDef).hasBeanClass()) {
+			// 20201214 检查是否已经加载了Class，因为我们甚至无法加载该Class的class文件。
 			// Check already loaded Class if present...
 			// since we possibly can't even load the class file for this Class.
+			// 20201214 返回beanDefinition的指定类（假设已经解决）
 			Class<?> beanClass = ((AbstractBeanDefinition) beanDef).getBeanClass();
+
+			// 20201214 如果该ConfigurationClassPostProcesso为
+			// 20201214 BeanFactoryPostProcessor | BeanPostProcessor | AopInfrastructureBean | AopInfrastructureBean | EventListenerFactory实现类时
 			if (BeanFactoryPostProcessor.class.isAssignableFrom(beanClass) ||
 					BeanPostProcessor.class.isAssignableFrom(beanClass) ||
 					AopInfrastructureBean.class.isAssignableFrom(beanClass) ||
 					EventListenerFactory.class.isAssignableFrom(beanClass)) {
+				// 20201214 则代表不是个配置类
 				return false;
 			}
 			metadata = AnnotationMetadata.introspect(beanClass);

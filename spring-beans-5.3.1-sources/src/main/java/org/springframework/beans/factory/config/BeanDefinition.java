@@ -124,17 +124,28 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	void setBeanClassName(@Nullable String beanClassName);
 
 	/**
+	 * 20201214
+	 * A. 返回此Bean定义的当前Bean类名称。
+	 * B. 请注意，在子定义从其父级继承/继承该子类名称的情况下，不必一定是在运行时使用的实际类名。 同样，这可能只是调用工厂方法的类，或者在调用工厂方法的工厂bean引用的情况下
+	 *    甚至可能为空。 因此，在运行时不要将其视为确定的bean类型，而应将其仅用于单个bean定义级别的解析目的。
+	 */
+	/**
+	 * A.
 	 * Return the current bean class name of this bean definition.
+	 *
+	 * B.
 	 * <p>Note that this does not have to be the actual class name used at runtime, in
 	 * case of a child definition overriding/inheriting the class name from its parent.
 	 * Also, this may just be the class that a factory method is called on, or it may
 	 * even be empty in case of a factory bean reference that a method is called on.
 	 * Hence, do <i>not</i> consider this to be the definitive bean type at runtime but
 	 * rather only use it for parsing purposes at the individual bean definition level.
+	 *
 	 * @see #getParentName()
 	 * @see #getFactoryBeanName()
 	 * @see #getFactoryMethodName()
 	 */
+	// 20201214 根据当前BeanDefinition获取Bean的Class名称
 	@Nullable
 	String getBeanClassName();
 
@@ -249,6 +260,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	/**
 	 * Return a factory method, if any.
 	 */
+	// 20201214  根据当前BeanDefinition获取工厂方法（如果有）。
 	@Nullable
 	String getFactoryMethodName();
 

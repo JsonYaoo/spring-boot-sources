@@ -17,6 +17,10 @@
 package org.springframework.beans.factory.parsing;
 
 /**
+ * 20201214
+ * SPI接口允许工具和其他外部进程处理在bean定义解析期间报告的错误和警告。
+ */
+/**
  * SPI interface allowing tools and other external processes to handle errors
  * and warnings reported during bean definition parsing.
  *
@@ -25,6 +29,7 @@ package org.springframework.beans.factory.parsing;
  * @since 2.0
  * @see Problem
  */
+// 20201214 BeanDefinition解析报告器
 public interface ProblemReporter {
 
 	/**

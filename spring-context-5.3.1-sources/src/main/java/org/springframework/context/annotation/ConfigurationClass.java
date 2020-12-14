@@ -35,6 +35,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 20201214
+ * 表示用户定义的{@link Configuration @Configuration}类。 包括一组{@link Bean}方法，包括以“扁平化”方式在类祖先定义的所有此类方法。
+ */
+/**
  * Represents a user-defined {@link Configuration @Configuration} class.
  * Includes a set of {@link Bean} methods, including all such methods
  * defined in the ancestry of the class, in a 'flattened-out' manner.
@@ -46,12 +50,16 @@ import org.springframework.util.ClassUtils;
  * @see BeanMethod
  * @see ConfigurationClassParser
  */
+// 20201214 @Configuration类
 final class ConfigurationClass {
 
+	// 20201214 注解元数据
 	private final AnnotationMetadata metadata;
 
+	// 20201214 注解资源
 	private final Resource resource;
 
+	// 20201214 注解所在的BeanDefinition名称
 	@Nullable
 	private String beanName;
 
@@ -128,14 +136,21 @@ final class ConfigurationClass {
 	 * @param beanName name of the {@code @Configuration} class bean
 	 * @see ConfigurationClass#ConfigurationClass(Class, ConfigurationClass)
 	 */
+	// 20201214 使用给定名称创建一个新的{@link ConfigurationClass}。
 	public ConfigurationClass(AnnotationMetadata metadata, String beanName) {
 		Assert.notNull(beanName, "Bean name must not be null");
+
+		// 20201214 注解元数据
 		this.metadata = metadata;
+
+		// 20201214 注解资源
 		this.resource = new DescriptiveResource(metadata.getClassName());
+
+		// 20201214 注解所在的BeanDefinition名称
 		this.beanName = beanName;
 	}
 
-
+	// 20201214 获取@Configuration类注解元数据
 	public AnnotationMetadata getMetadata() {
 		return this.metadata;
 	}
@@ -163,7 +178,7 @@ final class ConfigurationClass {
 	 * @since 3.1.1
 	 * @see #getImportedBy()
 	 */
-	// 20201213 返回此配置类是通过{@ link Import}注册还是由于嵌套在另一个配置类中而自动注册。
+	// 20201213 返回此配置类是通过{@link Import}注册还是由于嵌套在另一个配置类中而自动注册。
 	public boolean isImported() {
 		return !this.importedBy.isEmpty();
 	}
@@ -172,6 +187,7 @@ final class ConfigurationClass {
 	 * Merge the imported-by declarations from the given configuration class into this one.
 	 * @since 4.0.5
 	 */
+	// 20201214 将给定配置类的import-by声明合并到此声明中。
 	public void mergeImportedBy(ConfigurationClass otherConfigClass) {
 		this.importedBy.addAll(otherConfigClass.importedBy);
 	}

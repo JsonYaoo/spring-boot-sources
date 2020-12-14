@@ -54,6 +54,7 @@ public class StandardClassMetadata implements ClassMetadata {
 	/**
 	 * Return the underlying Class.
 	 */
+	// 20201214 返回基础类
 	public final Class<?> getIntrospectedClass() {
 		return this.introspectedClass;
 	}

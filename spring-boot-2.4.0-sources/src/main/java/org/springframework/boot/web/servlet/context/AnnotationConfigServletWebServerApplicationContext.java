@@ -224,7 +224,7 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 		// 20201212 注册ServletContextAwareProcessor。
 		super.postProcessBeanFactory(beanFactory);
 		if (this.basePackages != null && this.basePackages.length > 0) {
-			// 20201212 在指定的基本程序包中执行扫描 -> 返回已注册的BeanDefinitionHolder(beanDefinition包装类)数目
+			// 20201212 在指定的基本程序包中执行扫描 -> 返回已注册的BeanDefinitionHolder(beanDefinition包装类)数目、 添加ConfigurationClassPostProcessor等类信息
 			this.scanner.scan(this.basePackages);
 		}
 		if (!this.annotatedClasses.isEmpty()) {

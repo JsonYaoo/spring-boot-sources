@@ -340,36 +340,42 @@ public abstract class AnnotationConfigUtils {
 		);
 	}
 
-	static Set<AnnotationAttributes> attributesForRepeatable(AnnotationMetadata metadata,
-			Class<?> containerClass, Class<?> annotationClass) {
-
+	// 20201214 获取注解属性
+	static Set<AnnotationAttributes> attributesForRepeatable(AnnotationMetadata metadata, Class<?> containerClass, Class<?> annotationClass) {
+		// 20201214 获取注解属性
 		return attributesForRepeatable(metadata, containerClass.getName(), annotationClass.getName());
 	}
 
+	// 20201214 获取注解属性
 	@SuppressWarnings("unchecked")
-	static Set<AnnotationAttributes> attributesForRepeatable(
-			AnnotationMetadata metadata, String containerClassName, String annotationClassName) {
-
+	static Set<AnnotationAttributes> attributesForRepeatable(AnnotationMetadata metadata, String containerClassName, String annotationClassName) {
+		// 20201214 初始化结果集
 		Set<AnnotationAttributes> result = new LinkedHashSet<>();
 
-		// Direct annotation present?
-		addAttributesIfNotNull(result, metadata.getAnnotationAttributes(annotationClassName, false));
+		// Direct annotation present? // 20201214 有直接注解吗？
+		// 20201214 如果属性非空, 则添加到结果集中
+		addAttributesIfNotNull(result,
+				// 20201209 比如检索ComponentScan.class注解的属性
+				metadata.getAnnotationAttributes(annotationClassName, false)
+		);
 
-		// Container annotation present?
+		// Container annotation present? // 20201214 容器注释存在吗？
+		// 20201214 比如检索ComponentScans.class注解的属性
 		Map<String, Object> container = metadata.getAnnotationAttributes(containerClassName, false);
+
+		// 20201214 比如如果遍历@ComponentScans注解属性value值, 添加到结果集中
 		if (container != null && container.containsKey("value")) {
 			for (Map<String, Object> containedAttributes : (Map<String, Object>[]) container.get("value")) {
 				addAttributesIfNotNull(result, containedAttributes);
 			}
 		}
 
-		// Return merged result
+		// Return merged result // 20201214 返回合并结果
 		return Collections.unmodifiableSet(result);
 	}
 
-	private static void addAttributesIfNotNull(
-			Set<AnnotationAttributes> result, @Nullable Map<String, Object> attributes) {
-
+	// 20201214 如果属性非空, 则添加到结果集中
+	private static void addAttributesIfNotNull(Set<AnnotationAttributes> result, @Nullable Map<String, Object> attributes) {
 		if (attributes != null) {
 			result.add(AnnotationAttributes.fromMap(attributes));
 		}

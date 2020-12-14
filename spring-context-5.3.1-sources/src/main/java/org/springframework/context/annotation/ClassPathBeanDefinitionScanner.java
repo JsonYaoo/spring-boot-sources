@@ -326,7 +326,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @param basePackages the packages to check for annotated classes
 	 * @return number of beans registered	// 20201209 返回已注册的bean数目
 	 */
-	// 20201212 在指定的基本程序包中执行扫描 -> 返回已注册的BeanDefinitionHolder(beanDefinition包装类)数目
+	// 20201212 在指定的基本程序包中执行扫描 -> 返回已注册的BeanDefinitionHolder(beanDefinition包装类)数目、 添加ConfigurationClassPostProcessor等类信息
 	public int scan(String... basePackages) {
 		// 20201209 获取注册前的注册表中定义的bean数。
 		int beanCountAtScanStart = this.registry.getBeanDefinitionCount();
@@ -337,7 +337,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		// Register annotation config processors, if necessary.
 		// 20201209 如有必要，注册注解配置处理器, 默认为true
 		if (this.includeAnnotationConfig) {
-			// 20201211 给registry添加后置处理器
+			// 20201211 给registry添加后置处理器: 添加ConfigurationClassPostProcessor、AutowiredAnnotationBeanPostProcessor等类信息
 			AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 		}
 

@@ -116,16 +116,20 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 	private SourceExtractor sourceExtractor = new PassThroughSourceExtractor();
 
+	// 20201214 beanDefinition解析报告器: 默认为简单的BeanDefinition解析报告器实现
 	private ProblemReporter problemReporter = new FailFastProblemReporter();
 
+	// 20201214 环境实例
 	@Nullable
 	private Environment environment;
 
+	// 20201214 资源加载器
 	private ResourceLoader resourceLoader = new DefaultResourceLoader();
 
 	@Nullable
 	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
+	// 20201214 元数据读取工厂
 	private MetadataReaderFactory metadataReaderFactory = new CachingMetadataReaderFactory();
 
 	private boolean setMetadataReaderFactoryCalled = false;
@@ -137,9 +141,12 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	@Nullable
 	private ConfigurationClassBeanDefinitionReader reader;
 
+	// 20201214 是否需要设置本地BeanName生成器, 默认为false
 	private boolean localBeanNameGeneratorSet = false;
 
+	// 20201214 默认情况下使用短类名作为默认Bean名称
 	/* Using short class names as default bean names by default. */
+	// 20201214 componen包扫描BeanName生成器
 	private BeanNameGenerator componentScanBeanNameGenerator = AnnotationBeanNameGenerator.INSTANCE;
 
 	/* Using fully qualified class names as default bean names by default. */
@@ -280,26 +287,36 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 * Build and validate a configuration model based on the registry of
 	 * {@link Configuration} classes.
 	 */
-	// 20201212 基于{@link Configuration}类的注册表来构建和验证配置模型 -> 注册@Configuration、@Bean、@Import的BeanDefinition
+	// 20201212 【自动装配重点】 基于{@link Configuration}类的注册表来构建和验证配置模型 -> 注册@Configuration、@Bean、@Import的BeanDefinition
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
+		// 20201214 配置组件BeanDefinition列表
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
+
+		// 20201214 返回此注册表中定义的所有bean的名称。
 		String[] candidateNames = registry.getBeanDefinitionNames();
 
-		// 20201213 获取所有@Configuration组件BeanDefinition
+		// 20201214 遍历所有已注册的BeanNames: 比如internalConfigurationAnnotationProcessor与MySpringApplication
 		for (String beanName : candidateNames) {
+			// 20201214 返回给定bean名称的BeanDefinition。
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
-			// 20201212 ConfigurationClassPostProcessor configurationClass属性值
+
+			// 20201212 获取ConfigurationClassPostProcessor configurationClass属性值
 			if (beanDef.getAttribute(ConfigurationClassUtils.CONFIGURATION_CLASS_ATTRIBUTE) != null) {
+				// 20201214 如果不为空, 则日志打印
 				if (logger.isDebugEnabled()) {
 					logger.debug("Bean definition has already been processed as a configuration class: " + beanDef);
 				}
 			}
+
+			// 20201214 检查当前组件是否为配置类@ConfigurationClass => 明显ConfigurationClassPostProcessor是个BeanDefinitionRegistryPostProcessor, 不是配置类
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
+				// 20201214 而MySpringApplication显然是个配置组件
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
 			}
 		}
 
 		// Return immediately if no @Configuration classes were found // 20201213 如果未找到@Configuration类，则立即返回
+		// 20201214 MySpringApplication显然是个配置组件, 所以不用直接返回
 		if (configCandidates.isEmpty()) {
 			return;
 		}
@@ -311,14 +328,18 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			return Integer.compare(i1, i2);
 		});
 
-		// Detect any custom bean name generation strategy supplied through the enclosing application context
 		// 20201213 检测通过封闭的应用程序上下文提供的任何自定义bean名称生成策略
+		// Detect any custom bean name generation strategy supplied through the enclosing application context
+		// 20201214 为共享bean实例定义注册表的接口: 以统一的方式公开其单例管理功能
 		SingletonBeanRegistry sbr = null;
+
+		// 20201214 当前DefaultListableBeanFactory确实是SingletonBeanRegistry的实现
 		if (registry instanceof SingletonBeanRegistry) {
 			sbr = (SingletonBeanRegistry) registry;
+
+			// 20201214 是否需要设置本地BeanName生成器, 默认为false
 			if (!this.localBeanNameGeneratorSet) {
-				BeanNameGenerator generator = (BeanNameGenerator) sbr.getSingleton(
-						AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR);
+				BeanNameGenerator generator = (BeanNameGenerator) sbr.getSingleton(AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR);
 				if (generator != null) {
 					this.componentScanBeanNameGenerator = generator;
 					this.importBeanNameGenerator = generator;
@@ -326,19 +347,43 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			}
 		}
 
+		// 20021214 当前环境是否为空
 		if (this.environment == null) {
 			this.environment = new StandardEnvironment();
 		}
 
 		// Parse each @Configuration class	// 20201213 解析每个@Configuration类
+		// 20201214 构造@Configuration解析器
 		ConfigurationClassParser parser = new ConfigurationClassParser(
-				this.metadataReaderFactory, this.problemReporter, this.environment,
-				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
+				// 20201214 元数据读取工厂
+				this.metadataReaderFactory,
 
+				// 20201214 beanDefinition解析报告器
+				this.problemReporter,
+
+				// 20201214 环境实例
+				this.environment,
+
+				// 20201214 资源加载器
+				this.resourceLoader,
+
+				// 20201214 componen包扫描BeanName生成器
+				this.componentScanBeanNameGenerator,
+
+				// 当前注册表
+				registry
+		);
+
+		// 20201214 获取配置组件集合
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
+
+		// 20201214 初始化已解析完毕的配置组件集合
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
+			// 20201214 创建新步骤并标记其开始, 步骤名称"spring.context.config-classes.parse"描述当前操作或阶段
 			StartupStep processConfig = this.applicationStartup.start("spring.context.config-classes.parse");
+
+			// 20201214 【自动装配重点】
 			parser.parse(candidates);
 			parser.validate();
 

@@ -86,6 +86,7 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 	 * @return the BeanDefinition for the given name (never {@code null})
 	 * @throws NoSuchBeanDefinitionException if there is no such bean definition
 	 */
+	// 20201214 返回给定bean名称的BeanDefinition。
 	BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;
 
 	/**
@@ -101,6 +102,7 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 	 * @return the names of all beans defined in this registry,
 	 * or an empty array if none defined
 	 */
+	// 20201214 返回此注册表中定义的所有bean的名称。
 	String[] getBeanDefinitionNames();
 
 	/**

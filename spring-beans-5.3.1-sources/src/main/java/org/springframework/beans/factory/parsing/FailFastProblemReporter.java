@@ -22,12 +22,21 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201214
+ * A. 简单的{@link ProblemReporter}实现，在遇到错误时会表现出快速失败的行为。
+ * B. 遇到的第一个错误导致引发{@link BeanDefinitionParsingException}。
+ * C. 警告会写入此类的{@link #setLogger（Log）the log}。
+ */
+/**
+ * A.
  * Simple {@link ProblemReporter} implementation that exhibits fail-fast
  * behavior when errors are encountered.
  *
+ * B.
  * <p>The first error encountered results in a {@link BeanDefinitionParsingException}
  * being thrown.
  *
+ * C.
  * <p>Warnings are written to
  * {@link #setLogger(Log) the log} for this class.
  *
@@ -36,6 +45,7 @@ import org.springframework.lang.Nullable;
  * @author Rick Evans
  * @since 2.0
  */
+// 20201214 简单的BeanDefinition解析报告器实现: 在遇到错误时会表现出快速失败的行为
 public class FailFastProblemReporter implements ProblemReporter {
 
 	private Log logger = LogFactory.getLog(getClass());

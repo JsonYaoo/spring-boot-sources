@@ -87,16 +87,26 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201214
+ * A. 解析{@link Configuration}类定义，填充{@link ConfigurationClass}对象的集合（解析单个Configuration类可能会产生任意数量的ConfigurationClass对象，
+ *    因为一个配置类可以使用{@link Import}注释导入另一个） 。
+ * B. 此类有助于将解析Configuration类的结构的关注与基于该模型的内容注册BeanDefinition对象的关注（需要立即注册的{@code @ComponentScan}注释除外）分开。
+ * C. 这种基于ASM的实现避免了反射和渴望的类加载，以便与Spring ApplicationContext中的惰性类加载有效地互操作。
+ */
+/**
+ * A.
  * Parses a {@link Configuration} class definition, populating a collection of
  * {@link ConfigurationClass} objects (parsing a single Configuration class may result in
  * any number of ConfigurationClass objects because one Configuration class may import
  * another using the {@link Import} annotation).
  *
+ * B.
  * <p>This class helps separate the concern of parsing the structure of a Configuration
  * class from the concern of registering BeanDefinition objects based on the content of
  * that model (with the exception of {@code @ComponentScan} annotations which need to be
  * registered immediately).
  *
+ * C.
  * <p>This ASM-based implementation avoids reflection and eager class loading in order to
  * interoperate effectively with lazy class loading in a Spring ApplicationContext.
  *
@@ -108,10 +118,12 @@ import org.springframework.util.StringUtils;
  * @since 3.0
  * @see ConfigurationClassBeanDefinitionReader
  */
+// 20201214 @Configuration解析器: 解析{@link Configuration}类定义，填充{@link ConfigurationClass}对象的集合
 class ConfigurationClassParser {
 
 	private static final PropertySourceFactory DEFAULT_PROPERTY_SOURCE_FACTORY = new DefaultPropertySourceFactory();
 
+	// 20201214 默认过滤"java.lang.annotation." 以及 "org.springframework.stereotype."类
 	private static final Predicate<String> DEFAULT_EXCLUSION_FILTER = className ->
 			(className.startsWith("java.lang.annotation.") || className.startsWith("org.springframework.stereotype."));
 
@@ -121,20 +133,27 @@ class ConfigurationClassParser {
 
 	private final Log logger = LogFactory.getLog(getClass());
 
+	// 20201214 元数据读取工厂
 	private final MetadataReaderFactory metadataReaderFactory;
 
+	// 20201214 beanDefinition解析报告器
 	private final ProblemReporter problemReporter;
 
 	private final Environment environment;
 
+	// 20201214 资源加载器
 	private final ResourceLoader resourceLoader;
 
+	// 20201214 注册表
 	private final BeanDefinitionRegistry registry;
 
+	// 20201214 @ComponentScan解析器
 	private final ComponentScanAnnotationParser componentScanParser;
 
+	// 20201214 Conditional条件判断器
 	private final ConditionEvaluator conditionEvaluator;
 
+	// 20021214 配置组件Class缓存
 	private final Map<ConfigurationClass, ConfigurationClass> configurationClasses = new LinkedHashMap<>();
 
 	private final Map<String, ConfigurationClass> knownSuperclasses = new HashMap<>();
@@ -152,26 +171,47 @@ class ConfigurationClassParser {
 	 * Create a new {@link ConfigurationClassParser} instance that will be used
 	 * to populate the set of configuration classes.
 	 */
+	// 20201214 创建一个新的{@link ConfigurationClassParser}实例，该实例将用于填充配置类集。
 	public ConfigurationClassParser(MetadataReaderFactory metadataReaderFactory,
-			ProblemReporter problemReporter, Environment environment, ResourceLoader resourceLoader,
-			BeanNameGenerator componentScanBeanNameGenerator, BeanDefinitionRegistry registry) {
+									ProblemReporter problemReporter,
+									Environment environment,
+									ResourceLoader resourceLoader,
+									BeanNameGenerator componentScanBeanNameGenerator,
+									BeanDefinitionRegistry registry) {
 
+		// 20201214 元数据读取工厂
 		this.metadataReaderFactory = metadataReaderFactory;
+
+		// 20201214 beanDefinition解析报告器
 		this.problemReporter = problemReporter;
+
+		// 20201214 环境实例
 		this.environment = environment;
+
+		// 20201214 资源加载器
 		this.resourceLoader = resourceLoader;
+
+		// 20201214 注册表
 		this.registry = registry;
+
+		// 20201214 @ComponentScan解析器
 		this.componentScanParser = new ComponentScanAnnotationParser(
 				environment, resourceLoader, componentScanBeanNameGenerator, registry);
+
+		// 20201214 Conditional条件判断器
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, resourceLoader);
 	}
 
-
+	// 20201214 【自动装配重点】解析配置组件集合
 	public void parse(Set<BeanDefinitionHolder> configCandidates) {
+		// 20201214 遍历配置组件集合
 		for (BeanDefinitionHolder holder : configCandidates) {
+			// 20201214 返回包装的BeanDefinition。
 			BeanDefinition bd = holder.getBeanDefinition();
 			try {
+				// 20201214 @Configuration属于AnnotatedBeanDefinition
 				if (bd instanceof AnnotatedBeanDefinition) {
+					// 20201214 【自动装配重点】解析@Configuration Class的BeanDefinition
 					parse(((AnnotatedBeanDefinition) bd).getMetadata(), holder.getBeanName());
 				}
 				else if (bd instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) bd).hasBeanClass()) {
@@ -203,7 +243,9 @@ class ConfigurationClassParser {
 		processConfigurationClass(new ConfigurationClass(clazz, beanName), DEFAULT_EXCLUSION_FILTER);
 	}
 
+	// 20201214 【自动装配重点】解析@Configuration Class的BeanDefinition
 	protected final void parse(AnnotationMetadata metadata, String beanName) throws IOException {
+		// 20201214 【自动装配重点】处理@Configuration Class, 默认过滤"java.lang.annotation." 以及 "org.springframework.stereotype."类
 		processConfigurationClass(new ConfigurationClass(metadata, beanName), DEFAULT_EXCLUSION_FILTER);
 	}
 
@@ -221,22 +263,32 @@ class ConfigurationClassParser {
 		return this.configurationClasses.keySet();
 	}
 
-
+	// 20201214 【自动装配重点】处理@Configuration Class
 	protected void processConfigurationClass(ConfigurationClass configClass, Predicate<String> filter) throws IOException {
+		// 20201214 注解评估: 如果@Configuration应跳过该项注解的bean注册
 		if (this.conditionEvaluator.shouldSkip(configClass.getMetadata(), ConfigurationPhase.PARSE_CONFIGURATION)) {
+			// 20201214 则直接返回无需处理, 第一次自动配置, 不会进到这里
 			return;
 		}
 
+		// 20021214 从配置组件Class缓存中获取该@Configuration Class
 		ConfigurationClass existingClass = this.configurationClasses.get(configClass);
+
+		// 20201214 如果已存在
 		if (existingClass != null) {
+			// 20201213 判断此配置类是通过{@link Import}注册还是由于嵌套在另一个配置类中而自动注册。
 			if (configClass.isImported()) {
 				if (existingClass.isImported()) {
+					// 20201214 是的话, 则将给定配置类的import-by声明合并到此声明中。
 					existingClass.mergeImportedBy(configClass);
 				}
+
+				// 20201214 否则，忽略新导入的配置类； 现有的非导入类将覆盖它。
 				// Otherwise ignore new imported config class; existing non-imported class overrides it.
 				return;
 			}
 			else {
+				// 20201214 找到明确的bean定义，可能替换了导入。 让我们删除旧的，然后使用新的。
 				// Explicit bean definition found, probably replacing an import.
 				// Let's remove the old one and go with the new one.
 				this.configurationClasses.remove(configClass);
@@ -244,9 +296,11 @@ class ConfigurationClassParser {
 			}
 		}
 
-		// Recursively process the configuration class and its superclass hierarchy.
+		// Recursively process the configuration class and its superclass hierarchy. // 20201214 递归处理配置类及其超类层次结构。
+		// 20201214 对注解类型进行包装: 使带注释的源类可以以统一的方式处理，而不管它们如何加载
 		SourceClass sourceClass = asSourceClass(configClass, filter);
 		do {
+			// 20201214 【自动装配重点】通过阅读源类中的注释，成员和方法，应用处理并构建完整的{@link ConfigurationClass}
 			sourceClass = doProcessConfigurationClass(configClass, sourceClass, filter);
 		}
 		while (sourceClass != null);
@@ -255,6 +309,7 @@ class ConfigurationClassParser {
 	}
 
 	/**
+	 * // 20201214 通过阅读源类中的注释，成员和方法，应用处理并构建完整的{@link ConfigurationClass}。 发现相关来源后，可以多次调用此方法。
 	 * Apply processing and build a complete {@link ConfigurationClass} by reading the
 	 * annotations, members and methods from the source class. This method can be called
 	 * multiple times as relevant sources are discovered.
@@ -262,21 +317,27 @@ class ConfigurationClassParser {
 	 * @param sourceClass a source class
 	 * @return the superclass, or {@code null} if none found or previously processed
 	 */
+	// 20201214 【自动装配重点】通过阅读源类中的注释，成员和方法，应用处理并构建完整的{@link ConfigurationClass}
 	@Nullable
 	protected final SourceClass doProcessConfigurationClass(
 			ConfigurationClass configClass, SourceClass sourceClass, Predicate<String> filter)
 			throws IOException {
 
+		// 20201214 如果该Class上存在@Component注解
 		if (configClass.getMetadata().isAnnotated(Component.class.getName())) {
-			// Recursively process any member (nested) classes first
+			// Recursively process any member (nested) classes first // 20201214 首先递归处理任何成员（嵌套）类
+			// 20201214 注册碰巧是本身的成员（嵌套）类也是配置类
 			processMemberClasses(configClass, sourceClass, filter);
 		}
 
-		// Process any @PropertySource annotations
+		// Process any @PropertySource annotations // 20201214 处理任何@PropertySource批注
+		// 20201214 获取@PropertySources、@PropertySource注解属性
 		for (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(
-				sourceClass.getMetadata(), PropertySources.class,
+				sourceClass.getMetadata(),
+				PropertySources.class,
 				org.springframework.context.annotation.PropertySource.class)) {
 			if (this.environment instanceof ConfigurableEnvironment) {
+				// 20201214 处理给定的@PropertySource批注元数据。
 				processPropertySource(propertySource);
 			}
 			else {
@@ -285,15 +346,23 @@ class ConfigurationClassParser {
 			}
 		}
 
-		// Process any @ComponentScan annotations
+		// Process any @ComponentScan annotations // 20201214 处理任何@ComponentScan批注
+		// 20201214 获取@ComponentScans、@ComponentScan注解属性
 		Set<AnnotationAttributes> componentScans = AnnotationConfigUtils.attributesForRepeatable(
-				sourceClass.getMetadata(), ComponentScans.class, ComponentScan.class);
-		if (!componentScans.isEmpty() &&
-				!this.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationPhase.REGISTER_BEAN)) {
+				sourceClass.getMetadata(),
+				ComponentScans.class,
+				ComponentScan.class);
+
+		// 20201214 如果@Configuration不该跳过 且 @ComponentScans、@ComponentScan注解属性不为空
+		if (!componentScans.isEmpty() && !this.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationPhase.REGISTER_BEAN)) {
+			// 20201214 遍历所有@ComponentScans、@ComponentScan注解属性
 			for (AnnotationAttributes componentScan : componentScans) {
+				// 20201214 使用@ComponentScan注释配置类->立即执行扫描
 				// The config class is annotated with @ComponentScan -> perform the scan immediately
+				// 20201214 解析@ComponentScans、@ComponentScan注解属性
 				Set<BeanDefinitionHolder> scannedBeanDefinitions =
 						this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
+
 				// Check the set of scanned definitions for any further config classes and parse recursively if needed
 				for (BeanDefinitionHolder holder : scannedBeanDefinitions) {
 					BeanDefinition bdCand = holder.getBeanDefinition().getOriginatingBeanDefinition();
@@ -349,9 +418,11 @@ class ConfigurationClassParser {
 	/**
 	 * Register member (nested) classes that happen to be configuration classes themselves.
 	 */
+	// 20201214 注册碰巧是本身的成员（嵌套）类也是配置类
 	private void processMemberClasses(ConfigurationClass configClass, SourceClass sourceClass,
 			Predicate<String> filter) throws IOException {
 
+		// 20201214 获取嵌套注解的Class -> 主类时返回空的Class成员列表
 		Collection<SourceClass> memberClasses = sourceClass.getMemberClasses();
 		if (!memberClasses.isEmpty()) {
 			List<SourceClass> candidates = new ArrayList<>(memberClasses.size());
@@ -433,12 +504,12 @@ class ConfigurationClassParser {
 		return beanMethods;
 	}
 
-
 	/**
 	 * Process the given <code>@PropertySource</code> annotation metadata.
 	 * @param propertySource metadata for the <code>@PropertySource</code> annotation found
 	 * @throws IOException if loading a property source failed
 	 */
+	// 20201214 处理给定的@PropertySource批注元数据。
 	private void processPropertySource(AnnotationAttributes propertySource) throws IOException {
 		String name = propertySource.getString("name");
 		if (!StringUtils.hasLength(name)) {
@@ -637,31 +708,44 @@ class ConfigurationClassParser {
 	/**
 	 * Factory method to obtain a {@link SourceClass} from a {@link ConfigurationClass}.
 	 */
+	// 20201214 对注解类型进行包装: 使带注释的源类可以以统一的方式处理，而不管它们如何加载
 	private SourceClass asSourceClass(ConfigurationClass configurationClass, Predicate<String> filter) throws IOException {
+		// 20201214 获取@Configuration类注解元数据
 		AnnotationMetadata metadata = configurationClass.getMetadata();
+
+		// 20201214 @Configuration为StandardAnnotationMetadata类型
 		if (metadata instanceof StandardAnnotationMetadata) {
+			// 20201214 对注解类型进行包装: 使带注释的源类可以以统一的方式处理，而不管它们如何加载
 			return asSourceClass(((StandardAnnotationMetadata) metadata).getIntrospectedClass(), filter);
 		}
 		return asSourceClass(metadata.getClassName(), filter);
 	}
 
 	/**
+	 * // 20201214 从{@link Class}获取{@link SourceClass}的工厂方法
 	 * Factory method to obtain a {@link SourceClass} from a {@link Class}.
 	 */
+	// 20201214 对注解类型进行包装: 使带注释的源类可以以统一的方式处理，而不管它们如何加载
 	SourceClass asSourceClass(@Nullable Class<?> classType, Predicate<String> filter) throws IOException {
+		// 20201214 过滤"java.lang.annotation." 以及 "org.springframework.stereotype."类
 		if (classType == null || filter.test(classType.getName())) {
+			// 20201214 如果过滤到则直接返回, 因为他们是基础的注解类型, 不用再包装
 			return this.objectSourceClass;
 		}
 		try {
+			// 20201214 健全性测试，我们可以反射性地读取批注，包括Class属性； 如果不是->退回到ASM
 			// Sanity test that we can reflectively read annotations,
 			// including Class attributes; if not -> fall back to ASM
+			// 20201214 遍历检查该类下所有注解声明的属性
 			for (Annotation ann : classType.getDeclaredAnnotations()) {
 				AnnotationUtils.validateAnnotation(ann);
 			}
+
+			// 20201214 对注解类型进行包装: 使带注释的源类可以以统一的方式处理，而不管它们如何加载
 			return new SourceClass(classType);
 		}
 		catch (Throwable ex) {
-			// Enforce ASM via class name resolution
+			// Enforce ASM via class name resolution // 20201214 通过类名解析实施ASM
 			return asSourceClass(classType.getName(), filter);
 		}
 	}
@@ -917,8 +1001,10 @@ class ConfigurationClassParser {
 	 * Simple wrapper that allows annotated source classes to be dealt with
 	 * in a uniform manner, regardless of how they are loaded.
 	 */
+	// 20201214 一个简单的包装程序，使带注释的源类可以以统一的方式处理，而不管它们如何加载。
 	private class SourceClass implements Ordered {
 
+		// 20201214 类或MetadataReader
 		private final Object source;  // Class or MetadataReader
 
 		private final AnnotationMetadata metadata;
@@ -965,16 +1051,23 @@ class ConfigurationClassParser {
 			return new ConfigurationClass((MetadataReader) this.source, importedBy);
 		}
 
+		// 20201214 获取嵌套注解的Class -> 主类时返回空的Class成员列表
 		public Collection<SourceClass> getMemberClasses() throws IOException {
+			// 20201214 获取类或MetadataReader
 			Object sourceToProcess = this.source;
+
+			// 20201214 如果为Class类型
 			if (sourceToProcess instanceof Class) {
 				Class<?> sourceClass = (Class<?>) sourceToProcess;
 				try {
+					// 20201214 则获取表示的类的成员的所有类和接口的Class数组, 明显主类没有内部类
 					Class<?>[] declaredClasses = sourceClass.getDeclaredClasses();
 					List<SourceClass> members = new ArrayList<>(declaredClasses.length);
 					for (Class<?> declaredClass : declaredClasses) {
 						members.add(asSourceClass(declaredClass, DEFAULT_EXCLUSION_FILTER));
 					}
+
+					// 20201214 则返回空的Class成员列表
 					return members;
 				}
 				catch (NoClassDefFoundError err) {

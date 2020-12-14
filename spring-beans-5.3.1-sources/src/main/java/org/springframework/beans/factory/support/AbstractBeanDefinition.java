@@ -424,18 +424,33 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
+	 * 20201214
+	 * A. 返回beanDefinition的指定类（假设已经解决）。
+	 * B. 注意：这是Bean元数据定义中声明的初始类引用，可能与声明的工厂方法或{@link org.springframework.beans.factory.FactoryBean}结合使用，这可能导致Bean的运行时
+	 *    类型不同， 或在实例级工厂方法的情况下根本没有设置（而是通过{@link #getFactoryBeanName（）}解析）。
+	 * C. 不要将此用于任意bean定义的运行时类型自省。 找出特定bean的实际运行时类型的推荐方法是对指定bean名称的
+	 *    {@link org.springframework.beans.factory.BeanFactory＃getType}调用。 这考虑了以上所有情况，并返回了
+	 *    {@link org.springframework.beans.factory.BeanFactory＃getBean}调用将针对相同的bean名称返回的对象类型。
+	 */
+	/**
+	 * A.
 	 * Return the specified class of the bean definition (assuming it is resolved already).
+	 *
+	 * B.
 	 * <p><b>NOTE:</b> This is an initial class reference as declared in the bean metadata
 	 * definition, potentially combined with a declared factory method or a
 	 * {@link org.springframework.beans.factory.FactoryBean} which may lead to a different
 	 * runtime type of the bean, or not being set at all in case of an instance-level
 	 * factory method (which is resolved via {@link #getFactoryBeanName()} instead).
+	 *
+	 * C.
 	 * <b>Do not use this for runtime type introspection of arbitrary bean definitions.</b>
 	 * The recommended way to find out about the actual runtime type of a particular bean
 	 * is a {@link org.springframework.beans.factory.BeanFactory#getType} call for the
 	 * specified bean name; this takes all of the above cases into account and returns the
 	 * type of object that a {@link org.springframework.beans.factory.BeanFactory#getBean}
 	 * call is going to return for the same bean name.
+	 *
 	 * @return the resolved bean class (never {@code null})
 	 * @throws IllegalStateException if the bean definition does not define a bean class,
 	 * or a specified bean class name has not been resolved into an actual Class yet
@@ -444,6 +459,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @see #setBeanClass(Class)
 	 * @see #resolveBeanClass(ClassLoader)
 	 */
+	// 20201214 返回beanDefinition的指定类（假设已经解决）
 	public Class<?> getBeanClass() throws IllegalStateException {
 		Object beanClassObject = this.beanClass;
 		if (beanClassObject == null) {
@@ -462,6 +478,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @see #setBeanClass(Class)
 	 * @see #resolveBeanClass(ClassLoader)
 	 */
+	// 20201214 判断此Definition是否指定bean类。
 	public boolean hasBeanClass() {
 		return (this.beanClass instanceof Class);
 	}

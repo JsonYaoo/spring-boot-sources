@@ -910,8 +910,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return resolver.isAutowireCandidate(holder, descriptor);
 	}
 
+	// 20201214 返回给定bean名称的BeanDefinition。
 	@Override
 	public BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
+		// 20201214 Bean定义对象的映射，以Bean名称为键, bean实例描述为值
 		BeanDefinition bd = this.beanDefinitionMap.get(beanName);
 		if (bd == null) {
 			if (logger.isTraceEnabled()) {
