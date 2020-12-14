@@ -216,10 +216,16 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		ServletContext servletContext = getServletContext();
 		if (webServer == null && servletContext == null) {
 			StartupStep createWebServer = this.getApplicationStartup().start("spring.boot.webserver.create");
-			// 20201213 【Tomcat源码】获取一个新的完全配置但暂停的{@link WebServer}实例
+
+			// 20201214 获取WebServer工厂
 			ServletWebServerFactory factory = getWebServerFactory();
 			createWebServer.tag("factory", factory.getClass().toString());
-			this.webServer = factory.getWebServer(getSelfInitializer());
+
+			// 20201213 【Tomcat源码】获取一个新的完全配置但暂停的{@link WebServer}实例
+			this.webServer = factory.getWebServer(
+					// 20201213 返回{@link ServletContextInitializer}，它将用于完成此{@link WebApplicationContext}的设置。
+					getSelfInitializer()
+			);
 			createWebServer.end();
 
 			// 20201213 注册webServerGracefulShutdown单例
@@ -250,8 +256,9 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	 * the context itself.
 	 * @return a {@link ServletWebServerFactory} (never {@code null})
 	 */
+	// 20201214 返回用于创建嵌入式{@link WebServer}的{@link ServletWebServerFactory}。 默认情况下，此方法在上下文本身中搜索合适的bean。
 	protected ServletWebServerFactory getWebServerFactory() {
-		// Use bean names so that we don't consider the hierarchy
+		// Use bean names so that we don't consider the hierarchy // 20201214 使用Bean名称，这样我们就不会考虑层次结构
 		String[] beanNames = getBeanFactory().getBeanNamesForType(ServletWebServerFactory.class);
 		if (beanNames.length == 0) {
 			throw new ApplicationContextException("Unable to start ServletWebServerApplicationContext due to missing "
@@ -261,6 +268,8 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 			throw new ApplicationContextException("Unable to start ServletWebServerApplicationContext due to multiple "
 					+ "ServletWebServerFactory beans : " + StringUtils.arrayToCommaDelimitedString(beanNames));
 		}
+
+		// 20201207 返回一个实例，该实例可以是指定bean的共享或独立的。
 		return getBeanFactory().getBean(beanNames[0], ServletWebServerFactory.class);
 	}
 

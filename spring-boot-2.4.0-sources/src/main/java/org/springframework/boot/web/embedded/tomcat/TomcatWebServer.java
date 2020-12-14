@@ -96,44 +96,51 @@ public class TomcatWebServer implements WebServer {
 	 * @param shutdown type of shutdown supported by the server
 	 * @since 2.3.0
 	 */
+	// 20201214 创建一个新的{@link TomcatWebServer}实例。
 	public TomcatWebServer(Tomcat tomcat, boolean autoStart, Shutdown shutdown) {
 		Assert.notNull(tomcat, "Tomcat Server must not be null");
 		this.tomcat = tomcat;
 		this.autoStart = autoStart;
 		this.gracefulShutdown = (shutdown == Shutdown.GRACEFUL) ? new GracefulShutdown(tomcat) : null;
+
+		// 20201214 初始化Tomcat
 		initialize();
 	}
 
+	// 20201214 初始化Tomcat
 	private void initialize() throws WebServerException {
 		logger.info("Tomcat initialized with port(s): " + getPortsDescription(false));
 		synchronized (this.monitor) {
 			try {
+				// 20201214 根据ID设置Tomcat引擎名称
 				addInstanceIdToEngineName();
 
+				// 20201214 获取Tomcat上下文
 				Context context = findContext();
 				context.addLifecycleListener((event) -> {
 					if (context.equals(event.getSource()) && Lifecycle.START_EVENT.equals(event.getType())) {
+						// 20201214 删除服务连接器，以便在启动服务时不会发生协议绑定。
 						// Remove service connectors so that protocol binding doesn't
 						// happen when the service is started.
 						removeServiceConnectors();
 					}
 				});
 
-				// Start the server to trigger initialization listeners
+				// Start the server to trigger initialization listeners	// 20201214 启动服务器以触发初始化侦听器
 				this.tomcat.start();
 
-				// We can re-throw failure exception directly in the main thread
+				// We can re-throw failure exception directly in the main thread // 20201214 我们可以直接在主线程中重新抛出失败异常
 				rethrowDeferredStartupExceptions();
 
 				try {
 					ContextBindings.bindClassLoader(context, context.getNamingToken(), getClass().getClassLoader());
 				}
 				catch (NamingException ex) {
-					// Naming is not enabled. Continue
+					// Naming is not enabled. Continue // 20201214 未启用命名。 继续
 				}
 
 				// Unlike Jetty, all Tomcat threads are daemon threads. We create a
-				// blocking non-daemon to stop immediate shutdown
+				// blocking non-daemon to stop immediate shutdown // 20201214 与Jetty不同，所有Tomcat线程都是守护程序线程。 我们创建了一个阻止非守护进程来停止立即关闭
 				startDaemonAwaitThread();
 			}
 			catch (Exception ex) {
@@ -144,6 +151,7 @@ public class TomcatWebServer implements WebServer {
 		}
 	}
 
+	// 20201214 获取Tomcat上下文
 	private Context findContext() {
 		for (Container child : this.tomcat.getHost().findChildren()) {
 			if (child instanceof Context) {
@@ -153,6 +161,7 @@ public class TomcatWebServer implements WebServer {
 		throw new IllegalStateException("The host does not contain a Context");
 	}
 
+	// 20201214 根据ID设置Tomcat引擎名称
 	private void addInstanceIdToEngineName() {
 		int instanceId = containerCounter.incrementAndGet();
 		if (instanceId > 0) {

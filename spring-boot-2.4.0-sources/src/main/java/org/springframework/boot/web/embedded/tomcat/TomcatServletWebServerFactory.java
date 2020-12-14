@@ -178,13 +178,17 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		return lifecycleListeners;
 	}
 
-	// 20201213 【Tomcat源码】
+	// 20201213 【Tomcat源码】获取一个新的完全配置但暂停的{@link WebServer}实例
 	@Override
 	public WebServer getWebServer(ServletContextInitializer... initializers) {
 		if (this.disableMBeanRegistry) {
 			Registry.disableRegistry();
 		}
+
+		// 20201213 【Tomcat源码】tomcat-embed-core-9.0.39.jar
 		Tomcat tomcat = new Tomcat();
+
+		// 20201213 设置Tomcat必要属性
 		File baseDir = (this.baseDirectory != null) ? this.baseDirectory : createTempDir("tomcat");
 		tomcat.setBaseDir(baseDir.getAbsolutePath());
 		Connector connector = new Connector(this.protocol);
@@ -197,7 +201,10 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		for (Connector additionalConnector : this.additionalTomcatConnectors) {
 			tomcat.getService().addConnector(additionalConnector);
 		}
+
+		// 20201214 准备上下文环境, 设置其他属性
 		prepareContext(tomcat.getHost(), initializers);
+
 		return getTomcatWebServer(tomcat);
 	}
 
@@ -208,6 +215,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		}
 	}
 
+	// 20201214 准备上下文环境, 设置其他属性
 	protected void prepareContext(Host host, ServletContextInitializer[] initializers) {
 		File documentRoot = getValidDocumentRoot();
 		TomcatEmbeddedContext context = new TomcatEmbeddedContext();
@@ -448,6 +456,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	 * @param tomcat the Tomcat server.
 	 * @return a new {@link TomcatWebServer} instance
 	 */
+	// 20201214 调用工厂方法来创建{@link TomcatWebServer}。 子类可以重写此方法以返回不同的{@link TomcatWebServer}或对Tomcat服务器进行其他处理。
 	protected TomcatWebServer getTomcatWebServer(Tomcat tomcat) {
 		return new TomcatWebServer(tomcat, getPort() >= 0, getShutdown());
 	}
