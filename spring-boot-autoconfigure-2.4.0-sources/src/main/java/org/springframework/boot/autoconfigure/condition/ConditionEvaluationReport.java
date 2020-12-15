@@ -38,6 +38,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 20201215
+ * 记录条件评估详细信息以进行报告和记录。
+ */
+/**
  * Records condition evaluation details for reporting and logging.
  *
  * @author Greg Turnquist
@@ -47,6 +51,7 @@ import org.springframework.util.ObjectUtils;
  * @author Stephane Nicoll
  * @since 1.0.0
  */
+// 20201215 记录条件评估详细信息以进行报告和记录。
 public final class ConditionEvaluationReport {
 
 	private static final String BEAN_NAME = "autoConfigurationReport";
@@ -92,6 +97,7 @@ public final class ConditionEvaluationReport {
 	 * Records the names of the classes that have been excluded from condition evaluation.
 	 * @param exclusions the names of the excluded classes
 	 */
+	// 20201215 记录已从条件评估中排除的类的名称。
 	public void recordExclusions(Collection<String> exclusions) {
 		Assert.notNull(exclusions, "exclusions must not be null");
 		this.exclusions.addAll(exclusions);
@@ -102,6 +108,7 @@ public final class ConditionEvaluationReport {
 	 * @param evaluationCandidates the names of the classes whose conditions will be
 	 * evaluated
 	 */
+	// 20201215 记录作为条件评估候选者的类的名称。
 	public void recordEvaluationCandidates(List<String> evaluationCandidates) {
 		Assert.notNull(evaluationCandidates, "evaluationCandidates must not be null");
 		this.unconditionalClasses.addAll(evaluationCandidates);

@@ -56,7 +56,7 @@ final class PostProcessorRegistrationDelegate {
 	private PostProcessorRegistrationDelegate() {
 	}
 
-	// 20201213 执行BeanDefinitionRegistryPostProcessor -> BeanFactoryPostProcessor: PriorityOrdered -> Ordered -> 其余优先级
+	// 20201213 【自动装配重点】 执行BeanDefinitionRegistryPostProcessor -> BeanFactoryPostProcessor: PriorityOrdered -> Ordered -> 其余优先级
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
@@ -95,7 +95,7 @@ final class PostProcessorRegistrationDelegate {
 
 			// 20201213 首先，调用实现PriorityOrdered的BeanDefinitionRegistryPostProcessors。
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
-			// 20201213 根据BeanDefinitionRegistryPostProcessor.class判断，返回与给定类型（包括子类）匹配的bean名称。
+			// 20201213 【自动装配重点】 根据BeanDefinitionRegistryPostProcessor.class判断，返回与给定类型（包括子类）匹配的bean名称。
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
@@ -112,7 +112,7 @@ final class PostProcessorRegistrationDelegate {
 			// 20201213 添加到待注册的registryProcessors集合里
 			registryProcessors.addAll(currentRegistryProcessors);
 
-			// 20201213 注册后回调, 再次调用给定的BeanDefinitionRegistryPostProcessor Bean。
+			// 20201213 【自动装配重点】 注册后回调, 再次调用给定的BeanDefinitionRegistryPostProcessor Bean。
 			invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry, beanFactory.getApplicationStartup());
 			currentRegistryProcessors.clear();
 
@@ -310,7 +310,7 @@ final class PostProcessorRegistrationDelegate {
 	/**
 	 * Invoke the given BeanDefinitionRegistryPostProcessor beans.
 	 */
-	// 20201213 调用给定的BeanDefinitionRegistryPostProcessor Bean。
+	// 20201213 【自动装配重点】 调用给定的BeanDefinitionRegistryPostProcessor Bean。
 	private static void invokeBeanDefinitionRegistryPostProcessors(
 			Collection<? extends BeanDefinitionRegistryPostProcessor> postProcessors, BeanDefinitionRegistry registry, ApplicationStartup applicationStartup) {
 
@@ -318,7 +318,7 @@ final class PostProcessorRegistrationDelegate {
 			StartupStep postProcessBeanDefRegistry = applicationStartup.start("spring.context.beandef-registry.post-process")
 					.tag("postProcessor", postProcessor::toString);
 
-			// 20201213 BeanDefinitionRegistryPostProcessor实现的方法
+			// 20201213 【自动装配重点】 BeanDefinitionRegistryPostProcessor实现的方法
 			postProcessor.postProcessBeanDefinitionRegistry(registry);
 			postProcessBeanDefRegistry.end();
 		}

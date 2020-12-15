@@ -84,26 +84,41 @@ public final class SpringFactoriesLoader {
 	// 20201130 Spring工厂缓存 -> 类加载器-
 	static final Map<ClassLoader, Map<String, List<String>>> cache = new ConcurrentReferenceHashMap<>();
 
-
 	private SpringFactoriesLoader() {
+
 	}
 
-
+    /**
+     * 20201215
+     * A. 使用给定的类加载器，从"META-INF/spring.factories"加载并实例化给定类型的工厂实现
+     * B. 返回的工厂通过{@link AnnotationAwareOrderComparator}进行排序。
+     * C. 如果需要自定义实例化策略，请使用{@link #loadFactoryNames}获取所有注册的工厂名称。
+     * D. 从Spring Framework 5.3开始，如果为给定的工厂类型发现了重复的实现类名称，则仅实例化重复的实现类型的一个实例。
+     */
 	/**
+     * A.
 	 * Load and instantiate the factory implementations of the given type from
 	 * {@value #FACTORIES_RESOURCE_LOCATION}, using the given class loader.
+     *
+     * B.
 	 * <p>The returned factories are sorted through {@link AnnotationAwareOrderComparator}.
+     *
+     * C.
 	 * <p>If a custom instantiation strategy is required, use {@link #loadFactoryNames}
 	 * to obtain all registered factory names.
+     *
+     * D.
 	 * <p>As of Spring Framework 5.3, if duplicate implementation class names are
 	 * discovered for a given factory type, only one instance of the duplicated
 	 * implementation type will be instantiated.
+     *
 	 * @param factoryType the interface or abstract class representing the factory
 	 * @param classLoader the ClassLoader to use for loading (can be {@code null} to use the default)
 	 * @throws IllegalArgumentException if any factory implementation class cannot
 	 * be loaded or if an error occurs while instantiating any factory
 	 * @see #loadFactoryNames
 	 */
+	// 20201215 使用给定的类加载器，从"META-INF/spring.factories"加载并实例化给定类型的工厂实现, 并通过AnnotationAwareOrderComparator进行排序
 	public static <T> List<T> loadFactories(Class<T> factoryType, @Nullable ClassLoader classLoader) {
 		Assert.notNull(factoryType, "'factoryType' must not be null");
 		ClassLoader classLoaderToUse = classLoader;
@@ -129,13 +144,13 @@ public final class SpringFactoriesLoader {
 	 * <p>As of Spring Framework 5.3, if a particular implementation class name
 	 * is discovered more than once for the given factory type, duplicates will
 	 * be ignored.
-	 * @param factoryType the interface or abstract class representing the factory
+	 * @param factoryType the interface or abstract class representing the factory	// 20201215 代表工厂的接口或抽象类
 	 * @param classLoader the ClassLoader to use for loading resources; can be
 	 * {@code null} to use the default
 	 * @throws IllegalArgumentException if an error occurs while loading factory names
 	 * @see #loadFactories
 	 */
-	// 20201130 使用给定的类加载器从{@value #FACTORIES_RESOURCE_LOCATION}加载给定类型的工厂实现的完全限定类名。
+	// 20201130 使用给定的类加载器从"META-INF/spring.factories"加载给定类型的工厂实现的完全限定类名。
 	// 20201130 从springframework5.3开始，如果一个特定的实现类名对于给定的工厂类型被发现不止一次，那么重复的类名将被忽略。
 	public static List<String> loadFactoryNames(Class<?> factoryType, @Nullable ClassLoader classLoader) {
 		ClassLoader classLoaderToUse = classLoader;
@@ -147,12 +162,12 @@ public final class SpringFactoriesLoader {
 		// 20201130 获取工厂类型名称
 		String factoryTypeName = factoryType.getName();
 
-		// 20201130 根据类加载器(启动时当前线程没有加载器, 即默认使用Spring工厂加载器)加载指定类型的工厂实例名称
+		// 20201130 根据类加载器(启动时当前线程没有加载器, 即默认使用Spring工厂加载器)加载指定类型的工厂实例名称 -> 只是全类名, 还没实例化
 		// 20201130 构造SpringApplication的factoryTypeName类型: Bootstrapper、ApplicationContextInitializer、ApplicationListener
 		return loadSpringFactories(classLoaderToUse).getOrDefault(factoryTypeName, Collections.emptyList());
 	}
 
-	// 20201130 根据构造器加载工厂实例名称
+	// 20201130 根据构造器加载工厂实例名称 -> 只是全类名, 还没实例化
 	private static Map<String, List<String>> loadSpringFactories(ClassLoader classLoader) {
 		// 20201130 从Spring工厂缓存中获取
 		Map<String, List<String>> result = cache.get(classLoader);

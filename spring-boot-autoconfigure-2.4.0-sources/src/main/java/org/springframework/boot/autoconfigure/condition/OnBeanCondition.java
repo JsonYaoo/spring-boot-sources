@@ -62,6 +62,10 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201215
+ * {@link Condition}，用于检查是否存在特定的bean。
+ */
+/**
  * {@link Condition} that checks for the presence or absence of specific beans.
  *
  * @author Phillip Webb
@@ -73,6 +77,7 @@ import org.springframework.util.StringUtils;
  * @see ConditionalOnMissingBean
  * @see ConditionalOnSingleCandidate
  */
+// 20201215 {@link Condition}，用于检查是否存在特定的bean。
 @Order(Ordered.LOWEST_PRECEDENCE)
 class OnBeanCondition extends FilteringSpringBootCondition implements ConfigurationCondition {
 
@@ -81,18 +86,29 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 		return ConfigurationPhase.REGISTER_BEAN;
 	}
 
+	// 20201215 根据当前配置类的元数据和配置类的完全限定类名列表, 来获取条件匹配结果 -> 如果不包含ConditionalOnBean、ConditionalOnSingleCandidate则返回“不匹配”结果实例
 	@Override
-	protected final ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
-			AutoConfigurationMetadata autoConfigurationMetadata) {
+	protected final ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata) {
+		// 20201215 构建对应于配置类的完全限定类名列表的条件匹配的结果
 		ConditionOutcome[] outcomes = new ConditionOutcome[autoConfigurationClasses.length];
+
+		// 20201215 遍历该数组
 		for (int i = 0; i < outcomes.length; i++) {
+			// 20201215 获取配置类的完全限定类名
 			String autoConfigurationClass = autoConfigurationClasses[i];
+
+			// 20201215 如果配置类的完全限定类名不为空
 			if (autoConfigurationClass != null) {
+				// 20201215 从元数据中获取一个ConditionalOnBean值。
 				Set<String> onBeanTypes = autoConfigurationMetadata.getSet(autoConfigurationClass, "ConditionalOnBean");
+
+				// 20201215 获取匹配结果 -> 如果类加载器中没出现的ClassName列表, 则为“不匹配”创建一个新的{@link ConditionOutcome}实例。
 				outcomes[i] = getOutcome(onBeanTypes, ConditionalOnBean.class);
 				if (outcomes[i] == null) {
-					Set<String> onSingleCandidateTypes = autoConfigurationMetadata.getSet(autoConfigurationClass,
-							"ConditionalOnSingleCandidate");
+					// 20201215 如果匹配结果为空, 则继续从元数据中获取一个ConditionalOnSingleCandidate值。
+					Set<String> onSingleCandidateTypes = autoConfigurationMetadata.getSet(autoConfigurationClass, "ConditionalOnSingleCandidate");
+
+					// 20201215 获取匹配结果 -> 如果类加载器中没出现的ClassName列表, 则为“不匹配”创建一个新的{@link ConditionOutcome}实例。
 					outcomes[i] = getOutcome(onSingleCandidateTypes, ConditionalOnSingleCandidate.class);
 				}
 			}
@@ -100,8 +116,12 @@ class OnBeanCondition extends FilteringSpringBootCondition implements Configurat
 		return outcomes;
 	}
 
+	// 20201215 获取匹配结果 -> 如果类加载器中没出现的ClassName列表, 则为“不匹配”创建一个新的{@link ConditionOutcome}实例。
 	private ConditionOutcome getOutcome(Set<String> requiredBeanTypes, Class<? extends Annotation> annotation) {
+		// 20201215 类加载器中没出现的ClassName列表
 		List<String> missing = filter(requiredBeanTypes, ClassNameFilter.MISSING, getBeanClassLoader());
+
+		// 20201215 如果类加载器中没出现的ClassName列表不为空, 则为“不匹配”创建一个新的{@link ConditionOutcome}实例。
 		if (!missing.isEmpty()) {
 			ConditionMessage message = ConditionMessage.forCondition(annotation)
 					.didNotFind("required type", "required types").items(Style.QUOTE, missing);

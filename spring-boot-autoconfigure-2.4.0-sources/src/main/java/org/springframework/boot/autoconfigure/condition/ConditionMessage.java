@@ -106,6 +106,7 @@ public final class ConditionMessage {
 	 * @see #andCondition(String, Object...)
 	 * @see #forCondition(Class, Object...)
 	 */
+	// 20201215 返回一个新的构建器，以根据实例和新的条件结果构建新的{@link ConditionMessage}。
 	public Builder andCondition(Class<? extends Annotation> condition, Object... details) {
 		Assert.notNull(condition, "Condition must not be null");
 		return andCondition("@" + ClassUtils.getShortName(condition), details);
@@ -176,6 +177,7 @@ public final class ConditionMessage {
 	 * @see #forCondition(String, Object...)
 	 * @see #andCondition(String, Object...)
 	 */
+	// 20201215 构造器的工厂方法，用于为条件构造新的{@link ConditionMessage}。
 	public static Builder forCondition(Class<? extends Annotation> condition, Object... details) {
 		return new ConditionMessage().andCondition(condition, details);
 	}

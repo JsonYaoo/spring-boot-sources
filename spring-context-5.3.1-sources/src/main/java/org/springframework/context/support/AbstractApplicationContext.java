@@ -927,9 +927,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * B.
 	 * <p>Must be called before singleton instantiation.
 	 */
-	// 20201213 执行BeanDefinitionRegistryPostProcessor -> BeanFactoryPostProcessor: PriorityOrdered -> Ordered -> 其余优先级
+	// 20201213 【自动装配重点】 执行BeanDefinitionRegistryPostProcessor -> BeanFactoryPostProcessor: PriorityOrdered -> Ordered -> 其余优先级
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-		// 20201212 委托给PostProcessorRegistrationDelegate, 执行BeanDefinitionRegistryPostProcessor -> BeanFactoryPostProcessor: PriorityOrdered -> Ordered -> 其余优先级
+		// 20201212 【自动装配重点】 委托给PostProcessorRegistrationDelegate, 执行BeanDefinitionRegistryPostProcessor -> BeanFactoryPostProcessor: PriorityOrdered -> Ordered -> 其余优先级
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
 
 		// 20201212 检测LoadTimeWeaver并准备编织（如果在此期间发现）（例如，通过ConfigurationClassPostProcessor注册的@Bean方法）

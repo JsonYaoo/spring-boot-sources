@@ -27,15 +27,21 @@ import java.util.Set;
  * @author Phillip Webb
  * @since 1.5.0
  */
+// 20201215 导入自动配置类时触发事件。
 public class AutoConfigurationImportEvent extends EventObject {
 
 	private final List<String> candidateConfigurations;
 
 	private final Set<String> exclusions;
 
+	// 20201215 构建导入自动配置类时触发事件
 	public AutoConfigurationImportEvent(Object source, List<String> candidateConfigurations, Set<String> exclusions) {
 		super(source);
+
+		// 20201215 自动配置类全限定类名列表
 		this.candidateConfigurations = Collections.unmodifiableList(candidateConfigurations);
+
+		// 20201215 自动配置类排除项列表
 		this.exclusions = Collections.unmodifiableSet(exclusions);
 	}
 

@@ -33,6 +33,10 @@ import org.springframework.web.context.ConfigurableWebEnvironment;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
+ * 20201215
+ * {@link Condition}，检查是否存在{@link WebApplicationContext}。
+ */
+/**
  * {@link Condition} that checks for the presence or absence of
  * {@link WebApplicationContext}.
  *
@@ -41,6 +45,7 @@ import org.springframework.web.context.WebApplicationContext;
  * @see ConditionalOnWebApplication
  * @see ConditionalOnNotWebApplication
  */
+// 20201215 {@link Condition}，检查是否存在{@link WebApplicationContext}。
 @Order(Ordered.HIGHEST_PRECEDENCE + 20)
 class OnWebApplicationCondition extends FilteringSpringBootCondition {
 
@@ -48,15 +53,14 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 
 	private static final String REACTIVE_WEB_APPLICATION_CLASS = "org.springframework.web.reactive.HandlerResult";
 
+	// 20201215 根据当前配置类的元数据和配置类的完全限定类名列表, 来获取条件匹配结果 -> 如果不包含ConditionalOnWebApplication则返回“不匹配”结果实例
 	@Override
-	protected ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
-			AutoConfigurationMetadata autoConfigurationMetadata) {
+	protected ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata) {
 		ConditionOutcome[] outcomes = new ConditionOutcome[autoConfigurationClasses.length];
 		for (int i = 0; i < outcomes.length; i++) {
 			String autoConfigurationClass = autoConfigurationClasses[i];
 			if (autoConfigurationClass != null) {
-				outcomes[i] = getOutcome(
-						autoConfigurationMetadata.get(autoConfigurationClass, "ConditionalOnWebApplication"));
+				outcomes[i] = getOutcome(autoConfigurationMetadata.get(autoConfigurationClass, "ConditionalOnWebApplication"));
 			}
 		}
 		return outcomes;

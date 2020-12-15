@@ -31,21 +31,29 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 
 /**
+ * 20201215
+ * {@link SpringBootCondition}的抽象基类，它也实现了{@link AutoConfigurationImportFilter}。
+ */
+/**
  * Abstract base class for a {@link SpringBootCondition} that also implements
  * {@link AutoConfigurationImportFilter}.
  *
  * @author Phillip Webb
  */
-abstract class FilteringSpringBootCondition extends SpringBootCondition
-		implements AutoConfigurationImportFilter, BeanFactoryAware, BeanClassLoaderAware {
+// 20201215 {@link SpringBootCondition}的抽象基类，它也实现了{@link AutoConfigurationImportFilter}
+abstract class FilteringSpringBootCondition extends SpringBootCondition implements AutoConfigurationImportFilter, BeanFactoryAware, BeanClassLoaderAware {
 
 	private BeanFactory beanFactory;
 
 	private ClassLoader beanClassLoader;
 
+	// 20201215 将过滤器应用于给定的自动配置类候选对象 -> 返回匹配结果
 	@Override
 	public boolean[] match(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata) {
+		// 20201215 记录条件评估详细信息以进行报告和记录
 		ConditionEvaluationReport report = ConditionEvaluationReport.find(this.beanFactory);
+
+		// 20201215 根据当前配置类的元数据和配置类的完全限定类名列表, 如果不包含ConditionalOnBean、ConditionalOnSingleCandidate、ConditionalOnClass、ConditionalOnWebApplication则返回“不匹配”结果实例
 		ConditionOutcome[] outcomes = getOutcomes(autoConfigurationClasses, autoConfigurationMetadata);
 		boolean[] match = new boolean[outcomes.length];
 		for (int i = 0; i < outcomes.length; i++) {
@@ -57,11 +65,13 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 				}
 			}
 		}
+
+		// 20201215 返回匹配结果
 		return match;
 	}
 
-	protected abstract ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
-			AutoConfigurationMetadata autoConfigurationMetadata);
+	// 20201215 根据当前配置类的元数据和配置类的完全限定类名列表, 来获取条件匹配结果
+	protected abstract ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata);
 
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -81,11 +91,14 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 		this.beanClassLoader = classLoader;
 	}
 
-	protected final List<String> filter(Collection<String> classNames, ClassNameFilter classNameFilter,
-			ClassLoader classLoader) {
+	// 20201215 返回过滤器匹配的ClassName列表
+	protected final List<String> filter(Collection<String> classNames, ClassNameFilter classNameFilter, ClassLoader classLoader) {
+		// 20201215 ClassName为空则返回空
 		if (CollectionUtils.isEmpty(classNames)) {
 			return Collections.emptyList();
 		}
+
+		// 20201215 否则返回过滤器匹配的ClassName列表
 		List<String> matches = new ArrayList<>(classNames.size());
 		for (String candidate : classNames) {
 			if (classNameFilter.matches(candidate, classLoader)) {
@@ -110,10 +123,10 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 		return Class.forName(className);
 	}
 
+	// 20201215 Class名称过滤器
 	protected enum ClassNameFilter {
 
 		PRESENT {
-
 			@Override
 			public boolean matches(String className, ClassLoader classLoader) {
 				return isPresent(className, classLoader);
@@ -121,13 +134,12 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 
 		},
 
+		// 20201215 当前ClassName没出现在类加载器中
 		MISSING {
-
 			@Override
 			public boolean matches(String className, ClassLoader classLoader) {
 				return !isPresent(className, classLoader);
 			}
-
 		};
 
 		abstract boolean matches(String className, ClassLoader classLoader);

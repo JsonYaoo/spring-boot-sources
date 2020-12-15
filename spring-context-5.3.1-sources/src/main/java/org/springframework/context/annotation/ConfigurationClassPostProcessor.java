@@ -243,7 +243,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	/**
 	 * Derive further bean definitions from the configuration classes in the registry.
 	 */
-	// 20201212 BeanDefinitionRegistryPostProcessor实现方法: 从注册表中的配置类派生更多的bean定义
+	// 20201212 【自动装配重点】 BeanDefinitionRegistryPostProcessor实现方法: 从注册表中的配置类派生更多的bean定义
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 		int registryId = System.identityHashCode(registry);
@@ -257,7 +257,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 		this.registriesPostProcessed.add(registryId);
 
-		// 20201212 基于{@link Configuration}类的注册表来构建和验证配置模型 -> 注册@Configuration、@Bean、@Import的BeanDefinition
+		// 20201212 【自动装配重点】 基于{@link Configuration}类的注册表来构建和验证配置模型 -> 注册@Configuration、@Bean、@Import的BeanDefinition
 		processConfigBeanDefinitions(registry);
 	}
 
@@ -377,17 +377,22 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		// 20201214 获取配置组件集合
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 
-		// 20201214 初始化已解析完毕的配置组件集合
+		// 20201214 初始化已解析完毕的(加载了BeanDefinition)配置组件集合
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
 			// 20201214 创建新步骤并标记其开始, 步骤名称"spring.context.config-classes.parse"描述当前操作或阶段
 			StartupStep processConfig = this.applicationStartup.start("spring.context.config-classes.parse");
 
-			// 20201214 【自动装配重点】
+			// 20201214 【自动装配重点】解析配置组件集合
 			parser.parse(candidates);
+
+			// 20201215 验证每个{@link ConfigurationClass}对象。
 			parser.validate();
 
+			// 20201215 获取过滤、排序、验证过后的{@link ConfigurationClass}对象集合
 			Set<ConfigurationClass> configClasses = new LinkedHashSet<>(parser.getConfigurationClasses());
+
+			// 20201215 移除已解析完毕的配置组件集合
 			configClasses.removeAll(alreadyParsed);
 
 			// Read the model and create bean definitions based on its content
@@ -400,29 +405,52 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 			// 20201213 阅读{@code configurationModel}，根据其内容在注册表中注册bean定义: @Configuration、@Bean、@Import
 			this.reader.loadBeanDefinitions(configClasses);
+
+			// 20201215 加载了配置类的BeanDefinition后, 标记它们为已装配
 			alreadyParsed.addAll(configClasses);
 			processConfig.tag("classCount", () -> String.valueOf(configClasses.size())).end();
 
+			// 20201215 清空配置类全限定类名列表
 			candidates.clear();
+
+			// 20201215 如果确实有新注册的配置类
 			if (registry.getBeanDefinitionCount() > candidateNames.length) {
+				// 20201215 当前已成功注册的配置类组件名称列表
 				String[] newCandidateNames = registry.getBeanDefinitionNames();
+
+				// 20201214 配置前注册表中定义的所有bean的名称。
 				Set<String> oldCandidateNames = new HashSet<>(Arrays.asList(candidateNames));
+
+				// 20201215 初始化已经解析好的Class集合
 				Set<String> alreadyParsedClasses = new HashSet<>();
+
+				// 20201215 遍历已解析完毕(加载了BeanDefinition)的配置组件集合
 				for (ConfigurationClass configurationClass : alreadyParsed) {
+					// 20201215 设置已经解析好的Class集合
 					alreadyParsedClasses.add(configurationClass.getMetadata().getClassName());
 				}
+
+				// 20201215 遍历当前已成功注册的配置类组件名称列表
 				for (String candidateName : newCandidateNames) {
+					// 20201215 如果配置前注册表中定义的所有bean的名称不包含当前注册成功的配置类组件名称
 					if (!oldCandidateNames.contains(candidateName)) {
+						// 20201215 则获取该配置类组件的BeanDefinition
 						BeanDefinition bd = registry.getBeanDefinition(candidateName);
+
+						// 20201214 如果当前组件否为配置类@ConfigurationClass 且 已经解析好的Class集合不包含改BeanName
 						if (ConfigurationClassUtils.checkConfigurationClassCandidate(bd, this.metadataReaderFactory) &&
 								!alreadyParsedClasses.contains(bd.getBeanClassName())) {
+							// 20201215 则添加到配置组件集合中
 							candidates.add(new BeanDefinitionHolder(bd, candidateName));
 						}
 					}
 				}
+
+				// 20201215 更新此注册表中定义的所有bean的名称
 				candidateNames = newCandidateNames;
 			}
 		}
+		// 20201215 直到配置组件集合不为空(也即是配置类BeanDefinition成功加载后), 则停止循环
 		while (!candidates.isEmpty());
 
 		// Register the ImportRegistry as a bean in order to support ImportAware @Configuration classes	// 20201213 将ImportRegistry注册为Bean，以支持ImportAware @Configuration类

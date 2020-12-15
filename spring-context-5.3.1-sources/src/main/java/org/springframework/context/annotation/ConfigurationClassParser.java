@@ -127,6 +127,7 @@ class ConfigurationClassParser {
 	private static final Predicate<String> DEFAULT_EXCLUSION_FILTER = className ->
 			(className.startsWith("java.lang.annotation.") || className.startsWith("org.springframework.stereotype."));
 
+    // 20201215 使用{@code AnnotationAwareOrderComparator}的共享默认实例进行排序
 	private static final Comparator<DeferredImportSelectorHolder> DEFERRED_IMPORT_COMPARATOR =
 			(o1, o2) -> AnnotationAwareOrderComparator.INSTANCE.compare(o1.getImportSelector(), o2.getImportSelector());
 
@@ -160,12 +161,13 @@ class ConfigurationClassParser {
 
 	private final List<String> propertySourceNames = new ArrayList<>();
 
+	// 20201215 Import栈
 	private final ImportStack importStack = new ImportStack();
 
+    // 20201215 DeferredImportSelector处理器
 	private final DeferredImportSelectorHandler deferredImportSelectorHandler = new DeferredImportSelectorHandler();
 
 	private final SourceClass objectSourceClass = new SourceClass(Object.class);
-
 
 	/**
 	 * Create a new {@link ConfigurationClassParser} instance that will be used
@@ -211,7 +213,7 @@ class ConfigurationClassParser {
 			try {
 				// 20201214 @Configuration属于AnnotatedBeanDefinition
 				if (bd instanceof AnnotatedBeanDefinition) {
-					// 20201214 【自动装配重点】解析@Configuration Class的BeanDefinition
+					// 20201214 【自动装配重点】解析@Configuration Class的BeanDefinition -> 添加AutoConfigurationImportSelector到DeferredImportSelector列表中
 					parse(((AnnotatedBeanDefinition) bd).getMetadata(), holder.getBeanName());
 				}
 				else if (bd instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) bd).hasBeanClass()) {
@@ -230,6 +232,7 @@ class ConfigurationClassParser {
 			}
 		}
 
+	    // 20201215 DeferredImportSelector处理器 -> 对spring.factories配置类全限定类名列表再过滤器一次
 		this.deferredImportSelectorHandler.process();
 	}
 
@@ -243,9 +246,9 @@ class ConfigurationClassParser {
 		processConfigurationClass(new ConfigurationClass(clazz, beanName), DEFAULT_EXCLUSION_FILTER);
 	}
 
-	// 20201214 【自动装配重点】解析@Configuration Class的BeanDefinition
+	// 20201214 【自动装配重点】解析@Configuration Class的BeanDefinition -> 添加AutoConfigurationImportSelector到DeferredImportSelector列表中
 	protected final void parse(AnnotationMetadata metadata, String beanName) throws IOException {
-		// 20201214 【自动装配重点】处理@Configuration Class, 默认过滤"java.lang.annotation." 以及 "org.springframework.stereotype."类
+        // 20201214 【自动装配重点】处理@Configuration Class -> 添加AutoConfigurationImportSelector到DeferredImportSelector列表中
 		processConfigurationClass(new ConfigurationClass(metadata, beanName), DEFAULT_EXCLUSION_FILTER);
 	}
 
@@ -253,17 +256,19 @@ class ConfigurationClassParser {
 	 * Validate each {@link ConfigurationClass} object.
 	 * @see ConfigurationClass#validate
 	 */
+	// 20201215 验证每个{@link ConfigurationClass}对象。
 	public void validate() {
 		for (ConfigurationClass configClass : this.configurationClasses.keySet()) {
 			configClass.validate(this.problemReporter);
 		}
 	}
 
+	// 20201215 获取过滤、排序、验证过后的{@link ConfigurationClass}对象集合
 	public Set<ConfigurationClass> getConfigurationClasses() {
 		return this.configurationClasses.keySet();
 	}
 
-	// 20201214 【自动装配重点】处理@Configuration Class
+	// 20201214 【自动装配重点】处理@Configuration Class -> 添加AutoConfigurationImportSelector到DeferredImportSelector列表中
 	protected void processConfigurationClass(ConfigurationClass configClass, Predicate<String> filter) throws IOException {
 		// 20201214 注解评估: 如果@Configuration应跳过该项注解的bean注册
 		if (this.conditionEvaluator.shouldSkip(configClass.getMetadata(), ConfigurationPhase.PARSE_CONFIGURATION)) {
@@ -300,11 +305,12 @@ class ConfigurationClassParser {
 		// 20201214 对注解类型进行包装: 使带注释的源类可以以统一的方式处理，而不管它们如何加载
 		SourceClass sourceClass = asSourceClass(configClass, filter);
 		do {
-			// 20201214 【自动装配重点】通过阅读源类中的注释，成员和方法，应用处理并构建完整的{@link ConfigurationClass}
+			// 20201214 【自动装配重点】通过阅读源类中的注释，成员和方法，应用处理并构建完整的{@link ConfigurationClass} -> 添加AutoConfigurationImportSelector到DeferredImportSelector列表中
 			sourceClass = doProcessConfigurationClass(configClass, sourceClass, filter);
 		}
 		while (sourceClass != null);
 
+		// 20201215 在配置组件Class缓存中注册该配置类 -> MyApplication
 		this.configurationClasses.put(configClass, configClass);
 	}
 
@@ -363,6 +369,7 @@ class ConfigurationClassParser {
 				Set<BeanDefinitionHolder> scannedBeanDefinitions =
 						this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
 
+				// 20201215 检查扫描的定义集是否有其他配置类，并在需要时递归解析
 				// Check the set of scanned definitions for any further config classes and parse recursively if needed
 				for (BeanDefinitionHolder holder : scannedBeanDefinitions) {
 					BeanDefinition bdCand = holder.getBeanDefinition().getOriginatingBeanDefinition();
@@ -376,10 +383,18 @@ class ConfigurationClassParser {
 			}
 		}
 
-		// Process any @Import annotations
-		processImports(configClass, sourceClass, getImports(sourceClass), filter, true);
+		// Process any @Import annotations // 20201215 处理任何@Import批注
+        // 20201215 【自动装配重点】处理@Import注解 -> 添加AutoConfigurationImportSelector到DeferredImportSelector列表中
+		processImports(
+				configClass,
+				sourceClass,
+				// 20201215【自动装配重点】递归解析@Import注解 -> 返回收集到的import值的集合
+				getImports(sourceClass),
+				filter,
+				true
+		);
 
-		// Process any @ImportResource annotations
+		// Process any @ImportResource annotations	// 20201215 处理任何@ImportResource批注
 		AnnotationAttributes importResource =
 				AnnotationConfigUtils.attributesFor(sourceClass.getMetadata(), ImportResource.class);
 		if (importResource != null) {
@@ -391,27 +406,27 @@ class ConfigurationClassParser {
 			}
 		}
 
-		// Process individual @Bean methods
+		// Process individual @Bean methods // 20201215 处理单个@Bean方法
 		Set<MethodMetadata> beanMethods = retrieveBeanMethodMetadata(sourceClass);
 		for (MethodMetadata methodMetadata : beanMethods) {
 			configClass.addBeanMethod(new BeanMethod(methodMetadata, configClass));
 		}
 
-		// Process default methods on interfaces
+		// Process default methods on interfaces // 20201215 处理接口上的默认方法
 		processInterfaces(configClass, sourceClass);
 
-		// Process superclass, if any
+		// Process superclass, if any // 20201215 处理超类（如果有）
 		if (sourceClass.getMetadata().hasSuperClass()) {
 			String superclass = sourceClass.getMetadata().getSuperClassName();
 			if (superclass != null && !superclass.startsWith("java") &&
 					!this.knownSuperclasses.containsKey(superclass)) {
 				this.knownSuperclasses.put(superclass, configClass);
-				// Superclass found, return its annotation metadata and recurse
+				// Superclass found, return its annotation metadata and recurse // 20201215 找到超类，返回其注释元数据并递归
 				return sourceClass.getSuperClass();
 			}
 		}
 
-		// No superclass -> processing is complete
+		// No superclass -> processing is complete // 20201215 没有超类->处理完成
 		return null;
 	}
 
@@ -587,65 +602,110 @@ class ConfigurationClassParser {
 	/**
 	 * Returns {@code @Import} class, considering all meta-annotations.
 	 */
+	// 20201215【自动装配重点】考虑所有元注释，返回{@code @Import}类 -> 返回收集到的import值的集合
 	private Set<SourceClass> getImports(SourceClass sourceClass) throws IOException {
+		// 20201215 初始化imports、visited集合
 		Set<SourceClass> imports = new LinkedHashSet<>();
 		Set<SourceClass> visited = new LinkedHashSet<>();
+
+		// 20201215 递归收集所有声明的{@code @Import}值 -> 收集到imports结果集中
 		collectImports(sourceClass, imports, visited);
+
+		// 20201215 返回收集到的import值的集合
 		return imports;
 	}
 
 	/**
+	 * 20201215
+	 * A. 递归收集所有声明的{@code @Import}值。 与大多数元注释不同，使用多个声明为不同值的{@code @Import}是有效的。 从类的第一个元注释返回值的常规过程还不够。
+	 * B. 例如，除了源自{@code @Enable}注释的元导入之外，{@code @Configuration}类通常还声明直接{@code @Import}。
+	 */
+	/**
+	 * A.
 	 * Recursively collect all declared {@code @Import} values. Unlike most
 	 * meta-annotations it is valid to have several {@code @Import}s declared with
 	 * different values; the usual process of returning values from the first
 	 * meta-annotation on a class is not sufficient.
+	 *
+	 * B.
 	 * <p>For example, it is common for a {@code @Configuration} class to declare direct
 	 * {@code @Import}s in addition to meta-imports originating from an {@code @Enable}
 	 * annotation.
-	 * @param sourceClass the class to search
-	 * @param imports the imports collected so far
-	 * @param visited used to track visited classes to prevent infinite recursion
+	 * @param sourceClass the class to search	// 20201215 要搜索的Class
+	 * @param imports the imports collected so far	// 20201215 到目前为止收集的进口
+	 * @param visited used to track visited classes to prevent infinite recursion	// 20201215 用于跟踪访问的类以防止无限递归
 	 * @throws IOException if there is any problem reading metadata from the named class
 	 */
+	// 20201215 递归收集所有声明的{@code @Import}值 -> 收集到imports结果集中
 	private void collectImports(SourceClass sourceClass, Set<SourceClass> imports, Set<SourceClass> visited)
 			throws IOException {
-
+		// 20201215 该Class添加到已访问列表中
 		if (visited.add(sourceClass)) {
+			// 20201215 遍历当前源Class的所有注解
 			for (SourceClass annotation : sourceClass.getAnnotations()) {
+				// 20201215 获取注解类型
 				String annName = annotation.getMetadata().getClassName();
+
+				// 20201215 如果当前注解不为Import类型
 				if (!annName.equals(Import.class.getName())) {
+					// 20201215 则递归遍历当前注解
 					collectImports(annotation, imports, visited);
 				}
 			}
-			imports.addAll(sourceClass.getAnnotationAttributes(Import.class.getName(), "value"));
+
+			// 20201215 遍历完当前类的所有注解, 添加Import注解的值进imports结果集中
+			imports.addAll(
+					// 20201215 source.getAnnotationAttributes(): 获取指定注解类型的指定注解属性值 -> SourceClass列表
+					sourceClass.getAnnotationAttributes(Import.class.getName(),
+					"value")
+			);
 		}
 	}
 
-	private void processImports(ConfigurationClass configClass, SourceClass currentSourceClass,
-			Collection<SourceClass> importCandidates, Predicate<String> exclusionFilter,
-			boolean checkForCircularImports) {
-
+	// 20201215【自动装配重点】处理@Import注解 -> 添加AutoConfigurationImportSelector到DeferredImportSelector列表中
+	private void processImports(ConfigurationClass configClass, // 20201215 当前配置类
+								SourceClass currentSourceClass, // 20201215 当前封装好的配置类
+								Collection<SourceClass> importCandidates, // 20201215 收集到的所有@Import值的集合
+								Predicate<String> exclusionFilter, // 20201215 默认过滤"java.lang.annotation." 以及 "org.springframework.stereotype."类
+								boolean checkForCircularImports// 20201215 是否检查常规的Imports: 默认为true
+	) {
+		// 20201215 收集到的所有@Import值的集合为空时, 则直接返回
 		if (importCandidates.isEmpty()) {
 			return;
 		}
 
+		// 20201215 如果要检查常规Imports, 且当前配置类是否出现在Import栈上
 		if (checkForCircularImports && isChainedImportOnStack(configClass)) {
+			// 20201215 则beanDefinition解析报告器注册@Import注解异常问题
 			this.problemReporter.error(new CircularImportProblem(configClass, this.importStack));
 		}
 		else {
+			// 20201215 如果@Import注解校验通过, 则添加当前配置类到Import栈
 			this.importStack.push(configClass);
 			try {
+				// 20201215 遍历收集到的所有@Import值的集合
 				for (SourceClass candidate : importCandidates) {
+					// 20201215 如果当前@Import值候选组件属于ImportSelector类型
 					if (candidate.isAssignable(ImportSelector.class)) {
-						// Candidate class is an ImportSelector -> delegate to it to determine imports
+						// Candidate class is an ImportSelector -> delegate to it to determine imports // 20201215 候选类是一个ImportSelector->委托给它以确定导入
+						// 20201215 加载当前候选组件Class文件
 						Class<?> candidateClass = candidate.loadClass();
+
+						// 20201215 使用适当的构造函数实例化一个类，并以指定的可分配类型返回新实例, 且当前实例具有某些意识功能: BeanClassLoader、BeanFactory、Environment、ResourceLoader
 						ImportSelector selector = ParserStrategyUtils.instantiateClass(candidateClass, ImportSelector.class,
 								this.environment, this.resourceLoader, this.registry);
+
+						// 202012125 获取注解排除过滤操作 -> 空实现
 						Predicate<String> selectorFilter = selector.getExclusionFilter();
+
+						// 20201215 如果不为空, 则对当前传入的过滤器进行或运算, 得到过滤器并集
 						if (selectorFilter != null) {
 							exclusionFilter = exclusionFilter.or(selectorFilter);
 						}
+
+						// 20201215 AutoConfigurationImportSelector本身就是DeferredImportSelector
 						if (selector instanceof DeferredImportSelector) {
+                            // 20201215 【自动装配重点】处理指定的{@link DeferredImportSelector} -> 添加到DeferredImportSelector列表中
 							this.deferredImportSelectorHandler.handle(configClass, (DeferredImportSelector) selector);
 						}
 						else {
@@ -686,17 +746,30 @@ class ConfigurationClassParser {
 		}
 	}
 
+	// 20201215 判断当前配置类是否出现在Import栈上
 	private boolean isChainedImportOnStack(ConfigurationClass configClass) {
+		// 20201215 如果Import栈包含当前配置类, 代表当前配置类已经检查过了
 		if (this.importStack.contains(configClass)) {
+			// 20201215 获取当前配置类的Class名称
 			String configClassName = configClass.getMetadata().getClassName();
+
+			// 20201215 根据注解类型, 获取已经Import进来的注解元数据集合中元数据
 			AnnotationMetadata importingClass = this.importStack.getImportingClassFor(configClassName);
+
+			// 20201215 如果元数据存在
 			while (importingClass != null) {
+				// 20201215 注解元数据基础类型等于当前配置类型
 				if (configClassName.equals(importingClass.getClassName())) {
+					// 20201215 则说明当前配置类确实import栈上
 					return true;
 				}
+
+				// 20201215 继续根据注解类型, 获取已经Import进来的注解元数据集合中元数据
 				importingClass = this.importStack.getImportingClassFor(importingClass.getClassName());
 			}
 		}
+
+		// 20201215 如果一层层找都没找到, 则返回false, 说明当前配置不在import栈上
 		return false;
 	}
 
@@ -784,15 +857,18 @@ class ConfigurationClassParser {
 	@SuppressWarnings("serial")
 	private static class ImportStack extends ArrayDeque<ConfigurationClass> implements ImportRegistry {
 
+		// 20201215 已经Import进来的注解元数据集合
 		private final MultiValueMap<String, AnnotationMetadata> imports = new LinkedMultiValueMap<>();
 
 		public void registerImport(AnnotationMetadata importingClass, String importedClass) {
 			this.imports.add(importedClass, importingClass);
 		}
 
+		// 20201215 根据注解类型, 获取已经Import进来的注解元数据集合中元数据
 		@Override
 		@Nullable
 		public AnnotationMetadata getImportingClassFor(String importedClass) {
+			// 20201215 根据注解类型, 获取已经Import进来的注解元数据集合中元数据
 			return CollectionUtils.lastElement(this.imports.get(importedClass));
 		}
 
@@ -827,12 +903,18 @@ class ConfigurationClassParser {
 		}
 	}
 
-
+    // 20201215 DeferredImportSelector处理器
 	private class DeferredImportSelectorHandler {
 
+        // 20201215 DeferredImportSelector列表
 		@Nullable
 		private List<DeferredImportSelectorHolder> deferredImportSelectors = new ArrayList<>();
 
+        /**
+         * 20201215
+         * 处理指定的{@link DeferredImportSelector}。 如果要收集延迟的导入选择器，则会将此实例注册到列表中。 如果正在处理它们，则
+         * {@link DeferredImportSelector}也会根据其{@link DeferredImportSelector.Group}立即进行处理。
+         */
 		/**
 		 * Handle the specified {@link DeferredImportSelector}. If deferred import
 		 * selectors are being collected, this registers this instance to the list. If
@@ -841,58 +923,103 @@ class ConfigurationClassParser {
 		 * @param configClass the source configuration class
 		 * @param importSelector the selector to handle
 		 */
+		// 20201215 【自动装配重点】处理指定的{@link DeferredImportSelector} -> 添加到DeferredImportSelector列表中
 		public void handle(ConfigurationClass configClass, DeferredImportSelector importSelector) {
+		    // 20201215 构建DeferredImportSelector包装类
 			DeferredImportSelectorHolder holder = new DeferredImportSelectorHolder(configClass, importSelector);
+
+			// 20201215 如果DeferredImportSelector列表未初始化
 			if (this.deferredImportSelectors == null) {
+                // 20201215 构建DeferredImportSelector批量处理器, 然后注册该列表
 				DeferredImportSelectorGroupingHandler handler = new DeferredImportSelectorGroupingHandler();
+
+                // 20201215 设置注解配置类集合 -> 添加配置注解元数据 以及 注解类型
 				handler.register(holder);
+
+				// 20201215 【自动装配重点】处理导入的元数据Group -> 获取过滤排序后的配置类全限定类名列表
 				handler.processGroupImports();
 			}
 			else {
+			    // 20201215 如果DeferredImportSelector列表已初始化, 则添加到DeferredImportSelector列表中
 				this.deferredImportSelectors.add(holder);
 			}
 		}
 
+		// 20201215 【自动装配重点】DeferredImportSelector处理器执行处理操作
 		public void process() {
+		    // 20201215 获取DeferredImportSelector列表
 			List<DeferredImportSelectorHolder> deferredImports = this.deferredImportSelectors;
+
+            // 20201215 清空DeferredImportSelector列表
 			this.deferredImportSelectors = null;
 			try {
+			    // 20201215 如果deferredImports列表不为空
 				if (deferredImports != null) {
+                    // 20201215 构建DeferredImportSelector批量处理器
 					DeferredImportSelectorGroupingHandler handler = new DeferredImportSelectorGroupingHandler();
+
+                    // 20201215 使用{@code AnnotationAwareOrderComparator}的共享默认实例进行排序
 					deferredImports.sort(DEFERRED_IMPORT_COMPARATOR);
+
+					// 20201215 注解配置类集合添加注解元数据 以及 注解类型
 					deferredImports.forEach(handler::register);
+
+					// 20201215 处理导入的元数据Group -> 获取过滤排序后的配置类全限定类名列表
 					handler.processGroupImports();
 				}
 			}
 			finally {
+                // 20201215 重新初始化DeferredImportSelector列表
 				this.deferredImportSelectors = new ArrayList<>();
 			}
 		}
 	}
 
-
+    // 20201215 构建DeferredImportSelector批量处理器
 	private class DeferredImportSelectorGroupingHandler {
-
+        // 20201215 DeferredImportSelector组实例列表
 		private final Map<Object, DeferredImportSelectorGrouping> groupings = new LinkedHashMap<>();
 
+		// 20201215 注解配置类集合
 		private final Map<AnnotationMetadata, ConfigurationClass> configurationClasses = new HashMap<>();
 
+		// 20201215 设置注解配置类集合 -> 添加配置注解元数据 以及 注解类型
 		public void register(DeferredImportSelectorHolder deferredImport) {
+            // 20201215 通过DeferredImportSelector包装器获取DeferredImportSelector自动导入选择器, 然后获取自动配置导入组Class
 			Class<? extends Group> group = deferredImport.getImportSelector().getImportGroup();
+
+            // 20201215 DeferredImportSelector组实例列表
 			DeferredImportSelectorGrouping grouping = this.groupings.computeIfAbsent(
 					(group != null ? group : deferredImport),
-					key -> new DeferredImportSelectorGrouping(createGroup(group)));
+
+                    // 20201215 通过用于对来自不同导入选择器的结果进行分组的接口Group实例构建DeferredImportSelector组实例
+					key -> new DeferredImportSelectorGrouping(
+                            // 20201215 构建Group实例
+					        createGroup(group)
+                    )
+            );
+
+            // 20201215 Group实例列表添加DeferredImportSelectorHolder
 			grouping.add(deferredImport);
+
+            // 20201215 注解配置类集合添加注解元数据 以及 注解类型
 			this.configurationClasses.put(deferredImport.getConfigurationClass().getMetadata(),
 					deferredImport.getConfigurationClass());
 		}
 
+		// 20201215 处理导入的元数据Group -> 获取过滤排序后的配置类全限定类名列表
 		public void processGroupImports() {
+		    // 20201215 遍历/DeferredImportSelector组实例列表
 			for (DeferredImportSelectorGrouping grouping : this.groupings.values()) {
+                // 20201215 获取组件过滤操作 -> 返回取了并集的过滤器
 				Predicate<String> exclusionFilter = grouping.getCandidateFilter();
+
+				// 20201215 【自动装配重点】遍历该组已经排除且排序后的配置类的全限定类名列表
 				grouping.getImports().forEach(entry -> {
+					// 20201215 根据当前配置类的元数据取注解配置类集合中的配置类Class
 					ConfigurationClass configurationClass = this.configurationClasses.get(entry.getMetadata());
 					try {
+						// 20201215【自动装配重点】处理@Import注解 -> 添加AutoConfigurationImportSelector到DeferredImportSelector列表中
 						processImports(configurationClass, asSourceClass(configurationClass, exclusionFilter),
 								Collections.singleton(asSourceClass(entry.getImportClassName(), exclusionFilter)),
 								exclusionFilter, false);
@@ -909,6 +1036,7 @@ class ConfigurationClassParser {
 			}
 		}
 
+		// 20201215 构建Group实例
 		private Group createGroup(@Nullable Class<? extends Group> type) {
 			Class<? extends Group> effectiveType = (type != null ? type : DefaultDeferredImportSelectorGroup.class);
 			return ParserStrategyUtils.instantiateClass(effectiveType, Group.class,
@@ -918,13 +1046,16 @@ class ConfigurationClassParser {
 		}
 	}
 
-
+    // 20201215 DeferredImportSelector处理器
 	private static class DeferredImportSelectorHolder {
 
+	    // 20201215 @Configuration类
 		private final ConfigurationClass configurationClass;
 
+        // 20201215 DeferredImportSelector自动导入选择器
 		private final DeferredImportSelector importSelector;
 
+		// 20201215 构建DeferredImportSelector包装类
 		public DeferredImportSelectorHolder(ConfigurationClass configClass, DeferredImportSelector selector) {
 			this.configurationClass = configClass;
 			this.importSelector = selector;
@@ -934,18 +1065,22 @@ class ConfigurationClassParser {
 			return this.configurationClass;
 		}
 
+		// 20201215 通过DeferredImportSelector包装器获取DeferredImportSelector自动导入选择器
 		public DeferredImportSelector getImportSelector() {
+            // 20201215 DeferredImportSelector自动导入选择器
 			return this.importSelector;
 		}
 	}
 
-
+    // 20201215 DeferredImportSelector组实例
 	private static class DeferredImportSelectorGrouping {
 
 		private final DeferredImportSelector.Group group;
 
+		// 20201215 DeferredImportSelector包装类列表
 		private final List<DeferredImportSelectorHolder> deferredImports = new ArrayList<>();
 
+		// 20201215 通过用于对来自不同导入选择器的结果进行分组的接口实例构建DeferredImportSelector组实例
 		DeferredImportSelectorGrouping(Group group) {
 			this.group = group;
 		}
@@ -958,22 +1093,36 @@ class ConfigurationClassParser {
 		 * Return the imports defined by the group.
 		 * @return each import with its associated configuration class
 		 */
+		// 20201215 【自动装配重点】返回由组定义的导入。
 		public Iterable<Group.Entry> getImports() {
+            // 20201215 遍历DeferredImportSelector包装类列表
 			for (DeferredImportSelectorHolder deferredImport : this.deferredImports) {
-				this.group.process(deferredImport.getConfigurationClass().getMetadata(),
-						deferredImport.getImportSelector());
+				// 20201215 【自动装配重点】使用指定的{@link DeferredImportSelector}处理导入的{@link Configuration}类的{@link AnnotationMetadata}
+				this.group.process(deferredImport.getConfigurationClass().getMetadata(), deferredImport.getImportSelector());
 			}
+
+			// 20201215 返回应为此组导入哪个类的{@link Entry条目} -> 对剩余的自动配置类的全限定类名列表进行排序, 并返回排序后的结果列表
 			return this.group.selectImports();
 		}
 
+		// 20201215 获取组件过滤操作 -> 返回取了并集的过滤器
 		public Predicate<String> getCandidateFilter() {
+            // 20201215 默认过滤"java.lang.annotation." 以及 "org.springframework.stereotype."类
 			Predicate<String> mergedFilter = DEFAULT_EXCLUSION_FILTER;
+
+            // 20201215 遍历Group实例中的DeferredImportSelector包装类列表
 			for (DeferredImportSelectorHolder deferredImport : this.deferredImports) {
+                // 20201215 通过DeferredImportSelector包装器获取DeferredImportSelector自动导入选择器, 获取注解排除过滤操作
 				Predicate<String> selectorFilter = deferredImport.getImportSelector().getExclusionFilter();
+
+				// 20201215 如果过滤操作存在
 				if (selectorFilter != null) {
+				    // 20201215 则合并这些过滤器
 					mergedFilter = mergedFilter.or(selectorFilter);
 				}
 			}
+
+			// 20201215 返回取了并集的过滤器
 			return mergedFilter;
 		}
 	}
@@ -1120,17 +1269,28 @@ class ConfigurationClassParser {
 			return result;
 		}
 
+		// 20201215 source.getAnnotations(): 获取当前源Class的所有注解
 		public Set<SourceClass> getAnnotations() {
+			// 20201215 初始化收集结果集
 			Set<SourceClass> result = new LinkedHashSet<>();
+
+			// 20201215 如果当前源属于Class类型
 			if (this.source instanceof Class) {
 				Class<?> sourceClass = (Class<?>) this.source;
+
+				// 20201215 则获取遍历源Class当前类的注解
 				for (Annotation ann : sourceClass.getDeclaredAnnotations()) {
+					// 20201215 获取每个注解的注解类型
 					Class<?> annType = ann.annotationType();
+
+					// 20201215 如果注解名称不是以java开头
 					if (!annType.getName().startsWith("java")) {
 						try {
+							// 20201215 则对注解类型进行包装, 然后添加到结果集中
 							result.add(asSourceClass(annType, DEFAULT_EXCLUSION_FILTER));
 						}
 						catch (Throwable ex) {
+							// 20201215 JVM的类加载将忽略在类路径上不存在的注释->在此也忽略
 							// An annotation not present on the classpath is being ignored
 							// by the JVM's class loading -> ignore here as well.
 						}
@@ -1153,19 +1313,31 @@ class ConfigurationClassParser {
 			return result;
 		}
 
+		// 20201215 source.getAnnotationAttributes(): 获取指定注解类型的指定注解属性值 -> SourceClass列表
 		public Collection<SourceClass> getAnnotationAttributes(String annType, String attribute) throws IOException {
+			// 20201209 检索给定类型的注解的属性（如果有的话）（即，如果在基础元素上定义为直接注解或元注解），也要考虑对组合注解的属性覆盖。
 			Map<String, Object> annotationAttributes = this.metadata.getAnnotationAttributes(annType, true);
+
+			// 20201215 如果属性列表中没有指定的属性, 则返回空
 			if (annotationAttributes == null || !annotationAttributes.containsKey(attribute)) {
 				return Collections.emptySet();
 			}
+
+			// 20201215 否则获取指定属性
 			String[] classNames = (String[]) annotationAttributes.get(attribute);
 			Set<SourceClass> result = new LinkedHashSet<>();
+
+			// 20201215 遍历该属性的所有值
 			for (String className : classNames) {
+				// 20201215 包装ClassName成SourceClass
 				result.add(getRelated(className));
 			}
+
+			// 20201215 返回封装好的SourceClass列表
 			return result;
 		}
 
+		// 20201215 包装ClassName成SourceClass
 		private SourceClass getRelated(String className) throws IOException {
 			if (this.source instanceof Class) {
 				try {
@@ -1204,6 +1376,7 @@ class ConfigurationClassParser {
 	/**
 	 * {@link Problem} registered upon detection of a circular {@link Import}.
 	 */
+	// 202012115 在检测到通告{@link Import}时注册了{@link问题}。
 	private static class CircularImportProblem extends Problem {
 
 		public CircularImportProblem(ConfigurationClass attemptedImport, Deque<ConfigurationClass> importStack) {

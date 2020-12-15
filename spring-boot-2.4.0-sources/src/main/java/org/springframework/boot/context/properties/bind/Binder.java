@@ -202,6 +202,7 @@ public class Binder {
 	}
 
 	/**
+	 * // 20201215 使用此联编程序的{@link ConfigurationPropertySource}属性源绑定指定的目标{@link Class}。
 	 * Bind the specified target {@link Class} using this binder's
 	 * {@link ConfigurationPropertySource property sources}.
 	 * @param name the configuration property name to bind
@@ -210,6 +211,7 @@ public class Binder {
 	 * @return the binding result (never {@code null})
 	 * @see #bind(ConfigurationPropertyName, Bindable, BindHandler)
 	 */
+	// 20201215 使用此联编程序的{@link ConfigurationPropertySource}属性源绑定指定的目标{@link Class}。
 	public <T> BindResult<T> bind(String name, Class<T> target) {
 		return bind(name, Bindable.of(target));
 	}

@@ -57,6 +57,7 @@ public interface AutoConfigurationMetadata {
 	 * @param key the meta-data key
 	 * @return the meta-data value or {@code null}
 	 */
+	// 20201215 从元数据中获取一个{@link Set}值。
 	Set<String> getSet(String className, String key);
 
 	/**

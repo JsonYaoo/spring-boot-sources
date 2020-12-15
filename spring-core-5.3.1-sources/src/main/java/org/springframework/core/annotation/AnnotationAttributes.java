@@ -195,8 +195,16 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
+	 * 20201215
+	 * A. 获取以字符串数组形式存储在指定的{@code attributeName}下的值。
+	 * B. 如果在指定的{@code attributeName}下存储的值是一个字符串，则将其包装在一个单元素数组中，然后返回。
+	 */
+	/**
+	 * A.
 	 * Get the value stored under the specified {@code attributeName} as an
 	 * array of strings.
+	 *
+	 * B.
 	 * <p>If the value stored under the specified {@code attributeName} is
 	 * a string, it will be wrapped in a single-element array before
 	 * returning it.
@@ -206,7 +214,9 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	 * @throws IllegalArgumentException if the attribute does not exist or
 	 * if it is not of the expected type
 	 */
+	// 20201215 获取以字符串数组形式存储在指定的{@code attributeName}下的值。
 	public String[] getStringArray(String attributeName) {
+		// 20201215 获取存储在指定的{@code attributeName}下的值，并确保该值属于{@code ExpectedType}。
 		return getRequiredAttribute(attributeName, String[].class);
 	}
 
@@ -345,13 +355,23 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	}
 
 	/**
+	 * 20201215
+	 * A. 获取存储在指定的{@code attributeName}下的值，并确保该值属于{@code ExpectedType}。
+	 * B. 如果{@code ExpectationType}是一个数组，并且在指定的{@code attributeName}下存储的值是期望数组类型的组件类型的单个元素，
+	 *    则该单个元素将被包装在该元素的单个元素数组中 返回之前使用适当的类型。
+	 */
+	/**
+	 * A.
 	 * Get the value stored under the specified {@code attributeName},
 	 * ensuring that the value is of the {@code expectedType}.
+	 *
+	 * B.
 	 * <p>If the {@code expectedType} is an array and the value stored
 	 * under the specified {@code attributeName} is a single element of the
 	 * component type of the expected array type, the single element will be
 	 * wrapped in a single-element array of the appropriate type before
 	 * returning it.
+	 *
 	 * @param attributeName the name of the attribute to get;
 	 * never {@code null} or empty
 	 * @param expectedType the expected type; never {@code null}
@@ -359,6 +379,7 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	 * @throws IllegalArgumentException if the attribute does not exist or
 	 * if it is not of the expected type
 	 */
+	// 20201215 获取存储在指定的{@code attributeName}下的值，并确保该值属于{@code ExpectedType}。
 	@SuppressWarnings("unchecked")
 	private <T> T getRequiredAttribute(String attributeName, Class<T> expectedType) {
 		Assert.hasText(attributeName, "'attributeName' must not be null or empty");

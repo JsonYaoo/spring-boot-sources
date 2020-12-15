@@ -34,6 +34,7 @@ public interface ClassMetadata {
 	/**
 	 * Return the name of the underlying class.
 	 */
+	// 20201215 返回基础类的名称。
 	String getClassName();
 
 	/**

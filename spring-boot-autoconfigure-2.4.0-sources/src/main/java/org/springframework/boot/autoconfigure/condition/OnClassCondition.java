@@ -33,6 +33,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201215
+ * {@link Condition}和{@link AutoConfigurationImportFilter}检查是否存在特定类。
+ */
+/**
  * {@link Condition} and {@link AutoConfigurationImportFilter} that checks for the
  * presence or absence of specific classes.
  *
@@ -40,12 +44,14 @@ import org.springframework.util.StringUtils;
  * @see ConditionalOnClass
  * @see ConditionalOnMissingClass
  */
+// 20201215 {@link Condition}和{@link AutoConfigurationImportFilter}检查是否存在特定类。
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class OnClassCondition extends FilteringSpringBootCondition {
 
+	// 20201215 根据当前配置类的元数据和配置类的完全限定类名列表, 来获取条件匹配结果 -> 如果不包含ConditionalOnClass则返回“不匹配”结果实例
 	@Override
-	protected final ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
-			AutoConfigurationMetadata autoConfigurationMetadata) {
+	protected final ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata) {
+		// 20201215 如果有多个处理器，请分割工作并在后台线程中执行一半。 使用单个附加线程似乎可以提供最佳性能。 更多线程会使情况变得更糟。
 		// Split the work and perform half in a background thread if more than one
 		// processor is available. Using a single additional thread seems to offer the
 		// best performance. More threads make things worse.

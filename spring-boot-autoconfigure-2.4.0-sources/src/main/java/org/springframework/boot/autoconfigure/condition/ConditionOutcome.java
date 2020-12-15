@@ -20,12 +20,17 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 20201215
+ * 条件匹配的结果，包括日志消息。
+ */
+/**
  * Outcome for a condition match, including log message.
  *
  * @author Phillip Webb
  * @since 1.0.0
  * @see ConditionMessage
  */
+// 20201215 条件匹配的结果，包括日志消息。
 public class ConditionOutcome {
 
 	private final boolean match;
@@ -47,6 +52,7 @@ public class ConditionOutcome {
 	 * @param match if the condition is a match
 	 * @param message the condition message
 	 */
+	// 20201215 创建一个新的{@link ConditionOutcome}实例。
 	public ConditionOutcome(boolean match, ConditionMessage message) {
 		Assert.notNull(message, "ConditionMessage must not be null");
 		this.match = match;
@@ -95,6 +101,7 @@ public class ConditionOutcome {
 	 * @param message the message
 	 * @return the {@link ConditionOutcome}
 	 */
+	// 20201215 为“不匹配”创建一个新的{@link ConditionOutcome}实例。
 	public static ConditionOutcome noMatch(ConditionMessage message) {
 		return new ConditionOutcome(false, message);
 	}
@@ -103,6 +110,7 @@ public class ConditionOutcome {
 	 * Return {@code true} if the outcome was a match.
 	 * @return {@code true} if the outcome matches
 	 */
+	// 20201215 如果结果匹配，则返回{@code true}。
 	public boolean isMatch() {
 		return this.match;
 	}
