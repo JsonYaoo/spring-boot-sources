@@ -47,15 +47,40 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 /**
+ * 20201221
+ * A. 请求映射信息。 满足以下条件的组合：
+ * 		a. {@link PathPatternsRequestCondition}和解析的{@code PathPatterns}或{@link PatternsRequestCondition}和字符串模式通过{@code PathMatcher}
+ * 		b. {@link RequestMethodsRequestCondition}
+ * 		c. {@link ParamsRequestCondition}
+ * 		d. {@link HeadersRequestCondition}
+ * 		e. {@link ConsumesRequestCondition}
+ * 		f. {@link ProducesRequestCondition}
+ * 		g. {@code RequestCondition} (optional, custom request condition)
+ */
+/**
+ * A.
  * Request mapping information. A composite for the the following conditions:
  * <ol>
+ * a.
  * <li>{@link PathPatternsRequestCondition} with parsed {@code PathPatterns} or
  * {@link PatternsRequestCondition} with String patterns via {@code PathMatcher}
+ *
+ * b.
  * <li>{@link RequestMethodsRequestCondition}
+ *
+ * c.
  * <li>{@link ParamsRequestCondition}
+ *
+ * d.
  * <li>{@link HeadersRequestCondition}
+ *
+ * e.
  * <li>{@link ConsumesRequestCondition}
+ *
+ * f.
  * <li>{@link ProducesRequestCondition}
+ *
+ * g.
  * <li>{@code RequestCondition} (optional, custom request condition)
  * </ol>
  *
@@ -63,6 +88,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
  * @author Rossen Stoyanchev
  * @since 3.1
  */
+// 20201221 请求映射信息
 public final class RequestMappingInfo implements RequestCondition<RequestMappingInfo> {
 
 	private static final PathPatternsRequestCondition EMPTY_PATH_PATTERNS = new PathPatternsRequestCondition();

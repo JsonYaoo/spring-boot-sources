@@ -37,9 +37,17 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201221
+ * A. URL路径匹配的帮助程序类。 为{@code RequestDispatcher}中的URL路径提供支持，并支持一致的URL解码。
+ * B. {@link org.springframework.web.servlet.handler.AbstractUrlHandlerMapping}和{@link org.springframework.web.servlet.support.RequestContext}
+ *    用于路径匹配和/或URI确定。
+ */
+/**
+ * A.
  * Helper class for URL path matching. Provides support for URL paths in
  * {@code RequestDispatcher} includes and support for consistent URL decoding.
  *
+ * B.
  * <p>Used by {@link org.springframework.web.servlet.handler.AbstractUrlHandlerMapping}
  * and {@link org.springframework.web.servlet.support.RequestContext} for path matching
  * and/or URI determination.
@@ -51,6 +59,7 @@ import org.springframework.util.StringUtils;
  * @see #getLookupPathForRequest
  * @see javax.servlet.RequestDispatcher
  */
+// 20201221 URL路径匹配的帮助程序类。 为{@code RequestDispatcher}中的URL路径提供支持，并支持一致的URL解码。
 public class UrlPathHelper {
 
 	/**
@@ -58,6 +67,7 @@ public class UrlPathHelper {
 	 * {@link #getLookupPathForRequest resolved} lookupPath.
 	 * @since 5.3
 	 */
+	// 20201221 包含{@link #getLookupPathForRequest} lookupPath已解决的Servlet请求属性的名称。
 	public static final String PATH_ATTRIBUTE = UrlPathHelper.class.getName() + ".path";
 
 	private static boolean isServlet4Present =

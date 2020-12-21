@@ -32,21 +32,55 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201221
+ * A. 解析路径模式的表示。 包括用于快速匹配的路径元素链，并累积计算状态以快速比较模式。
+ * B. {@code PathPattern}使用以下规则匹配URL路径：
+ * 		a. {@code ？}匹配一个字符
+ * 		b. {@code *}匹配路径段中的零个或多个字符
+ * 		c. {@code **}匹配零个或多个路径段，直到路径结尾
+ * 		d. {spring}匹配路径段并将其捕获为名为“spring”的变量
+ * 		e. {spring：[a-z] +}与正则表达式{@code [a-z] +}匹配，并将其作为名为“spring”的路径变量
+ * 		f. {* spring}匹配零个或多个路径段，直到路径结尾，并将其捕获为名为“spring”的变量
+ * C. 注意：与{@link org.springframework.util.AntPathMatcher}相比，{@code **}仅在模式末尾受支持。 例如，{@code / pages / {**}}有效，
+ *    但{@code / pages / {**} / details}无效。 捕获变量{* spring}也是如此。 目的是消除比较特异性模式时的歧义。
+ * D. 例子:
+ * 		a. {@code /pages/t?st.html}＆mdash; 匹配{@code /pages/test.html}和{@code /pages/tXst.html}，但不匹配{@code /pages/toast.html}
+ * 		b. {@code /resources/*.png}＆mdash; 匹配{@code resources}目录中的所有{@code .png}文件
+ * 		c. / resources / **; ＆mdash; 匹配{@code / resources /}路径下的所有文件，包括{@code /resources/image.png}和{@code /resources/css/spring.css}
+ * 		d. / resources / * path}＆mdash; 匹配{@code / resources /}路径下的所有文件，并在名为“path”的变量中捕获其相对路径；
+ * 	       {@code /resources/image.png}将与“路径”匹配＆rarr; “ /image.png”和{@code /resources/css/spring.css}将与“path”＆rarr; “ /css/spring.css”
+ * 	    e. / resources / {文件名：\\ w +.dat}。将与{@code /resources/spring.dat}匹配，并将值{@code“spring”}分配给{@code filename}变量
+ */
+/**
+ * A.
  * Representation of a parsed path pattern. Includes a chain of path elements
  * for fast matching and accumulates computed state for quick comparison of
  * patterns.
  *
+ * B.
  * <p>{@code PathPattern} matches URL paths using the following rules:<br>
  * <ul>
+ * a.
  * <li>{@code ?} matches one character</li>
+ *
+ * b.
  * <li>{@code *} matches zero or more characters within a path segment</li>
+ *
+ * c.
  * <li>{@code **} matches zero or more <em>path segments</em> until the end of the path</li>
+ *
+ * d.
  * <li><code>{spring}</code> matches a <em>path segment</em> and captures it as a variable named "spring"</li>
+ *
+ * e.
  * <li><code>{spring:[a-z]+}</code> matches the regexp {@code [a-z]+} as a path variable named "spring"</li>
+ *
+ * f.
  * <li><code>{*spring}</code> matches zero or more <em>path segments</em> until the end of the path
  * and captures it as a variable named "spring"</li>
  * </ul>
  *
+ * C.
  * <p><strong>Note:</strong> In contrast to
  * {@link org.springframework.util.AntPathMatcher}, {@code **} is supported only
  * at the end of a pattern. For example {@code /pages/{**}} is valid but
@@ -54,20 +88,30 @@ import org.springframework.util.StringUtils;
  * variant <code>{*spring}</code>. The aim is to eliminate ambiguity when
  * comparing patterns for specificity.
  *
+ * D.
  * <h3>Examples</h3>
  * <ul>
+ * a.
  * <li>{@code /pages/t?st.html} &mdash; matches {@code /pages/test.html} as well as
  * {@code /pages/tXst.html} but not {@code /pages/toast.html}</li>
+ *
+ * b.
  * <li>{@code /resources/*.png} &mdash; matches all {@code .png} files in the
  * {@code resources} directory</li>
+ *
+ * c.
  * <li><code>/resources/&#42;&#42;</code> &mdash; matches all files
  * underneath the {@code /resources/} path, including {@code /resources/image.png}
  * and {@code /resources/css/spring.css}</li>
+ *
+ * d.
  * <li><code>/resources/{&#42;path}</code> &mdash; matches all files
  * underneath the {@code /resources/} path and captures their relative path in
  * a variable named "path"; {@code /resources/image.png} will match with
  * "path" &rarr; "/image.png", and {@code /resources/css/spring.css} will match
  * with "path" &rarr; "/css/spring.css"</li>
+ *
+ * e.
  * <li><code>/resources/{filename:\\w+}.dat</code> will match {@code /resources/spring.dat}
  * and assign the value {@code "spring"} to the {@code filename} variable</li>
  * </ul>
@@ -77,6 +121,7 @@ import org.springframework.util.StringUtils;
  * @since 5.0
  * @see PathContainer
  */
+// 20201221 解析路径模式的表示。 包括用于快速匹配的路径元素链，并累积计算状态以快速比较模式
 public class PathPattern implements Comparable<PathPattern> {
 
 	private static final PathContainer EMPTY_PATH = PathContainer.parsePath("");

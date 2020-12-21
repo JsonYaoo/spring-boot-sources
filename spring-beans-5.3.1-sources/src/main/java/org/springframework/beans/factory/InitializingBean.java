@@ -17,10 +17,18 @@
 package org.springframework.beans.factory;
 
 /**
+ * 20201221
+ * A. 由{@link BeanFactory}设置完所有属性后需要响应的bean所实现的接口： 执行自定义初始化，或仅检查是否已设置所有必填属性。
+ * B. 实现{@code InitializingBean}的替代方法是指定自定义init方法，例如在XML bean定义中。 有关所有bean生命周期方法的列表，请参见
+ *    {@link BeanFactory BeanFactory javadocs}。
+ */
+/**
+ * A.
  * Interface to be implemented by beans that need to react once all their properties
  * have been set by a {@link BeanFactory}: e.g. to perform custom initialization,
  * or merely to check that all mandatory properties have been set.
  *
+ * B.
  * <p>An alternative to implementing {@code InitializingBean} is specifying a custom
  * init method, for example in an XML bean definition. For a list of all bean
  * lifecycle methods, see the {@link BeanFactory BeanFactory javadocs}.
@@ -31,6 +39,7 @@ package org.springframework.beans.factory;
  * @see org.springframework.beans.factory.config.BeanDefinition#getPropertyValues()
  * @see org.springframework.beans.factory.support.AbstractBeanDefinition#getInitMethodName()
  */
+// 20201221 由{@link BeanFactory}设置完所有属性后需要响应的bean所实现的接口： 执行自定义初始化，或仅检查是否已设置所有必填属性
 public interface InitializingBean {
 
 	/**

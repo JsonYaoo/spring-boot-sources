@@ -23,12 +23,20 @@ import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * A. 提供其他方法来处理servlet请求中的多部分内容，从而允许访问上载的文件。 实现还需要重写标准的{@link javax.servlet.ServletRequest}方法以进行参数访问，以使多部分参数可用。
+ * B. 一个具体的实现是{@link org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest}。 作为中间步骤，可以将
+ *    {@link org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest}子类化。
+ */
+/**
+ * A.
  * Provides additional methods for dealing with multipart content within a
  * servlet request, allowing to access uploaded files.
  * Implementations also need to override the standard
  * {@link javax.servlet.ServletRequest} methods for parameter access, making
  * multipart parameters available.
  *
+ * B.
  * <p>A concrete implementation is
  * {@link org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest}.
  * As an intermediate step,
@@ -46,6 +54,7 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest
  * @see org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest
  */
+// 20201221 提供其他方法来处理servlet请求中的多部分内容，从而允许访问上载的文件
 public interface MultipartHttpServletRequest extends HttpServletRequest, MultipartRequest {
 
 	/**

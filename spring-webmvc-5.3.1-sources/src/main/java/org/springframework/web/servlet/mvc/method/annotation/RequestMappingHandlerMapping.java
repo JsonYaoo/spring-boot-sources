@@ -55,10 +55,20 @@ import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 /**
+ * 20201221
+ * A. 根据{@link Controller @Controller}类中的类型和方法级别的{@link RequestMapping @RequestMapping}注释创建{@link RequestMappingInfo}实例。
+ * B. 弃用说明：在5.2.4中，不建议使用{@link #setUseSuffixPatternMatch（boolean）useSuffixPatternMatch}和
+ *    {@link #setUseRegisteredSuffixPatternMatch（boolean）useRegisteredSuffixPatternMatch}，以防止使用路径扩展进行请求映射和内容协商
+ *    （与在{@link org.springframework.web.accept.ContentNegotiationManagerFactoryBean ContentNegotiationManagerFactoryBean}中）。 有关更多背景信息，
+ *    请阅读问题<a href="https://github.com/spring-projects/spring-framework/issues/24179">＃24719 </a>。
+ */
+/**
+ * A.
  * Creates {@link RequestMappingInfo} instances from type and method-level
  * {@link RequestMapping @RequestMapping} annotations in
  * {@link Controller @Controller} classes.
  *
+ * B.
  * <p><strong>Deprecation Note:</strong></p> In 5.2.4,
  * {@link #setUseSuffixPatternMatch(boolean) useSuffixPatternMatch} and
  * {@link #setUseRegisteredSuffixPatternMatch(boolean) useRegisteredSuffixPatternMatch}
@@ -73,8 +83,8 @@ import org.springframework.web.util.pattern.PathPatternParser;
  * @author Sam Brannen
  * @since 3.1
  */
-public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMapping
-		implements MatchableHandlerMapping, EmbeddedValueResolverAware {
+// 20201221 根据{@link Controller @Controller}类中的类型和方法级别的{@link RequestMapping @RequestMapping}注释创建{@link RequestMappingInfo}实例
+public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMapping implements MatchableHandlerMapping, EmbeddedValueResolverAware {
 
 	private boolean useSuffixPatternMatch = false;
 

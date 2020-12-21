@@ -24,6 +24,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * 20201221
+ * 该接口定义了针对实际多部分请求公开的多部分请求访问操作。 {@link MultipartHttpServletRequest}对其进行了扩展。
+ */
+/**
  * This interface defines the multipart request access operations that are exposed
  * for actual multipart requests. It is extended by {@link MultipartHttpServletRequest}.
  *
@@ -31,6 +35,7 @@ import org.springframework.util.MultiValueMap;
  * @author Arjen Poutsma
  * @since 2.5.2
  */
+// 20201221 该接口定义了针对实际多部分请求公开的多部分请求访问操作
 public interface MultipartRequest {
 
 	/**

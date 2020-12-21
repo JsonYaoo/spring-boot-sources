@@ -43,8 +43,17 @@ import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.pattern.PathPattern;
 
 /**
+ * 20201221
+ * A. URL映射的{@link HandlerMapping}实现的抽象基类。
+ * B. 支持文字匹配和模式匹配，例如“ / test / *”，“ / test / **”等。 有关模式语法的详细信息，请在启用{@link #usesPathPatterns（）}时参考{@link PathPattern}，
+ *    否则请参阅{@link AntPathMatcher}。 语法基本相同，但是{@code PathPattern}语法更适合于Web应用程序，并且其实现效率更高。
+ * C. 检查所有路径模式，以便找到当前请求路径的最精确匹配，其中“最精确”是与当前请求路径匹配的最长路径模式。
+ */
+/**
+ * A.
  * Abstract base class for URL-mapped {@link HandlerMapping} implementations.
  *
+ * B.
  * <p>Supports literal matches and pattern matches such as "/test/*", "/test/**",
  * and others. For details on pattern syntax refer to {@link PathPattern} when
  * parsed patterns are {@link #usesPathPatterns() enabled} or see
@@ -52,6 +61,7 @@ import org.springframework.web.util.pattern.PathPattern;
  * {@code PathPattern} syntax is more tailored for web applications, and its
  * implementation is more efficient.
  *
+ * C.
  * <p>All path patterns are checked in order to find the most exact match for the
  * current request path where the "most exact" is the longest path pattern that
  * matches the current request path.
@@ -60,6 +70,7 @@ import org.springframework.web.util.pattern.PathPattern;
  * @author Arjen Poutsma
  * @since 16.04.2003
  */
+// 20201221 URL映射的{@link HandlerMapping}实现的抽象基类: 检查所有路径模式，以便找到当前请求路径的最精确匹配，其中“最精确”是与当前请求路径匹配的最长路径模式。
 public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping implements MatchableHandlerMapping {
 
 	@Nullable

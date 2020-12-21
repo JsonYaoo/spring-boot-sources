@@ -27,18 +27,29 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 20201221
+ * A. 想要知道应用程序上下文的应用程序对象的便捷超类，例如用于自定义查找协作bean或用于特定于上下文的资源访问。 它保存应用程序上下文引用，并提供初始化回调方法。
+ *    此外，它提供了许多方便的消息查找方法。
+ * B. 不需要继承此类：如果您需要访问上下文，例如，它将使事情变得容易一些。 用于访问文件资源或消息源。 注意，许多应用程序对象根本不需要了解应用程序上下文，因为它们可以
+ *    通过bean引用接收协作bean。
+ * C. 许多框架类都派生自此类，尤其是在Web支持中。
+ */
+/**
+ * A.
  * Convenient superclass for application objects that want to be aware of
  * the application context, e.g. for custom lookup of collaborating beans
  * or for context-specific resource access. It saves the application
  * context reference and provides an initialization callback method.
  * Furthermore, it offers numerous convenience methods for message lookup.
  *
+ * B.
  * <p>There is no requirement to subclass this class: It just makes things
  * a little easier if you need access to the context, e.g. for access to
  * file resources or to the message source. Note that many application
  * objects do not need to be aware of the application context at all,
  * as they can receive collaborating beans via bean references.
  *
+ * C.
  * <p>Many framework classes are derived from this class, particularly
  * within the web support.
  *
@@ -46,6 +57,7 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @see org.springframework.web.context.support.WebApplicationObjectSupport
  */
+// 20201221 想要知道应用程序上下文的应用程序对象的便捷超类: 例如用于自定义查找协作bean或用于特定于上下文的资源访问。 它保存应用程序上下文引用，并提供初始化回调方法
 public abstract class ApplicationObjectSupport implements ApplicationContextAware {
 
 	/** Logger that is available to subclasses. */

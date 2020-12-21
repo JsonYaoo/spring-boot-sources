@@ -27,11 +27,30 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
 
 /**
+ * 20201221
+ * A. {@link MultipartResolver}接口的标准实现，基于Servlet 3.0 {@link Part} API。 可以作为“multipartResolver” bean添加到Spring DispatcherServlet上下文中，
+ *    而无需在bean级别进行任何额外配置（请参见下文）。
+ * B. 注意：为了使用基于Servlet 3.0的多部分解析，您需要在{@code web.xml}中使用“multipart-config”部分或在Programmatic中使用
+ *    {@link javax.servlet.MultipartConfigElement}标记受影响的servlet。 Servlet注册，或者（对于自定义Servlet类）可能在Servlet类上带有
+ *    {@link javax.servlet.annotation.MultipartConfig}注释。 需要在该servlet注册级别应用配置设置，例如最大大小或存储位置；
+ *    Servlet 3.0不允许在MultipartResolver级别上设置它们:
+ * 			public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+ *	 			// ...
+ *	 			@Override
+ *	 			protected void customizeRegistration(ServletRegistration.Dynamic registration) {
+ *     				// Optionally also set maxFileSize, maxRequestSize, fileSizeThreshold
+ *     				registration.setMultipartConfig(new MultipartConfigElement("/tmp"));
+ *   			}
+ * 			}
+ */
+/**
+ * A.
  * Standard implementation of the {@link MultipartResolver} interface,
  * based on the Servlet 3.0 {@link Part} API.
  * To be added as "multipartResolver" bean to a Spring DispatcherServlet context,
  * without any extra configuration at the bean level (see below).
  *
+ * B.
  * <p><b>Note:</b> In order to use Servlet 3.0 based multipart parsing,
  * you need to mark the affected servlet with a "multipart-config" section in
  * {@code web.xml}, or with a {@link javax.servlet.MultipartConfigElement}
@@ -58,6 +77,7 @@ import org.springframework.web.multipart.MultipartResolver;
  * @see HttpServletRequest#getParts()
  * @see org.springframework.web.multipart.commons.CommonsMultipartResolver
  */
+// 20201221 基于Servlet 3.0 {@link Part} API: 可以作为“multipartResolver” bean添加到Spring DispatcherServlet上下文中，而无需在bean级别进行任何额外配置（请参见下文）
 public class StandardServletMultipartResolver implements MultipartResolver {
 
 	private boolean resolveLazily = false;

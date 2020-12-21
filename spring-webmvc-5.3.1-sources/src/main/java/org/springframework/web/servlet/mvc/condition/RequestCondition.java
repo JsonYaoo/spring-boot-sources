@@ -21,8 +21,16 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * A. 合同要求映射条件。
+ * B. 可以通过{@link #combine（Object）}组合请求条件，通过{@link #getMatchingCondition（HttpServletRequest）}与请求进行匹配，并通过
+ *    {@link #compareTo（Object，HttpServletRequest）}相互比较以确定, 这是给定请求的更接近匹配。
+ */
+/**
+ * A.
  * Contract for request mapping conditions.
  *
+ * B.
  * <p>Request conditions can be combined via {@link #combine(Object)}, matched to
  * a request via {@link #getMatchingCondition(HttpServletRequest)}, and compared
  * to each other via {@link #compareTo(Object, HttpServletRequest)} to determine
@@ -34,6 +42,7 @@ import org.springframework.lang.Nullable;
  * @param <T> the type of objects that this RequestCondition can be combined
  * with and compared to
  */
+// 20201221 约定要求映射条件
 public interface RequestCondition<T> {
 
 	/**

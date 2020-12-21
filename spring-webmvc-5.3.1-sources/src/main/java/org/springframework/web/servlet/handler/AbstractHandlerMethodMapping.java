@@ -50,9 +50,16 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
+ * 20201221
+ * A. {@link HandlerMapping}实现的抽象基类，这些实现定义了请求和{@link HandlerMethod}之间的映射。
+ * B. 对于每个已注册的处理程序方法，唯一的映射将由子类维护，这些子类定义了映射类型{@code <T>}的详细信息。
+ */
+/**
+ * A.
  * Abstract base class for {@link HandlerMapping} implementations that define
  * a mapping between a request and a {@link HandlerMethod}.
  *
+ * B.
  * <p>For each registered handler method, a unique mapping is maintained with
  * subclasses defining the details of the mapping type {@code <T>}.
  *
@@ -64,6 +71,7 @@ import org.springframework.web.servlet.HandlerMapping;
  * @param <T> the mapping for a {@link HandlerMethod} containing the conditions
  * needed to match the handler method to an incoming request.
  */
+// 20201221 HandlerMapping实现的抽象基类，这些实现定义了请求和HandlerMethod之间的映射
 public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMapping implements InitializingBean {
 
 	/**
@@ -356,8 +364,10 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	/**
 	 * Look up a handler method for the given request.
 	 */
+	// 20201221 查找给定请求的处理程序方法。
 	@Override
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
+		// 20201221 初始化用于请求映射的路径
 		String lookupPath = initLookupPath(request);
 		this.mappingRegistry.acquireReadLock();
 		try {

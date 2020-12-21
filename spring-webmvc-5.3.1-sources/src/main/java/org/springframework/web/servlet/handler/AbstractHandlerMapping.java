@@ -56,10 +56,17 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 /**
+ * 20201221
+ * A. {@link org.springframework.web.servlet.HandlerMapping}实现的抽象基类。 支持排序，默认处理程序，处理程序拦截器，包括由路径模式映射的处理程序拦截器。
+ * B. 注意：此基类不支持{@link #PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE}的公开。 该属性的支持取决于具体的子类，通常基于请求URL映射。
+ */
+/**
+ * A.
  * Abstract base class for {@link org.springframework.web.servlet.HandlerMapping}
  * implementations. Supports ordering, a default handler, handler interceptors,
  * including handler interceptors mapped by path patterns.
  *
+ * B.
  * <p>Note: This base class does <i>not</i> support exposure of the
  * {@link #PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE}. Support for this attribute
  * is up to concrete subclasses, typically based on request URL mappings.
@@ -72,12 +79,13 @@ import org.springframework.web.util.pattern.PathPatternParser;
  * @see #setInterceptors
  * @see org.springframework.web.servlet.HandlerInterceptor
  */
-public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
-		implements HandlerMapping, Ordered, BeanNameAware {
+// 20201221 HandlerMapping实现的抽象基类: 支持排序，默认处理程序，处理程序拦截器，包括由路径模式映射的处理程序拦截器, 但不支持公开{@link #PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE}属性(通常基于请求URL映射)
+public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport implements HandlerMapping, Ordered, BeanNameAware {
 
 	@Nullable
 	private Object defaultHandler;
 
+	// 20201221 URI路径模式的解析器, 可以将其与请求进行匹配
 	@Nullable
 	private PathPatternParser patternParser;
 
@@ -158,8 +166,10 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * {@code PathPatternParser}, or {@code null}.
 	 * @since 5.3
 	 */
+	// 20201221 返回{@link #setPatternParser（PathPatternParser）} 配置的{@code PathPatternParser}或{@code null}。
 	@Nullable
 	public PathPatternParser getPatternParser() {
+		// 20201221 返回URI路径模式的解析器, 可以将其与请求进行匹配
 		return this.patternParser;
 	}
 
@@ -468,16 +478,21 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		return (!mappedInterceptors.isEmpty() ? mappedInterceptors.toArray(new MappedInterceptor[0]) : null);
 	}
 
-
 	/**
 	 * Return "true" if this {@code HandlerMapping} has been
 	 * {@link #setPatternParser enabled} to use parsed {@code PathPattern}s.
 	 */
+	// 20201221 如果此{@code HandlerMapping}已被{@link #setPatternParser enabled}使用解析的{@code PathPattern}，则返回“ true”
 	@Override
 	public boolean usesPathPatterns() {
+		// 20201221 查询是否指定了URI路径模式的解析器
 		return getPatternParser() != null;
 	}
 
+	/**
+	 * 20201221
+	 * 查找给定请求的处理程序，如果未找到特定的处理程序，则退回到默认处理程序。
+	 */
 	/**
 	 * Look up a handler for the given request, falling back to the default
 	 * handler if no specific one is found.
@@ -485,9 +500,11 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @return the corresponding handler instance, or the default handler
 	 * @see #getHandlerInternal
 	 */
+	// 20201221 查找给定请求的处理程序，如果未找到特定的处理程序，则退回到默认处理程序。
 	@Override
 	@Nullable
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+		// 20201221 查找给定请求的处理程序，如果未找到特定请求，则返回{@code null}。 {@link #getHandler}调用此方法； 如果设置了{@code null}返回值，则会导致默认处理程序。
 		Object handler = getHandlerInternal(request);
 		if (handler == null) {
 			handler = getDefaultHandler();
@@ -526,14 +543,26 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	}
 
 	/**
+	 * 20201221
+	 * A. 查找给定请求的处理程序，如果未找到特定请求，则返回{@code null}。 {@link #getHandler}调用此方法； 如果设置了{@code null}返回值，则会导致默认处理程序。
+	 * B. 在CORS pre-flight请求中，此方法应基于URL路径，“Access-Control-Request-Method”标头中的HTTP方法和标头，而不是针对pre-flight请求，而是针对预期的实际请求返回
+	 *    匹配项从“ Access-Control-Request-Headers”标头中获取，从而允许通过{@link #getCorsConfiguration（Object，HttpServletRequest）}获取CORS配置
+	 * C. 注意：此方法还可能返回预构建的{@link HandlerExecutionChain}，将处理程序对象与动态确定的拦截器组合在一起。 静态指定的拦截器将合并到这样的现有链中。
+	 */
+	/**
+	 * A.
 	 * Look up a handler for the given request, returning {@code null} if no
 	 * specific one is found. This method is called by {@link #getHandler};
 	 * a {@code null} return value will lead to the default handler, if one is set.
+	 *
+	 * B.
 	 * <p>On CORS pre-flight requests this method should return a match not for
 	 * the pre-flight request but for the expected actual request based on the URL
 	 * path, the HTTP methods from the "Access-Control-Request-Method" header, and
 	 * the headers from the "Access-Control-Request-Headers" header thus allowing
 	 * the CORS configuration to be obtained via {@link #getCorsConfiguration(Object, HttpServletRequest)},
+	 *
+	 * C.
 	 * <p>Note: This method may also return a pre-built {@link HandlerExecutionChain},
 	 * combining a handler object with dynamically determined interceptors.
 	 * Statically specified interceptors will get merged into such an existing chain.
@@ -541,24 +570,44 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @return the corresponding handler instance, or {@code null} if none found
 	 * @throws Exception if there is an internal error
 	 */
+	// 20201221 查找给定请求的处理程序，如果未找到特定请求，则返回{@code null}。 {@link #getHandler}调用此方法； 如果设置了{@code null}返回值，则会导致默认处理程序。
 	@Nullable
 	protected abstract Object getHandlerInternal(HttpServletRequest request) throws Exception;
 
 	/**
+	 * 20201221
+	 * A. 初始化用于请求映射的路径。
+	 * B. 启用{@link #usesPathPatterns（）}解析模式后，{@link org.springframework.web.servlet将在外部解析
+	 *    {@link ServletRequestPathUtils＃parseAndCache（HttpServletRequest）DispatcherServlet}或
+	 *    {@link org.springframework.web.filter.ServletRequestPathFilter}。
+	 * C. 否则，对于通过{@code PathMatcher}进行的字符串模式匹配，此方法将通过{@link UrlPathHelper＃resolveAndCacheLookupPath resolve}路径。
+	 */
+	/**
+	 * A.
 	 * Initialize the path to use for request mapping.
+	 *
+	 * B.
 	 * <p>When parsed patterns are {@link #usesPathPatterns() enabled} a parsed
 	 * {@code RequestPath} is expected to have been
 	 * {@link ServletRequestPathUtils#parseAndCache(HttpServletRequest) parsed}
 	 * externally by the {@link org.springframework.web.servlet.DispatcherServlet}
 	 * or {@link org.springframework.web.filter.ServletRequestPathFilter}.
+	 *
+	 * C.
 	 * <p>Otherwise for String pattern matching via {@code PathMatcher} the
 	 * path is {@link UrlPathHelper#resolveAndCacheLookupPath resolved} by this
 	 * method.
+	 *
 	 * @since 5.3
 	 */
+	// 20201221 初始化用于请求映射的路径
 	protected String initLookupPath(HttpServletRequest request) {
+		// 20201221 查询是否指定了URI路径模式的解析器
 		if (usesPathPatterns()) {
+			// 20201221 是, 则移除“UrlPathHelper.path”属性: lookupPath已解决的Servlet请求属性的名称
 			request.removeAttribute(UrlPathHelper.PATH_ATTRIBUTE);
+
+
 			RequestPath requestPath = ServletRequestPathUtils.getParsedRequestPath(request);
 			String lookupPath = requestPath.pathWithinApplication().value();
 			return UrlPathHelper.defaultInstance.removeSemicolonContent(lookupPath);

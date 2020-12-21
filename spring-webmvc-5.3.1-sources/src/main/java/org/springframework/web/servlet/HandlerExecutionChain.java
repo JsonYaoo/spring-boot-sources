@@ -31,6 +31,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
 /**
+ * 20201221
+ * 处理程序执行链，包括处理程序对象和任何处理程序拦截器。 由HandlerMapping的{@link HandlerMapping＃getHandler}方法返回。
+ */
+/**
  * Handler execution chain, consisting of handler object and any handler interceptors.
  * Returned by HandlerMapping's {@link HandlerMapping#getHandler} method.
  *
@@ -38,6 +42,7 @@ import org.springframework.util.CollectionUtils;
  * @since 20.06.2003
  * @see HandlerInterceptor
  */
+// 20201221 处理程序执行链，包括处理程序对象和任何处理程序拦截器
 public class HandlerExecutionChain {
 
 	private static final Log logger = LogFactory.getLog(HandlerExecutionChain.class);

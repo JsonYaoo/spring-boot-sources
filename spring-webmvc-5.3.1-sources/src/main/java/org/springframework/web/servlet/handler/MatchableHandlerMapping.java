@@ -23,6 +23,10 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 /**
+ * 20201221
+ * {@link HandlerMapping}可以实现的附加接口，以公开与其内部请求匹配配置和实现对齐的请求匹配API。
+ */
+/**
  * Additional interface that a {@link HandlerMapping} can implement to expose
  * a request matching API aligned with its internal request matching
  * configuration and implementation.
@@ -31,6 +35,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
  * @since 4.3.1
  * @see HandlerMappingIntrospector
  */
+// 20201221 {@link HandlerMapping}可以实现的附加接口，以公开与其内部请求匹配配置和实现对齐的请求匹配API。
 public interface MatchableHandlerMapping extends HandlerMapping {
 
 	/**

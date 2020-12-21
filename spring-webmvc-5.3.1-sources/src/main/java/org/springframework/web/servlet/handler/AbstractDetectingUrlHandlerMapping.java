@@ -23,6 +23,10 @@ import org.springframework.context.ApplicationContextException;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 20201221
+ * {@link org.springframework.web.servlet.HandlerMapping}接口的抽象实现，通过对应用程序上下文中所有已定义的bean进行内省来检测处理程序bean的URL映射。
+ */
+/**
  * Abstract implementation of the {@link org.springframework.web.servlet.HandlerMapping}
  * interface, detecting URL mappings for handler beans through introspection of all
  * defined beans in the application context.
@@ -31,6 +35,7 @@ import org.springframework.util.ObjectUtils;
  * @since 2.5
  * @see #determineUrlsForHandler
  */
+// 20201221 HandlerMapping接口的抽象实现: 通过对应用程序上下文中所有已定义的bean进行内省来检测处理程序bean的URL映
 public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHandlerMapping {
 
 	private boolean detectHandlersInAncestorContexts = false;

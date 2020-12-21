@@ -361,6 +361,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	/** Perform cleanup of request attributes after include request?. */
 	private boolean cleanupAfterInclude = true;
 
+	// 20201221 此servlet使用的MultipartResolver。
 	/** MultipartResolver used by this servlet. */
 	@Nullable
 	private MultipartResolver multipartResolver;
@@ -375,6 +376,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	@Nullable
 	private ThemeResolver themeResolver;
 
+	// 20201221 此servlet使用的HandlerMappings列表。
 	/** List of HandlerMappings used by this servlet. */
 	@Nullable
 	private List<HandlerMapping> handlerMappings;
@@ -1044,6 +1046,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 
 		try {
+			// 20201221 处理向处理程序的实际分派: 所有HTTP方法都由该方法处理, 由HandlerAdapters或处理程序本身决定可接受的方法。
 			doDispatch(request, response);
 		}
 		finally {
@@ -1123,18 +1126,26 @@ public class DispatcherServlet extends FrameworkServlet {
 	protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		HttpServletRequest processedRequest = request;
 		HandlerExecutionChain mappedHandler = null;
+
+        // 20201221 判断是否存在多部分文件
 		boolean multipartRequestParsed = false;
 
+		// 20201221 获取当前请求的{@link WebAsyncManager}，如果找不到，请创建该请求并将其与请求关联。
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 
 		try {
+			// 20201221 Web MVC框架中的Model和View的持有人: 可以在单个返回值中返回模型和视图, 该模型是一个Map，允许使用多个按名称键入的对象
 			ModelAndView mv = null;
 			Exception dispatchException = null;
 
 			try {
+                // 20201221 将请求转换为多部分请求，并使多部分解析器可用, 将给定的HTTP请求解析为多部分文件和参数，并将请求包装在MultipartHttpServletRequest对象中
 				processedRequest = checkMultipart(request);
+
+				// 20201221 判断是否存在多部分文件
 				multipartRequestParsed = (processedRequest != request);
 
+				// 20201221 确定当前请求的处理程序。
 				// Determine handler for the current request.
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
@@ -1279,12 +1290,22 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
+	 * 20201221
+	 * A. 将请求转换为多部分请求，并使多部分解析器可用
+	 * B. 如果未设置多部分解析器，则只需使用现有请求。
+	 */
+	/**
+	 * A.
 	 * Convert the request into a multipart request, and make multipart resolver available.
+	 *
+	 * B.
 	 * <p>If no multipart resolver is set, simply use the existing request.
+	 *
 	 * @param request current HTTP request
 	 * @return the processed request (multipart wrapper if necessary)
 	 * @see MultipartResolver#resolveMultipart
 	 */
+	// 20201221 将请求转换为多部分请求，并使多部分解析器可用, 将给定的HTTP请求解析为多部分文件和参数，并将请求包装在MultipartHttpServletRequest对象中
 	protected HttpServletRequest checkMultipart(HttpServletRequest request) throws MultipartException {
 		if (this.multipartResolver != null && this.multipartResolver.isMultipart(request)) {
 			if (WebUtils.getNativeRequest(request, MultipartHttpServletRequest.class) != null) {
@@ -1298,6 +1319,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 			else {
 				try {
+                    // 20201221 将给定的HTTP请求解析为多部分文件和参数，并将请求包装在MultipartHttpServletRequest对象中: 提供对文件描述符的访问, 可通过标准ServletRequest方法访问
 					return this.multipartResolver.resolveMultipart(request);
 				}
 				catch (MultipartException ex) {
@@ -1344,16 +1366,28 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 	}
 
+    /**
+     * 20201221
+     * A. 返回此请求的HandlerExecutionChain。
+     * B. 按顺序尝试所有处理程序映射。
+     */
 	/**
+     * A.
 	 * Return the HandlerExecutionChain for this request.
+     *
+     * B.
 	 * <p>Tries all handler mappings in order.
 	 * @param request current HTTP request
 	 * @return the HandlerExecutionChain, or {@code null} if no handler could be found
 	 */
+	// 20201221 返回此请求的HandlerExecutionChain -> 按顺序尝试所有处理程序映射
 	@Nullable
 	protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+		// 20201221 此servlet使用的HandlerMappings列表
 		if (this.handlerMappings != null) {
+			// 20201221 遍历HandlerMappings列表
 			for (HandlerMapping mapping : this.handlerMappings) {
+				// 20201221 返回此请求的处理程序和所有拦截器。 该选择可以根据请求URL，会话状态或实现类选择的任何因素进行
 				HandlerExecutionChain handler = mapping.getHandler(request);
 				if (handler != null) {
 					return handler;

@@ -19,19 +19,30 @@ package org.springframework.web.util.pattern;
 import org.springframework.http.server.PathContainer;
 
 /**
+ * 20201221
+ * A. URI路径模式的解析器，生成{@link PathPattern}实例，然后可以将其与请求进行匹配。
+ * B. {@link PathPatternParser}和{@link PathPattern}专为与Web应用程序中的HTTP URL路径一起使用而设计，在Web应用程序中，大量URI路径模式不断与传入请求匹配，
+ *    从而激发了有效匹配的需求。
+ * C. 有关路径模式语法的详细信息，请参见{@link PathPattern}。
+ */
+/**
+ * A.
  * Parser for URI path patterns producing {@link PathPattern} instances that can
  * then be matched to requests.
  *
+ * B.
  * <p>The {@link PathPatternParser} and {@link PathPattern} are specifically
  * designed for use with HTTP URL paths in web applications where a large number
  * of URI path patterns, continuously matched against incoming requests,
  * motivates the need for efficient matching.
  *
+ * C.
  * <p>For details of the path pattern syntax see {@link PathPattern}.
  *
  * @author Andy Clement
  * @since 5.0
  */
+// 20201221 URI路径模式的解析器，生成{@link PathPattern}实例，然后可以将其与请求进行匹配
 public class PathPatternParser {
 
 	private boolean matchOptionalTrailingSeparator = true;

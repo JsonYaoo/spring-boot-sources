@@ -56,6 +56,10 @@ import org.springframework.web.util.WebUtils;
 import org.springframework.web.util.pattern.PathPattern;
 
 /**
+ * 20201221
+ * {@link RequestMappingInfo}为其定义请求和处理程序方法之间的映射的类的抽象基类。
+ */
+/**
  * Abstract base class for classes for which {@link RequestMappingInfo} defines
  * the mapping between a request and a handler method.
  *
@@ -63,6 +67,7 @@ import org.springframework.web.util.pattern.PathPattern;
  * @author Rossen Stoyanchev
  * @since 3.1
  */
+// 20201221 RequestMappingInfo为其定义请求和处理程序方法之间的映射的类的抽象基类
 public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMethodMapping<RequestMappingInfo> {
 
 	private static final Method HTTP_OPTIONS_HANDLE_METHOD;
