@@ -54,13 +54,23 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @author Sebastien Deleuze
  */
+// 20201221 Web应用程序的杂项实用程序。 由各种框架类使用。
 public abstract class WebUtils {
 
 	/**
+	 * 20201221
+	 * A. 包含请求URI的标准Servlet 2.3+ spec请求属性。
+	 * B. 如果通过{@code RequestDispatcher}包含在内，当前资源将看到原始请求。 它自己的请求URI作为请求属性公开。
+	 */
+	/**
+	 * A.
 	 * Standard Servlet 2.3+ spec request attribute for include request URI.
+	 *
+	 * B.
 	 * <p>If included via a {@code RequestDispatcher}, the current resource will see the
 	 * originating request. Its own request URI is exposed as a request attribute.
 	 */
+	// 20201221 包含请求URI的标准Servlet 2.3+ spec请求属性
 	public static final String INCLUDE_REQUEST_URI_ATTRIBUTE = "javax.servlet.include.request_uri";
 
 	/**
@@ -490,14 +500,23 @@ public abstract class WebUtils {
 	}
 
 	/**
+	 * 20201221
+	 * A. 确定给定的请求是否是包含请求，即不是从外部传入的顶级HTTP请求。
+	 * B. 检查“javax.servlet.include.request_uri”请求属性的存在。 可以检查仅包含请求中包含的任何请求属性。
+	 */
+	/**
+	 * A.
 	 * Determine whether the given request is an include request,
 	 * that is, not a top-level HTTP request coming in from the outside.
+	 *
+	 * B.
 	 * <p>Checks the presence of the "javax.servlet.include.request_uri"
 	 * request attribute. Could check any request attribute that is only
 	 * present in an include request.
 	 * @param request current servlet request
 	 * @return whether the given request is an include request
 	 */
+	// 20201221 确定给定的请求是否是包含请求，即不是从外部传入的顶级HTTP请求
 	public static boolean isIncludeRequest(ServletRequest request) {
 		return (request.getAttribute(INCLUDE_REQUEST_URI_ATTRIBUTE) != null);
 	}

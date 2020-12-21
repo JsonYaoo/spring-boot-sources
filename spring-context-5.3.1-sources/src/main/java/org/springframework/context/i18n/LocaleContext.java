@@ -21,8 +21,15 @@ import java.util.Locale;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * A. 用于确定当前语言环境的策略界面。
+ * B. 可以通过LocaleContextHolder类将LocaleContext实例与线程关联。
+ */
+/**
+ * A.
  * Strategy interface for determining the current Locale.
  *
+ * B.
  * <p>A LocaleContext instance can be associated with a thread
  * via the LocaleContextHolder class.
  *
@@ -31,6 +38,7 @@ import org.springframework.lang.Nullable;
  * @see LocaleContextHolder#getLocale()
  * @see TimeZoneAwareLocaleContext
  */
+// 20201221 用于确定当前语言环境的策略界面
 public interface LocaleContext {
 
 	/**

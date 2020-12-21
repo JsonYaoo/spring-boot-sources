@@ -28,10 +28,17 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
+ * 20201221
+ * A. {@link org.springframework.web.client.RestTemplate}和其他HTTP访问网关助手的基类，将与拦截器相关的属性添加到{@link HttpAccessor}的公共属性中。
+ * B. 不可直接使用。 有关入口点，请参见{@link org.springframework.web.client.RestTemplate}。
+ */
+/**
+ * A.
  * Base class for {@link org.springframework.web.client.RestTemplate}
  * and other HTTP accessing gateway helpers, adding interceptor-related
  * properties to {@link HttpAccessor}'s common properties.
  *
+ * B.
  * <p>Not intended to be used directly.
  * See {@link org.springframework.web.client.RestTemplate} for an entry point.
  *
@@ -42,6 +49,7 @@ import org.springframework.util.CollectionUtils;
  * @see InterceptingClientHttpRequestFactory
  * @see org.springframework.web.client.RestTemplate
  */
+// 20201221 HTTP访问网关助手的基类: 将与拦截器相关的属性添加到{@link HttpAccessor}的公共属性中
 public abstract class InterceptingHttpAccessor extends HttpAccessor {
 
 	private final List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();

@@ -38,9 +38,19 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.async.DeferredResult.DeferredResultHandler;
 
 /**
+ * 20201221
+ * A. 用于管理异步请求处理的中央类，主要用作SPI，通常不被应用程序类直接使用。
+ * B. 异步方案从线程（T1）中的常规请求处理开始。 可以通过调用{@link #startCallableProcessing（Callable，Object ...）startCallableProcessing}或
+ *    {@link #startDeferredResultProcessing（DeferredResult，Object ...）startDeferredResultProcessing}来启动并发请求处理，这两者都会在单独的线程中产生结果 （T2）。
+ *    结果被保存，并将请求分派到容器，以在第三线程（T3）中使用保存的结果恢复处理。 在分派线程（T3）中，可以通过{@link #getConcurrentResult（）}访问保存的结果，也可以通过
+ *    {@link #hasConcurrentResult（）}检测到保存的结果。
+ */
+/**
+ * A.
  * The central class for managing asynchronous request processing, mainly intended
  * as an SPI and not typically used directly by application classes.
  *
+ * B.
  * <p>An async scenario starts with request processing as usual in a thread (T1).
  * Concurrent request handling can be initiated by calling
  * {@link #startCallableProcessing(Callable, Object...) startCallableProcessing} or
@@ -59,6 +69,7 @@ import org.springframework.web.context.request.async.DeferredResult.DeferredResu
  * @see org.springframework.web.filter.OncePerRequestFilter#shouldNotFilterAsyncDispatch
  * @see org.springframework.web.filter.OncePerRequestFilter#isAsyncDispatch
  */
+// 20201221 用于管理异步请求处理的中央类
 public final class WebAsyncManager {
 
 	private static final Object RESULT_NONE = new Object();
@@ -92,6 +103,7 @@ public final class WebAsyncManager {
 	 */
 	private volatile boolean errorHandlingInProgress;
 
+	// 20201221 并发请求处理拦截器列表
 	private final Map<Object, CallableProcessingInterceptor> callableInterceptors = new LinkedHashMap<>();
 
 	private final Map<Object, DeferredResultProcessingInterceptor> deferredResultInterceptors = new LinkedHashMap<>();
@@ -132,6 +144,11 @@ public final class WebAsyncManager {
 	}
 
 	/**
+	 * 20201221
+	 * 当前请求的选定处理程序是否选择异步处理该请求。 返回值为“true”表示正在进行并发处理，并且响应将保持打开状态。 返回值“false”表示并发处理未开始或可能尚未完成，
+	 * 并且调度了请求以进一步处理并发结果。
+	 */
+	/**
 	 * Whether the selected handler for the current request chose to handle the
 	 * request asynchronously. A return value of "true" indicates concurrent
 	 * handling is under way and the response will remain open. A return value
@@ -139,6 +156,7 @@ public final class WebAsyncManager {
 	 * that it has completed and the request was dispatched for further
 	 * processing of the concurrent result.
 	 */
+	// 20201221 当前请求的选定处理程序是否选择异步处理该请求
 	public boolean isConcurrentHandlingStarted() {
 		return (this.asyncWebRequest != null && this.asyncWebRequest.isAsyncStarted());
 	}
@@ -194,9 +212,12 @@ public final class WebAsyncManager {
 	 * @param key the key
 	 * @param interceptor the interceptor to register
 	 */
+	// 20201221 在给定的密钥下注册{@link CallableProcessingInterceptor}。
 	public void registerCallableInterceptor(Object key, CallableProcessingInterceptor interceptor) {
 		Assert.notNull(key, "Key is required");
 		Assert.notNull(interceptor, "CallableProcessingInterceptor  is required");
+
+		// 20201221 并发请求处理拦截器列表
 		this.callableInterceptors.put(key, interceptor);
 	}
 

@@ -19,9 +19,14 @@ package javax.servlet;
 import java.util.Enumeration;
 
 /**
+ * 20201220
+ * servlet容器使用的servlet配置对象，用于在初始化期间将信息传递给servlet。
+ */
+/**
  * A servlet configuration object used by a servlet container to pass
  * information to a servlet during initialization.
  */
+// 20201220 servlet容器使用的servlet配置对象，用于在初始化期间将信息传递给servlet。
 public interface ServletConfig {
 
     /**

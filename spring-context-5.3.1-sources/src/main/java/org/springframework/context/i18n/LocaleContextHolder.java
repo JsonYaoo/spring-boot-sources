@@ -24,11 +24,19 @@ import org.springframework.core.NamedThreadLocal;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * A. 将LocaleContext实例与当前线程关联的简单持有人类。 如果{@code Inheritable}标志设置为{@code true}，则当前线程派生的所有子线程都将继承LocaleContext。
+ * B. 如有必要，在Spring中用作当前Locale的中央保持器：例如，在MessageSourceAccessor中。 DispatcherServlet在此处自动公开其当前的语言环境。 其他应用程序也可以公开
+ *    其应用程序，以使诸如MessageSourceAccessor之类的类自动使用该Locale。
+ */
+/**
+ * A.
  * Simple holder class that associates a LocaleContext instance
  * with the current thread. The LocaleContext will be inherited
  * by any child threads spawned by the current thread if the
  * {@code inheritable} flag is set to {@code true}.
  *
+ * B.
  * <p>Used as a central holder for the current Locale in Spring,
  * wherever necessary: for example, in MessageSourceAccessor.
  * DispatcherServlet automatically exposes its current Locale here.
@@ -42,6 +50,7 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.context.support.MessageSourceAccessor
  * @see org.springframework.web.servlet.DispatcherServlet
  */
+// 20201221 在Spring中用作当前Locale的中央保持器: DispatcherServlet在此处自动公开其当前的语言环境
 public final class LocaleContextHolder {
 
 	private static final ThreadLocal<LocaleContext> localeContextHolder =
@@ -86,9 +95,18 @@ public final class LocaleContextHolder {
 	}
 
 	/**
+	 * 20201221
+	 * A. 将给定的LocaleContext与当前线程相关联
+	 * B. 给定的LocaleContext可以是{@link TimeZoneAwareLocaleContext}，其中包含具有关联的时区信息的语言环境。
+	 */
+	/**
+	 * A.
 	 * Associate the given LocaleContext with the current thread.
+	 *
+	 * B.
 	 * <p>The given LocaleContext may be a {@link TimeZoneAwareLocaleContext},
 	 * containing a locale with associated time zone information.
+	 *
 	 * @param localeContext the current LocaleContext,
 	 * or {@code null} to reset the thread-bound context
 	 * @param inheritable whether to expose the LocaleContext as inheritable
@@ -96,6 +114,7 @@ public final class LocaleContextHolder {
 	 * @see SimpleLocaleContext
 	 * @see SimpleTimeZoneAwareLocaleContext
 	 */
+	// 20201221 将给定的LocaleContext与当前线程相关联, 默认不可继承
 	public static void setLocaleContext(@Nullable LocaleContext localeContext, boolean inheritable) {
 		if (localeContext == null) {
 			resetLocaleContext();

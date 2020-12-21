@@ -20,15 +20,23 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
+ * 20201212
+ * A. 表示HTTP输出消息，由{@linkplain #getHeaders（）标头}和可写的{@linkplain #getBody（）主体}组成。
+ * B. 通常由客户端的HTTP请求句柄或服务器端的HTTP响应句柄实现。
+ */
+/**
+ * A.
  * Represents an HTTP output message, consisting of {@linkplain #getHeaders() headers}
  * and a writable {@linkplain #getBody() body}.
  *
+ * B.
  * <p>Typically implemented by an HTTP request handle on the client side,
  * or an HTTP response handle on the server side.
  *
  * @author Arjen Poutsma
  * @since 3.0
  */
+// 20201221 表示HTTP输出消息，由{@linkplain #getHeaders（）标头}和可写的{@linkplain #getBody（）主体}组成
 public interface HttpOutputMessage extends HttpMessage {
 
 	/**

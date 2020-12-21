@@ -20,30 +20,51 @@ package javax.servlet;
 import java.io.IOException;
 
 /**
+ * 20201220
+ * A. 定义所有servlet必须实现的方法。
+ * B. Servlet是在Web服务器中运行的小型Java程序。 Servlet通常通过HTTP（超文本传输协议）接收和响应来自Web客户端的请求。
+ * C. 要实现此接口，您可以编写扩展javax.servlet.GenericServlet的通用servlet或扩展javax.servlet.http.HttpServlet的HTTP servlet。
+ * D. 该接口定义了初始化Servlet，处理请求以及从服务器中删除Servlet的方法。 这些称为生命周期方法，按以下顺序调用：
+ *      a. 构造Servlet，然后使用init方法初始化。
+ *      b. 客户端对service方法的所有调用都会得到处理。
+ *      c. 将该Servlet退出服务，然后使用destroy方法将其破坏，然后将垃圾回收并完成。
+ * E. 除了生命周期方法外，此接口还提供了Servlet可用于获取任何启动信息的getServletConfig方法，以及允许Servlet返回有关自身的基本信息（如作者，版本和版本、版权）。
+ */
+/**
+ * A.
  * Defines methods that all servlets must implement.
  *
+ * B.
  * <p>
  * A servlet is a small Java program that runs within a Web server. Servlets
  * receive and respond to requests from Web clients, usually across HTTP, the
  * HyperText Transfer Protocol.
  *
+ * C.
  * <p>
  * To implement this interface, you can write a generic servlet that extends
  * <code>javax.servlet.GenericServlet</code> or an HTTP servlet that extends
  * <code>javax.servlet.http.HttpServlet</code>.
  *
+ * D.
  * <p>
  * This interface defines methods to initialize a servlet, to service requests,
  * and to remove a servlet from the server. These are known as life-cycle
  * methods and are called in the following sequence:
  * <ol>
+ * a.
  * <li>The servlet is constructed, then initialized with the <code>init</code>
  * method.
+ *
+ * b.
  * <li>Any calls from clients to the <code>service</code> method are handled.
+ *
+ * c.
  * <li>The servlet is taken out of service, then destroyed with the
  * <code>destroy</code> method, then garbage collected and finalized.
  * </ol>
  *
+ * E.
  * <p>
  * In addition to the life-cycle methods, this interface provides the
  * <code>getServletConfig</code> method, which the servlet can use to get any
@@ -54,6 +75,7 @@ import java.io.IOException;
  * @see GenericServlet
  * @see javax.servlet.http.HttpServlet
  */
+// 20201220 定义所有servlet必须实现的方法: Servlet是在Web服务器中运行的小型Java程序。 Servlet通常通过HTTP（超文本传输协议）接收和响应来自Web客户端的请求
 public interface Servlet {
 
     /**
@@ -107,18 +129,29 @@ public interface Servlet {
     public ServletConfig getServletConfig();
 
     /**
+     * 20201221
+     * A. 由Servlet容器调用，以允许Servlet响应请求。
+     * B. 仅在servlet的init方法成功完成后才调用此方法。
+     * C. 始终应为引发或发送错误的servlet设置响应的状态代码。
+     * D. Servlet通常在多线程Servlet容器中运行，该容器可以同时处理多个请求。 开发人员必须注意同步访问任何共享资源，例如文件，网络连接，以及Servlet的类和实例变量。
+     *    <a href="http://java.sun.com/Series/Tutorial/java/threads/multithreaded.html">有关多线程编程的Java教程</a>中提供了有关Java多线程编程的更多信息。
+     */
+    /**
+     * A.
      * Called by the servlet container to allow the servlet to respond to a
      * request.
      *
+     * B.
      * <p>
      * This method is only called after the servlet's <code>init()</code> method
      * has completed successfully.
      *
+     * C.
      * <p>
      * The status code of the response always should be set for a servlet that
      * throws or sends an error.
      *
-     *
+     * D.
      * <p>
      * Servlets typically run inside multithreaded servlet containers that can
      * handle multiple requests concurrently. Developers must be aware to
@@ -129,11 +162,12 @@ public interface Servlet {
      * ="http://java.sun.com/Series/Tutorial/java/threads/multithreaded.html">
      * the Java tutorial on multi-threaded programming</a>.
      *
-     *
+     * // 20201221 包含客户端请求的ServletRequest对象
      * @param req
      *            the <code>ServletRequest</code> object that contains the
      *            client's request
      *
+     * // 20201221 包含Servlet响应的ServletResponse对象
      * @param res
      *            the <code>ServletResponse</code> object that contains the
      *            servlet's response
@@ -145,8 +179,8 @@ public interface Servlet {
      * @exception IOException
      *                if an input or output exception occurs
      */
-    public void service(ServletRequest req, ServletResponse res)
-            throws ServletException, IOException;
+    // 20201221 由Servlet容器调用，以允许Servlet响应请求, 仅在servlet的init方法成功完成后才调用此方法
+    public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException;
 
     /**
      * Returns information about the servlet, such as author, version, and

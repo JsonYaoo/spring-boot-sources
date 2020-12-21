@@ -24,11 +24,19 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 20201221
+ * A. Holder类以线程绑定{@link RequestAttributes}对象的形式公开Web请求。 如果{@codeInheritable}标志设置为{@code true}，则当前线程产生的所有子线程都将继承该请求。
+ * B. 使用{@link RequestContextListener}或{@link org.springframework.web.filter.RequestContextFilter}公开当前的Web请求。 请注意，默认情况下，
+ *    {@link org.springframework.web.servlet.DispatcherServlet}已经公开了当前请求。
+ */
+/**
+ * A.
  * Holder class to expose the web request in the form of a thread-bound
  * {@link RequestAttributes} object. The request will be inherited
  * by any child threads spawned by the current thread if the
  * {@code inheritable} flag is set to {@code true}.
  *
+ * B.
  * <p>Use {@link RequestContextListener} or
  * {@link org.springframework.web.filter.RequestContextFilter} to expose
  * the current web request. Note that
@@ -42,6 +50,7 @@ import org.springframework.util.ClassUtils;
  * @see org.springframework.web.filter.RequestContextFilter
  * @see org.springframework.web.servlet.DispatcherServlet
  */
+// 20201221 Holder类以线程绑定{@link RequestAttributes}对象的形式公开Web请求: DispatcherServlet已经公开了当前请求
 public abstract class RequestContextHolder  {
 
 	private static final boolean jsfPresent =
@@ -79,6 +88,7 @@ public abstract class RequestContextHolder  {
 	 * @param inheritable whether to expose the RequestAttributes as inheritable
 	 * for child threads (using an {@link InheritableThreadLocal})
 	 */
+	// 20201221 将给定的RequestAttributes绑定到当前线程, 默认不可继承
 	public static void setRequestAttributes(@Nullable RequestAttributes attributes, boolean inheritable) {
 		if (attributes == null) {
 			resetRequestAttributes();
@@ -100,6 +110,7 @@ public abstract class RequestContextHolder  {
 	 * @return the RequestAttributes currently bound to the thread,
 	 * or {@code null} if none bound
 	 */
+	// 20201221 返回当前绑定到线程的RequestAttributes。
 	@Nullable
 	public static RequestAttributes getRequestAttributes() {
 		RequestAttributes attributes = requestAttributesHolder.get();

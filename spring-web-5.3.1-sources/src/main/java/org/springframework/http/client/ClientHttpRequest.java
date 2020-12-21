@@ -23,9 +23,16 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpRequest;
 
 /**
+ * 20201221
+ * A. 表示客户端HTTP请求。 通过{@link ClientHttpRequestFactory}的实现创建。
+ * B. {@code ClientHttpRequest}可以被{@linkplain #execute（）执行}，接收到一个{@link ClientHttpResponse}，可以从中读取该信息。
+ */
+/**
+ * A.
  * Represents a client-side HTTP request.
  * Created via an implementation of the {@link ClientHttpRequestFactory}.
  *
+ * B.
  * <p>A {@code ClientHttpRequest} can be {@linkplain #execute() executed},
  * receiving a {@link ClientHttpResponse} which can be read from.
  *
@@ -33,6 +40,7 @@ import org.springframework.http.HttpRequest;
  * @since 3.0
  * @see ClientHttpRequestFactory#createRequest(java.net.URI, HttpMethod)
  */
+// 20201221 表示客户端HTTP请求: {@code ClientHttpRequest}可以被{@linkplain #execute（）执行}，接收到一个{@link ClientHttpResponse}，可以从中读取该信息
 public interface ClientHttpRequest extends HttpRequest, HttpOutputMessage {
 
 	/**

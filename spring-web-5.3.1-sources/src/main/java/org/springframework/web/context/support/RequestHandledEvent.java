@@ -20,8 +20,15 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * A. 在ApplicationContext中处理请求时引发的事件。
+ * B. 由Spring自己的FrameworkServlet支持（通过特定的ServletRequestHandledEvent子类），但是任何其他Web组件也可以支持它。
+ */
+/**
+ * A.
  * Event raised when a request is handled within an ApplicationContext.
  *
+ * B.
  * <p>Supported by Spring's own FrameworkServlet (through a specific
  * ServletRequestHandledEvent subclass), but can also be raised by any
  * other web component.
@@ -33,6 +40,7 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.web.servlet.FrameworkServlet
  * @see org.springframework.context.ApplicationContext#publishEvent
  */
+// 20201221 在ApplicationContext中处理请求时引发的事件
 @SuppressWarnings("serial")
 public class RequestHandledEvent extends ApplicationEvent {
 

@@ -27,13 +27,22 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
 /**
+ * 20201221
+ * A. 扩展{@link javax.servlet.ServletRequest}接口以提供HTTP Servlet的请求信息。
+ * B. Servlet容器创建一个HttpServletRequest对象，并将其作为参数传递给Servlet的服务方法（doGet，doPost等）。
+ */
+/**
+ * A.
  * Extends the {@link javax.servlet.ServletRequest} interface to provide request
  * information for HTTP servlets.
+ *
+ * B.
  * <p>
  * The servlet container creates an <code>HttpServletRequest</code> object and
  * passes it as an argument to the servlet's service methods
  * (<code>doGet</code>, <code>doPost</code>, etc).
  */
+// 20201221 ServletRequest扩展接口: 提供HTTP Servlet的请求信息, 作为参数传递给Servlet的服务方法（doGet，doPost等）
 public interface HttpServletRequest extends ServletRequest {
 
     /**
@@ -198,13 +207,19 @@ public interface HttpServletRequest extends ServletRequest {
     }
 
     /**
+     * 20201221
+     * 返回发出此请求的HTTP方法的名称，例如GET，POST或PUT。 与CGI变量REQUEST_METHOD的值相同。
+     */
+    /**
      * Returns the name of the HTTP method with which this request was made, for
      * example, GET, POST, or PUT. Same as the value of the CGI variable
      * REQUEST_METHOD.
      *
+     * // 20201221 一个字符串，用于指定与此请求一起使用的方法的名称
      * @return a <code>String</code> specifying the name of the method with
      *         which this request was made
      */
+    // 20201221 返回发出此请求的HTTP方法的名称，例如GET，POST或PUT。
     public String getMethod();
 
     /**

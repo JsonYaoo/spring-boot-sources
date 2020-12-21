@@ -33,12 +33,21 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.util.Assert;
 
 /**
+ * 20201221
+ * A. {@link org.springframework.web.client.RestTemplate}和其他HTTP访问网关帮助器的基类，定义了诸如{@link ClientHttpRequestFactory}等要操作的通用属性。
+ * B. 不可直接使用。
+ * C. 有关入口点，请参见{@link org.springframework.web.client.RestTemplate}。
+ */
+/**
+ * A.
  * Base class for {@link org.springframework.web.client.RestTemplate}
  * and other HTTP accessing gateway helpers, defining common properties
  * such as the {@link ClientHttpRequestFactory} to operate on.
  *
+ * B.
  * <p>Not intended to be used directly.
  *
+ * C.
  * <p>See {@link org.springframework.web.client.RestTemplate} for an entry point.
  *
  * @author Arjen Poutsma
@@ -48,6 +57,7 @@ import org.springframework.util.Assert;
  * @see ClientHttpRequestFactory
  * @see org.springframework.web.client.RestTemplate
  */
+// 20201221 HTTP访问网关帮助器的基类: 定义了诸如{@link ClientHttpRequestFactory}等要操作的通用属性
 public abstract class HttpAccessor {
 
 	/** Logger available to subclasses. */

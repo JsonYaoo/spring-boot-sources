@@ -29,6 +29,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * 该接口指定一组基本的RESTful操作。 由{@link RestTemplate}实现。 它不经常直接使用，而是增强可测试性的有用选项，因为它很容易被嘲笑或存根。
+ */
+/**
  * Interface specifying a basic set of RESTful operations.
  * Implemented by {@link RestTemplate}. Not often used directly, but a useful
  * option to enhance testability, as it can easily be mocked or stubbed.
@@ -38,6 +42,7 @@ import org.springframework.lang.Nullable;
  * @since 3.0
  * @see RestTemplate
  */
+// 202012212 该接口指定一组基本的RESTful操作, 由{@link RestTemplate}实现
 public interface RestOperations {
 
 	// GET

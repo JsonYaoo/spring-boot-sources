@@ -32,8 +32,15 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * 20201221
+ * A. {@link RequestAttributes}接口的基于Servlet的实现。
+ * B. 从servlet请求和HTTP会话范围访问对象，而“会话”和“全局会话”之间没有区别。
+ */
+/**
+ * A.
  * Servlet-based implementation of the {@link RequestAttributes} interface.
  *
+ * B.
  * <p>Accesses objects from servlet request and HTTP session scope,
  * with no distinction between "session" and "global session".
  *
@@ -42,6 +49,7 @@ import org.springframework.web.util.WebUtils;
  * @see javax.servlet.ServletRequest#getAttribute
  * @see HttpSession#getAttribute
  */
+// 20201221 基于Servlet实现的RequestAttributes: 从servlet请求和HTTP会话范围访问对象，而“会话”和“全局会话”之间没有区别
 public class ServletRequestAttributes extends AbstractRequestAttributes {
 
 	/**
@@ -76,6 +84,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 	 * Create a new ServletRequestAttributes instance for the given request.
 	 * @param request current HTTP request
 	 */
+	// 20201221 为给定请求创建一个新的ServletRequestAttributes实例。
 	public ServletRequestAttributes(HttpServletRequest request) {
 		Assert.notNull(request, "Request must not be null");
 		this.request = request;
@@ -86,6 +95,7 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 	 * @param request current HTTP request
 	 * @param response current HTTP response (for optional exposure)
 	 */
+	// 20201221 为给定请求创建一个新的ServletRequestAttributes实例。
 	public ServletRequestAttributes(HttpServletRequest request, @Nullable HttpServletResponse response) {
 		this(request);
 		this.response = response;

@@ -27,6 +27,7 @@ import org.springframework.util.StringUtils;
  * @author Rossen Stoyanchev
  * @since 5.0
  */
+// 20201221 {@link RequestPath}的默认实现。
 class DefaultRequestPath implements RequestPath {
 
 	private final PathContainer fullPath;

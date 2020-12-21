@@ -21,6 +21,10 @@ import java.util.Locale;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * {@link LocaleContext}接口的简单实现，始终返回指定的{@code Locale}。
+ */
+/**
  * Simple implementation of the {@link LocaleContext} interface,
  * always returning a specified {@code Locale}.
  *
@@ -30,17 +34,22 @@ import org.springframework.lang.Nullable;
  * @see LocaleContextHolder#getLocale()
  * @see SimpleTimeZoneAwareLocaleContext
  */
+// 20201221 {@link LocaleContext}接口的简单实现，始终返回指定的{@code Locale}。
 public class SimpleLocaleContext implements LocaleContext {
 
 	@Nullable
 	private final Locale locale;
 
-
+	/**
+	 * 20201221
+	 * 创建一个新的SimpleLocaleContext，以暴露指定的语言环境。 每次{@link #getLocale（）}调用都将返回此语言环境。
+	 */
 	/**
 	 * Create a new SimpleLocaleContext that exposes the specified Locale.
 	 * Every {@link #getLocale()} call will return this Locale.
 	 * @param locale the Locale to expose, or {@code null} for no specific one
 	 */
+	// 20201221 创建一个新的SimpleLocaleContext，以暴露指定的语言环境
 	public SimpleLocaleContext(@Nullable Locale locale) {
 		this.locale = locale;
 	}

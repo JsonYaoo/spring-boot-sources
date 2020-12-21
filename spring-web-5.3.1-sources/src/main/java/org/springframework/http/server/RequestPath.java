@@ -20,6 +20,11 @@ import java.net.URI;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * {@link PathContainer}的专业化，将路径细分为{@link #contextPath（）}和其余的{@link #pathWithinApplication（）}。后者通常用于应用程序内的请求映射，而前者则是
+ * 在准备指向应用程序的外部链接时很有用。
+ */
+/**
  * Specialization of {@link PathContainer} that sub-divides the path into a
  * {@link #contextPath()} and the remaining {@link #pathWithinApplication()}.
  * The lattery is typically used for request mapping within the application
@@ -29,6 +34,7 @@ import org.springframework.lang.Nullable;
  * @author Rossen Stoyanchev
  * @since 5.0
  */
+// 20201221 {@link PathContainer}的专业化: 将路径细分为{@link #contextPath（）}和其余的{@link #pathWithinApplication（）}
 public interface RequestPath extends PathContainer {
 
 	/**
@@ -74,6 +80,7 @@ public interface RequestPath extends PathContainer {
 	 * @param contextPath the contextPath portion of the URI path
 	 * @since 5.3
 	 */
+	// 20201221 {@link #parse（URI，String）}与已编码的{@link URI＃getRawPath（）原始路径}的变体。
 	static RequestPath parse(String rawPath, @Nullable String contextPath) {
 		return new DefaultRequestPath(rawPath, contextPath);
 	}

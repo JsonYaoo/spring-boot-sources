@@ -20,25 +20,40 @@ import java.io.IOException;
 import java.util.Enumeration;
 
 /**
+ * 20201220
+ * A. 定义一个与协议无关的通用servlet。 要编写用于Web的HTTP Servlet，请扩展{@link javax.servlet.http.HttpServlet}。
+ * B. GenericServlet实现Servlet和ServletConfig接口。 可以直接由servlet扩展GenericServlet，尽管扩展特定于协议的子类（如HttpServlet）更为常见。
+ * C. GenericServlet使编写servlet更容易。 它提供了生命周期方法init和destroy以及ServletConfig接口中的方法的简单版本。
+ *    GenericServlet还实现了在ServletContext接口中声明的log方法。
+ * D. 要编写通用servlet，您只需要重写抽象服务方法即可。
+ */
+/**
+ * A.
  * Defines a generic, protocol-independent servlet. To write an HTTP servlet for
  * use on the Web, extend {@link javax.servlet.http.HttpServlet} instead.
+ *
+ * B.
  * <p>
  * <code>GenericServlet</code> implements the <code>Servlet</code> and
  * <code>ServletConfig</code> interfaces. <code>GenericServlet</code> may be
  * directly extended by a servlet, although it's more common to extend a
  * protocol-specific subclass such as <code>HttpServlet</code>.
  * <p>
+ *
+ * C.
  * <code>GenericServlet</code> makes writing servlets easier. It provides simple
  * versions of the lifecycle methods <code>init</code> and <code>destroy</code>
  * and of the methods in the <code>ServletConfig</code> interface.
  * <code>GenericServlet</code> also implements the <code>log</code> method,
  * declared in the <code>ServletContext</code> interface.
+ *
+ * D.
  * <p>
  * To write a generic servlet, you need only override the abstract
  * <code>service</code> method.
  */
-public abstract class GenericServlet implements Servlet, ServletConfig,
-        java.io.Serializable {
+// 20201220 定义一个与协议无关的通用servlet: 使编写servlet更容易, 提供了生命周期方法init和destroy以及ServletConfig接口中的方法的简单版本, 还实现了在ServletContext接口中声明的log方法
+public abstract class GenericServlet implements Servlet, ServletConfig, java.io.Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -203,8 +218,16 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
     }
 
     /**
+     * 20201221
+     * A. 由Servlet容器调用，以允许Servlet响应请求。 请参阅{@link Servlet＃service}。
+     * B. 将此方法声明为抽象方法，因此子类（例如HttpServlet）必须覆盖它。
+     */
+    /**
+     * A.
      * Called by the servlet container to allow the servlet to respond to a
      * request. See {@link Servlet#service}.
+     *
+     * B.
      * <p>
      * This method is declared abstract so subclasses, such as
      * <code>HttpServlet</code>, must override it.
@@ -221,9 +244,9 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * @exception IOException
      *                if an input or output exception occurs
      */
+    // 20201221 由Servlet容器调用，以允许Servlet响应请求: 子类（例如HttpServlet）必须覆盖它
     @Override
-    public abstract void service(ServletRequest req, ServletResponse res)
-            throws ServletException, IOException;
+    public abstract void service(ServletRequest req, ServletResponse res) throws ServletException, IOException;
 
     /**
      * Returns the name of this servlet instance. See

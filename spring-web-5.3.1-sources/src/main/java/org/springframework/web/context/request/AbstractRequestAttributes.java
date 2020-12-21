@@ -22,6 +22,10 @@ import java.util.Map;
 import org.springframework.util.Assert;
 
 /**
+ * 20201221
+ * RequestAttributes实现的抽象支持类，为特定于请求的销毁回调和更新访问的会话属性提供请求完成机制。
+ */
+/**
  * Abstract support class for RequestAttributes implementations,
  * offering a request completion mechanism for request-specific destruction
  * callbacks and for updating accessed session attributes.
@@ -30,21 +34,34 @@ import org.springframework.util.Assert;
  * @since 2.0
  * @see #requestCompleted()
  */
+// 20201221 RequestAttributes实现的抽象支持类，为特定于请求的销毁回调和更新访问的会话属性提供请求完成机制
 public abstract class AbstractRequestAttributes implements RequestAttributes {
 
+	// 20201221 从属性名称String映射到销毁回调Runnable。
 	/** Map from attribute name String to destruction callback Runnable. */
 	protected final Map<String, Runnable> requestDestructionCallbacks = new LinkedHashMap<>(8);
 
 	private volatile boolean requestActive = true;
 
-
 	/**
+	 * 20201221
+	 * A. 发出请求已完成的信号。
+	 * B. 执行所有请求销毁回调，并更新在请求处理期间已访问的会话属性。
+	 */
+	/**
+	 * A.
 	 * Signal that the request has been completed.
+	 *
+	 * B.
 	 * <p>Executes all request destruction callbacks and updates the
 	 * session attributes that have been accessed during request processing.
 	 */
+	// 20201221 发出请求已完成的信号: 执行所有请求销毁回调，并更新在请求处理期间已访问的会话属性
 	public void requestCompleted() {
+		// 20201221 请求完成后，执行所有已注册执行的回调。
 		executeRequestDestructionCallbacks();
+
+		// 20201221 更新在请求处理期间已访问的所有会话属性，以向基础会话管理器公开它们的潜在更新状态。
 		updateAccessedSessionAttributes();
 		this.requestActive = false;
 	}
@@ -85,6 +102,7 @@ public abstract class AbstractRequestAttributes implements RequestAttributes {
 	 * Execute all callbacks that have been registered for execution
 	 * after request completion.
 	 */
+	// 20201221 请求完成后，执行所有已注册执行的回调。
 	private void executeRequestDestructionCallbacks() {
 		synchronized (this.requestDestructionCallbacks) {
 			for (Runnable runnable : this.requestDestructionCallbacks.values()) {
@@ -98,6 +116,7 @@ public abstract class AbstractRequestAttributes implements RequestAttributes {
 	 * Update all session attributes that have been accessed during request processing,
 	 * to expose their potentially updated state to the underlying session manager.
 	 */
+	// 20201221 更新在请求处理期间已访问的所有会话属性，以向基础会话管理器公开它们的潜在更新状态。
 	protected abstract void updateAccessedSessionAttributes();
 
 }

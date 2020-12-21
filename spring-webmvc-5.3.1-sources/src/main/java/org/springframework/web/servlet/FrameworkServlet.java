@@ -71,23 +71,56 @@ import org.springframework.web.util.NestedServletException;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * 20201220
+ * A. Spring Web框架的基础servlet。 在基于JavaBean的整体解决方案中提供与Spring应用程序上下文的集成。
+ * B. 此类提供以下功能：
+ * 		a. 每个servlet管理一个{@link org.springframework.web.context.WebApplicationContext WebApplicationContext}实例。
+ * 	   	   Servlet的配置由Servlet名称空间中的bean确定。
+ * 	   	b. 发布有关请求处理的事件，无论是否成功处理了请求。
+ * C. 子类必须实现{@link #doService}才能处理请求。 因为这扩展了{@link HttpServletBean}而不是直接扩展HttpServlet，所以bean属性会自动映射到其上。
+ *    子类可以重写{@link #initFrameworkServlet（）}进行自定义初始化。
+ * D. 如果未找到，则在servlet初始化参数级别检测“contextClass”参数，并返回默认上下文类
+ *    {@link org.springframework.web.context.support.XmlWebApplicationContext XmlWebApplicationContext}。请注意，使用默认的{@code FrameworkServlet}，
+ *    自定义上下文类需要实现{@link org.springframework.web.context.ConfigurableWebApplicationContext ConfigurableWebApplicationContext} SPI。
+ * E. 接受一个可选的“contextInitializerClasses” Servlet初始化参数，该参数指定一个或多个
+ *    {@link org.springframework.context.ApplicationContextInitializer ApplicationContextInitializer}类。 托管的Web应用程序上下文将委派给这些初始化程序，
+ *    从而允许进行其他编程配置，例如根据{@linkplain org.springframework.context.ConfigurableApplicationContext＃getEnvironment（）}上下文环境添加属性源或
+ *    激活配置文件。 另请参见{@link org.springframework.web.context.ContextLoader}，它支持具有“root” Web应用程序上下文相同语义的
+ *    “contextInitializerClasses”上下文参数。
+ * F. 将“contextConfigLocation” servlet初始化参数传递给上下文实例，将其解析为可能由多个逗号和空格分隔的多个文件路径，例如“test-servlet.xml，myServlet.xml”。
+ *    如果未明确指定，则上下文实现应从Servlet的命名空间构建默认位置。
+ * G. 注意：如果有多个配置位置，则至少在使用Spring的默认ApplicationContext实现时，以后的bean定义将覆盖在先前加载的文件中定义的定义。 可以利用它来通过一个额外的XML文件
+ *    有意覆盖某些bean定义。
+ * H. 默认名称空间是“'servlet-name'-servlet”，例如servlet名称“test”的“test-servlet”（使用XmlWebApplicationContext导致默认位置为“/WEB-INF/test-servlet.xml”）。
+ *    也可以通过“名称空间”servlet init-param显式设置名称空间。
+ * I. 从Spring 3.1开始，{@code FrameworkServlet}现在可以注入Web应用程序上下文，而不是在内部创建它自己的上下文。 这在Servlet 3.0+环境中非常有用，该环境支持以编程方式
+ *    注册Servlet实例。 有关详细信息，请参见{@link #FrameworkServlet（WebApplicationContext）} Javadoc。
+ */
+/**
+ * A.
  * Base servlet for Spring's web framework. Provides integration with
  * a Spring application context, in a JavaBean-based overall solution.
  *
+ * B.
  * <p>This class offers the following functionality:
  * <ul>
+ * a.
  * <li>Manages a {@link org.springframework.web.context.WebApplicationContext
  * WebApplicationContext} instance per servlet. The servlet's configuration is determined
  * by beans in the servlet's namespace.
+ *
+ * b.
  * <li>Publishes events on request processing, whether or not a request is
  * successfully handled.
  * </ul>
  *
+ * C.
  * <p>Subclasses must implement {@link #doService} to handle requests. Because this extends
  * {@link HttpServletBean} rather than HttpServlet directly, bean properties are
  * automatically mapped onto it. Subclasses can override {@link #initFrameworkServlet()}
  * for custom initialization.
  *
+ * D.
  * <p>Detects a "contextClass" parameter at the servlet init-param level,
  * falling back to the default context class,
  * {@link org.springframework.web.context.support.XmlWebApplicationContext
@@ -96,6 +129,7 @@ import org.springframework.web.util.WebUtils;
  * {@link org.springframework.web.context.ConfigurableWebApplicationContext
  * ConfigurableWebApplicationContext} SPI.
  *
+ * E.
  * <p>Accepts an optional "contextInitializerClasses" servlet init-param that
  * specifies one or more {@link org.springframework.context.ApplicationContextInitializer
  * ApplicationContextInitializer} classes. The managed web application context will be
@@ -106,22 +140,26 @@ import org.springframework.web.util.WebUtils;
  * supports a "contextInitializerClasses" context-param with identical semantics for
  * the "root" web application context.
  *
+ * F.
  * <p>Passes a "contextConfigLocation" servlet init-param to the context instance,
  * parsing it into potentially multiple file paths which can be separated by any
  * number of commas and spaces, like "test-servlet.xml, myServlet.xml".
  * If not explicitly specified, the context implementation is supposed to build a
  * default location from the namespace of the servlet.
  *
+ * G.
  * <p>Note: In case of multiple config locations, later bean definitions will
  * override ones defined in earlier loaded files, at least when using Spring's
  * default ApplicationContext implementation. This can be leveraged to
  * deliberately override certain bean definitions via an extra XML file.
  *
+ * H.
  * <p>The default namespace is "'servlet-name'-servlet", e.g. "test-servlet" for a
  * servlet-name "test" (leading to a "/WEB-INF/test-servlet.xml" default location
  * with XmlWebApplicationContext). The namespace can also be set explicitly via
  * the "namespace" servlet init-param.
  *
+ * I.
  * <p>As of Spring 3.1, {@code FrameworkServlet} may now be injected with a web
  * application context, rather than creating its own internally. This is useful in Servlet
  * 3.0+ environments, which support programmatic registration of servlet instances. See
@@ -139,6 +177,8 @@ import org.springframework.web.util.WebUtils;
  * @see #setContextInitializerClasses
  * @see #setNamespace
  */
+// 20201220 Spring Web框架的基础servlet, 在基于JavaBean的整体解决方案中提供与Spring应用程序上下文的集成: 每个Servlet管理一个WebApplicationContext实例, 发布有关请求处理的事件(无论是否成功处理了请求)
+// 20201220 子类必须实现{@link #doService}才能处理请求、子类可以重写{@link #initFrameworkServlet（）}进行自定义初始化
 @SuppressWarnings("serial")
 public abstract class FrameworkServlet extends HttpServletBean implements ApplicationContextAware {
 
@@ -198,9 +238,11 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	/** Should we publish the context as a ServletContext attribute?. */
 	private boolean publishContext = true;
 
+	// 20201221 我们是否应该在每个请求的末尾发布ServletRequestHandledEvent？
 	/** Should we publish a ServletRequestHandledEvent at the end of each request?. */
 	private boolean publishEvents = true;
 
+	// 20201221 公开LocaleContext和RequestAttributes可继承为子线程吗？
 	/** Expose LocaleContext and RequestAttributes as inheritable for child threads?. */
 	private boolean threadContextInheritable = false;
 
@@ -213,6 +255,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	/** Whether to log potentially sensitive info (request params at DEBUG + headers at TRACE). */
 	private boolean enableLoggingRequestDetails = false;
 
+	// 20201221 此Servlet的WebApplicationContext。
 	/** WebApplicationContext for this servlet. */
 	@Nullable
 	private WebApplicationContext webApplicationContext;
@@ -801,6 +844,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	/**
 	 * Return this servlet's WebApplicationContext.
 	 */
+	// 20201221 返回此Servlet的WebApplicationContext。
 	@Nullable
 	public final WebApplicationContext getWebApplicationContext() {
 		return this.webApplicationContext;
@@ -867,34 +911,45 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 	}
 
-
 	/**
 	 * Override the parent class implementation in order to intercept PATCH requests.
 	 */
+	// 20201221 重写父类实现以拦截PATCH请求。
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// 20201221 将给定的方法值解析为{@code HttpMethod}。
 		HttpMethod httpMethod = HttpMethod.resolve(request.getMethod());
+
+		// 20201221 PATCH类型的HttpMethod
 		if (httpMethod == HttpMethod.PATCH || httpMethod == null) {
+			// 20201221 处理此请求，发布事件，无论结果如何: 子类必须实现doService方法来完成请求处理，并接收针对GET，POST，PUT和DELETE的集中式回调
 			processRequest(request, response);
-		}
-		else {
+		} else {
+			// 20201221 【当前默认】否则从公共服务方法接收标准的HTTP请求，并将其分派到此类中定义的do Method方法, 此方法是service方法的HTTP特定版本。 无需重写此方法。
 			super.service(request, response);
 		}
 	}
 
 	/**
+	 * 20201221
+	 * A. 将GET请求委托给processRequest / doService。
+	 * B. 将由HttpServlet的默认实现{@code doHead}调用，其中的{@code NoBodyResponse}仅捕获内容长度。
+	 */
+	/**
+	 * A.
 	 * Delegate GET requests to processRequest/doService.
+	 *
+	 * B.
 	 * <p>Will also be invoked by HttpServlet's default implementation of {@code doHead},
 	 * with a {@code NoBodyResponse} that just captures the content length.
+	 *
 	 * @see #doService
 	 * @see #doHead
 	 */
+	// 20201221 将GET请求委托给processRequest / doService。
 	@Override
 	protected final void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		processRequest(request, response);
 	}
 
@@ -902,10 +957,10 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * Delegate POST requests to {@link #processRequest}.
 	 * @see #doService
 	 */
+	// 20201221 将POST请求委托给{@link #processRequest}。
 	@Override
 	protected final void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		processRequest(request, response);
 	}
 
@@ -913,10 +968,10 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * Delegate PUT requests to {@link #processRequest}.
 	 * @see #doService
 	 */
+	// 20201221 将PUT请求委托给{@link #processRequest}。
 	@Override
 	protected final void doPut(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		processRequest(request, response);
 	}
 
@@ -924,31 +979,41 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * Delegate DELETE requests to {@link #processRequest}.
 	 * @see #doService
 	 */
+	// 20201221 将DELETE请求委托给{@link #processRequest}。
 	@Override
 	protected final void doDelete(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		processRequest(request, response);
 	}
 
 	/**
+	 * 20201221
+	 * A. 如果需要，将OPTIONS请求委托给{@link #processRequest}。
+	 * B. 否则，以及在分派后仍然没有设置“Allow”标头的情况下，应用HttpServlet的标准OPTIONS处理。
+	 */
+	/**
+	 * A.
 	 * Delegate OPTIONS requests to {@link #processRequest}, if desired.
+	 *
+	 * B.
 	 * <p>Applies HttpServlet's standard OPTIONS processing otherwise,
 	 * and also if there is still no 'Allow' header set after dispatching.
 	 * @see #doService
 	 */
+	// 20201221 如果需要，将OPTIONS请求委托给{@link #processRequest}。
 	@Override
 	protected void doOptions(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		if (this.dispatchOptionsRequest || CorsUtils.isPreFlightRequest(request)) {
 			processRequest(request, response);
 			if (response.containsHeader("Allow")) {
+				// 20201221 来自处理程序的正确OPTIONS响应-我们完成了。
 				// Proper OPTIONS response coming from a handler - we're done.
 				return;
 			}
 		}
 
+		// 20201221 使用响应包装程序以便始终将PATCH添加到允许的方法中
 		// Use response wrapper in order to always add PATCH to the allowed methods
 		super.doOptions(request, new HttpServletResponseWrapper(response) {
 			@Override
@@ -962,17 +1027,26 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	}
 
 	/**
+	 * 20201221
+	 * A. 如果需要，将TRACE请求委托给{@link #processRequest}。
+	 * B. 否则，将应用HttpServlet的标准TRACE处理。
+	 */
+	/**
+	 * A.
 	 * Delegate TRACE requests to {@link #processRequest}, if desired.
+	 *
+	 * B.
 	 * <p>Applies HttpServlet's standard TRACE processing otherwise.
 	 * @see #doService
 	 */
+	// 20201221 如果需要，将TRACE请求委托给{@link #processRequest}。
 	@Override
 	protected void doTrace(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		if (this.dispatchTraceRequest) {
 			processRequest(request, response);
 			if ("message/http".equals(response.getContentType())) {
+				// 20201221 来自处理程序的正确TRACE响应-我们完成了。
 				// Proper TRACE response coming from a handler - we're done.
 				return;
 			}
@@ -981,28 +1055,46 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	}
 
 	/**
+	 * 20201221
+	 * A. 处理此请求，发布事件，无论结果如何。
+	 * B. 实际的事件处理由抽象的{@link #doService}模板方法执行。
+	 */
+	/**
+	 * A.
 	 * Process this request, publishing an event regardless of the outcome.
+	 *
+	 * B.
 	 * <p>The actual event handling is performed by the abstract
 	 * {@link #doService} template method.
 	 */
-	protected final void processRequest(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-
+	// 20201221 处理此请求，发布事件，无论结果如何: 子类必须实现doService方法来完成请求处理，并接收针对GET，POST，PUT和DELETE的集中式回调
+	protected final void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		long startTime = System.currentTimeMillis();
 		Throwable failureCause = null;
 
+		// 20201221 在Spring中用作当前Locale的中央保持器: DispatcherServlet在此处自动公开其当前的语言环境
 		LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
+
+		// 20201221 为给定请求构建LocaleContext，将请求的主要语言环境公开为当前语言环境。
 		LocaleContext localeContext = buildLocaleContext(request);
 
+		// 20201221 返回当前绑定到线程的RequestAttributes。
 		RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
+
+		// 20201221 考虑到预先绑定的属性（及其类型），为给定的请求构建ServletRequestAttributes（可能还包含对响应的引用）。
 		ServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
 
+		// 20201221 获取当前请求的{@link WebAsyncManager}，如果找不到，请创建该请求并将其与请求关联。
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+
+		// 20201221 在给定的密钥下注册{@link CallableProcessingInterceptor}。
 		asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), new RequestBindingInterceptor());
 
+		// 20201221 将给定的LocaleContext、RequestAttributes绑定到当前线程, 默认不可继承
 		initContextHolders(request, localeContext, requestAttributes);
 
 		try {
+			// 20201221 子类必须实现此方法来完成请求处理，并接收针对GET，POST，PUT和DELETE的集中式回调: 本质上与HttpServlet常用的{@code doGet}或{@code doPost}方法相同
 			doService(request, response);
 		}
 		catch (ServletException | IOException ex) {
@@ -1015,11 +1107,15 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 
 		finally {
+			// 20201221 重置上一次的LocaleContext、RequestAttributes绑定到当前线程, 默认不可继承
 			resetContextHolders(request, previousLocaleContext, previousAttributes);
 			if (requestAttributes != null) {
+				// 20201221 发出请求已完成的信号: 执行所有请求销毁回调，并更新在请求处理期间已访问的会话属性
 				requestAttributes.requestCompleted();
 			}
 			logResult(request, response, failureCause, asyncManager);
+
+			// 20201221 发布一个ServletRequestHandledEvent。
 			publishRequestHandledEvent(request, response, startTime, failureCause);
 		}
 	}
@@ -1031,11 +1127,17 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * @return the corresponding LocaleContext, or {@code null} if none to bind
 	 * @see LocaleContextHolder#setLocaleContext
 	 */
+	// 20201221 为给定请求构建LocaleContext，将请求的主要语言环境公开为当前语言环境。
 	@Nullable
 	protected LocaleContext buildLocaleContext(HttpServletRequest request) {
+		// 20201221 创建一个新的SimpleLocaleContext，以暴露指定的语言环境
 		return new SimpleLocaleContext(request.getLocale());
 	}
 
+	/**
+	 * 20201221
+	 * 考虑到预先绑定的属性（及其类型），为给定的请求构建ServletRequestAttributes（可能还包含对响应的引用）。
+	 */
 	/**
 	 * Build ServletRequestAttributes for the given request (potentially also
 	 * holding a reference to the response), taking pre-bound attributes
@@ -1047,29 +1149,36 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * the previously bound instance (or not binding any, if none bound before)
 	 * @see RequestContextHolder#setRequestAttributes
 	 */
+	// 20201221 考虑到预先绑定的属性（及其类型），为给定的请求构建ServletRequestAttributes（可能还包含对响应的引用）。
 	@Nullable
 	protected ServletRequestAttributes buildRequestAttributes(HttpServletRequest request,
 			@Nullable HttpServletResponse response, @Nullable RequestAttributes previousAttributes) {
 
 		if (previousAttributes == null || previousAttributes instanceof ServletRequestAttributes) {
+			// 20201221 基于Servlet实现的RequestAttributes: 从servlet请求和HTTP会话范围访问对象，而“会话”和“全局会话”之间没有区别
 			return new ServletRequestAttributes(request, response);
 		}
 		else {
+			// 20201221 保留预绑定的RequestAttributes实例
 			return null;  // preserve the pre-bound RequestAttributes instance
 		}
 	}
 
+	// 20201221 将给定的LocaleContext、RequestAttributes绑定到当前线程, 默认不可继承
 	private void initContextHolders(HttpServletRequest request,
 			@Nullable LocaleContext localeContext, @Nullable RequestAttributes requestAttributes) {
 
 		if (localeContext != null) {
+			// 20201221 将给定的LocaleContext与当前线程相关联, 默认不可继承
 			LocaleContextHolder.setLocaleContext(localeContext, this.threadContextInheritable);
 		}
 		if (requestAttributes != null) {
+			// 20201221 将给定的RequestAttributes绑定到当前线程, 默认不可继承
 			RequestContextHolder.setRequestAttributes(requestAttributes, this.threadContextInheritable);
 		}
 	}
 
+	// 20201221 重置给定的LocaleContext、RequestAttributes绑定到当前线程, 默认不可继承
 	private void resetContextHolders(HttpServletRequest request,
 			@Nullable LocaleContext prevLocaleContext, @Nullable RequestAttributes previousAttributes) {
 
@@ -1132,13 +1241,16 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 	}
 
+	// 20201221 发布一个ServletRequestHandledEvent。
 	private void publishRequestHandledEvent(HttpServletRequest request, HttpServletResponse response,
 			long startTime, @Nullable Throwable failureCause) {
 
 		if (this.publishEvents && this.webApplicationContext != null) {
+			// 20201221 无论我们是否成功，都发布一个事件。
 			// Whether or not we succeeded, publish an event.
 			long processingTime = System.currentTimeMillis() - startTime;
 			this.webApplicationContext.publishEvent(
+					// 20201221 创建一个新的ServletRequestHandledEvent。
 					new ServletRequestHandledEvent(this,
 							request.getRequestURI(), request.getRemoteAddr(),
 							request.getMethod(), getServletConfig().getServletName(),
@@ -1161,23 +1273,33 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		return (userPrincipal != null ? userPrincipal.getName() : null);
 	}
 
-
 	/**
+	 * 20201221
+	 * A. 子类必须实现此方法来完成请求处理，并接收针对GET，POST，PUT和DELETE的集中式回调。
+	 * B. 合同本质上与HttpServlet常用的{@code doGet}或{@code doPost}方法相同。
+	 * C. 此类拦截调用以确保发生异常处理和事件发布。
+	 */
+	/**
+	 * A.
 	 * Subclasses must implement this method to do the work of request handling,
 	 * receiving a centralized callback for GET, POST, PUT and DELETE.
+	 *
+	 * B.
 	 * <p>The contract is essentially the same as that for the commonly overridden
 	 * {@code doGet} or {@code doPost} methods of HttpServlet.
+	 *
+	 * C.
 	 * <p>This class intercepts calls to ensure that exception handling and
 	 * event publication takes place.
+	 *
 	 * @param request current HTTP request
 	 * @param response current HTTP response
 	 * @throws Exception in case of any kind of processing failure
 	 * @see javax.servlet.http.HttpServlet#doGet
 	 * @see javax.servlet.http.HttpServlet#doPost
 	 */
-	protected abstract void doService(HttpServletRequest request, HttpServletResponse response)
-			throws Exception;
-
+	// 20201221 子类必须实现此方法来完成请求处理，并接收针对GET，POST，PUT和DELETE的集中式回调: 本质上与HttpServlet常用的{@code doGet}或{@code doPost}方法相同
+	protected abstract void doService(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 	/**
 	 * ApplicationListener endpoint that receives events from this servlet's WebApplicationContext
@@ -1191,11 +1313,15 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		}
 	}
 
-
+	/**
+	 * 20201221
+	 * 初始化和重置FrameworkServlet的上下文持有者（即LocaleContextHolder和RequestContextHolder）的CallableProcessingInterceptor实现。
+	 */
 	/**
 	 * CallableProcessingInterceptor implementation that initializes and resets
 	 * FrameworkServlet's context holders, i.e. LocaleContextHolder and RequestContextHolder.
 	 */
+	// 20201221 初始化和重置FrameworkServlet的上下文持有者（即LocaleContextHolder和RequestContextHolder）的CallableProcessingInterceptor实现。
 	private class RequestBindingInterceptor implements CallableProcessingInterceptor {
 
 		@Override

@@ -19,6 +19,10 @@ package org.springframework.web.context.support;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * RequestHandledEvent的特定于Servlet的子类，添加了特定于Servlet的上下文信息。
+ */
+/**
  * Servlet-specific subclass of RequestHandledEvent,
  * adding servlet-specific context information.
  *
@@ -27,6 +31,7 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.web.servlet.FrameworkServlet
  * @see org.springframework.context.ApplicationContext#publishEvent
  */
+// 20201221 在ApplicationContext中处理Servlet请求时引发的事件，添加了特定于Servlet的上下文信息。
 @SuppressWarnings("serial")
 public class ServletRequestHandledEvent extends RequestHandledEvent {
 
@@ -109,6 +114,7 @@ public class ServletRequestHandledEvent extends RequestHandledEvent {
 	 * @param failureCause the cause of failure, if any
 	 * @param statusCode the HTTP status code of the response
 	 */
+	// 20201221 创建一个新的ServletRequestHandledEvent。
 	public ServletRequestHandledEvent(Object source, String requestUrl,
 			String clientAddress, String method, String servletName, @Nullable String sessionId,
 			@Nullable String userName, long processingTimeMillis, @Nullable Throwable failureCause, int statusCode) {

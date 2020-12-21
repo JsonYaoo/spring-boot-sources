@@ -21,9 +21,27 @@ import java.io.PrintWriter;
 import java.util.Locale;
 
 /**
+ * 20201221
+ * A. 定义一个对象，以帮助Servlet向客户端发送响应。 Servlet容器创建一个ServletResponse对象，并将其作为参数传递给Servlet的service方法。
+ * B. 要在MIME正文响应中发送二进制数据，请使用{@link #getOutputStream}返回的{@link ServletOutputStream}。 要发送字符数据，请使用{@link #getWriter}返回的
+ *    PrintWriter对象。 例如，要混合二进制和文本数据以创建多部分响应，请使用ServletOutputStream并手动管理字符部分。
+ * C. MIME主体响应的字符集可以显式或隐式指定。 指定响应主体的优先级顺序为：
+ *      a. 使用{@link #setCharacterEncoding}和{@link #setContentType}明确地针对每个请求
+ *      b. 使用{@link #setLocale}隐式地针对每个请求
+ *      c. 每个Web应用程序通过部署描述符或{@link ServletContext＃setRequestCharacterEncoding（String）}
+ *      d. 容器默认值（通过供应商特定的配置）
+ *      e. ISO-8859-1
+ * D. 必须在getWriter之前以及在提交要使用的字符编码的响应之前，调用setCharacterEncoding，setContentType或setLocale方法。
+ * E. 有关MIME的更多信息，请参见Internet RFC，例如<a href="http://www.ietf.org/rfc/rfc2045.txt"> RFC 2045 </a>。 诸如SMTP和HTTP之类的协议定义了MIME的配置文件，
+ *    并且这些标准仍在不断发展。
+ */
+/**
+ * A.
  * Defines an object to assist a servlet in sending a response to the client.
  * The servlet container creates a <code>ServletResponse</code> object and
  * passes it as an argument to the servlet's <code>service</code> method.
+ *
+ * B.
  * <p>
  * To send binary data in a MIME body response, use the
  * {@link ServletOutputStream} returned by {@link #getOutputStream}. To send
@@ -31,21 +49,36 @@ import java.util.Locale;
  * {@link #getWriter}. To mix binary and text data, for example, to create a
  * multipart response, use a <code>ServletOutputStream</code> and manage the
  * character sections manually.
+ *
+ * C.
  * <p>
  * The charset for the MIME body response can be specified explicitly or
  * implicitly. The priority order for specifying the response body is:
  * <ol>
+ * a.
  * <li>explicitly per request using {@link #setCharacterEncoding} and
  *    {@link #setContentType}</li>
+ *
+ * b.
  * <li>implicitly per request using {@link #setLocale}</li>
+ *
+ * c.
  * <li>per web application via the deployment descriptor or
  *     {@link ServletContext#setRequestCharacterEncoding(String)}</li>
+ *
+ * d.
  * <li>container default via vendor specific configuration</li>
+ *
+ * e.
  * <li>ISO-8859-1</li>
  * </ol>
+ *
+ * D.
  * The <code>setCharacterEncoding</code>, <code>setContentType</code>, or
  * <code>setLocale</code> method must be called before <code>getWriter</code>
  * and before committing the response for the character encoding to be used.
+ *
+ * E.
  * <p>
  * See the Internet RFCs such as <a href="http://www.ietf.org/rfc/rfc2045.txt">
  * RFC 2045</a> for more information on MIME. Protocols such as SMTP and HTTP
@@ -53,6 +86,7 @@ import java.util.Locale;
  *
  * @see ServletOutputStream
  */
+// 20201221 定义一个对象，以帮助Servlet向客户端发送响应
 public interface ServletResponse {
 
     /**

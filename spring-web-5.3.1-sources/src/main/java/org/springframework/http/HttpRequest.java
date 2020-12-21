@@ -21,12 +21,17 @@ import java.net.URI;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * 表示HTTP请求消息，由{@linkplain #getMethod（）方法}和{@linkplain #getURI（）uri}组成。
+ */
+/**
  * Represents an HTTP request message, consisting of
  * {@linkplain #getMethod() method} and {@linkplain #getURI() uri}.
  *
  * @author Arjen Poutsma
  * @since 3.1
  */
+// 20201221 表示HTTP请求消息，由{@linkplain #getMethod（）方法}和{@linkplain #getURI（）uri}组成。
 public interface HttpRequest extends HttpMessage {
 
 	/**

@@ -23,9 +23,18 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
+ * 20201221
+ * A. 定义一个对象以向Servlet提供客户端请求信息。 Servlet容器创建一个ServletRequest对象，并将其作为参数传递给Servlet的service方法。
+ * B. ServletRequest对象提供的数据包括参数名称和值，属性以及输入流。 扩展ServletRequest的接口可以提供其他特定于协议的数据（例如，HTTP数据由
+ *    {@link javax.servlet.http.HttpServletRequest}提供。
+ */
+/**
+ * A.
  * Defines an object to provide client request information to a servlet. The
  * servlet container creates a <code>ServletRequest</code> object and passes it
  * as an argument to the servlet's <code>service</code> method.
+ *
+ * B.
  * <p>
  * A <code>ServletRequest</code> object provides data including parameter name
  * and values, attributes, and an input stream. Interfaces that extend
@@ -35,6 +44,7 @@ import java.util.Map;
  *
  * @see javax.servlet.http.HttpServletRequest
  */
+// 20201221 定义一个对象以向Servlet提供客户端请求信息: 提供的数据包括参数名称和值，属性以及输入流
 public interface ServletRequest {
 
     /**

@@ -22,6 +22,10 @@ import java.util.Map;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * Java 5枚举的HTTP请求方法。 旨在与{@link org.springframework.http.client.ClientHttpRequest}和{@link org.springframework.web.client.RestTemplate}一起使用。
+ */
+/**
  * Java 5 enumeration of HTTP request methods. Intended for use
  * with {@link org.springframework.http.client.ClientHttpRequest}
  * and {@link org.springframework.web.client.RestTemplate}.
@@ -30,19 +34,29 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 3.0
  */
+// 20201221 HTTP请求方法枚举
 public enum HttpMethod {
 
-	GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE;
+	GET,
+	HEAD,
+	POST,
+	PUT,
 
+	// 20201221 PATCH method 是在Servlet 3.0和Tomcat 7中都提到的，也就是尚未实现它: 只对已有资源进行更新操作
+	PATCH,
+	DELETE,
+	OPTIONS,
+	TRACE;
 
+	// 20201221 HttpMethod映射器
 	private static final Map<String, HttpMethod> mappings = new HashMap<>(16);
 
 	static {
+		// 20201221 初始化HttpMethod映射器: 方法名称-方法名称
 		for (HttpMethod httpMethod : values()) {
 			mappings.put(httpMethod.name(), httpMethod);
 		}
 	}
-
 
 	/**
 	 * Resolve the given method value to an {@code HttpMethod}.
@@ -50,11 +64,12 @@ public enum HttpMethod {
 	 * @return the corresponding {@code HttpMethod}, or {@code null} if not found
 	 * @since 4.2.4
 	 */
+	// 20201221 将给定的方法值解析为{@code HttpMethod}。
 	@Nullable
 	public static HttpMethod resolve(@Nullable String method) {
+		// 20201221 从HttpMethod映射器获取HttpMethod实例
 		return (method != null ? mappings.get(method) : null);
 	}
-
 
 	/**
 	 * Determine whether this {@code HttpMethod} matches the given

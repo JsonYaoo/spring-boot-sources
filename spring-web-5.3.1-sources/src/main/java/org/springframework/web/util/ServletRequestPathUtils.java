@@ -23,11 +23,20 @@ import org.springframework.http.server.RequestPath;
 import org.springframework.util.Assert;
 
 /**
+ * 20201221
+ * A. 实用程序类，用于解析{@link HttpServletRequest}到{@link RequestPath}的路径并将其缓存在请求属性中，以供进一步访问。 然后可以将其用于与
+ *    {@link org.springframework.web.util.pattern.PathPattern PathPattern} s的URL路径匹配。
+ * B. 还包括帮助程序方法，以根据在请求属性中缓存的内容来返回先前的{@link UrlPathHelper＃resolveAndCacheLookupPathsolved}字符串lookupPath或先前的
+ *    {@link #parseAndCache解析} {@code RequestPath}。
+ */
+/**
+ * A.
  * Utility class to parse the path of an {@link HttpServletRequest} to a
  * {@link RequestPath} and cache it in a request attribute for further access.
  * This can then be used for URL path matching with
  * {@link org.springframework.web.util.pattern.PathPattern PathPattern}s.
  *
+ * B.
  * <p>Also includes helper methods to return either a previously
  * {@link UrlPathHelper#resolveAndCacheLookupPath resolved} String lookupPath
  * or a previously {@link #parseAndCache parsed} {@code RequestPath} depending
@@ -36,26 +45,38 @@ import org.springframework.util.Assert;
  * @author Rossen Stoyanchev
  * @since 5.3
  */
+// 20201221 实用程序类，用于解析{@link HttpServletRequest}到{@link RequestPath}的路径并将其缓存在请求属性中，以供进一步访问
 public abstract class ServletRequestPathUtils {
 
+	// 20201221 包含已解析的{@link RequestPath}的Servlet请求属性的名称。
 	/** Name of Servlet request attribute that holds the parsed {@link RequestPath}. */
 	public static final String PATH_ATTRIBUTE = ServletRequestPathUtils.class.getName() + ".path";
 
-
 	/**
+	 * 20201221
+	 * A. 解析请求的{@link HttpServletRequest＃getRequestURI（）requestURI}及其{@code contextPath}以创建{@link RequestPath}并将其缓存在请求属性{@link #PATH_ATTRIBUTE}中。
+	 * B. 此方法忽略{@link HttpServletRequest＃getServletPath（）servletPath}和{@link HttpServletRequest＃getPathInfo（）pathInfo}。 因此，在通过前缀映射
+	 *    Servlet的情况下，{@link RequestPath＃pathWithinApplication（）}将始终包含Servlet前缀。
+	 */
+	/**
+	 * A.
 	 * Parse the {@link HttpServletRequest#getRequestURI() requestURI} of the
 	 * request and its {@code contextPath} to create a {@link RequestPath} and
 	 * cache it in the request attribute {@link #PATH_ATTRIBUTE}.
 	 *
+	 * B.
 	 * <p>This method ignores the {@link HttpServletRequest#getServletPath()
 	 * servletPath} and the {@link HttpServletRequest#getPathInfo() pathInfo}.
 	 * Therefore in case of a Servlet mapping by prefix, the
 	 * {@link RequestPath#pathWithinApplication()} will always include the
 	 * Servlet prefix.
 	 */
+	// 20201221 解析请求的{@link HttpServletRequest＃getRequestURI（）requestURI}及其{@code contextPath}以创建{@link RequestPath}并将其缓存在请求属性{@link #PATH_ATTRIBUTE}中。
 	public static RequestPath parseAndCache(HttpServletRequest request) {
 		String requestUri = (String) request.getAttribute(WebUtils.INCLUDE_REQUEST_URI_ATTRIBUTE);
 		requestUri = (requestUri != null ? requestUri : request.getRequestURI());
+
+		// 20201221 {@link #parse（URI，String）}与已编码的{@link URI＃getRawPath（）原始路径}的变体。
 		RequestPath requestPath = RequestPath.parse(requestUri, request.getContextPath());
 		request.setAttribute(PATH_ATTRIBUTE, requestPath);
 		return requestPath;
@@ -82,10 +103,10 @@ public abstract class ServletRequestPathUtils {
 	 * Remove the request attribute {@link #PATH_ATTRIBUTE} that holds a
 	 * {@link #parseAndCache  previously} parsed and cached {@code RequestPath}.
 	 */
+	// 20201221 删除保存了{@link #parseAndCache先前}解析并缓存的{@code RequestPath}的请求属性{@link #PATH_ATTRIBUTE}。
 	public static void clearParsedRequestPath(ServletRequest request) {
 		request.removeAttribute(PATH_ATTRIBUTE);
 	}
-
 
 	// Methods to select either parsed RequestPath or resolved String lookupPath
 

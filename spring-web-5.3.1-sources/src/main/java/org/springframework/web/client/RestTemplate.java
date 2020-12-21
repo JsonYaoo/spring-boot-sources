@@ -65,14 +65,24 @@ import org.springframework.web.util.DefaultUriBuilderFactory.EncodingMode;
 import org.springframework.web.util.UriTemplateHandler;
 
 /**
+ * 20201221
+ * A. 同步客户端执行HTTP请求，在基础HTTP客户端库（如JDK {@code HttpURLConnection}，Apache HttpComponents等）上公开简单的模板方法API。
+ * B. 除了支持不常见情况的通用{@code exchange}和{@code execute}方法外，RestTemplate还提供了通过HTTP方法用于常见方案的模板。
+ * C. 注意：从5.0版本开始，该类处于维护模式，并且仅接受很小的更改和错误请求。 请考虑使用{@code org.springframework.web.reactive.client.WebClient}，
+ *    它具有更现代的API，并支持同步，异步和流传输方案。
+ */
+/**
+ * A.
  * Synchronous client to perform HTTP requests, exposing a simple, template
  * method API over underlying HTTP client libraries such as the JDK
  * {@code HttpURLConnection}, Apache HttpComponents, and others.
  *
+ * B.
  * <p>The RestTemplate offers templates for common scenarios by HTTP method, in
  * addition to the generalized {@code exchange} and {@code execute} methods that
  * support of less frequent cases.
  *
+ * C.
  * <p><strong>NOTE:</strong> As of 5.0 this class is in maintenance mode, with
  * only minor requests for changes and bugs to be accepted going forward. Please,
  * consider using the {@code org.springframework.web.reactive.client.WebClient}
@@ -90,6 +100,7 @@ import org.springframework.web.util.UriTemplateHandler;
  * @see ResponseExtractor
  * @see ResponseErrorHandler
  */
+// 20201221 同步客户端执行HTTP请求，在基础HTTP客户端库（如JDK {@code HttpURLConnection}，Apache HttpComponents等）上公开简单的模板方法API
 public class RestTemplate extends InterceptingHttpAccessor implements RestOperations {
 
 	/**

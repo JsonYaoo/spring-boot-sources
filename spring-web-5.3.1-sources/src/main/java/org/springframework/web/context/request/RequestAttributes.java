@@ -19,10 +19,17 @@ package org.springframework.web.context.request;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * A. 用于访问与请求关联的属性对象的抽象。 支持使用“全局会话”的可选概念访问请求范围的属性以及会话范围的属性。
+ * B. 可以为任何类型的请求/会话机制实现，尤其是对于Servlet请求。
+ */
+/**
+ * A.
  * Abstraction for accessing attribute objects associated with a request.
  * Supports access to request-scoped attributes as well as to session-scoped
  * attributes, with the optional notion of a "global session".
  *
+ * B.
  * <p>Can be implemented for any kind of request/session mechanism,
  * in particular for servlet requests.
  *
@@ -30,6 +37,7 @@ import org.springframework.lang.Nullable;
  * @since 2.0
  * @see ServletRequestAttributes
  */
+// 20201221 用于访问与请求关联的属性对象的抽象。 支持使用“全局会话”的可选概念访问请求范围的属性以及会话范围的属性。
 public interface RequestAttributes {
 
 	/**
