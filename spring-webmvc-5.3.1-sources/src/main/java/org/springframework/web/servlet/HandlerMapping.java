@@ -77,6 +77,7 @@ public interface HandlerMapping {
 	 * handler for the best matching pattern.
 	 * @since 4.3.21
 	 */
+	// 20201221 {@link HttpServletRequest}属性的名称，该属性包含最佳匹配模式的映射处理程序。
 	String BEST_MATCHING_HANDLER_ATTRIBUTE = HandlerMapping.class.getName() + ".bestMatchingHandler";
 
 	/**
@@ -95,24 +96,42 @@ public interface HandlerMapping {
 	String LOOKUP_PATH = HandlerMapping.class.getName() + ".lookupPath";
 
 	/**
+	 * 20201221
+	 * A. {@link HttpServletRequest}属性的名称，如果模式匹配，则包含处理程序映射内的路径，否则包含完整的相关URI（通常在DispatcherServlet映射内）。
+	 * B. 注意：并非所有HandlerMapping实现都支持此属性。 基于URL的HandlerMappings通常将支持它，但是处理程序不必一定希望此请求属性在所有情况下都存在。
+	 */
+	/**
+	 * A.
 	 * Name of the {@link HttpServletRequest} attribute that contains the path
 	 * within the handler mapping, in case of a pattern match, or the full
 	 * relevant URI (typically within the DispatcherServlet's mapping) else.
+	 *
+	 * B.
 	 * <p>Note: This attribute is not required to be supported by all
 	 * HandlerMapping implementations. URL-based HandlerMappings will
 	 * typically support it, but handlers should not necessarily expect
 	 * this request attribute to be present in all scenarios.
 	 */
+	// 20201221 如果模式匹配，则包含处理程序映射内的路径，否则包含完整的相关URI => eg: "org.springframework.web.servlet.HandlerMapping.pathWithinHandlerMapping"
 	String PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE = HandlerMapping.class.getName() + ".pathWithinHandlerMapping";
 
 	/**
+	 * 20201221
+	 * A. {@link HttpServletRequest}属性的名称，该属性包含处理程序映射中的最佳匹配模式。
+	 * B. 注意：并非所有HandlerMapping实现都支持此属性。 基于URL的HandlerMappings通常将支持它，但是处理程序不必一定希望此请求属性在所有情况下都存在。
+	 */
+	/**
+	 * A.
 	 * Name of the {@link HttpServletRequest} attribute that contains the
 	 * best matching pattern within the handler mapping.
+	 *
+	 * B.
 	 * <p>Note: This attribute is not required to be supported by all
 	 * HandlerMapping implementations. URL-based HandlerMappings will
 	 * typically support it, but handlers should not necessarily expect
 	 * this request attribute to be present in all scenarios.
 	 */
+	// 20201221 该属性包含处理程序映射中的最佳匹配模式: "org.springframework.web.servlet.HandlerMapping.bestMatchingPattern"
 	String BEST_MATCHING_PATTERN_ATTRIBUTE = HandlerMapping.class.getName() + ".bestMatchingPattern";
 
 	/**
@@ -124,13 +143,22 @@ public interface HandlerMapping {
 	String INTROSPECT_TYPE_LEVEL_MAPPING = HandlerMapping.class.getName() + ".introspectTypeLevelMapping";
 
 	/**
+	 * 20201221
+	 * A. 包含URI模板映射的{@link HttpServletRequest}属性的名称，将变量名称映射为值。
+	 * B. 注意：并非所有HandlerMapping实现都支持此属性。 基于URL的HandlerMappings通常将支持它，但是处理程序不必一定希望此请求属性在所有情况下都存在。
+	 */
+	/**
+	 * A.
 	 * Name of the {@link HttpServletRequest} attribute that contains the URI
 	 * templates map, mapping variable names to values.
+	 *
+	 * B.
 	 * <p>Note: This attribute is not required to be supported by all
 	 * HandlerMapping implementations. URL-based HandlerMappings will
 	 * typically support it, but handlers should not necessarily expect
 	 * this request attribute to be present in all scenarios.
 	 */
+	// 20201221 包含URI模板映射的属性的名称, 将变量名称映射为值: "org.springframework.web.servlet.HandlerMapping.uriTemplateVariables"
 	String URI_TEMPLATE_VARIABLES_ATTRIBUTE = HandlerMapping.class.getName() + ".uriTemplateVariables";
 
 	/**
@@ -144,14 +172,22 @@ public interface HandlerMapping {
 	String MATRIX_VARIABLES_ATTRIBUTE = HandlerMapping.class.getName() + ".matrixVariables";
 
 	/**
+	 * 20201221
+	 * A. {@link HttpServletRequest}属性的名称，该属性包含适用于映射处理程序的可产生MediaTypes的集合
+	 * B. 注意：并非所有HandlerMapping实现都支持此属性。 处理程序不必一定希望此请求属性在所有情况下都存在。
+	 */
+	/**
+	 * A.
 	 * Name of the {@link HttpServletRequest} attribute that contains the set of
 	 * producible MediaTypes applicable to the mapped handler.
+	 *
+	 * B.
 	 * <p>Note: This attribute is not required to be supported by all
 	 * HandlerMapping implementations. Handlers should not necessarily expect
 	 * this request attribute to be present in all scenarios.
 	 */
+	// 20201221 MediaTypes的集合 "org.springframework.web.servlet.HandlerMapping.producibleMediaTypes"
 	String PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE = HandlerMapping.class.getName() + ".producibleMediaTypes";
-
 
 	/**
 	 * Whether this {@code HandlerMapping} instance has been enabled to use parsed

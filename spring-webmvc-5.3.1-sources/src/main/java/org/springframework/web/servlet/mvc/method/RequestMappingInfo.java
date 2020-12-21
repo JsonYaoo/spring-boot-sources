@@ -107,26 +107,34 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 
 	private static final RequestConditionHolder EMPTY_CUSTOM = new RequestConditionHolder(null);
 
-
+	// 20201221 组件名称
 	@Nullable
 	private final String name;
 
+	// 20201221 逻辑分离（'||'）请求条件，该条件将请求与一组URL路径模式进行匹配： 不是与AntPathMatcher匹配的字符串模式。
 	@Nullable
 	private final PathPatternsRequestCondition pathPatternsCondition;
 
+	// 20201221 逻辑分离（'||'）请求条件，该条件将请求与一组URL路径模式进行匹配: 通过AntPathMatcher进行字符串模式匹配
 	@Nullable
 	private final PatternsRequestCondition patternsCondition;
 
+	// 20201221 逻辑析取（'||'）请求条件，该条件与一组{@link RequestMethod RequestMethods}的请求相匹配
 	private final RequestMethodsRequestCondition methodsCondition;
 
+	// 20201221 逻辑合取（'&&'）请求条件，该条件将请求与使用{@link RequestMapping＃params（）}中定义的语法的设置参数表达式进行匹配。
 	private final ParamsRequestCondition paramsCondition;
 
+	// 20201221 辑合取（'&&'）请求条件，该条件将请求与{@link RequestMapping＃headers（）}中定义的语法的一组标头表达式进行匹配
 	private final HeadersRequestCondition headersCondition;
 
+	// 20201221 逻辑析取（'||'）请求条件，用于将请求的“ Content-Type”标头与媒体类型表达式列表进行匹配
 	private final ConsumesRequestCondition consumesCondition;
 
+	// 20201221 逻辑析取（'||'）请求条件，用于将请求的“ Accept”标头与媒体类型表达式列表进行匹配。
 	private final ProducesRequestCondition producesCondition;
 
+	// 20201221 当两个{@code RequestConditionHolder}实例合并或相互比较时，可以预期它们所持有的条件是同一类型。 如果不是，则会引发{@link ClassCastException}。
 	private final RequestConditionHolder customConditionHolder;
 
 	private final int hashCode;
@@ -177,12 +185,34 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 				info.consumesCondition, info.producesCondition, customRequestCondition);
 	}
 
-	private RequestMappingInfo(@Nullable String name,
+	// 20201221 构建RequestMappingInfo => eg: [/testController/testRequestMapping]
+	private RequestMappingInfo(
+			// 20201221 组件名称 => eg: null
+			@Nullable String name,
+
+			// 20201221 逻辑分离（'||'）请求条件，该条件将请求与一组URL路径模式进行匹配： 不是与AntPathMatcher匹配的字符串模式 => eg: null
 			@Nullable PathPatternsRequestCondition pathPatternsCondition,
+
+			// 20201221 逻辑分离（'||'）请求条件，该条件将请求与一组URL路径模式进行匹配: 通过AntPathMatcher进行字符串模式匹配 => eg: [/testController/testRequestMapping]
 			@Nullable PatternsRequestCondition patternsCondition,
-			RequestMethodsRequestCondition methodsCondition, ParamsRequestCondition paramsCondition,
-			HeadersRequestCondition headersCondition, ConsumesRequestCondition consumesCondition,
-			ProducesRequestCondition producesCondition, RequestConditionHolder customCondition) {
+
+			// 20201221 逻辑析取（'||'）请求条件，该条件与一组{@link RequestMethod RequestMethods}的请求相匹配 => eg: []
+			RequestMethodsRequestCondition methodsCondition,
+
+			// 20201221 逻辑合取（'&&'）请求条件，该条件将请求与使用{@link RequestMapping＃params（）}中定义的语法的设置参数表达式进行匹配 => eg: []
+			ParamsRequestCondition paramsCondition,
+
+			// 20201221 辑合取（'&&'）请求条件，该条件将请求与{@link RequestMapping＃headers（）}中定义的语法的一组标头表达式进行匹配 => eg:[]
+			HeadersRequestCondition headersCondition,
+
+			// 20201221 逻辑析取（'||'）请求条件，用于将请求的“ Content-Type”标头与媒体类型表达式列表进行匹配 => eg: []
+			ConsumesRequestCondition consumesCondition,
+
+			// 20201221 逻辑析取（'||'）请求条件，用于将请求的“ Accept”标头与媒体类型表达式列表进行匹配 => eg: []
+			ProducesRequestCondition producesCondition,
+
+			// 20201221 当两个{@code RequestConditionHolder}实例合并或相互比较时，可以预期它们所持有的条件是同一类型。 如果不是，则会引发{@link ClassCastException} => eg: []
+			RequestConditionHolder customCondition) {
 
 		Assert.isTrue(pathPatternsCondition != null || patternsCondition != null,
 				"Neither PathPatterns nor String patterns condition");
@@ -241,11 +271,15 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 	 * {@link #getPatternsCondition()} depending on which is not null.
 	 * @since 5.3
 	 */
+	// 20201221 根据不为null的情况，返回{@link #getPathPatternsCondition（）}或{@link #getPatternsCondition（）}。
 	@SuppressWarnings("unchecked")
 	public <T> RequestCondition<T> getActivePatternsCondition() {
+		// 20201221 eg: null
 		if (this.pathPatternsCondition != null) {
 			return (RequestCondition<T>) this.pathPatternsCondition;
 		}
+
+		// 20201221 eg: [/testController/testRequestMapping]
 		else if (this.patternsCondition != null) {
 			return (RequestCondition<T>) this.patternsCondition;
 		}
@@ -314,6 +348,7 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 	 * Return the "produces" condition of this {@link RequestMappingInfo};
 	 * or instance with 0 produces expressions (never {@code null}).
 	 */
+	// 20201221 返回此{@link RequestMappingInfo}的“产生”条件；或者具有0的实例产生表达式（绝不{@code null}）。
 	public ProducesRequestCondition getProducesCondition() {
 		return this.producesCondition;
 	}
@@ -382,55 +417,86 @@ public final class RequestMappingInfo implements RequestCondition<RequestMapping
 	}
 
 	/**
+	 * 20201221
+	 * A. 检查此请求映射信息中的所有条件是否与提供的请求匹配，并返回具有针对当前请求量身定制的条件的潜在新请求映射信息。
+	 * B. 例如，返回的实例可能包含与当前请求匹配的URL模式的子集，并在顶部以最佳匹配模式进行排序。
+	 */
+	/**
+	 * A.
 	 * Checks if all conditions in this request mapping info match the provided
 	 * request and returns a potentially new request mapping info with conditions
 	 * tailored to the current request.
+	 *
+	 * B.
 	 * <p>For example the returned instance may contain the subset of URL
 	 * patterns that match to the current request, sorted with best matching
 	 * patterns on top.
 	 * @return a new instance in case of a match; or {@code null} otherwise
 	 */
+	// 20201221 检查此请求映射信息中的所有条件是否与提供的请求匹配，并返回具有针对当前请求量身定制的条件的潜在新请求映射信息
 	@Override
 	@Nullable
 	public RequestMappingInfo getMatchingCondition(HttpServletRequest request) {
+		// 20201221 逻辑析取（'||'）请求条件，该条件与一组{@link RequestMethod RequestMethods}的请求相匹配 => eg: []
 		RequestMethodsRequestCondition methods = this.methodsCondition.getMatchingCondition(request);
 		if (methods == null) {
 			return null;
 		}
+
+		// 20201221 逻辑合取（'&&'）请求条件，该条件将请求与使用{@link RequestMapping＃params（）}中定义的语法的设置参数表达式进行匹配 => eg: []
 		ParamsRequestCondition params = this.paramsCondition.getMatchingCondition(request);
 		if (params == null) {
 			return null;
 		}
+
+		// 20201221 辑合取（'&&'）请求条件，该条件将请求与{@link RequestMapping＃headers（）}中定义的语法的一组标头表达式进行匹配 => eg: []
 		HeadersRequestCondition headers = this.headersCondition.getMatchingCondition(request);
 		if (headers == null) {
 			return null;
 		}
+
+		// 20201221 逻辑析取（'||'）请求条件，用于将请求的“ Content-Type”标头与媒体类型表达式列表进行匹配 => eg: []
 		ConsumesRequestCondition consumes = this.consumesCondition.getMatchingCondition(request);
 		if (consumes == null) {
 			return null;
 		}
+
+		// 20201221 逻辑析取（'||'）请求条件，用于将请求的“ Accept”标头与媒体类型表达式列表进行匹配 => eg: []
 		ProducesRequestCondition produces = this.producesCondition.getMatchingCondition(request);
 		if (produces == null) {
 			return null;
 		}
+
+		// 20201221 逻辑分离（'||'）请求条件，该条件将请求与一组URL路径模式进行匹配： 不是与AntPathMatcher匹配的字符串模式。
 		PathPatternsRequestCondition pathPatterns = null;
+
+		// 20201221 逻辑分离（'||'）请求条件，该条件将请求与一组URL路径模式进行匹配： 不是与AntPathMatcher匹配的字符串模式 => eg: null
 		if (this.pathPatternsCondition != null) {
 			pathPatterns = this.pathPatternsCondition.getMatchingCondition(request);
 			if (pathPatterns == null) {
 				return null;
 			}
 		}
+
+		// 20201221 逻辑分离（'||'）请求条件，该条件将请求与一组URL路径模式进行匹配: 通过AntPathMatcher进行字符串模式匹配
 		PatternsRequestCondition patterns = null;
+
+		// 20201221 逻辑分离（'||'）请求条件，该条件将请求与一组URL路径模式进行匹配: 通过AntPathMatcher进行字符串模式匹配 => eg: [/testController/testRequestMapping]
 		if (this.patternsCondition != null) {
+			// 20201221 检查是否有任何模式与给定请求匹配，并返回一个保证包含匹配模式的实例 eg: 返回新的PatternsRequestCondition: "/testController/testRequestMapping"
 			patterns = this.patternsCondition.getMatchingCondition(request);
 			if (patterns == null) {
 				return null;
 			}
 		}
+
+		// 20201221 当两个{@code RequestConditionHolder}实例合并或相互比较时，可以预期它们所持有的条件是同一类型。 如果不是，则会引发{@link ClassCastException} => eg: []
 		RequestConditionHolder custom = this.customConditionHolder.getMatchingCondition(request);
 		if (custom == null) {
 			return null;
 		}
+
+		// 20201221 构建RequestMappingInfo => eg: [/testController/testRequestMapping]
 		return new RequestMappingInfo(
 				this.name, pathPatterns, patterns, methods, params, headers, consumes, produces, custom);
 	}

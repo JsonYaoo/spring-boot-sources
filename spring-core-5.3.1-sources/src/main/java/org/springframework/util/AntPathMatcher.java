@@ -206,8 +206,9 @@ public class AntPathMatcher implements PathMatcher {
 	 * @param path the path to test
 	 * @param fullMatch whether a full pattern match is required (else a pattern match
 	 * as far as the given base path goes is sufficient)
-	 * @return {@code true} if the supplied {@code path} matched, {@code false} if it didn't
+	 * @return {@code true} if the supplied {@code path} matched, {@code false} if it didn't // 20201221 如果提供的{@code path}匹配，则为{@code true}，否则为{@code false}
 	 */
+	// 20201221 实际上将给定的{@code path}与给定的{@code pattern}相匹配, 如果提供的{@code path}匹配，则为{@code true}，否则为{@code false}
 	protected boolean doMatch(String pattern, @Nullable String path, boolean fullMatch,
 			@Nullable Map<String, String> uriTemplateVariables) {
 
@@ -509,13 +510,18 @@ public class AntPathMatcher implements PathMatcher {
 		return builder.toString();
 	}
 
+	// 20201221 给定模式和完整路径，请提取URI模板变量 => eg: "/testController/testRequestMapping"、"/testController/testRequestMapping"
 	@Override
 	public Map<String, String> extractUriTemplateVariables(String pattern, String path) {
 		Map<String, String> variables = new LinkedHashMap<>();
+
+		// 20201221 实际上将给定的{@code path}与给定的{@code pattern}相匹配, 如果提供的{@code path}匹配，则为{@code true}，否则为{@code false} => eg: true
 		boolean result = doMatch(pattern, path, true, variables);
 		if (!result) {
 			throw new IllegalStateException("Pattern \"" + pattern + "\" is not a match for \"" + path + "\"");
 		}
+
+		// 20201221 eg: {}
 		return variables;
 	}
 

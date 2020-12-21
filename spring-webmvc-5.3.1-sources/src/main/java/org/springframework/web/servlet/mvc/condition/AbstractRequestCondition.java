@@ -22,6 +22,10 @@ import java.util.StringJoiner;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * {@link RequestCondition}类型的基类提供了{@link #equals（Object）}，{@ link #hashCode（）}和{@link #toString（）}的实现。
+ */
+/**
  * A base class for {@link RequestCondition} types providing implementations of
  * {@link #equals(Object)}, {@link #hashCode()}, and {@link #toString()}.
  *
@@ -30,6 +34,7 @@ import org.springframework.lang.Nullable;
  * @param <T> the type of objects that this RequestCondition can be combined
  * with and compared to
  */
+// 20201221 RequestCondition类型的基类提供了{@link #equals（Object）}，{@ link #hashCode（）}和{@link #toString（）}的实现
 public abstract class AbstractRequestCondition<T extends AbstractRequestCondition<T>> implements RequestCondition<T> {
 
 	/**

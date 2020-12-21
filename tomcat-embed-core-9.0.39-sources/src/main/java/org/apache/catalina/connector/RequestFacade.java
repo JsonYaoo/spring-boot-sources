@@ -47,12 +47,17 @@ import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
+ * 20201221
+ * 包裹请求对象的Facade类。 所有方法都委托给包装的请求。
+ */
+/**
  * Facade class that wraps a Coyote request object.
  * All methods are delegated to the wrapped request.
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
+// 20201221 包裹请求对象的Facade类。 所有方法都委托给包装的请求。
 @SuppressWarnings("deprecation")
 public class RequestFacade implements HttpServletRequest {
 
@@ -540,10 +545,9 @@ public class RequestFacade implements HttpServletRequest {
         request.setAttribute(name, o);
     }
 
-
+    // 20201221 从此请求中删除属性 eg: "org.springframework.web.servlet.HandlerMapping.producibleMediaTypes"
     @Override
     public void removeAttribute(String name) {
-
         if (request == null) {
             throw new IllegalStateException(
                             sm.getString("requestFacade.nullRequest"));
@@ -784,7 +788,7 @@ public class RequestFacade implements HttpServletRequest {
         return request.getPathTranslated();
     }
 
-
+    // 20201221 返回请求URI中指示请求上下文的部分, 上下文路径总是在请求URI中排在第一位, 路径以“ /”字符开头，但不以“ /”字符结尾
     @Override
     public String getContextPath() {
 
@@ -793,6 +797,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
+        // 20201221 eg: 根上下文返回""
         return request.getContextPath();
     }
 
@@ -856,7 +861,7 @@ public class RequestFacade implements HttpServletRequest {
         return request.getRequestedSessionId();
     }
 
-
+    // 20201221 返回此请求的URL的一部分，从协议名称到HTTP请求第一行中的查询字符串
     @Override
     public String getRequestURI() {
 

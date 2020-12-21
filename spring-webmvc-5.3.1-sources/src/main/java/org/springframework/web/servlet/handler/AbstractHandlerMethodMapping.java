@@ -367,18 +367,28 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	// 20201221 查找给定请求的处理程序方法。
 	@Override
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
-		// 20201221 初始化用于请求映射的路径
+		// 20201221 初始化用于请求映射的路径 => eg: "org.springframework.web.util.UrlPathHelper.path"-"/testController/testRequestMapping"
 		String lookupPath = initLookupPath(request);
+
+		// 20201221 使用getMappings和getMappingsByUrl时获取读取锁定。
 		this.mappingRegistry.acquireReadLock();
 		try {
+			// 20201221 查找当前请求的最佳匹配处理程序方法: 设置匹配到的路径, 返回最好的HandlerMethod实例 => eg: "com.jsonyao.cs.Controller.TestController#testRequestMapping()"
 			HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
+
+			// 20201221 如果提供的实例包含bean名称而不是对象实例，则在创建并返回{@link HandlerMethod}之前，将解析bean名称 eg: TestController
 			return (handlerMethod != null ? handlerMethod.createWithResolvedBean() : null);
 		}
 		finally {
+			// 20201221 使用getMappings和getMappingsByUrl后释放读取锁定。
 			this.mappingRegistry.releaseReadLock();
 		}
 	}
 
+	/**
+	 * 20201221
+	 * 查找当前请求的最佳匹配处理程序方法。 如果找到多个匹配项，则选择最佳匹配项。
+	 */
 	/**
 	 * Look up the best-matching handler method for the current request.
 	 * If multiple matches are found, the best match is selected.
@@ -388,17 +398,24 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @see #handleMatch(Object, String, HttpServletRequest)
 	 * @see #handleNoMatch(Set, String, HttpServletRequest)
 	 */
+	// 20201221 查找当前请求的最佳匹配处理程序方法: 设置匹配到的路径, 返回最好的HandlerMethod实例
 	@Nullable
 	protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
 		List<Match> matches = new ArrayList<>();
+
+		// 20201221 从存放扫描到的所有RequestMapping中获取当前"/testController/testRestController"的RequestMappingInfo: { [/testController/testRestController]}
 		List<T> directPathMatches = this.mappingRegistry.getMappingsByDirectPath(lookupPath);
+
+		// 20201221 eg: "/testController/testRestController": RequestMappingInfo: { [/testController/testRestController]}
 		if (directPathMatches != null) {
+			// 20201221 添加匹配到的Mappings => eg: { [/testController/testRequestMapping]}
 			addMatchingMappings(directPathMatches, matches, request);
 		}
 		if (matches.isEmpty()) {
 			addMatchingMappings(this.mappingRegistry.getRegistrations().keySet(), matches, request);
 		}
 		if (!matches.isEmpty()) {
+			// 20201221 eg: { [/testController/testRequestMapping]}
 			Match bestMatch = matches.get(0);
 			if (matches.size() > 1) {
 				Comparator<Match> comparator = new MatchComparator(getMappingComparator(request));
@@ -419,8 +436,14 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 							"Ambiguous handler methods mapped for '" + uri + "': {" + m1 + ", " + m2 + "}");
 				}
 			}
+
+			// 20201221 该属性包含最佳匹配模式的映射处理程序 => eg: "org.springframework.web.servlet.HandlerMapping.bestMatchingHandler"-"com.jsonyao.cs.Controller.TestController#testRequestMapping()"
 			request.setAttribute(BEST_MATCHING_HANDLER_ATTRIBUTE, bestMatch.handlerMethod);
+
+			// 20201221 在请求中公开URI模板变量，矩阵变量和可生产的媒体类型 => eg: 提取匹配路径的变量详情 => eg: "org.springframework.web.servlet.HandlerMapping.uriTemplateVariables"-{}
 			handleMatch(bestMatch.mapping, lookupPath, request);
+
+			// 20201221 eg: "com.jsonyao.cs.Controller.TestController#testRequestMapping()"
 			return bestMatch.handlerMethod;
 		}
 		else {
@@ -428,12 +451,21 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		}
 	}
 
+	// 20201221 添加匹配到的Mappings => eg: { [/testController/testRequestMapping]}
 	private void addMatchingMappings(Collection<T> mappings, List<Match> matches, HttpServletRequest request) {
 		for (T mapping : mappings) {
+			// 20201221 检查映射是否与当前请求匹配，并返回与当前请求相关的条件的（可能是新的）映射, 构建RequestMappingInfo => eg: [/testController/testRequestMapping]
 			T match = getMatchingMapping(mapping, request);
 			if (match != null) {
-				matches.add(new Match(match,
-						this.mappingRegistry.getRegistrations().get(mapping).getHandlerMethod()));
+				// 20201221 添加到匹配包装器列表中 => eg: { [/testController/testRequestMapping]}
+				matches.add(
+						// 20201221 构造围绕匹配的HandlerMethod及其映射的瘦包装器
+						new Match(
+							match,
+							// 20201221 获取注册Mapping的方法签名 => eg: "com.jsonyao.cs.Controller.TestController#testRequestMapping()"
+							this.mappingRegistry.getRegistrations().get(mapping).getHandlerMethod()
+						)
+				);
 			}
 		}
 	}
@@ -444,7 +476,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @param lookupPath mapping lookup path within the current servlet mapping
 	 * @param request the current request
 	 */
+	// 20201221 找到匹配的映射时调用。
 	protected void handleMatch(T mapping, String lookupPath, HttpServletRequest request) {
+		// 20201221 => eg: "org.springframework.web.servlet.HandlerMapping.pathWithinHandlerMapping"-"/testController/testRequestMapping"
 		request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, lookupPath);
 	}
 
@@ -538,6 +572,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @param request the current HTTP servlet request
 	 * @return the match, or {@code null} if the mapping doesn't match
 	 */
+	// 20201221 检查映射是否与当前请求匹配，并返回与当前请求相关的条件的（可能是新的）映射。
 	@Nullable
 	protected abstract T getMatchingMapping(T mapping, HttpServletRequest request);
 
@@ -549,16 +584,25 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	protected abstract Comparator<T> getMappingComparator(HttpServletRequest request);
 
-
 	/**
+	 * 20201221
+	 * A. 一个注册表，用于维护到处理程序方法的所有映射，公开用于执行查找的方法并提供并发访问。
+	 * B. 出于测试目的的私有软件包。
+	 */
+	/**
+	 * A.
 	 * A registry that maintains all mappings to handler methods, exposing methods
 	 * to perform lookups and providing concurrent access.
+	 *
+	 * B.
 	 * <p>Package-private for testing purposes.
 	 */
+	// 20201221 一个注册表，用于维护到处理程序方法的所有映射，公开用于执行查找的方法并提供并发访问
 	class MappingRegistry {
-
+		// 20201221 Mapping注册表
 		private final Map<T, MappingRegistration<T>> registry = new HashMap<>();
 
+		// 20201221 {@code Map}接口的扩展，用于存储多个值 => eg: 存放扫描到的所有RequestMapping
 		private final MultiValueMap<String, T> pathLookup = new LinkedMultiValueMap<>();
 
 		private final Map<String, List<HandlerMethod>> nameLookup = new ConcurrentHashMap<>();
@@ -571,6 +615,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		 * Return all registrations.
 		 * @since 5.3
 		 */
+		// 20201221 返回所有注册的Mapping。
 		public Map<T, MappingRegistration<T>> getRegistrations() {
 			return this.registry;
 		}
@@ -579,8 +624,10 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		 * Return matches for the given URL path. Not thread-safe.
 		 * @see #acquireReadLock()
 		 */
+		// 20201221 返回给定URL路径的匹配项。 不是线程安全的。
 		@Nullable
 		public List<T> getMappingsByDirectPath(String urlPath) {
+			// 20201221 从存放扫描到的所有RequestMapping中获取当前"/testController/testRestController"的RequestMappingInfo: { [/testController/testRestController]}
 			return this.pathLookup.get(urlPath);
 		}
 
@@ -603,6 +650,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		/**
 		 * Acquire the read lock when using getMappings and getMappingsByUrl.
 		 */
+		// 20201221 使用getMappings和getMappingsByUrl时获取读取锁定。
 		public void acquireReadLock() {
 			this.readWriteLock.readLock().lock();
 		}
@@ -610,6 +658,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		/**
 		 * Release the read lock after using getMappings and getMappingsByUrl.
 		 */
+		// 20201221 使用getMappings和getMappingsByUrl后释放读取锁定。
 		public void releaseReadLock() {
 			this.readWriteLock.readLock().unlock();
 		}
@@ -724,11 +773,12 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		}
 	}
 
-
+	// 20201221 Mapping注册表
 	static class MappingRegistration<T> {
 
 		private final T mapping;
 
+		// 20201221 封装有关由{@linkplain #getMethod（）方法}和{@linkplain #getBean（）bean}组成的处理程序方法的信息: 提供对方法参数，方法返回值，方法注释等的便捷访问。
 		private final HandlerMethod handlerMethod;
 
 		private final Set<String> directPaths;
@@ -751,6 +801,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			return this.mapping;
 		}
 
+		// 20201221 封装有关由{@linkplain #getMethod（）方法}和{@linkplain #getBean（）bean}组成的处理程序方法的信息: 提供对方法参数，方法返回值，方法注释等的便捷访问。
 		public HandlerMethod getHandlerMethod() {
 			return this.handlerMethod;
 		}
@@ -765,19 +816,29 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		}
 	}
 
-
+	/**
+	 * 20201221
+	 * 围绕匹配的HandlerMethod及其映射的瘦包装器，目的是在当前请求的上下文中将最佳匹配与比较器进行比较。
+	 */
 	/**
 	 * A thin wrapper around a matched HandlerMethod and its mapping, for the purpose of
 	 * comparing the best match with a comparator in the context of the current request.
 	 */
+	// 20201221 围绕匹配的HandlerMethod及其映射的瘦包装器，目的是在当前请求的上下文中将最佳匹配与比较器进行比较。
 	private class Match {
 
+		// 20201221 Mapping实例
 		private final T mapping;
 
+		// 20201221 封装有关由{@linkplain #getMethod（）方法}和{@linkplain #getBean（）bean}组成的处理程序方法的信息: 提供对方法参数，方法返回值，方法注释等的便捷访问。
 		private final HandlerMethod handlerMethod;
 
+		// 20201221 构造围绕匹配的HandlerMethod及其映射的瘦包装器
 		public Match(T mapping, HandlerMethod handlerMethod) {
+			// 20201221 当前Mapping实例 => eg: RequestMappingInfo: { [/testController/testRequestMapping]}
 			this.mapping = mapping;
+
+			// 20201221 方法助手实例 => eg: com.jsonyao.cs.Controller.TestController#testRequestMapping()
 			this.handlerMethod = handlerMethod;
 		}
 

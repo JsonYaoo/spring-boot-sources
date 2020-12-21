@@ -38,6 +38,11 @@ import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.servlet.mvc.condition.HeadersRequestCondition.HeaderExpression;
 
 /**
+ * 20201221
+ * 逻辑析取（'||'）请求条件，用于将请求的“ Accept”标头与媒体类型表达式列表进行匹配。 支持两种媒体类型表达式，它们在{@link RequestMapping＃produces（）}和
+ * {@link RequestMapping＃headers（）}中进行了描述，其中标头名称为“ Accept”。 无论使用哪种语法，语义都是相同的。
+ */
+/**
  * A logical disjunction (' || ') request condition to match a request's 'Accept' header
  * to a list of media type expressions. Two kinds of media type expressions are
  * supported, which are described in {@link RequestMapping#produces()} and
@@ -48,6 +53,7 @@ import org.springframework.web.servlet.mvc.condition.HeadersRequestCondition.Hea
  * @author Rossen Stoyanchev
  * @since 3.1
  */
+// 20201221 逻辑析取（'||'）请求条件，用于将请求的“ Accept”标头与媒体类型表达式列表进行匹配。
 public final class ProducesRequestCondition extends AbstractRequestCondition<ProducesRequestCondition> {
 
 	private static final ContentNegotiationManager DEFAULT_CONTENT_NEGOTIATION_MANAGER =
@@ -146,6 +152,7 @@ public final class ProducesRequestCondition extends AbstractRequestCondition<Pro
 	/**
 	 * Return the contained producible media types excluding negated expressions.
 	 */
+	// 20201221 返回所包含的可生产媒体类型，不包括否定表达式。
 	public Set<MediaType> getProducibleMediaTypes() {
 		Set<MediaType> result = new LinkedHashSet<>();
 		for (ProduceMediaTypeExpression expression : this.expressions) {

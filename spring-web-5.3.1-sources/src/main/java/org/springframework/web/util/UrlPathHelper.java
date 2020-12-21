@@ -67,7 +67,7 @@ public class UrlPathHelper {
 	 * {@link #getLookupPathForRequest resolved} lookupPath.
 	 * @since 5.3
 	 */
-	// 20201221 包含{@link #getLookupPathForRequest} lookupPath已解决的Servlet请求属性的名称。
+	// 20201221 包含{@link #getLookupPathForRequest} lookupPath已解决的Servlet请求属性的名称。=> "org.springframework.web.util.UrlPathHelper.path"
 	public static final String PATH_ATTRIBUTE = UrlPathHelper.class.getName() + ".path";
 
 	private static boolean isServlet4Present =
@@ -86,11 +86,13 @@ public class UrlPathHelper {
 	@Nullable
 	static volatile Boolean websphereComplianceFlag;
 
-
+	// 20201221 是否始终使用完整路径, 默认为false
 	private boolean alwaysUseFullPath = false;
 
+	// 20201221 是否允许URL解码, 默认为true
 	private boolean urlDecode = true;
 
+	// 20201221 是否需要移除;号内容, 默认为true
 	private boolean removeSemicolonContent = true;
 
 	private String defaultEncoding = WebUtils.DEFAULT_CHARACTER_ENCODING;
@@ -155,6 +157,7 @@ public class UrlPathHelper {
 	/**
 	 * Whether configured to remove ";" (semicolon) content from the request URI.
 	 */
+	// 20201221 是否配置为删除“;” （分号）来自请求URI的内容。
 	public boolean shouldRemoveSemicolonContent() {
 		checkReadOnly();
 		return this.removeSemicolonContent;
@@ -196,7 +199,10 @@ public class UrlPathHelper {
 		Assert.isTrue(!this.readOnly, "This instance cannot be modified");
 	}
 
-
+	/**
+	 * 20201221
+	 * {@link #getLookupPathForRequest Resolve} lookupPath并将其缓存在带有键{@link #PATH_ATTRIBUTE}的请求属性中，以便随后通过{@link #getResolvedLookupPath（ServletRequest）}访问。
+	 */
 	/**
 	 * {@link #getLookupPathForRequest Resolve} the lookupPath and cache it in a
 	 * a request attribute with the key {@link #PATH_ATTRIBUTE} for subsequent
@@ -205,9 +211,15 @@ public class UrlPathHelper {
 	 * @return the resolved path
 	 * @since 5.3
 	 */
+	// 20201221 lookupPath并将其缓存在带有键{@link #PATH_ATTRIBUTE}的请求属性中
 	public String resolveAndCacheLookupPath(HttpServletRequest request) {
+		// 20201221 返回给定请求的映射查找路径 => eg: "/testController/testRequestMapping"
 		String lookupPath = getLookupPathForRequest(request);
+
+		// 20201221 包含{@link #getLookupPathForRequest} lookupPath已解决的Servlet请求属性的名称。=> "org.springframework.web.util.UrlPathHelper.path"
 		request.setAttribute(PATH_ATTRIBUTE, lookupPath);
+
+		// 20201221 => eg: "/testController/testRequestMapping"
 		return lookupPath;
 	}
 
@@ -218,7 +230,9 @@ public class UrlPathHelper {
 	 * @throws IllegalArgumentException if the not found
 	 * @since 5.3
 	 */
+	// 20201221 返回以前的{@link #getLookupPathForRequest} 已解决的lookupPath。
 	public static String getResolvedLookupPath(ServletRequest request) {
+		// 20201221 eg: "org.springframework.web.util.UrlPathHelper.path" -> "/testController/testRequestMapping"
 		String lookupPath = (String) request.getAttribute(PATH_ATTRIBUTE);
 		Assert.notNull(lookupPath, "Expected lookupPath in request attribute \"" + PATH_ATTRIBUTE + "\".");
 		return lookupPath;
@@ -246,18 +260,32 @@ public class UrlPathHelper {
 	}
 
 	/**
+	 * 20201221
+	 * A. 返回给定请求的映射查找路径，如果适用，则在当前Servlet映射中，否则返回Web应用程序中的映射查找路径。
+	 * B. 如果在RequestDispatcher包含中调用，则检测包含请求URL。
+	 */
+	/**
+	 * A.
 	 * Return the mapping lookup path for the given request, within the current
 	 * servlet mapping if applicable, else within the web application.
+	 *
+	 * B.
 	 * <p>Detects include request URL if called within a RequestDispatcher include.
 	 * @param request current HTTP request
 	 * @return the lookup path
 	 * @see #getPathWithinServletMapping
 	 * @see #getPathWithinApplication
 	 */
+	// 20201221 返回给定请求的映射查找路径
 	public String getLookupPathForRequest(HttpServletRequest request) {
+		// 20201221 返回Web应用程序中给定请求的路径 => eg: "/testController/testRequestMapping"
 		String pathWithinApp = getPathWithinApplication(request);
+
+		// 20201221 始终在当前servlet上下文中使用完整路径吗？
 		// Always use full path within current servlet context?
+		// 20201221 是否始终使用完整路径, 默认为false => eg:true ||
 		if (this.alwaysUseFullPath || skipServletPathDetermination(request)) {
+			// 20201221 > eg: "/testController/testRequestMapping"
 			return pathWithinApp;
 		}
 		// Else, use path within current servlet mapping if applicable
@@ -349,17 +377,34 @@ public class UrlPathHelper {
 	}
 
 	/**
+	 * 20201221
+	 * A. 返回Web应用程序中给定请求的路径。
+	 * B. 如果在RequestDispatcher包含中调用，则检测包含请求URL。
+	 */
+	/**
+	 * A.
 	 * Return the path within the web application for the given request.
+	 *
+	 * B.
 	 * <p>Detects include request URL if called within a RequestDispatcher include.
 	 * @param request current HTTP request
 	 * @return the path within the web application
 	 * @see #getLookupPathForRequest
 	 */
+	// 20201221 返回Web应用程序中给定请求的路径
 	public String getPathWithinApplication(HttpServletRequest request) {
+		// 20201221 返回给定请求的上下文路径 => eg: 根上下文返回""
 		String contextPath = getContextPath(request);
+
+		// 20201221 返回给定请求的请求URI, 可消除错误的“;”或者“; jsessionid” => eg: "/testController/testRequestMapping"
 		String requestUri = getRequestUri(request);
+
+		// 20201221 将给定的“映射”匹配到“ requestUri”的开头，如果匹配则返回多余的部分 => eg: "/testController/testRequestMapping"
 		String path = getRemainingPath(requestUri, contextPath, true);
+
+		// 20201221 => eg: "/testController/testRequestMapping"
 		if (path != null) {
+			// 20201221 正常情况：URI包含上下文路径。=> eg: "/testController/testRequestMapping"
 			// Normal case: URI contains context path.
 			return (StringUtils.hasText(path) ? path : "/");
 		}
@@ -369,11 +414,16 @@ public class UrlPathHelper {
 	}
 
 	/**
+	 * 20201221
+	 * 将给定的“映射”匹配到“ requestUri”的开头，如果匹配则返回多余的部分。 之所以需要此方法，是因为与requestUri不同，HttpServletRequest返回的上下文路径和servlet路径已去除分号内容。
+	 */
+	/**
 	 * Match the given "mapping" to the start of the "requestUri" and if there
 	 * is a match return the extra part. This method is needed because the
 	 * context path and the servlet path returned by the HttpServletRequest are
 	 * stripped of semicolon content unlike the requestUri.
 	 */
+	// 20201221 将给定的“映射”匹配到“ requestUri”的开头，如果匹配则返回多余的部分 => eg: "/testController/testRequestMapping"、""、true
 	@Nullable
 	private String getRemainingPath(String requestUri, String mapping, boolean ignoreCase) {
 		int index1 = 0;
@@ -402,6 +452,8 @@ public class UrlPathHelper {
 		else if (requestUri.charAt(index1) == ';') {
 			index1 = requestUri.indexOf('/', index1);
 		}
+
+		// 20201221 => eg: "/testController/testRequestMapping"
 		return (index1 != -1 ? requestUri.substring(index1) : "");
 	}
 
@@ -411,6 +463,7 @@ public class UrlPathHelper {
 	 * <li>replace all "//" by "/"</li>
 	 * </ul>
 	 */
+	// 20201221 清理给定的路径。 使用以下规则：用“ /”替换所有“ //”
 	private static String getSanitizedPath(final String path) {
 		int index = path.indexOf("//");
 		if (index >= 0) {
@@ -425,41 +478,70 @@ public class UrlPathHelper {
 	}
 
 	/**
+	 * 20201221
+	 * A. 返回给定请求的请求URI，如果在RequestDispatcher包含中调用了该请求，则检测包含请求URL。
+	 * B. 由于{@code request.getRequestURI（）}返回的值未被servlet容器解码，因此此方法将对其进行解码。
+	 * C. Web容器解析的URI应该正确，但是某些容器（如JBoss / Jetty）错误地包含“;”。 字符串，例如URI中的“; jsessionid”。 此方法可消除此类不正确的附录。
+	 */
+	/**
+	 * A.
 	 * Return the request URI for the given request, detecting an include request
 	 * URL if called within a RequestDispatcher include.
+	 *
+	 * B.
 	 * <p>As the value returned by {@code request.getRequestURI()} is <i>not</i>
 	 * decoded by the servlet container, this method will decode it.
+	 *
+	 * C.
 	 * <p>The URI that the web container resolves <i>should</i> be correct, but some
 	 * containers like JBoss/Jetty incorrectly include ";" strings like ";jsessionid"
 	 * in the URI. This method cuts off such incorrect appendices.
 	 * @param request current HTTP request
 	 * @return the request URI
 	 */
+	// 20201221 返回给定请求的请求URI, 可消除错误的“;”或者“; jsessionid”
 	public String getRequestUri(HttpServletRequest request) {
+		// 20201221 获取包含请求URI的标准Servlet 2.3+ spec请求属性 "javax.servlet.include.request_uri" => eg: null
 		String uri = (String) request.getAttribute(WebUtils.INCLUDE_REQUEST_URI_ATTRIBUTE);
 		if (uri == null) {
+			// 20201221 返回此请求的URL的一部分，从协议名称到HTTP请求第一行中的查询字符串 => eg: "/testController/testRequestMapping"
 			uri = request.getRequestURI();
 		}
+
+		// 20201221 解码提供的URI字符串，并在';'之后去除任何多余的部分。 => eg: "/testController/testRequestMapping"
 		return decodeAndCleanUriString(request, uri);
 	}
 
 	/**
+	 * 20201221
+	 * A. 返回给定请求的上下文路径，如果在RequestDispatcher包含中调用了包含请求URL，则检测到该请求。
+	 * B. 由于{@code request.getContextPath（）}返回的值未被Servlet容器解码，因此此方法将对其进行解码。
+	 */
+	/**
+	 * A.
 	 * Return the context path for the given request, detecting an include request
 	 * URL if called within a RequestDispatcher include.
+	 *
+	 * B.
 	 * <p>As the value returned by {@code request.getContextPath()} is <i>not</i>
 	 * decoded by the servlet container, this method will decode it.
 	 * @param request current HTTP request
 	 * @return the context path
 	 */
+	// 20201221 返回给定请求的上下文路径 eg: 根上下文返回""
 	public String getContextPath(HttpServletRequest request) {
+		// 20201221 用于包含上下文路径的标准Servlet 2.3+规范请求属性 "javax.servlet.include.context_path" => eg: null
 		String contextPath = (String) request.getAttribute(WebUtils.INCLUDE_CONTEXT_PATH_ATTRIBUTE);
 		if (contextPath == null) {
+			// 20201221 返回请求URI中指示请求上下文的部分, eg: 根上下文返回""
 			contextPath = request.getContextPath();
 		}
 		if (StringUtils.matchesCharacter(contextPath, '/')) {
 			// Invalid case, but happens for includes on Jetty: silently adapt it.
 			contextPath = "";
 		}
+
+		// 20201221 使用URLDecoder解码给定的源字符串 -> 编码将从请求中获取，并使用默认的“ ISO-8859-1”
 		return decodeRequestString(request, contextPath);
 	}
 
@@ -550,16 +632,30 @@ public class UrlPathHelper {
 	/**
 	 * Decode the supplied URI string and strips any extraneous portion after a ';'.
 	 */
+	// 20201221 解码提供的URI字符串，并在';'之后去除任何多余的部分。
 	private String decodeAndCleanUriString(HttpServletRequest request, String uri) {
+		// 20201221 删除分号内容
 		uri = removeSemicolonContent(uri);
+
+		// 20201221 使用URLDecoder解码给定的源字符串 -> 编码将从请求中获取，并使用默认的“ ISO-8859-1”
 		uri = decodeRequestString(request, uri);
+
+		// 20201221 清理给定的路径。 使用以下规则：用“ /”替换所有“ //”
 		uri = getSanitizedPath(uri);
 		return uri;
 	}
 
 	/**
+	 * 20201221
+	 * A. 使用URLDecoder解码给定的源字符串。 编码将从请求中获取，并使用默认的“ ISO-8859-1”。
+	 * B. 默认实现使用{@code URLDecoder.decode（input，enc）}。
+	 */
+	/**
+	 * A.
 	 * Decode the given source string with a URLDecoder. The encoding will be taken
 	 * from the request, falling back to the default "ISO-8859-1".
+	 *
+	 * B.
 	 * <p>The default implementation uses {@code URLDecoder.decode(input, enc)}.
 	 * @param request current HTTP request
 	 * @param source the String to decode
@@ -569,17 +665,23 @@ public class UrlPathHelper {
 	 * @see URLDecoder#decode(String, String)
 	 * @see URLDecoder#decode(String)
 	 */
+	// 20201221 使用URLDecoder解码给定的源字符串 -> 编码将从请求中获取，并使用默认的“ ISO-8859-1”
 	public String decodeRequestString(HttpServletRequest request, String source) {
+		// 20201221 是否允许URL解码, 默认为true
 		if (this.urlDecode) {
+			// 20201221 解码给定的已编码URI组件
 			return decodeInternal(request, source);
 		}
 		return source;
 	}
 
+	// 20201221 解码给定的已编码URI组件
 	@SuppressWarnings("deprecation")
 	private String decodeInternal(HttpServletRequest request, String source) {
+		// 20201221 确定给定请求的编码
 		String enc = determineEncoding(request);
 		try {
+			// 20201221 解码给定的已编码URI组件
 			return UriUtils.decode(source, enc);
 		}
 		catch (UnsupportedCharsetException ex) {
@@ -592,8 +694,16 @@ public class UrlPathHelper {
 	}
 
 	/**
+	 * 20201221
+	 * A. 确定给定请求的编码。 可以在子类中覆盖。
+	 * B. 默认实现检查请求编码，并回退为此解析器指定的默认编码。
+	 */
+	/**
+	 * A.
 	 * Determine the encoding for the given request.
 	 * Can be overridden in subclasses.
+	 *
+	 * B.
 	 * <p>The default implementation checks the request encoding,
 	 * falling back to the default encoding specified for this resolver.
 	 * @param request current HTTP request
@@ -601,6 +711,7 @@ public class UrlPathHelper {
 	 * @see ServletRequest#getCharacterEncoding()
 	 * @see #setDefaultEncoding
 	 */
+	// 20201221 确定给定请求的编码
 	protected String determineEncoding(HttpServletRequest request) {
 		String enc = request.getCharacterEncoding();
 		if (enc == null) {
@@ -610,17 +721,28 @@ public class UrlPathHelper {
 	}
 
 	/**
+	 * 20201221
+	 * 去掉 ”;” 如果{@linkplain #setRemoveSemicolonContent removeSemicolonContent}属性设置为“ true”，则来自给定请求URI的（分号）内容。 注意，“ jsessionid”始终被删除。
+	 */
+	/**
 	 * Remove ";" (semicolon) content from the given request URI if the
 	 * {@linkplain #setRemoveSemicolonContent removeSemicolonContent}
 	 * property is set to "true". Note that "jsessionid" is always removed.
 	 * @param requestUri the request URI string to remove ";" content from
 	 * @return the updated URI string
 	 */
+	// 20201221 删除分号内容
 	public String removeSemicolonContent(String requestUri) {
+		// 20201221 是否需要移除;号内容, 默认为true
 		return (this.removeSemicolonContent ?
-				removeSemicolonContentInternal(requestUri) : removeJsessionid(requestUri));
+				// 20201221 删除给定请求URI的（分号）内容
+				removeSemicolonContentInternal(requestUri) :
+
+				// 20201221 删除;jsessionid=
+				removeJsessionid(requestUri));
 	}
 
+	// 20201221 删除给定请求URI的（分号）内容
 	private static String removeSemicolonContentInternal(String requestUri) {
 		int semicolonIndex = requestUri.indexOf(';');
 		if (semicolonIndex == -1) {
@@ -638,6 +760,7 @@ public class UrlPathHelper {
 		return sb.toString();
 	}
 
+	// 20201221 删除;jsessionid=
 	private String removeJsessionid(String requestUri) {
 		String key = ";jsessionid=";
 		int index = requestUri.toLowerCase().indexOf(key);
@@ -655,6 +778,11 @@ public class UrlPathHelper {
 	}
 
 	/**
+	 * 20201221
+	 * 除非将{@link #setUrlDecode}设置为{@code true}，否则通过{@link #decodeRequestString}解码给定的URI路径变量，在这种情况下，假定通过调用，已经解码了从中提取变量的URL路径。
+	 * {@link #getLookupPathForRequest（HttpServletRequest）}。
+	 */
+	/**
 	 * Decode the given URI path variables via {@link #decodeRequestString} unless
 	 * {@link #setUrlDecode} is set to {@code true} in which case it is assumed
 	 * the URL path from which the variables were extracted is already decoded
@@ -663,7 +791,9 @@ public class UrlPathHelper {
 	 * @param vars the URI variables extracted from the URL path
 	 * @return the same Map or a new Map instance
 	 */
+	// 20201221 通过{@link #decodeRequestString}解码给定的URI路径变量
 	public Map<String, String> decodePathVariables(HttpServletRequest request, Map<String, String> vars) {
+		// 20201221 是否允许URL解码, 默认为true
 		if (this.urlDecode) {
 			return vars;
 		}
@@ -732,22 +862,36 @@ public class UrlPathHelper {
 		return !flagToUse;
 	}
 
-
 	/**
+	 * 20201221
+	 * A. 具有默认值的共享只读实例。 以下内容适用：
+	 * 		a. {@code alwaysUseFullPath = false}
+	 * 		b. {@code urlDecode = true}
+	 * 		c. {@code removeSemicolon = true}
+	 * 		d. {@code defaultEncoding =} {@ link WebUtils＃DEFAULT_CHARACTER_ENCODING}
+	 */
+	/**
+	 * A.
 	 * Shared, read-only instance with defaults. The following apply:
 	 * <ul>
+	 * a.
 	 * <li>{@code alwaysUseFullPath=false}
+	 *
+	 * b.
 	 * <li>{@code urlDecode=true}
+	 *
+	 * c.
 	 * <li>{@code removeSemicolon=true}
+	 *
+	 * d.
 	 * <li>{@code defaultEncoding=}{@link WebUtils#DEFAULT_CHARACTER_ENCODING}
 	 * </ul>
 	 */
+	// 20201221 具有默认值的共享只读实例
 	public static final UrlPathHelper defaultInstance = new UrlPathHelper();
-
 	static {
 		defaultInstance.setReadOnly();
 	}
-
 
 	/**
 	 * Shared, read-only instance for the full, encoded path. The following apply:

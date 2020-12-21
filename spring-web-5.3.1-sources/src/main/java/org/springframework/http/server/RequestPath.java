@@ -53,6 +53,7 @@ public interface RequestPath extends PathContainer {
 	 * The portion of the request path after the context path which is typically
 	 * used for request mapping within the application .
 	 */
+	// 20201221 请求路径中上下文路径之后的部分，通常用于应用程序中的请求映射。
 	PathContainer pathWithinApplication();
 
 	/**

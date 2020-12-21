@@ -44,11 +44,19 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
+ * 20201221
+ * A. 封装有关由{@linkplain #getMethod（）方法}和{@linkplain #getBean（）bean}组成的处理程序方法的信息。 提供对方法参数，方法返回值，方法注释等的便捷访问。
+ * B. 可以使用bean实例或bean名称（例如lazy-init bean，prototype bean）创建该类。 使用{@link #createWithResolvedBean（）}获得一个{@code HandlerMethod}实例，
+ *    该实例具有通过关联的{@link BeanFactory}解析的bean实例。
+ */
+/**
+ * A.
  * Encapsulates information about a handler method consisting of a
  * {@linkplain #getMethod() method} and a {@linkplain #getBean() bean}.
  * Provides convenient access to method parameters, the method return value,
  * method annotations, etc.
  *
+ * B.
  * <p>The class may be created with a bean instance or with a bean name
  * (e.g. lazy-init bean, prototype bean). Use {@link #createWithResolvedBean()}
  * to obtain a {@code HandlerMethod} instance with a bean instance resolved
@@ -60,6 +68,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author Sam Brannen
  * @since 3.1
  */
+// 20201221 封装有关由{@linkplain #getMethod（）方法}和{@linkplain #getBean（）bean}组成的处理程序方法的信息: 提供对方法参数，方法返回值，方法注释等的便捷访问。
 public class HandlerMethod {
 
 	/** Logger that is available to subclasses. */
@@ -91,7 +100,6 @@ public class HandlerMethod {
 	private volatile List<Annotation[][]> interfaceParameterAnnotations;
 
 	private final String description;
-
 
 	/**
 	 * Create an instance from a bean instance and a method.
@@ -169,18 +177,39 @@ public class HandlerMethod {
 	/**
 	 * Re-create HandlerMethod with the resolved handler.
 	 */
+	// 20201221 用已解析的处理程序重新创建HandlerMethod。
 	private HandlerMethod(HandlerMethod handlerMethod, Object handler) {
 		Assert.notNull(handlerMethod, "HandlerMethod is required");
 		Assert.notNull(handler, "Handler object is required");
+
+		// 20201221 找到的处理器实例 TestController
 		this.bean = handler;
+
+		// 20201221 BeanFactory eg: DefaultListableBeanFactory
 		this.beanFactory = handlerMethod.beanFactory;
+
+		// 20201221 控制器Class eg: class com.jsonyao.cs.Controller.TestController
 		this.beanType = handlerMethod.beanType;
+
+		// 20201221 Method对象 eg: public void com.jsonyao.cs.Controller.TestController.testRequestMapping()
 		this.method = handlerMethod.method;
+
+		// 20201221 桥接Method对象 eg: public void com.jsonyao.cs.Controller.TestController.testRequestMapping()
 		this.bridgedMethod = handlerMethod.bridgedMethod;
+
+		// 20201221 方法参数 eg: {}
 		this.parameters = handlerMethod.parameters;
+
+		// 20201221 eg: null
 		this.responseStatus = handlerMethod.responseStatus;
+
+		// 20201221 eg: null
 		this.responseStatusReason = handlerMethod.responseStatusReason;
+
+		// 20201221 HandlerMethod实例 => eg: "com.jsonyao.cs.Controller.TestController#testRequestMapping()"
 		this.resolvedFromHandlerMethod = handlerMethod;
+
+		// 20201221 "com.jsonyao.cs.Controller.TestController#testRequestMapping()"
 		this.description = handlerMethod.description;
 	}
 
@@ -326,16 +355,26 @@ public class HandlerMethod {
 	}
 
 	/**
+	 * 20201221
+	 * 如果提供的实例包含bean名称而不是对象实例，则在创建并返回{@link HandlerMethod}之前，将解析bean名称。
+	 */
+	/**
 	 * If the provided instance contains a bean name rather than an object instance,
 	 * the bean name is resolved before a {@link HandlerMethod} is created and returned.
 	 */
+	// 20201221 如果提供的实例包含bean名称而不是对象实例，则在创建并返回{@link HandlerMethod}之前，将解析bean名称 eg: TestController
 	public HandlerMethod createWithResolvedBean() {
+		// 20201221 HandlerMethod所在的Bean实例 => eg: testController
 		Object handler = this.bean;
 		if (this.bean instanceof String) {
 			Assert.state(this.beanFactory != null, "Cannot resolve bean name without BeanFactory");
 			String beanName = (String) this.bean;
+
+			// 20201221 根据testController BeanName获取BeanFatory获取实际的控制器TestController
 			handler = this.beanFactory.getBean(beanName);
 		}
+
+		// 20201221 用已解析的处理程序重新创建HandlerMethod。
 		return new HandlerMethod(this, handler);
 	}
 

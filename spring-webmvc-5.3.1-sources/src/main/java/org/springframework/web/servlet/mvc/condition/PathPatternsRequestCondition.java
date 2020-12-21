@@ -35,9 +35,16 @@ import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 /**
+ * 20201221
+ * A. 逻辑分离（'||'）请求条件，该条件将请求与一组URL路径模式进行匹配。
+ * B. 与{@link PatternsRequestCondition}相比，此条件使用解析的{@link PathPattern}而不是与{@link org.springframework.util.AntPathMatcher AntPathMatcher}匹配的字符串模式。
+ */
+/**
+ * A.
  * A logical disjunction (' || ') request condition that matches a request
  * against a set of URL path patterns.
  *
+ * B.
  * <p>In contrast to {@link PatternsRequestCondition}, this condition uses
  * parsed {@link PathPattern}s instead of String pattern matching with
  * {@link org.springframework.util.AntPathMatcher AntPathMatcher}.
@@ -45,6 +52,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
  * @author Rossen Stoyanchev
  * @since 5.3
  */
+// 20201221 逻辑分离（'||'）请求条件，该条件将请求与一组URL路径模式进行匹配： 不是与AntPathMatcher匹配的字符串模式。
 public final class PathPatternsRequestCondition extends AbstractRequestCondition<PathPatternsRequestCondition> {
 
 	private static final SortedSet<PathPattern> EMPTY_PATH_PATTERN =

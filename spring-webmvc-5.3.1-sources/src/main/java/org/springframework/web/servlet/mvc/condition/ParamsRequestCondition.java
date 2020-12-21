@@ -30,6 +30,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * 20201221
+ * 逻辑合取（'&&'）请求条件，该条件将请求与使用{@link RequestMapping＃params（）}中定义的语法的设置参数表达式进行匹配。
+ */
+/**
  * A logical conjunction (' && ') request condition that matches a request against
  * a set parameter expressions with syntax defined in {@link RequestMapping#params()}.
  *
@@ -37,6 +41,7 @@ import org.springframework.web.util.WebUtils;
  * @author Rossen Stoyanchev
  * @since 3.1
  */
+// 20201221 逻辑合取（'&&'）请求条件，该条件将请求与使用{@link RequestMapping＃params（）}中定义的语法的设置参数表达式进行匹配。
 public final class ParamsRequestCondition extends AbstractRequestCondition<ParamsRequestCondition> {
 
 	private final Set<ParamExpression> expressions;

@@ -337,9 +337,17 @@ public interface ServletRequest {
     public void setAttribute(String name, Object o);
 
     /**
+     * 20201221
+     * A. 从此请求中删除属性。 通常不需要此方法，因为仅在处理请求时属性才持久存在。
+     * B. 属性名称应遵循与程序包名称相同的约定。 以java.*和javax.*开头的名称保留供Servlet规范使用。 以sun.*，com.sun.*，oracle.*和* com.oracle.*开头的名称保留供Oracle Corporation使用。
+     */
+    /**
+     * A.
      * Removes an attribute from this request. This method is not generally
      * needed as attributes only persist as long as the request is being
      * handled.
+     *
+     * B.
      * <p>
      * Attribute names should follow the same conventions as package names.
      * Names beginning with <code>java.*</code> and <code>javax.*</code> are
@@ -351,6 +359,7 @@ public interface ServletRequest {
      *            a <code>String</code> specifying the name of the attribute to
      *            remove
      */
+    // 20201221 从此请求中删除属性
     public void removeAttribute(String name);
 
     /**

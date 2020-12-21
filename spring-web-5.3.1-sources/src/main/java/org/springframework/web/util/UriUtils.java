@@ -30,16 +30,29 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201221
+ * A. 基于RFC 3986的URI编码和解码的实用方法。
+ * B. 编码方法有两种：
+ * 		a. {@code“ encodeXyz”}-它们通过百分比编码非法字符（包括非US-ASCII字符，以及在给定URI组件类型内否则是非法的字符）来编码特定的URI组件（例如，路径，查询）， RFC 3986中定义。
+ * 	 	   此方法在编码方面的效果与使用{@link URI}的多参数构造函数相当。
+ * 	 	b. {@code“ encode”}和{@code“ encodeUriVariables”} –它们可以用于对URI变量值进行编码，方法是对URI中任何地方非法或具有保留含义的所有字符进行百分比编码。
+ */
+/**
+ * A.
  * Utility methods for URI encoding and decoding based on RFC 3986.
  *
+ * B.
  * <p>There are two types of encode methods:
  * <ul>
+ * a.
  * <li>{@code "encodeXyz"} -- these encode a specific URI component (e.g. path,
  * query) by percent encoding illegal characters, which includes non-US-ASCII
  * characters, and also characters that are otherwise illegal within the given
  * URI component type, as defined in RFC 3986. The effect of this method, with
  * regards to encoding, is comparable to using the multi-argument constructor
  * of {@link URI}.
+ *
+ * b.
  * <li>{@code "encode"} and {@code "encodeUriVariables"} -- these can be used
  * to encode URI variable values by percent encoding all characters that are
  * either illegal, or have any reserved meaning, anywhere within a URI.
@@ -51,6 +64,7 @@ import org.springframework.util.StringUtils;
  * @since 3.0
  * @see <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a>
  */
+// 20201221 基于RFC 3986的URI编码和解码的实用方法
 public abstract class UriUtils {
 
 	/**
@@ -357,9 +371,16 @@ public abstract class UriUtils {
 		return HierarchicalUriComponents.encodeUriComponent(scheme, charset, type);
 	}
 
-
 	/**
+	 * 20201221
+	 * A. 解码给定的已编码URI组件。
+	 * B. 有关解码规则，请参见{@link StringUtils＃uriDecode（String，Charset）}。
+	 */
+	/**
+	 * A.
 	 * Decode the given encoded URI component.
+	 *
+	 * B.
 	 * <p>See {@link StringUtils#uriDecode(String, Charset)} for the decoding rules.
 	 * @param source the encoded String
 	 * @param encoding the character encoding to use
@@ -368,6 +389,7 @@ public abstract class UriUtils {
 	 * @see StringUtils#uriDecode(String, Charset)
 	 * @see java.net.URLDecoder#decode(String, String)
 	 */
+	// 20201221 解码给定的已编码URI组件
 	public static String decode(String source, String encoding) {
 		return StringUtils.uriDecode(source, Charset.forName(encoding));
 	}

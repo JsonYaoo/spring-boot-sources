@@ -89,6 +89,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	@Nullable
 	private PathPatternParser patternParser;
 
+	// 20201221 URL路径匹配的帮助程序类
 	private UrlPathHelper urlPathHelper = new UrlPathHelper();
 
 	private PathMatcher pathMatcher = new AntPathMatcher();
@@ -232,7 +233,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	/**
 	 * Return the {@link #setUrlPathHelper configured} {@code UrlPathHelper}.
 	 */
+	// 20201221 返回{@link已配置的#setUrlPathHelper} {@code UrlPathHelper}。
 	public UrlPathHelper getUrlPathHelper() {
+		// 20201221 URL路径匹配的帮助程序类
 		return this.urlPathHelper;
 	}
 
@@ -254,6 +257,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	/**
 	 * Return the {@link #setPathMatcher configured} {@code PathMatcher}.
 	 */
+	// 20201221 返回{@link已配置的#setPathMatcher} {@code PathMatcher}。
 	public PathMatcher getPathMatcher() {
 		return this.pathMatcher;
 	}
@@ -504,7 +508,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	@Override
 	@Nullable
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
-		// 20201221 查找给定请求的处理程序，如果未找到特定请求，则返回{@code null}。 {@link #getHandler}调用此方法； 如果设置了{@code null}返回值，则会导致默认处理程序。
+		// 20201221 查找给定请求的处理程序方法 => eg: TestController
 		Object handler = getHandlerInternal(request);
 		if (handler == null) {
 			handler = getDefaultHandler();
@@ -512,11 +516,14 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		if (handler == null) {
 			return null;
 		}
+
+		// 20201221 Bean名称或解析的处理程序？
 		// Bean name or resolved handler?
 		if (handler instanceof String) {
 			String handlerName = (String) handler;
 			handler = obtainApplicationContext().getBean(handlerName);
 		}
+
 
 		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
 
@@ -602,17 +609,22 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 */
 	// 20201221 初始化用于请求映射的路径
 	protected String initLookupPath(HttpServletRequest request) {
-		// 20201221 查询是否指定了URI路径模式的解析器
+		// 20201221 查询是否指定了URI路径模式的解析器 eg: false
 		if (usesPathPatterns()) {
 			// 20201221 是, 则移除“UrlPathHelper.path”属性: lookupPath已解决的Servlet请求属性的名称
 			request.removeAttribute(UrlPathHelper.PATH_ATTRIBUTE);
 
-
+			// 20201221 返回经过{@link #parseAndCache}解析和缓存的{@code RequestPath}。
 			RequestPath requestPath = ServletRequestPathUtils.getParsedRequestPath(request);
+
+			// 20201221 请求路径中上下文路径之后的部分，通常用于应用程序中的请求映射 -> 解析此实例的原始路径
 			String lookupPath = requestPath.pathWithinApplication().value();
+
+			// 20201221 删除分号内容
 			return UrlPathHelper.defaultInstance.removeSemicolonContent(lookupPath);
 		}
 		else {
+			// 20201221 先获取URL路径匹配的帮助程序类, 再lookupPath并将其缓存在带有键PATH_ATTRIBUTE的请求属性中 => eg: "org.springframework.web.util.UrlPathHelper.path"-"/testController/testRequestMapping"
 			return getUrlPathHelper().resolveAndCacheLookupPath(request);
 		}
 	}

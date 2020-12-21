@@ -34,8 +34,8 @@ class DefaultRequestPath implements RequestPath {
 
 	private final PathContainer contextPath;
 
+	// 20201221 请求路径中上下文路径之后的部分，通常用于应用程序中的请求映射。
 	private final PathContainer pathWithinApplication;
-
 
 	DefaultRequestPath(String rawPath, @Nullable String contextPath) {
 		this.fullPath = PathContainer.parsePath(rawPath);
@@ -113,6 +113,7 @@ class DefaultRequestPath implements RequestPath {
 		return this.contextPath;
 	}
 
+	// 20201221 请求路径中上下文路径之后的部分，通常用于应用程序中的请求映射。
 	@Override
 	public PathContainer pathWithinApplication() {
 		return this.pathWithinApplication;

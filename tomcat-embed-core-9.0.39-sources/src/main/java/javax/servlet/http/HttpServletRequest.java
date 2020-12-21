@@ -275,6 +275,10 @@ public interface HttpServletRequest extends ServletRequest {
     }
 
     /**
+     * 20201221
+     * 返回请求URI中指示请求上下文的部分。 上下文路径总是在请求URI中排在第一位。 路径以“ /”字符开头，但不以“ /”字符结尾。 对于默认（根）上下文中的servlet，此方法返回“”。 容器不解码此字符串。
+     */
+    /**
      * Returns the portion of the request URI that indicates the context of the
      * request. The context path always comes first in a request URI. The path
      * starts with a "/" character but does not end with a "/" character. For
@@ -284,6 +288,7 @@ public interface HttpServletRequest extends ServletRequest {
      * @return a <code>String</code> specifying the portion of the request URI
      *         that indicates the context of the request
      */
+    // 20201221 返回请求URI中指示请求上下文的部分, 上下文路径总是在请求URI中排在第一位, 路径以“ /”字符开头，但不以“ /”字符结尾
     public String getContextPath();
 
     /**
@@ -346,6 +351,17 @@ public interface HttpServletRequest extends ServletRequest {
     public String getRequestedSessionId();
 
     /**
+     * 20201221
+     * A. 返回此请求的URL的一部分，从协议名称到HTTP请求第一行中的查询字符串。 Web容器不会解码此String。 例如：
+     *      返回值示例:
+     *      HTTP请求的第一行                              返回值
+     *      POST /some/path.html HTTP/1.1                /some/path.html
+     *      GET http://foo.bar/a.html HTTP/1.0          /a.html
+     *      HEAD /xyz?a=b HTTP/1.1                      /xyz
+     *    要使用方案和主机重建URL，请使用{@link #getRequestURL}。
+     */
+    /**
+     * A.
      * Returns the part of this request's URL from the protocol name up to the
      * query string in the first line of the HTTP request. The web container
      * does not decode this String. For example:
@@ -375,6 +391,7 @@ public interface HttpServletRequest extends ServletRequest {
      *         protocol name up to the query string
      * @see #getRequestURL
      */
+    // 20201221 返回此请求的URL的一部分，从协议名称到HTTP请求第一行中的查询字符串
     public String getRequestURI();
 
     /**

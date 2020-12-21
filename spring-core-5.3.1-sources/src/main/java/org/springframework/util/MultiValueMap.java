@@ -22,6 +22,10 @@ import java.util.Map;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201221
+ * {@code Map}接口的扩展，用于存储多个值。
+ */
+/**
  * Extension of the {@code Map} interface that stores multiple values.
  *
  * @author Arjen Poutsma
@@ -29,6 +33,7 @@ import org.springframework.lang.Nullable;
  * @param <K> the key type
  * @param <V> the value element type
  */
+// 20201221 {@code Map}接口的扩展，用于存储多个值。
 public interface MultiValueMap<K, V> extends Map<K, List<V>> {
 
 	/**

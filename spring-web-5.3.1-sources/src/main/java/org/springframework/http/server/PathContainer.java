@@ -45,6 +45,7 @@ public interface PathContainer {
 	/**
 	 * The original path from which this instance was parsed.
 	 */
+	// 20201221 解析此实例的原始路径。
 	String value();
 
 	/**

@@ -108,8 +108,11 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 	 * current request -- for example with a subset of URL patterns.
 	 * @return an info in case of a match; or {@code null} otherwise.
 	 */
+	// 20201221 检查给定的RequestMappingInfo是否与当前请求匹配，并返回一个具有与当前请求匹配的条件的（可能是新的）实例，例如带有URL模式的子集。
 	@Override
 	protected RequestMappingInfo getMatchingMapping(RequestMappingInfo info, HttpServletRequest request) {
+		// 20201221 检查此请求映射信息中的所有条件是否与提供的请求匹配，并返回具有针对当前请求量身定制的条件的潜在新请求映射信息
+		// 20201221 eg: { [/testController/testRequestMapping]}, request实例, 构建RequestMappingInfo => eg: [/testController/testRequestMapping]
 		return info.getMatchingCondition(request);
 	}
 
@@ -121,10 +124,13 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 		return (info1, info2) -> info1.compareTo(info2, request);
 	}
 
+	// 20201221 查找给定请求的处理程序，如果未找到特定请求，则返回{@code null}。 {@link #getHandler}调用此方法； 如果设置了{@code null}返回值，则会导致默认处理程序。
 	@Override
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
+		// 20201221 从此请求中删除属性 eg: "org.springframework.web.servlet.HandlerMapping.producibleMediaTypes"
 		request.removeAttribute(PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE);
 		try {
+			// 20201221 查找给定请求的处理程序方法。
 			return super.getHandlerInternal(request);
 		}
 		finally {
@@ -138,18 +144,23 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 	 * @see HandlerMapping#MATRIX_VARIABLES_ATTRIBUTE
 	 * @see HandlerMapping#PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE
 	 */
+	// 20201221 在请求中公开URI模板变量，矩阵变量和可生产的媒体类型 => eg: 提取匹配路径的变量详情 => eg: "org.springframework.web.servlet.HandlerMapping.uriTemplateVariables"-{}
 	@Override
 	protected void handleMatch(RequestMappingInfo info, String lookupPath, HttpServletRequest request) {
+		// 20201221 => eg: "org.springframework.web.servlet.HandlerMapping.pathWithinHandlerMapping"-"/testController/testRequestMapping"
 		super.handleMatch(info, lookupPath, request);
 
+		// 20201221 根据不为null的情况，返回{@link #getPathPatternsCondition（）}或{@link #getPatternsCondition（）} => eg: [/testController/testRequestMapping]
 		RequestCondition<?> condition = info.getActivePatternsCondition();
 		if (condition instanceof PathPatternsRequestCondition) {
 			extractMatchDetails((PathPatternsRequestCondition) condition, lookupPath, request);
 		}
 		else {
+			// 20201221 提取匹配路径的变量详情 => eg: "org.springframework.web.servlet.HandlerMapping.uriTemplateVariables"-{}
 			extractMatchDetails((PatternsRequestCondition) condition, lookupPath, request);
 		}
 
+		// 20201221 eg: isEmpty() == true
 		if (!info.getProducesCondition().getProducibleMediaTypes().isEmpty()) {
 			Set<MediaType> mediaTypes = info.getProducesCondition().getProducibleMediaTypes();
 			request.setAttribute(PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE, mediaTypes);
@@ -178,24 +189,37 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 		request.setAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE, uriVariables);
 	}
 
-	private void extractMatchDetails(
-			PatternsRequestCondition condition, String lookupPath, HttpServletRequest request) {
+	// 20201221 提取匹配路径的变量详情 => eg: "org.springframework.web.servlet.HandlerMapping.uriTemplateVariables"-{}
+	private void extractMatchDetails(PatternsRequestCondition condition, String lookupPath, HttpServletRequest request) {
 
 		String bestPattern;
 		Map<String, String> uriVariables;
+
+		// 20201221 条件是否为“”（空路径）映射。 eg: false
 		if (condition.isEmptyPathMapping()) {
 			bestPattern = lookupPath;
 			uriVariables = Collections.emptyMap();
 		}
 		else {
+			// 20201221 eg: "/testController/testRequestMapping"
 			bestPattern = condition.getPatterns().iterator().next();
+
+			// 20201221 返回{@link已配置的#setPathMatcher} {@code PathMatcher} eg: AntPathMatcher, 给定模式和完整路径，请提取URI模板变量 => eg: "/testController/testRequestMapping"、"/testController/testRequestMapping" => eg: {}
 			uriVariables = getPathMatcher().extractUriTemplateVariables(bestPattern, lookupPath);
+
+			// 20201221 返回{@link已配置的#setUrlPathHelper} {@code UrlPathHelper} eg: UrlPathHelper, 是否配置为删除“;” （分号）来自请求URI的内容 => eg: true
 			if (!getUrlPathHelper().shouldRemoveSemicolonContent()) {
 				request.setAttribute(MATRIX_VARIABLES_ATTRIBUTE, extractMatrixVariables(request, uriVariables));
 			}
+
+			// 20201221 返回{@link已配置的#setUrlPathHelper} {@code UrlPathHelper} eg: UrlPathHelper, 通过{@link #decodeRequestString}解码给定的URI路径变量 => eg: {}
 			uriVariables = getUrlPathHelper().decodePathVariables(request, uriVariables);
 		}
+
+		// 20201221 该属性包含处理程序映射中的最佳匹配模式: "org.springframework.web.servlet.HandlerMapping.bestMatchingPattern"-"/testController/testRequestMapping"
 		request.setAttribute(BEST_MATCHING_PATTERN_ATTRIBUTE, bestPattern);
+
+		// 20201221 包含URI模板映射的属性的名称, 将变量名称映射为值: "org.springframework.web.servlet.HandlerMapping.uriTemplateVariables"-{}
 		request.setAttribute(URI_TEMPLATE_VARIABLES_ATTRIBUTE, uriVariables);
 	}
 

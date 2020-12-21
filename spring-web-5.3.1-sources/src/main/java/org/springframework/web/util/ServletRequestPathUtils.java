@@ -86,6 +86,7 @@ public abstract class ServletRequestPathUtils {
 	 * Return a {@link #parseAndCache  previously} parsed and cached {@code RequestPath}.
 	 * @throws IllegalArgumentException if not found
 	 */
+	// 20201221 返回经过{@link #parseAndCache}解析和缓存的{@code RequestPath}。
 	public static RequestPath getParsedRequestPath(ServletRequest request) {
 		RequestPath path = (RequestPath) request.getAttribute(PATH_ATTRIBUTE);
 		Assert.notNull(path, "Expected parsed RequestPath in request attribute \"" + PATH_ATTRIBUTE + "\".");

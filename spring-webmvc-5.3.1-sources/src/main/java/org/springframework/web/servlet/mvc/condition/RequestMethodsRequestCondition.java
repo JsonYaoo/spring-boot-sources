@@ -35,6 +35,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.cors.CorsUtils;
 
 /**
+ * 20201221
+ * 逻辑析取（'||'）请求条件，该条件与一组{@link RequestMethod RequestMethods}的请求相匹配。
+ */
+/**
  * A logical disjunction (' || ') request condition that matches a request
  * against a set of {@link RequestMethod RequestMethods}.
  *
@@ -42,6 +46,7 @@ import org.springframework.web.cors.CorsUtils;
  * @author Rossen Stoyanchev
  * @since 3.1
  */
+// 20201221 逻辑析取（'||'）请求条件，该条件与一组{@link RequestMethod RequestMethods}的请求相匹配
 public final class RequestMethodsRequestCondition extends AbstractRequestCondition<RequestMethodsRequestCondition> {
 
 	/** Per HTTP method cache to return ready instances from getMatchingCondition. */
