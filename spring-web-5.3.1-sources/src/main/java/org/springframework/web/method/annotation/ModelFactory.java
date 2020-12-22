@@ -78,8 +78,8 @@ public final class ModelFactory {
 
 	private final WebDataBinderFactory dataBinderFactory;
 
+	// 20201222 管理通过{@link SessionAttributes @SessionAttributes}声明的控制器特定的会话属性。 实际的存储委托给{@link SessionAttributeStore}实例。
 	private final SessionAttributesHandler sessionAttributesHandler;
-
 
 	/**
 	 * Create a new instance with the given {@code @ModelAttribute} methods.
@@ -87,24 +87,42 @@ public final class ModelFactory {
 	 * @param binderFactory for preparation of {@link BindingResult} attributes
 	 * @param attributeHandler for access to session attributes
 	 */
+	// 20201222 使用给定的{@code @ModelAttribute}方法创建一个新实例。
 	public ModelFactory(@Nullable List<InvocableHandlerMethod> handlerMethods,
 			WebDataBinderFactory binderFactory, SessionAttributesHandler attributeHandler) {
 
+		// 20201222 eg: []
 		if (handlerMethods != null) {
 			for (InvocableHandlerMethod handlerMethod : handlerMethods) {
 				this.modelMethods.add(new ModelMethod(handlerMethod));
 			}
 		}
+
+		// 20201222 eg: ServletRequestDataBinderFactory
 		this.dataBinderFactory = binderFactory;
+
+		// 20201222 eg: SessionAttributesHandler
 		this.sessionAttributesHandler = attributeHandler;
 	}
 
-
 	/**
+	 * 20201222
+	 * A. 按以下顺序填充模型：
+	 * 		a. 检索列为{@code @SessionAttributes}的“已知”会话属性。
+	 * 		b. 调用{@code @ModelAttribute}方法
+	 * 		c. 找到也列为{@code @SessionAttributes}的{@code @ModelAttribute}方法参数，并确保它们存在于模型中，并在必要时引发异常。
+	 */
+	/**
+	 * A.
 	 * Populate the model in the following order:
 	 * <ol>
+	 * a.
 	 * <li>Retrieve "known" session attributes listed as {@code @SessionAttributes}.
+	 *
+	 * b.
 	 * <li>Invoke {@code @ModelAttribute} methods
+	 *
+	 * c.
 	 * <li>Find {@code @ModelAttribute} method arguments also listed as
 	 * {@code @SessionAttributes} and ensure they're present in the model raising
 	 * an exception if necessary.
@@ -114,11 +132,18 @@ public final class ModelFactory {
 	 * @param handlerMethod the method for which the model is initialized
 	 * @throws Exception may arise from {@code @ModelAttribute} methods
 	 */
-	public void initModel(NativeWebRequest request, ModelAndViewContainer container, HandlerMethod handlerMethod)
-			throws Exception {
+	// 20201222 初始化模型
+	public void initModel(
+			// 20201222 eg: ServletWebRequest@xxxx, ModelAndViewContainer@xxxx, ServletInvocableHandlerMethod@xxxx
+			NativeWebRequest request, ModelAndViewContainer container, HandlerMethod handlerMethod) throws Exception {
 
+		// 20201222 eg: []
 		Map<String, ?> sessionAttributes = this.sessionAttributesHandler.retrieveAttributes(request);
+
+		// 20201222 eg: do nothing
 		container.mergeAttributes(sessionAttributes);
+
+
 		invokeModelAttributeMethods(request, container);
 
 		for (String name : findSessionAttributeArguments(handlerMethod)) {

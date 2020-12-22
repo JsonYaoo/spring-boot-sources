@@ -300,6 +300,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * with "input" flash attributes saved by a previous request, if any.
 	 * @see org.springframework.web.servlet.support.RequestContextUtils#getInputFlashMap(HttpServletRequest)
 	 */
+	// 20201222 包含只读{@code Map <String，？>}以及前一个请求（如果有）保存的“ input”闪存属性的请求属性的名称。
 	public static final String INPUT_FLASH_MAP_ATTRIBUTE = DispatcherServlet.class.getName() + ".INPUT_FLASH_MAP";
 
 	/**

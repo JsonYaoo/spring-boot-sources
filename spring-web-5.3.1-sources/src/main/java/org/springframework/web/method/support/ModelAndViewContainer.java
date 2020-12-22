@@ -29,14 +29,24 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.bind.support.SimpleSessionStatus;
 
 /**
+ * 20201222
+ * A. 记录模型并查看由{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}和{@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers}做出的相关决策。
+ * B. {@link #setRequestHandled}标志可用于指示请求已直接处理，并且不需要视图分辨率。
+ * C. 实例化时会自动创建一个默认的{@link Model}。 可以通过{@link #setRedirectModel}提供备用模型实例，以用于重定向方案。 当{@link #setRedirectModelScenario}设置为{@code true}表示
+ *     重定向方案时，{@link #getModel（）}返回重定向模型，而不是默认模型。
+ */
+/**
+ * A.
  * Records model and view related decisions made by
  * {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers} and
  * {@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers} during the course of invocation of
  * a controller method.
  *
+ * B.
  * <p>The {@link #setRequestHandled} flag can be used to indicate the request
  * has been handled directly and view resolution is not required.
  *
+ * C.
  * <p>A default {@link Model} is automatically created at instantiation.
  * An alternate model instance may be provided via {@link #setRedirectModel}
  * for use in a redirect scenario. When {@link #setRedirectModelScenario} is set
@@ -47,18 +57,23 @@ import org.springframework.web.bind.support.SimpleSessionStatus;
  * @author Juergen Hoeller
  * @since 3.1
  */
+// 20201222 记录模型并查看由{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}和{@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers}做出的相关决策。
 public class ModelAndViewContainer {
 
+	// 20201222 是否忽略默认的重定向模型, 默认为false
 	private boolean ignoreDefaultModelOnRedirect = false;
 
 	@Nullable
 	private Object view;
 
+	// 20201222 默认模型
 	private final ModelMap defaultModel = new BindingAwareModelMap();
 
+	// 20201222 重定向模型
 	@Nullable
 	private ModelMap redirectModel;
 
+	// 20201222 重定向场景, 默认为false
 	private boolean redirectModelScenario = false;
 
 	@Nullable
@@ -132,12 +147,19 @@ public class ModelAndViewContainer {
 	}
 
 	/**
+	 * 20201222
+	 * 返回要使用的模型-“默认”模型或“重定向”模型。 如果{@code redirectModelScenario = false}或没有重定向模型（即未将RedirectAttributes声明为方法参数）和
+	 * {@code ignoreDefaultModelOnRedirect = false}，则使用默认模型。
+	 */
+	/**
 	 * Return the model to use -- either the "default" or the "redirect" model.
 	 * The default model is used if {@code redirectModelScenario=false} or
 	 * there is no redirect model (i.e. RedirectAttributes was not declared as
 	 * a method argument) and {@code ignoreDefaultModelOnRedirect=false}.
 	 */
+	// 20201222 返回要使用的模型-“默认”模型或“重定向”模型。
 	public ModelMap getModel() {
+		// 20201222 eg: true, 使用“默认”模型
 		if (useDefaultModel()) {
 			return this.defaultModel;
 		}
@@ -152,7 +174,9 @@ public class ModelAndViewContainer {
 	/**
 	 * Whether to use the default model or the redirect model.
 	 */
+	// 20201222 是使用默认模型还是重定向模型。
 	private boolean useDefaultModel() {
+		// 20201222 eg: false || (null == null && !false) => true
 		return (!this.redirectModelScenario || (this.redirectModel == null && !this.ignoreDefaultModelOnRedirect));
 	}
 
@@ -281,6 +305,7 @@ public class ModelAndViewContainer {
 	 * A shortcut for {@code getModel().addAttribute(Object)}.
 	 */
 	public ModelAndViewContainer addAttribute(Object value) {
+		// 20201222 eg: BindingAwareModelMap@xxxx, eg: BindingAwareModelMap@xxxx
 		getModel().addAttribute(value);
 		return this;
 	}
@@ -289,6 +314,7 @@ public class ModelAndViewContainer {
 	 * Copy all attributes to the underlying model.
 	 * A shortcut for {@code getModel().addAllAttributes(Map)}.
 	 */
+	// 20201222 将所有属性复制到基础模型。 {@code getModel（）。addAllAttributes（Map）}的快捷方式。
 	public ModelAndViewContainer addAllAttributes(@Nullable Map<String, ?> attributes) {
 		getModel().addAllAttributes(attributes);
 		return this;
@@ -299,7 +325,9 @@ public class ModelAndViewContainer {
 	 * the same name taking precedence (i.e. not getting replaced).
 	 * A shortcut for {@code getModel().mergeAttributes(Map<String, ?>)}.
 	 */
+	// 20201222 复制提供的{@code Map}中的属性，并使用具有相同名称的现有对象优先（即不被替换）。 {@code getModel（）。mergeAttributes（Map <String，？>）}的快捷方式。
 	public ModelAndViewContainer mergeAttributes(@Nullable Map<String, ?> attributes) {
+		// 20201222
 		getModel().mergeAttributes(attributes);
 		return this;
 	}

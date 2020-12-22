@@ -25,6 +25,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 20201222
+ * 通过委派给已注册的{@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers}列表来处理方法返回值。 先前解析的返回类型将被缓存，以加快查找速度。
+ */
+/**
  * Handles method return values by delegating to a list of registered
  * {@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers}.
  * Previously resolved return types are cached for faster lookups.
@@ -32,6 +36,7 @@ import org.springframework.web.context.request.NativeWebRequest;
  * @author Rossen Stoyanchev
  * @since 3.1
  */
+// 20201222 通过委派给已注册的{@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers}列表来处理方法返回值。 先前解析的返回类型将被缓存，以加快查找速度。
 public class HandlerMethodReturnValueHandlerComposite implements HandlerMethodReturnValueHandler {
 
 	private final List<HandlerMethodReturnValueHandler> returnValueHandlers = new ArrayList<>();

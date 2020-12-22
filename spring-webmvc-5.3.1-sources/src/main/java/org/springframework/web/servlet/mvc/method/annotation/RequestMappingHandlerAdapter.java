@@ -149,6 +149,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 	@Nullable
 	private List<HandlerMethodArgumentResolver> customArgumentResolvers;
 
+	// 20201222 通过委派给已注册的{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}列表来解析方法参数。 先前解析的方法参数将被缓存，以加快查找速度。
 	@Nullable
 	private HandlerMethodArgumentResolverComposite argumentResolvers;
 
@@ -158,6 +159,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 	@Nullable
 	private List<HandlerMethodReturnValueHandler> customReturnValueHandlers;
 
+	// 20201222 通过委派给已注册的{@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers}列表来处理方法返回值。 先前解析的返回类型将被缓存，以加快查找速度。
 	@Nullable
 	private HandlerMethodReturnValueHandlerComposite returnValueHandlers;
 
@@ -193,6 +195,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 
 	private SessionAttributeStore sessionAttributeStore = new DefaultSessionAttributeStore();
 
+	// 20201222 用于发现方法和构造函数的参数名称的接口
 	private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
 	@Nullable
@@ -207,10 +210,11 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 	// 20201222 @ControllerAdvice绑定的Method缓存
 	private final Map<ControllerAdviceBean, Set<Method>> initBinderAdviceCache = new LinkedHashMap<>();
 
+	// 20201222 模型-Method缓存
 	private final Map<Class<?>, Set<Method>> modelAttributeCache = new ConcurrentHashMap<>(64);
 
+	// 20201222 @ControllerAdvice-Method缓存
 	private final Map<ControllerAdviceBean, Set<Method>> modelAttributeAdviceCache = new LinkedHashMap<>();
-
 
 	public RequestMappingHandlerAdapter() {
 		this.messageConverters = new ArrayList<>(4);
@@ -883,21 +887,35 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 			// 20201222 根据Handler获取用于为命名目标对象创建{@link WebDataBinder}实例的工厂 => eg: [], ConfigurableWebBindingInitializer
 			WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
 
-
+			// 20201222 eg: ModelFactory: dataBinderFactory、SessionAttributesHandler
 			ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
 
+			// 20201222 ServletInvocableHandlerMethod@xxxx: "com.jsonyao.cs.Controller.TestController#testRequestMapping()"
 			ServletInvocableHandlerMethod invocableMethod = createInvocableHandlerMethod(handlerMethod);
+
+			// 20201222 eg: HandlerMethodArgumentResolver列表
 			if (this.argumentResolvers != null) {
 				invocableMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers);
 			}
+
+			// 20201222 eg: HandlerMethodReturnValueHandler列表
 			if (this.returnValueHandlers != null) {
 				invocableMethod.setHandlerMethodReturnValueHandlers(this.returnValueHandlers);
 			}
+
+			// 20201222 eg: ServletRequestDataBinderFactory@xxxx
 			invocableMethod.setDataBinderFactory(binderFactory);
+
+			// 20201222 eg: DefaultParameterNameDiscoverer@xxxx
 			invocableMethod.setParameterNameDiscoverer(this.parameterNameDiscoverer);
 
+			// 20201222 eg: ModelAndViewContainer@xxxx: ModelAndViewContainer: View is [null]; default model {}
 			ModelAndViewContainer mavContainer = new ModelAndViewContainer();
+
+			// 20201222 eg: "org.springframework.web.servlet.DispatcherServlet.INPUT_FLASH_MAP"-null
 			mavContainer.addAllAttributes(RequestContextUtils.getInputFlashMap(request));
+
+			// 20201222 eg: ServletWebRequest@xxxx, ModelAndViewContainer@xxxx, ServletInvocableHandlerMethod@xxxx
 			modelFactory.initModel(webRequest, mavContainer, invocableMethod);
 			mavContainer.setIgnoreDefaultModelOnRedirect(this.ignoreDefaultModelOnRedirect);
 
@@ -939,6 +957,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 	 * @return the corresponding {@link ServletInvocableHandlerMethod} (or custom subclass thereof)
 	 * @since 4.2
 	 */
+	// 20201222 根据给定的{@link HandlerMethod}定义创建一个{@link ServletInvocableHandlerMethod}。
 	protected ServletInvocableHandlerMethod createInvocableHandlerMethod(HandlerMethod handlerMethod) {
 		return new ServletInvocableHandlerMethod(handlerMethod);
 	}
@@ -948,14 +967,22 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 		// 20201222 eg: SessionAttributesHandler
 		SessionAttributesHandler sessionAttrHandler = getSessionAttributesHandler(handlerMethod);
 
+		// 20201222 eg: "class com.jsonyao.cs.Controller.TestController"
 		Class<?> handlerType = handlerMethod.getBeanType();
+
+		// 20201222 eg: "class com.jsonyao.cs.Controller.TestController"-[]
 		Set<Method> methods = this.modelAttributeCache.get(handlerType);
 		if (methods == null) {
 			methods = MethodIntrospector.selectMethods(handlerType, MODEL_ATTRIBUTE_METHODS);
 			this.modelAttributeCache.put(handlerType, methods);
 		}
+
+		// 20201222 {@link HandlerMethod}的扩展，它通过通过{@link HandlerMethodArgumentResolver}列表从当前HTTP请求中解析的参数值调用基础方法
 		List<InvocableHandlerMethod> attrMethods = new ArrayList<>();
+
+		// 20201222 全局方法优先
 		// Global methods first
+		// 20201222 eg: []
 		this.modelAttributeAdviceCache.forEach((controllerAdviceBean, methodSet) -> {
 			if (controllerAdviceBean.isApplicableToBeanType(handlerType)) {
 				Object bean = controllerAdviceBean.resolveBean();
@@ -964,10 +991,14 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 				}
 			}
 		});
+
+		// 20201222 eg: []
 		for (Method method : methods) {
 			Object bean = handlerMethod.getBean();
 			attrMethods.add(createModelAttributeMethod(binderFactory, bean, method));
 		}
+
+		// 20201222 eg: ModelFactory: dataBinderFactory、SessionAttributesHandler
 		return new ModelFactory(attrMethods, binderFactory, sessionAttrHandler);
 	}
 

@@ -161,17 +161,39 @@ public class HandlerMethod {
 	/**
 	 * Copy constructor for use in subclasses.
 	 */
+	// 20201222 复制用于子类的构造函数。
 	protected HandlerMethod(HandlerMethod handlerMethod) {
+		// 20201222 eg: ServletInvocableHandlerMethod@xxxx: "com.jsonyao.cs.Controller.TestController#testRequestMapping()"
 		Assert.notNull(handlerMethod, "HandlerMethod is required");
+
+		// 20201222 eg: TestController@xxxx
 		this.bean = handlerMethod.bean;
+
+		// 20201222 eg: DefaultListableBeanFactory@xxxx
 		this.beanFactory = handlerMethod.beanFactory;
+
+		// 20201222 eg: Class@xxxx: "class com.jsonyao.cs.Controller.TestController"
 		this.beanType = handlerMethod.beanType;
+
+		// 20201222 eg: Method@xxxx: "public void com.jsonyao.cs.Controller.TestController.testRequestMapping()"
 		this.method = handlerMethod.method;
+
+		// 20201222 eg: Method@xxxx: "public void com.jsonyao.cs.Controller.TestController.testRequestMapping()"
 		this.bridgedMethod = handlerMethod.bridgedMethod;
+
+		// 20201222 eg: MethodParameter[0]@xxxx
 		this.parameters = handlerMethod.parameters;
+
+		// 20201222 eg: null
 		this.responseStatus = handlerMethod.responseStatus;
+
+		// 20201222 eg: null
 		this.responseStatusReason = handlerMethod.responseStatusReason;
+
+		// 20201222 "com.jsonyao.cs.Controller.TestController#testRequestMapping()"
 		this.description = handlerMethod.description;
+
+		// 20201222 HandlerMethod@xxxx: "com.jsonyao.cs.Controller.TestController#testRequestMapping()"
 		this.resolvedFromHandlerMethod = handlerMethod.resolvedFromHandlerMethod;
 	}
 

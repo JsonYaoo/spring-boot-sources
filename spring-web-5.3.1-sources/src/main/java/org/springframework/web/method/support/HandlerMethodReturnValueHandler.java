@@ -21,6 +21,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 20201222
+ * 策略接口处理从处理程序方法调用返回的值。
+ */
+/**
  * Strategy interface to handle the value returned from the invocation of a
  * handler method .
  *
@@ -28,6 +32,7 @@ import org.springframework.web.context.request.NativeWebRequest;
  * @since 3.1
  * @see HandlerMethodArgumentResolver
  */
+// 20201222 策略接口处理从处理程序方法调用返回的值。
 public interface HandlerMethodReturnValueHandler {
 
 	/**

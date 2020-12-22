@@ -46,11 +46,19 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.util.NestedServletException;
 
 /**
+ * 20201222
+ * A. 扩展了{@link InvocableHandlerMethod}，使其能够通过已注册的{@link HandlerMethodReturnValueHandler}处理返回值，并且还支持基于方法级别的{@code @ResponseStatus}注释设置响应状态。
+ * B. {@code null}返回值（包括void）可以与{@code @ResponseStatus}批注（未修改的检查条件）结合起来解释为请求处理的结束（请参阅{@link ServletWebRequest＃checkNotModified（long） }）或
+ *    提供访问响应流的方法参数。
+ */
+/**
+ * A.
  * Extends {@link InvocableHandlerMethod} with the ability to handle return
  * values through a registered {@link HandlerMethodReturnValueHandler} and
  * also supports setting the response status based on a method-level
  * {@code @ResponseStatus} annotation.
  *
+ * B.
  * <p>A {@code null} return value (including void) may be interpreted as the
  * end of request processing in combination with a {@code @ResponseStatus}
  * annotation, a not-modified check condition
@@ -61,6 +69,7 @@ import org.springframework.web.util.NestedServletException;
  * @author Juergen Hoeller
  * @since 3.1
  */
+// 20201222 扩展了{@link InvocableHandlerMethod}，使其能够通过已注册的{@link HandlerMethodReturnValueHandler}处理返回值，并且还支持基于方法级别的{@code @ResponseStatus}注释设置响应状态。
 public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 
 	private static final Method CALLABLE_METHOD = ClassUtils.getMethod(Callable.class, "call");
@@ -79,15 +88,20 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	/**
 	 * Create an instance from a {@code HandlerMethod}.
 	 */
+	// 20201222 从{@code HandlerMethod}创建一个实例。
 	public ServletInvocableHandlerMethod(HandlerMethod handlerMethod) {
 		super(handlerMethod);
 	}
 
-
+	/**
+	 * 20201222
+	 * 注册{@link HandlerMethodReturnValueHandler}实例以处理返回值。
+	 */
 	/**
 	 * Register {@link HandlerMethodReturnValueHandler} instances to use to
 	 * handle return values.
 	 */
+	// 20201222 注册{@link HandlerMethodReturnValueHandler}实例以处理返回值。
 	public void setHandlerMethodReturnValueHandlers(HandlerMethodReturnValueHandlerComposite returnValueHandlers) {
 		this.returnValueHandlers = returnValueHandlers;
 	}

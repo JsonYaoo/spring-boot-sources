@@ -25,9 +25,16 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 20201222
+ * A. {@link java.util.Map}的实现，用于构建用于UI工具的模型数据。 支持链式调用和模型属性名称的生成。
+ * B. 此类充当Servlet MVC的通用模型持有人，但并不与之相关。 请查看{@link Model}接口以获取接口变体。
+ */
+/**
+ * A.
  * Implementation of {@link java.util.Map} for use when building model data for use
  * with UI tools. Supports chained calls and generation of model attribute names.
  *
+ * B.
  * <p>This class serves as generic model holder for Servlet MVC but is not tied to it.
  * Check out the {@link Model} interface for an interface variant.
  *
@@ -37,6 +44,7 @@ import org.springframework.util.Assert;
  * @see Conventions#getVariableName
  * @see org.springframework.web.servlet.ModelAndView
  */
+// 20201222 {@link java.util.Map}的实现: 用于构建用于UI工具的模型数据、支持链式调用和模型属性名称的生成。此类充当Servlet MVC的通用模型持有人，但并不与之相关。
 @SuppressWarnings("serial")
 public class ModelMap extends LinkedHashMap<String, Object> {
 
@@ -78,14 +86,23 @@ public class ModelMap extends LinkedHashMap<String, Object> {
 	}
 
 	/**
+	 * 20201222
+	 * A. 使用{@link org.springframework.core.Conventions＃getVariableName生成的名称}将提供的属性添加到此{@code Map}。
+	 * B. 注意：使用此方法时，不会将空的{@link Collection Collections}添加到模型中，因为我们无法正确确定真实的约定名称。 查看代码应检查{@code null}，而不是JSTL标签已完成的空集合。
+	 */
+	/**
+	 * A.
 	 * Add the supplied attribute to this {@code Map} using a
 	 * {@link org.springframework.core.Conventions#getVariableName generated name}.
+	 *
+	 * B.
 	 * <p><i>Note: Empty {@link Collection Collections} are not added to
 	 * the model when using this method because we cannot correctly determine
 	 * the true convention name. View code should check for {@code null} rather
 	 * than for empty collections as is already done by JSTL tags.</i>
 	 * @param attributeValue the model attribute value (never {@code null})
 	 */
+	// 20201222 使用{@link org.springframework.core.Conventions＃getVariableName生成的名称}将提供的属性添加到此{@code Map}。
 	public ModelMap addAttribute(Object attributeValue) {
 		Assert.notNull(attributeValue, "Model object must not be null");
 		if (attributeValue instanceof Collection && ((Collection<?>) attributeValue).isEmpty()) {
@@ -124,7 +141,9 @@ public class ModelMap extends LinkedHashMap<String, Object> {
 	 * with existing objects of the same name taking precedence (i.e. not getting
 	 * replaced).
 	 */
+	// 20201222 将提供的{@code映射}中的所有属性复制到该{@code映射}中，同名的现有对象优先（即不被替换）。
 	public ModelMap mergeAttributes(@Nullable Map<String, ?> attributes) {
+		// 20201222 eg: []
 		if (attributes != null) {
 			attributes.forEach((key, value) -> {
 				if (!containsKey(key)) {

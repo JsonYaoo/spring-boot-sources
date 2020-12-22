@@ -45,9 +45,16 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
+ * 20201222
+ * A. 由{@link org.springframework.web.servlet.DispatcherServlet}设置的实用程序类，用于轻松访问特定于请求的状态。
+ * B. 支持查找当前的WebApplicationContext，LocaleResolver，Locale，ThemeResolver，Theme和MultipartResolver。
+ */
+/**
+ * A.
  * Utility class for easy access to request-specific state which has been
  * set by the {@link org.springframework.web.servlet.DispatcherServlet}.
  *
+ * B.
  * <p>Supports lookup of current WebApplicationContext, LocaleResolver,
  * Locale, ThemeResolver, Theme, and MultipartResolver.
  *
@@ -57,6 +64,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * @see RequestContext
  * @see org.springframework.web.servlet.DispatcherServlet
  */
+// 20201222 由{@link org.springframework.web.servlet.DispatcherServlet}设置的实用程序类: 用于轻松访问特定于请求的状态、支持查找当前的WebApplicationContext，LocaleResolver，Locale，ThemeResolver，Theme和MultipartResolver
 public abstract class RequestContextUtils {
 
 	/**
@@ -228,9 +236,11 @@ public abstract class RequestContextUtils {
 	 * @return a read-only Map, or {@code null} if not found
 	 * @see FlashMap
 	 */
+	// 20201222 重定向之前，从请求中返回只读的“输入” Flash属性。
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public static Map<String, ?> getInputFlashMap(HttpServletRequest request) {
+		// 20201222 eg: "org.springframework.web.servlet.DispatcherServlet.INPUT_FLASH_MAP"-null
 		return (Map<String, ?>) request.getAttribute(DispatcherServlet.INPUT_FLASH_MAP_ATTRIBUTE);
 	}
 

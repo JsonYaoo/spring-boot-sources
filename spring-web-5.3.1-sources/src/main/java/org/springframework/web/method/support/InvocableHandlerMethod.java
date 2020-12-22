@@ -35,6 +35,11 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.HandlerMethod;
 
 /**
+ * 20201222
+ * {@link HandlerMethod}的扩展，它通过{@link HandlerMethodArgumentResolver}列表从当前HTTP请求中解析的参数值调用基础方法。
+ */
+
+/**
  * Extension of {@link HandlerMethod} that invokes the underlying method with
  * argument values resolved from the current HTTP request through a list of
  * {@link HandlerMethodArgumentResolver}.
@@ -44,6 +49,7 @@ import org.springframework.web.method.HandlerMethod;
  * @author Sebastien Deleuze
  * @since 3.1
  */
+// 20201222 {@link HandlerMethod}的扩展，它通过通过{@link HandlerMethodArgumentResolver}列表从当前HTTP请求中解析的参数值调用基础方法。
 public class InvocableHandlerMethod extends HandlerMethod {
 
 	private static final Object[] EMPTY_ARGS = new Object[0];
@@ -56,10 +62,10 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	@Nullable
 	private WebDataBinderFactory dataBinderFactory;
 
-
 	/**
 	 * Create an instance from a {@code HandlerMethod}.
 	 */
+	// 20201222 从{@code HandlerMethod}创建一个实例
 	public InvocableHandlerMethod(HandlerMethod handlerMethod) {
 		super(handlerMethod);
 	}
@@ -84,18 +90,30 @@ public class InvocableHandlerMethod extends HandlerMethod {
 		super(bean, methodName, parameterTypes);
 	}
 
-
+	/**
+	 * 20201222
+	 * 设置{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}用于解析方法参数值。
+	 */
 	/**
 	 * Set {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}
 	 * to use for resolving method argument values.
 	 */
+	// 20201222 设置{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}用于解析方法参数值。
 	public void setHandlerMethodArgumentResolvers(HandlerMethodArgumentResolverComposite argumentResolvers) {
 		this.resolvers = argumentResolvers;
 	}
 
 	/**
+	 * 20201222
+	 * A. 设置ParameterNameDiscoverer以在需要时解析参数名称（例如默认请求属性名称）。
+	 * B. 默认值为{@link DefaultParameterNameDiscoverer}。
+	 */
+	/**
+	 * A.
 	 * Set the ParameterNameDiscoverer for resolving parameter names when needed
 	 * (e.g. default request attribute name).
+	 *
+	 * B.
 	 * <p>Default is a {@link DefaultParameterNameDiscoverer}.
 	 */
 	public void setParameterNameDiscoverer(ParameterNameDiscoverer parameterNameDiscoverer) {
@@ -103,13 +121,17 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	}
 
 	/**
+	 * 20201222
+	 * 设置{@link WebDataBinderFactory}传递给参数解析器，使他们可以创建{@link WebDataBinder}进行数据绑定和类型转换。
+	 */
+	/**
 	 * Set the {@link WebDataBinderFactory} to be passed to argument resolvers allowing them
 	 * to create a {@link WebDataBinder} for data binding and type conversion purposes.
 	 */
+	// 20201222 设置{@link WebDataBinderFactory}传递给参数解析器，使他们可以创建{@link WebDataBinder}进行数据绑定和类型转换。
 	public void setDataBinderFactory(WebDataBinderFactory dataBinderFactory) {
 		this.dataBinderFactory = dataBinderFactory;
 	}
-
 
 	/**
 	 * Invoke the method after resolving its argument values in the context of the given request.

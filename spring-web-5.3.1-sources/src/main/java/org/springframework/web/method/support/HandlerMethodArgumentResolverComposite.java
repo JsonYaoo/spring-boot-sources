@@ -28,6 +28,10 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 20201222
+ * 通过委派给已注册的{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}列表来解析方法参数。 先前解析的方法参数将被缓存，以加快查找速度。
+ */
+/**
  * Resolves method parameters by delegating to a list of registered
  * {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}.
  * Previously resolved method parameters are cached for faster lookups.
@@ -36,6 +40,7 @@ import org.springframework.web.context.request.NativeWebRequest;
  * @author Juergen Hoeller
  * @since 3.1
  */
+// 20201222 通过委派给已注册的{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}列表来解析方法参数。 先前解析的方法参数将被缓存，以加快查找速度。
 public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgumentResolver {
 
 	private final List<HandlerMethodArgumentResolver> argumentResolvers = new ArrayList<>();

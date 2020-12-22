@@ -133,20 +133,29 @@ public class SessionAttributesHandler {
 	}
 
 	/**
+	 * 20201222
+	 * 从会话中检索“已知”属性，即在{@code @SessionAttributes}中按名称列出的属性，或先前存储在模型中按类型匹配的属性。
+	 */
+	/**
 	 * Retrieve "known" attributes from the session, i.e. attributes listed
 	 * by name in {@code @SessionAttributes} or attributes previously stored
 	 * in the model that matched by type.
 	 * @param request the current request
 	 * @return a map with handler session attributes, possibly empty
 	 */
+	// 20201222 从会话中检索“已知”属性，即在{@code @SessionAttributes}中按名称列出的属性，或先前存储在模型中按类型匹配的属性。
 	public Map<String, Object> retrieveAttributes(WebRequest request) {
 		Map<String, Object> attributes = new HashMap<>();
+
+		// 20201222 eg: []
 		for (String name : this.knownAttributeNames) {
 			Object value = this.sessionAttributeStore.retrieveAttribute(request, name);
 			if (value != null) {
 				attributes.put(name, value);
 			}
 		}
+
+		// 20201222 eg: []
 		return attributes;
 	}
 

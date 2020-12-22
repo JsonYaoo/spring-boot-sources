@@ -23,6 +23,10 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 20201222
+ * 策略接口，用于在给定请求的上下文中将方法参数解析为参数值。
+ */
+/**
  * Strategy interface for resolving method parameters into argument values in
  * the context of a given request.
  *
@@ -30,6 +34,7 @@ import org.springframework.web.context.request.NativeWebRequest;
  * @since 3.1
  * @see HandlerMethodReturnValueHandler
  */
+// 20201222 策略接口，用于在给定请求的上下文中将方法参数解析为参数值。
 public interface HandlerMethodArgumentResolver {
 
 	/**
