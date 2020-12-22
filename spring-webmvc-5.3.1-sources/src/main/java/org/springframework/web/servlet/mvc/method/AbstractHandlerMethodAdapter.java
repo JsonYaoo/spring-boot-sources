@@ -27,12 +27,17 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.support.WebContentGenerator;
 
 /**
+ * 20201222
+ * {@link HandlerAdapter}实现的抽象基类，支持{@link HandlerMethod}类型的处理程序。
+ */
+/**
  * Abstract base class for {@link HandlerAdapter} implementations that support
  * handlers of type {@link HandlerMethod}.
  *
  * @author Arjen Poutsma
  * @since 3.1
  */
+// 20201222 {@link HandlerAdapter}实现的抽象基类，支持{@link HandlerMethod}类型的处理程序。
 public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator implements HandlerAdapter, Ordered {
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
@@ -64,8 +69,10 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 	 * @param handler the handler instance to check
 	 * @return whether or not this adapter can adapt the given handler
 	 */
+	// 20201222 此实现期望处理程序为{@link HandlerMethod}。
 	@Override
 	public final boolean supports(Object handler) {
+		// 20201222 eg: true && [RequestMappingHandlerAdapter#supportsInternal] true => true
 		return (handler instanceof HandlerMethod && supportsInternal((HandlerMethod) handler));
 	}
 
@@ -74,6 +81,7 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 	 * @param handlerMethod the handler method to check
 	 * @return whether or not this adapter can adapt the given method
 	 */
+	// 20201222 给定处理程序方法，返回此适配器是否可以支持它。
 	protected abstract boolean supportsInternal(HandlerMethod handlerMethod);
 
 	/**

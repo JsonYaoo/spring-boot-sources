@@ -99,9 +99,17 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * 20201222
+ * A. {@link AbstractHandlerMethodAdapter}的扩展支持{@link HandlerMethod HandlerMethods}注释的{@link RequestMapping @RequestMapping}。
+ * B. 可以通过{@link #setCustomArgumentResolvers}和{@link #setCustomReturnValueHandlers}添加对自定义参数和返回值类型的支持，或者，要重新配置所有参数和返回值类型，
+ *     请使用{@link #setArgumentResolvers}和{@link #setReturnValueHandlers}。
+ */
+/**
+ * A.
  * Extension of {@link AbstractHandlerMethodAdapter} that supports
  * {@link RequestMapping @RequestMapping} annotated {@link HandlerMethod HandlerMethods}.
  *
+ * B.
  * <p>Support for custom argument and return value types can be added via
  * {@link #setCustomArgumentResolvers} and {@link #setCustomReturnValueHandlers},
  * or alternatively, to re-configure all argument and return value types,
@@ -114,8 +122,8 @@ import org.springframework.web.util.WebUtils;
  * @see HandlerMethodArgumentResolver
  * @see HandlerMethodReturnValueHandler
  */
-public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
-		implements BeanFactoryAware, InitializingBean {
+// 20201222 {@link AbstractHandlerMethodAdapter}的扩展支持{@link HandlerMethod HandlerMethods}注释的{@link RequestMapping @RequestMapping}
+public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter implements BeanFactoryAware, InitializingBean {
 
 	/**
 	 * Boolean flag controlled by a {@code spring.xml.ignore} system property that instructs Spring to
@@ -767,7 +775,11 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		return handlers;
 	}
 
-
+	/**
+	 * 20201222
+	 * 始终返回{@code true}，因为将以某种方式处理任何方法参数和返回值类型。 如果方法参数是简单类型，则任何HandlerMethodArgumentResolver都无法识别的方法参数被解释为
+	 * 请求参数，否则被解释为模型属性。 任何HandlerMethodReturnValueHandler无法识别的返回值将被解释为模型属性。
+	 */
 	/**
 	 * Always return {@code true} since any method argument and return value
 	 * type will be processed in some way. A method argument not recognized
@@ -776,6 +788,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	 * not recognized by any HandlerMethodReturnValueHandler will be interpreted
 	 * as a model attribute.
 	 */
+	// 20201222 始终返回{@code true}，因为将以某种方式处理任何方法参数和返回值类型
 	@Override
 	protected boolean supportsInternal(HandlerMethod handlerMethod) {
 		return true;

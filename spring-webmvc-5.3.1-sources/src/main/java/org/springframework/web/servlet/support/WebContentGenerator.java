@@ -39,16 +39,29 @@ import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
 
 /**
+ * 20201222
+ * A. 任何类型的Web内容生成器的便捷超类，例如{@link org.springframework.web.servlet.mvc.AbstractController}和
+ *    {@link  org.springframework.web.servlet.mvc.WebContentInterceptor}。 也可以用于具有自己的
+ *    {@link org.springframework.web.servlet.HandlerAdapter}的自定义处理程序。
+ * B. 支持HTTP缓存控制选项。 可以通过{@link #setCacheSeconds“ cacheSeconds”}和{@link #setCacheControl“ cacheControl”}属性来控制相应HTTP标头的使用。
+ * C. 注意：从Spring 4.2开始，仅使用{@link #setCacheSeconds}时，此生成器的默认行为已更改，发送与当前浏览器和代理实现一致的HTTP响应标头（即不再有HTTP 1.0标头），
+ *    可以恢复到以前的行为, 您可以使用以下不推荐使用的方法轻松完成此操作：{@link #setUseExpiresHeader}，{@link #setUseCacheControlHeader}，
+ *    {@link #setUseCacheControlNoStore}或{@link #setAlwaysMustRevalidate}。
+ */
+/**
+ * A.
  * Convenient superclass for any kind of web content generator,
  * like {@link org.springframework.web.servlet.mvc.AbstractController}
  * and {@link org.springframework.web.servlet.mvc.WebContentInterceptor}.
  * Can also be used for custom handlers that have their own
  * {@link org.springframework.web.servlet.HandlerAdapter}.
  *
+ * B.
  * <p>Supports HTTP cache control options. The usage of corresponding HTTP
  * headers can be controlled via the {@link #setCacheSeconds "cacheSeconds"}
  * and {@link #setCacheControl "cacheControl"} properties.
  *
+ * C.
  * <p><b>NOTE:</b> As of Spring 4.2, this generator's default behavior changed when
  * using only {@link #setCacheSeconds}, sending HTTP response headers that are in line
  * with current browsers and proxies implementations (i.e. no HTTP 1.0 headers anymore)
@@ -64,6 +77,7 @@ import org.springframework.web.context.support.WebApplicationObjectSupport;
  * @see #setCacheControl
  * @see #setRequireSession
  */
+// 20201222 任何类型的Web内容生成器的便捷超类, 支持HTTP缓存控制选项
 public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 
 	/** HTTP method "GET". */

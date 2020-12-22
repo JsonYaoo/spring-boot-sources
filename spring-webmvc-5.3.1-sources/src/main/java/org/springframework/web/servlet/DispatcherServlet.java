@@ -381,6 +381,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	@Nullable
 	private List<HandlerMapping> handlerMappings;
 
+	// 20201222 此servlet使用的HandlerAdapter列表。
 	/** List of HandlerAdapters used by this servlet. */
 	@Nullable
 	private List<HandlerAdapter> handlerAdapters;
@@ -1154,7 +1155,9 @@ public class DispatcherServlet extends FrameworkServlet {
 					return;
 				}
 
+				// 20201222 确定当前请求的处理程序适配器。
 				// Determine handler adapter for the current request.
+				// 20201222 eg: RequestMappingHandlerAdapter
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.
@@ -1423,10 +1426,14 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * @param handler the handler object to find an adapter for
 	 * @throws ServletException if no HandlerAdapter can be found for the handler. This is a fatal error.
 	 */
+	// 20201222 返回此处理程序对象的HandlerAdapter。
 	protected HandlerAdapter getHandlerAdapter(Object handler) throws ServletException {
+		// 20201222 eg: RequestMappingHandlerAdapter、HandlerFunctionAdapter、HttpRequestHandlerAdapter、SimpleControllerHandlerAdapter
 		if (this.handlerAdapters != null) {
 			for (HandlerAdapter adapter : this.handlerAdapters) {
+				// 20201222 eg: true && [RequestMappingHandlerAdapter#supportsInternal] true => true
 				if (adapter.supports(handler)) {
+					// 20201222 eg: RequestMappingHandlerAdapter
 					return adapter;
 				}
 			}
