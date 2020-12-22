@@ -19,15 +19,23 @@ package org.springframework.web.context.request;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201222
+ * A. {@link WebRequest}接口的扩展，以通用方式公开本机请求和响应对象。
+ * B. 主要用于框架内部使用，特别是用于通用参数解析代码。
+ */
+/**
+ * A.
  * Extension of the {@link WebRequest} interface, exposing the
  * native request and response objects in a generic fashion.
  *
+ * B.
  * <p>Mainly intended for framework-internal usage,
  * in particular for generic argument resolution code.
  *
  * @author Juergen Hoeller
  * @since 2.5.2
  */
+// 20201222 {@link WebRequest}接口的扩展，以通用方式公开本机请求和响应对象
 public interface NativeWebRequest extends WebRequest {
 
 	/**

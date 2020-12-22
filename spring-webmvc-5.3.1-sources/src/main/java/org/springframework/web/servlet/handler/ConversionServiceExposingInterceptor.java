@@ -39,8 +39,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
  */
 public class ConversionServiceExposingInterceptor implements HandlerInterceptor {
 
+	// 20201202 用于类型转换的服务接口。这是转换系统的入口点。调用{@link #convert（Object，Class）}使用该系统执行线程安全类型转换
 	private final ConversionService conversionService;
-
 
 	/**
 	 * Creates a new {@link ConversionServiceExposingInterceptor}.
@@ -51,11 +51,10 @@ public class ConversionServiceExposingInterceptor implements HandlerInterceptor 
 		this.conversionService = conversionService;
 	}
 
-
+	// 20201222 拦截处理程序的执行: 在HandlerMapping确定适当的处理程序对象之后但在HandlerAdapter调用处理程序之前调用, 默认实现返回{@code true}
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-			throws ServletException, IOException {
-
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws ServletException, IOException {
+		// 20201222 eg: "org.springframework.core.convert.ConversionService"-WebConversionService
 		request.setAttribute(ConversionService.class.getName(), this.conversionService);
 		return true;
 	}

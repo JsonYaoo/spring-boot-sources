@@ -96,27 +96,45 @@ import org.springframework.web.method.HandlerMethod;
 public interface HandlerInterceptor {
 
 	/**
+	 * 20201222
+	 * A. 拦截处理程序的执行。 在HandlerMapping确定适当的处理程序对象之后但在HandlerAdapter调用处理程序之前调用。
+	 * B. DispatcherServlet处理执行链中的处理程序，该处理程序由任意数量的拦截器组成，处理程序本身位于末尾。 使用此方法，每个拦截器都可以决定中止执行链，
+	 *    通常是发送HTTP错误或编写自定义响应。
+	 * C. 注意：特殊注意事项适用于异步请求处理。 有关更多详细信息，请参见{@link org.springframework.web.servlet.AsyncHandlerInterceptor}。
+	 * D. 默认实现返回{@code true}。
+	 */
+	/**
+	 * A.
 	 * Intercept the execution of a handler. Called after HandlerMapping determined
 	 * an appropriate handler object, but before HandlerAdapter invokes the handler.
+	 *
+	 * B.
 	 * <p>DispatcherServlet processes a handler in an execution chain, consisting
 	 * of any number of interceptors, with the handler itself at the end.
 	 * With this method, each interceptor can decide to abort the execution chain,
 	 * typically sending an HTTP error or writing a custom response.
+	 *
+	 * C.
 	 * <p><strong>Note:</strong> special considerations apply for asynchronous
 	 * request processing. For more details see
 	 * {@link org.springframework.web.servlet.AsyncHandlerInterceptor}.
+	 *
+	 * D.
 	 * <p>The default implementation returns {@code true}.
+	 *
 	 * @param request current HTTP request
 	 * @param response current HTTP response
 	 * @param handler chosen handler to execute, for type and/or instance evaluation
+	 *
+	 * // 20201222 {@code true}，如果执行链应该继续下一个拦截器或处理程序本身。 否则，DispatcherServlet假定此拦截器已经处理了响应本身。
 	 * @return {@code true} if the execution chain should proceed with the
 	 * next interceptor or the handler itself. Else, DispatcherServlet assumes
 	 * that this interceptor has already dealt with the response itself.
 	 * @throws Exception in case of errors
 	 */
+	// 20201222 拦截处理程序的执行: 在HandlerMapping确定适当的处理程序对象之后但在HandlerAdapter调用处理程序之前调用, 默认实现返回{@code true}
 	default boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-
 		return true;
 	}
 

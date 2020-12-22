@@ -1160,17 +1160,24 @@ public class DispatcherServlet extends FrameworkServlet {
 				// 20201222 eg: RequestMappingHandlerAdapter
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
+				// 20201222 如果处理程序支持，则处理最后修改的标头
 				// Process last-modified header, if supported by the handler.
+				// 20201222 eg: GET
 				String method = request.getMethod();
 				boolean isGet = "GET".equals(method);
 				if (isGet || "HEAD".equals(method)) {
+					// 20201222 与HttpServlet的{@code getLastModified}方法具有相同的约定。 如果处理程序类不支持，则可以简单地返回-1 => eg: -1
 					long lastModified = ha.getLastModified(request, mappedHandler.getHandler());
+
+					// 20201222 eg: false && true => false
 					if (new ServletWebRequest(request, response).checkNotModified(lastModified) && isGet) {
 						return;
 					}
 				}
 
+				// 20201222 应用注册拦截器的preHandle方法。
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
+					// 20201222 如果preHandle方法应用失败, 则直接返回
 					return;
 				}
 

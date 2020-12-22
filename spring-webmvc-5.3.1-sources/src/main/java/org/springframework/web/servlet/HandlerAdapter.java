@@ -111,6 +111,7 @@ public interface HandlerAdapter {
 	 * @see javax.servlet.http.HttpServlet#getLastModified
 	 * @see org.springframework.web.servlet.mvc.LastModified#getLastModified
 	 */
+	// 20201222 与HttpServlet的{@code getLastModified}方法具有相同的约定。 如果处理程序类不支持，则可以简单地返回-1。
 	long getLastModified(HttpServletRequest request, Object handler);
 
 }

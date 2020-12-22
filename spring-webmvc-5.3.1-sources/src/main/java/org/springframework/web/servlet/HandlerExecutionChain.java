@@ -52,8 +52,8 @@ public class HandlerExecutionChain {
 	// 20201222 工作流接口，允许自定义处理程序执行链: 添加常见的预处理行为，而无需修改每个处理程序实现, 在适当的HandlerAdapter触发处理程序本身的执行之前，将调用HandlerInterceptor
 	private final List<HandlerInterceptor> interceptorList = new ArrayList<>();
 
+	// 20201222 拦截器索引
 	private int interceptorIndex = -1;
-
 
 	/**
 	 * Create a new HandlerExecutionChain.
@@ -145,19 +145,30 @@ public class HandlerExecutionChain {
 
 	/**
 	 * Apply preHandle methods of registered interceptors.
+	 *
+	 * // 20201222 执行链是否应该使用下一个拦截器或处理程序本身。 否则，DispatcherServlet假定此拦截器已经处理了响应本身。
 	 * @return {@code true} if the execution chain should proceed with the
 	 * next interceptor or the handler itself. Else, DispatcherServlet assumes
 	 * that this interceptor has already dealt with the response itself.
 	 */
+	// 20201222 应用注册拦截器的preHandle方法。
 	boolean applyPreHandle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// 20201222 工作流接口，允许自定义处理程序执行链 => eg: ConversionServiceExposingInterceptor、ResourceUrlProviderExposingInterceptor
 		for (int i = 0; i < this.interceptorList.size(); i++) {
 			HandlerInterceptor interceptor = this.interceptorList.get(i);
+
+			// 20201222 eg: ConversionServiceExposingInterceptor: "org.springframework.core.convert.ConversionService"-WebConversionService, 返回true
+			// 20201222 eg: ResourceUrlProviderExposingInterceptor: eg: "org.springframework.web.servlet.resource.ResourceUrlProvider"-ResourceUrlProvider, 返回true
 			if (!interceptor.preHandle(request, response, this.handler)) {
 				triggerAfterCompletion(request, response, null);
 				return false;
 			}
+
+			// 20201222 更新拦截器索引
 			this.interceptorIndex = i;
 		}
+
+		// 20201222 返回true表示成功应用拦截器的preHandle方法
 		return true;
 	}
 

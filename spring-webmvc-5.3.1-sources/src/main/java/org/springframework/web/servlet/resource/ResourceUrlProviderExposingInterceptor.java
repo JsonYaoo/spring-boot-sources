@@ -37,19 +37,21 @@ public class ResourceUrlProviderExposingInterceptor implements HandlerIntercepto
 	 */
 	public static final String RESOURCE_URL_PROVIDER_ATTR = ResourceUrlProvider.class.getName();
 
+	// 20201222 用来获取客户端访问静态资源时应使用的公共URL路径的中央组件
 	private final ResourceUrlProvider resourceUrlProvider;
-
 
 	public ResourceUrlProviderExposingInterceptor(ResourceUrlProvider resourceUrlProvider) {
 		Assert.notNull(resourceUrlProvider, "ResourceUrlProvider is required");
 		this.resourceUrlProvider = resourceUrlProvider;
 	}
 
+	// 20201222 拦截处理程序的执行: 在HandlerMapping确定适当的处理程序对象之后但在HandlerAdapter调用处理程序之前调用, 默认实现返回{@code true}
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 
 		try {
+			// 20201222 eg: "org.springframework.web.servlet.resource.ResourceUrlProvider"-ResourceUrlProvider
 			request.setAttribute(RESOURCE_URL_PROVIDER_ATTR, this.resourceUrlProvider);
 		}
 		catch (ResourceUrlEncodingFilter.LookupPathIndexException ex) {

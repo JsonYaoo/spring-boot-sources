@@ -39,9 +39,16 @@ import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
+ * 20201222
+ * A. 用来获取客户端访问静态资源时应使用的公共URL路径的中央组件。
+ * B. 此类知道用于提供静态资源的Spring MVC处理程序映射，并使用已配置的{@code ResourceHttpRequestHandler}的{@code ResourceResolver}链来做出决定。
+ */
+/**
+ * A.
  * A central component to use to obtain the public URL path that clients should
  * use to access a static resource.
  *
+ * B.
  * <p>This class is aware of Spring MVC handler mappings used to serve static
  * resources and uses the {@code ResourceResolver} chains of the configured
  * {@code ResourceHttpRequestHandler}s to make its decisions.
@@ -49,6 +56,7 @@ import org.springframework.web.util.UrlPathHelper;
  * @author Rossen Stoyanchev
  * @since 4.1
  */
+// 20201222 用来获取客户端访问静态资源时应使用的公共URL路径的中央组件
 public class ResourceUrlProvider implements ApplicationListener<ContextRefreshedEvent> {
 
 	protected final Log logger = LogFactory.getLog(getClass());

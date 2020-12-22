@@ -24,6 +24,10 @@ import java.util.Map;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201222
+ * Web请求的通用接口。 主要用于通用Web请求拦截器，使它们可以访问通用请求元数据，而不用于实际处理请求。
+ */
+/**
  * Generic interface for a web request. Mainly intended for generic web
  * request interceptors, giving them access to general request metadata,
  * not for actual handling of the request.
@@ -33,6 +37,7 @@ import org.springframework.lang.Nullable;
  * @since 2.0
  * @see WebRequestInterceptor
  */
+// 20201222 Web请求的通用接口。 主要用于通用Web请求拦截器，使它们可以访问通用请求元数据，而不用于实际处理请求。
 public interface WebRequest extends RequestAttributes {
 
 	/**

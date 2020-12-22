@@ -43,6 +43,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * 20201222
+ * {@link HttpServletRequest}的{@link WebRequest}适配器。
+ */
+/**
  * {@link WebRequest} adapter for an {@link HttpServletRequest}.
  *
  * @author Juergen Hoeller
@@ -50,6 +54,7 @@ import org.springframework.web.util.WebUtils;
  * @author Markus Malkusch
  * @since 2.0
  */
+// 20201222 {@link HttpServletRequest}的{@link WebRequest}适配器。
 public class ServletWebRequest extends ServletRequestAttributes implements NativeWebRequest {
 
 	private static final List<String> SAFE_METHODS = Arrays.asList("GET", "HEAD");
@@ -88,10 +93,10 @@ public class ServletWebRequest extends ServletRequestAttributes implements Nativ
 	 * @param request current HTTP request
 	 * @param response current HTTP response (for automatic last-modified handling)
 	 */
+	// 20201222 为给定的请求/响应对创建一个新的ServletWebRequest实例。
 	public ServletWebRequest(HttpServletRequest request, @Nullable HttpServletResponse response) {
 		super(request, response);
 	}
-
 
 	@Override
 	public Object getNativeRequest() {
@@ -195,9 +200,10 @@ public class ServletWebRequest extends ServletRequestAttributes implements Nativ
 		return getRequest().isSecure();
 	}
 
-
+	// 20201222 检查是否响应被篡改过
 	@Override
 	public boolean checkNotModified(long lastModifiedTimestamp) {
+		// 20201222 检查是否响应被篡改过 eg: false
 		return checkNotModified(null, lastModifiedTimestamp);
 	}
 
@@ -206,13 +212,17 @@ public class ServletWebRequest extends ServletRequestAttributes implements Nativ
 		return checkNotModified(etag, -1);
 	}
 
+	// 20201222 检查是否响应被篡改过
 	@Override
 	public boolean checkNotModified(@Nullable String etag, long lastModifiedTimestamp) {
 		HttpServletResponse response = getResponse();
+
+		// 20201222 eg: -1 || (response.getStatus() == 200): false => false
 		if (this.notModified || (response != null && HttpStatus.OK.value() != response.getStatus())) {
 			return this.notModified;
 		}
 
+		// 20201222 按优先级评估条件。
 		// Evaluate conditions in order of precedence.
 		// See https://tools.ietf.org/html/rfc7232#section-6
 
@@ -245,6 +255,7 @@ public class ServletWebRequest extends ServletRequestAttributes implements Nativ
 			}
 		}
 
+		// 20201222 eg: false
 		return this.notModified;
 	}
 
