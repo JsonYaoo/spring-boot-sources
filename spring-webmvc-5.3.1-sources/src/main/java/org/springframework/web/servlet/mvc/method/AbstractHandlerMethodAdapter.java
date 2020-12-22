@@ -87,6 +87,7 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 	/**
 	 * This implementation expects the handler to be an {@link HandlerMethod}.
 	 */
+	// 20201222 此实现期望处理程序为{@link HandlerMethod}。
 	@Override
 	@Nullable
 	public final ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -101,10 +102,13 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 	 * @param response current HTTP response
 	 * @param handlerMethod handler method to use. This object must have previously been passed to the
 	 * {@link #supportsInternal(HandlerMethod)} this interface, which must have returned {@code true}.
+	 *
+	 * // 20201222 带有视图名称和所需模型数据的ModelAndView对象；如果直接处理了请求，则为{@code null}
 	 * @return a ModelAndView object with the name of the view and the required model data,
 	 * or {@code null} if the request has been handled directly
 	 * @throws Exception in case of errors
 	 */
+	// 20201222 使用给定的处理程序方法处理请求。
 	@Nullable
 	protected abstract ModelAndView handleInternal(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception;

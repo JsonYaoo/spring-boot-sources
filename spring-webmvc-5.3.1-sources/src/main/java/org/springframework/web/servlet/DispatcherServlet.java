@@ -1181,7 +1181,9 @@ public class DispatcherServlet extends FrameworkServlet {
 					return;
 				}
 
+				// 20201222 实际调用处理程序。
 				// Actually invoke the handler.
+
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
 				if (asyncManager.isConcurrentHandlingStarted()) {

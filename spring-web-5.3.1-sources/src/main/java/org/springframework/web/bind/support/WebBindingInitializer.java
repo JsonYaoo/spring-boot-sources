@@ -20,6 +20,10 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.context.request.WebRequest;
 
 /**
+ * 20201222
+ * 回调接口，用于初始化{@link WebDataBinder}，以便在特定Web请求的上下文中执行数据绑定。
+ */
+/**
  * Callback interface for initializing a {@link WebDataBinder} for performing
  * data binding in the context of a specific web request.
  *
@@ -27,6 +31,7 @@ import org.springframework.web.context.request.WebRequest;
  * @author Rossen Stoyanchev
  * @since 2.5
  */
+// 20201222 回调接口，用于初始化{@link WebDataBinder}，以便在特定Web请求的上下文中执行数据绑定。
 public interface WebBindingInitializer {
 
 	/**

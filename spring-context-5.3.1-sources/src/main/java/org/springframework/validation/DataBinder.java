@@ -51,11 +51,32 @@ import org.springframework.util.PatternMatchUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201222
+ * A. 活页夹，允许将属性值设置到目标对象上，包括支持验证和绑定结果分析。 可以通过指定允许的字段，必填字段，自定义编辑器等来自定义绑定过程。
+ * B. 请注意，如果无法设置允许字段的数组，可能会带来安全隐患。 例如，在使用HTTP表单POST数据的情况下，恶意客户端可以通过提供表单上不存在的字段或属性的值来尝试破坏应用程序。
+ *    在某些情况下，这可能会导致在命令对象或其嵌套对象上设置非法数据。 因此，强烈建议在DataBinder上指定{@link #setAllowedFields allowedFields}属性。
+ * C. 可以通过{@link BindingResult}接口检查绑定结果，扩展{@link Errors}接口：请参见{@link #getBindingResult（）}方法。缺少的字段和属性访问异常将转换为
+ *    {@link FieldError FieldErrors}，使用以下错误代码在Errors实例中收集：
+ *    	a. 缺少字段错误：“required”
+ *      b. 类型不匹配错误：“ typeMismatch”
+ *      c. 方法调用错误：“ methodInvocation”
+ * D. 默认情况下，绑定错误通过{@link BindingErrorProcessor}策略，缺失字段的处理和属性访问异常得到解决：请参见{@link #setBindingErrorProcessor}方法。
+ *    如果需要，您可以覆盖默认策略，例如生成不同的错误代码。
+ * E. 之后可以添加自定义验证错误。 您通常需要将此类错误代码解析为适当的用户可见的错误消息； 这可以通过{@link org.springframework.context.MessageSource}解决每个错误
+ *    来实现，该错误可以通过{@link org.springframework.context {@link ObjectError} / {@link FieldError}解决。
+ *    MessageSource＃getMessage（org.springframework.context.MessageSourceResolvable，java.util.Locale）}方法。
+ *    可以通过{@link MessageCodesResolver}策略自定义消息代码列表：请参见{@link #setMessageCodesResolver}方法。
+ *    {@link DefaultMessageCodesResolver}的javadoc声明有关默认解析规则的详细信息。
+ * F. 该通用数据绑定程序可以在任何类型的环境中使用。
+ */
+/**
+ * A.
  * Binder that allows for setting property values onto a target object,
  * including support for validation and binding result analysis.
  * The binding process can be customized through specifying allowed fields,
  * required fields, custom editors, etc.
  *
+ * B.
  * <p>Note that there are potential security implications in failing to set an array
  * of allowed fields. In the case of HTTP form POST data for example, malicious clients
  * can attempt to subvert an application by supplying values for fields or properties
@@ -64,22 +85,30 @@ import org.springframework.util.StringUtils;
  * <b>highly recommended to specify the {@link #setAllowedFields allowedFields} property</b>
  * on the DataBinder.
  *
+ * C.
  * <p>The binding results can be examined via the {@link BindingResult} interface,
  * extending the {@link Errors} interface: see the {@link #getBindingResult()} method.
  * Missing fields and property access exceptions will be converted to {@link FieldError FieldErrors},
  * collected in the Errors instance, using the following error codes:
  *
  * <ul>
+ * a.
  * <li>Missing field error: "required"
+ *
+ * b.
  * <li>Type mismatch error: "typeMismatch"
+ *
+ * c.
  * <li>Method invocation error: "methodInvocation"
  * </ul>
  *
+ * D.
  * <p>By default, binding errors get resolved through the {@link BindingErrorProcessor}
  * strategy, processing for missing fields and property access exceptions: see the
  * {@link #setBindingErrorProcessor} method. You can override the default strategy
  * if needed, for example to generate different error codes.
  *
+ * E.
  * <p>Custom validation errors can be added afterwards. You will typically want to resolve
  * such error codes into proper user-visible error messages; this can be achieved through
  * resolving each error via a {@link org.springframework.context.MessageSource}, which is
@@ -89,6 +118,7 @@ import org.springframework.util.StringUtils;
  * strategy: see the {@link #setMessageCodesResolver} method. {@link DefaultMessageCodesResolver}'s
  * javadoc states details on the default resolution rules.
  *
+ * F.
  * <p>This generic data binder can be used in any kind of environment.
  *
  * @author Rod Johnson
@@ -107,6 +137,7 @@ import org.springframework.util.StringUtils;
  * @see DefaultBindingErrorProcessor
  * @see org.springframework.context.MessageSource
  */
+// 20201222 活页夹: 允许将属性值设置到目标对象上，包括支持验证和绑定结果分析。可以通过指定允许的字段，必填字段，自定义编辑器等来自定义绑定过程。可以在任何类型的环境中使用。
 public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 
 	/** Default object name used for binding: "target". */

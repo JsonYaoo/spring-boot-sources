@@ -32,10 +32,18 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.context.request.WebRequest;
 
 /**
+ * 20201222
+ * A. 管理通过{@link SessionAttributes @SessionAttributes}声明的控制器特定的会话属性。 实际的存储委托给{@link SessionAttributeStore}实例。
+ * B. 当使用{@code @SessionAttributes}注释的控制器向其模型添加属性时，将根据通过{@code @SessionAttributes}指定的名称和类型来检查这些属性。 匹配的模型属性保存在
+ *    HTTP会话中，并保持在那里，直到控制器调用{@link SessionStatus＃setComplete（）}为止。
+ */
+/**
+ * A.
  * Manages controller-specific session attributes declared via
  * {@link SessionAttributes @SessionAttributes}. Actual storage is
  * delegated to a {@link SessionAttributeStore} instance.
  *
+ * B.
  * <p>When a controller annotated with {@code @SessionAttributes} adds
  * attributes to its model, those attributes are checked against names and
  * types specified via {@code @SessionAttributes}. Matching model attributes
@@ -46,6 +54,7 @@ import org.springframework.web.context.request.WebRequest;
  * @author Juergen Hoeller
  * @since 3.1
  */
+// 20201222 管理通过{@link SessionAttributes @SessionAttributes}声明的控制器特定的会话属性。 实际的存储委托给{@link SessionAttributeStore}实例。
 public class SessionAttributesHandler {
 
 	private final Set<String> attributeNames = new HashSet<>();
@@ -56,7 +65,10 @@ public class SessionAttributesHandler {
 
 	private final SessionAttributeStore sessionAttributeStore;
 
-
+	/**
+	 * 20201222
+	 * 创建一个新的会话属性处理程序。 会话属性名称和类型从给定类型上的{@code @SessionAttributes}批注中提取。
+	 */
 	/**
 	 * Create a new session attributes handler. Session attribute names and types
 	 * are extracted from the {@code @SessionAttributes} annotation, if present,
@@ -64,6 +76,7 @@ public class SessionAttributesHandler {
 	 * @param handlerType the controller type
 	 * @param sessionAttributeStore used for session access
 	 */
+	// 20201222 创建一个新的会话属性处理程序。 会话属性名称和类型从给定类型上的{@code @SessionAttributes}批注中提取。
 	public SessionAttributesHandler(Class<?> handlerType, SessionAttributeStore sessionAttributeStore) {
 		Assert.notNull(sessionAttributeStore, "SessionAttributeStore may not be null");
 		this.sessionAttributeStore = sessionAttributeStore;

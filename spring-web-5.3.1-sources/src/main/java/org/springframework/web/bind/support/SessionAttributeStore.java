@@ -20,12 +20,17 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.context.request.WebRequest;
 
 /**
+ * 20201222
+ * 策略接口，用于在后端会话中存储模型属性。
+ */
+/**
  * Strategy interface for storing model attributes in a backend session.
  *
  * @author Juergen Hoeller
  * @since 2.5
  * @see org.springframework.web.bind.annotation.SessionAttributes
  */
+// 20021222 策略接口，用于在后端会话中存储模型属性。
 public interface SessionAttributeStore {
 
 	/**

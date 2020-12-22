@@ -96,9 +96,12 @@ public interface HandlerAdapter {
 	 * to the {@code supports} method of this interface, which must have
 	 * returned {@code true}.
 	 * @throws Exception in case of errors
+	 *
+	 * // 20201222 带有视图名称和所需模型数据的ModelAndView对象；如果直接处理了请求，则为{@code null}
 	 * @return a ModelAndView object with the name of the view and the required
 	 * model data, or {@code null} if the request has been handled directly
 	 */
+	// 20201222 使用给定的处理程序来处理此请求。 所需的工作流程可能相差很大。
 	@Nullable
 	ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception;
 

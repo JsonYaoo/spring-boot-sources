@@ -188,6 +188,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 
 	private int cacheSecondsForSessionAttributeHandlers = 0;
 
+	// 20201222 是否需要在会话上同步, 默认为false
 	private boolean synchronizeOnSession = false;
 
 	private SessionAttributeStore sessionAttributeStore = new DefaultSessionAttributeStore();
@@ -197,10 +198,13 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 	@Nullable
 	private ConfigurableBeanFactory beanFactory;
 
+	// 20201222 控制器-@SessionAttributes属性控制器缓存
 	private final Map<Class<?>, SessionAttributesHandler> sessionAttributesHandlerCache = new ConcurrentHashMap<>(64);
 
+	// 20201222 绑定的Method缓存
 	private final Map<Class<?>, Set<Method>> initBinderCache = new ConcurrentHashMap<>(64);
 
+	// 20201222 @ControllerAdvice绑定的Method缓存
 	private final Map<ControllerAdviceBean, Set<Method>> initBinderAdviceCache = new LinkedHashMap<>();
 
 	private final Map<Class<?>, Set<Method>> modelAttributeCache = new ConcurrentHashMap<>(64);
@@ -409,6 +413,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 	/**
 	 * Return the configured WebBindingInitializer, or {@code null} if none.
 	 */
+	// 20201222 返回配置的WebBindingInitializer，如果没有，则返回{@code null}。
 	@Nullable
 	public WebBindingInitializer getWebBindingInitializer() {
 		return this.webBindingInitializer;
@@ -794,14 +799,19 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 		return true;
 	}
 
+	// 20201222 使用给定的处理程序方法处理请求。
 	@Override
 	protected ModelAndView handleInternal(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
 
 		ModelAndView mav;
+
+		// 20201222 检查给定的请求以获取受支持的方法和所需的会话（如果有）, 如果不支持Request的方法或者需要Session时不存在, 则抛出异常 => eg: do nothing
 		checkRequest(request);
 
+		// 20201222 如果需要，在同步块中执行invokeHandlerMethod。
 		// Execute invokeHandlerMethod in synchronized block if required.
+		// 20201222 是否需要在会话上同步, 默认为false
 		if (this.synchronizeOnSession) {
 			HttpSession session = request.getSession(false);
 			if (session != null) {
@@ -811,11 +821,13 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 				}
 			}
 			else {
+				// 20201222 没有可用的HttpSession -> 不需要互斥
 				// No HttpSession available -> no mutex necessary
 				mav = invokeHandlerMethod(request, response, handlerMethod);
 			}
 		}
 		else {
+			// 20201222 完全不需要会话同步...
 			// No synchronization on session demanded at all...
 			mav = invokeHandlerMethod(request, response, handlerMethod);
 		}
@@ -847,8 +859,11 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 	 * Return the {@link SessionAttributesHandler} instance for the given handler type
 	 * (never {@code null}).
 	 */
+	// 20201222 返回给定处理程序类型的{@link SessionAttributesHandler}实例（永不{@code null}）。
 	private SessionAttributesHandler getSessionAttributesHandler(HandlerMethod handlerMethod) {
+		// 20201222 eg: "class com.jsonyao.cs.Controller.TestController"-SessionAttributesHandler
 		return this.sessionAttributesHandlerCache.computeIfAbsent(
+				// 20201222 eg: "class com.jsonyao.cs.Controller.TestController"
 				handlerMethod.getBeanType(),
 				type -> new SessionAttributesHandler(type, this.sessionAttributeStore));
 	}
@@ -859,13 +874,16 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 	 * @since 4.2
 	 * @see #createInvocableHandlerMethod(HandlerMethod)
 	 */
+	// 20201222 如果需要视图分辨率，则调用{@link RequestMapping}处理程序方法，以准备{@link ModelAndView}。
 	@Nullable
-	protected ModelAndView invokeHandlerMethod(HttpServletRequest request,
-			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
-
+	protected ModelAndView invokeHandlerMethod(HttpServletRequest request, HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
+		// 20201222 为给定的请求/响应对创建一个新的ServletWebRequest实例。
 		ServletWebRequest webRequest = new ServletWebRequest(request, response);
 		try {
+			// 20201222 根据Handler获取用于为命名目标对象创建{@link WebDataBinder}实例的工厂 => eg: [], ConfigurableWebBindingInitializer
 			WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
+
+
 			ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
 
 			ServletInvocableHandlerMethod invocableMethod = createInvocableHandlerMethod(handlerMethod);
@@ -925,8 +943,11 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 		return new ServletInvocableHandlerMethod(handlerMethod);
 	}
 
+	// 20201222 获取模型工厂
 	private ModelFactory getModelFactory(HandlerMethod handlerMethod, WebDataBinderFactory binderFactory) {
+		// 20201222 eg: SessionAttributesHandler
 		SessionAttributesHandler sessionAttrHandler = getSessionAttributesHandler(handlerMethod);
+
 		Class<?> handlerType = handlerMethod.getBeanType();
 		Set<Method> methods = this.modelAttributeCache.get(handlerType);
 		if (methods == null) {
@@ -960,15 +981,22 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 		return attrMethod;
 	}
 
+	// 20201222 根据Handler获取用于为命名目标对象创建{@link WebDataBinder}实例的工厂 => eg: [], ConfigurableWebBindingInitializer
 	private WebDataBinderFactory getDataBinderFactory(HandlerMethod handlerMethod) throws Exception {
+		// 20201222 eg: class com.jsonyao.cs.Controller.TestController
 		Class<?> handlerType = handlerMethod.getBeanType();
+
+		// 20201222 "class com.jsonyao.cs.Controller.TestController"-[]
 		Set<Method> methods = this.initBinderCache.get(handlerType);
 		if (methods == null) {
 			methods = MethodIntrospector.selectMethods(handlerType, INIT_BINDER_METHODS);
 			this.initBinderCache.put(handlerType, methods);
 		}
 		List<InvocableHandlerMethod> initBinderMethods = new ArrayList<>();
+
+		// 20201222 全局方法优先
 		// Global methods first
+		// 20201222 遍历所有的ControllerAdvice绑定的Method缓存 => eg: null
 		this.initBinderAdviceCache.forEach((controllerAdviceBean, methodSet) -> {
 			if (controllerAdviceBean.isApplicableToBeanType(handlerType)) {
 				Object bean = controllerAdviceBean.resolveBean();
@@ -977,10 +1005,14 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 				}
 			}
 		});
+
+		// 20201222 eg: []
 		for (Method method : methods) {
 			Object bean = handlerMethod.getBean();
 			initBinderMethods.add(createInitBinderMethod(bean, method));
 		}
+
+		// 20201222 eg: [], ConfigurableWebBindingInitializer
 		return createDataBinderFactory(initBinderMethods);
 	}
 
@@ -995,17 +1027,32 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 	}
 
 	/**
+	 * 20201222
+	 * A. 用于创建新的InitBinderDataBinderFactory实例的模板方法。
+	 * B. 默认实现创建一个ServletRequestDataBinderFactory。 对于自定义ServletRequestDataBinder子类，可以重写此方法。
+	 */
+	/**
+	 * A.
 	 * Template method to create a new InitBinderDataBinderFactory instance.
+	 *
+	 * B.
 	 * <p>The default implementation creates a ServletRequestDataBinderFactory.
 	 * This can be overridden for custom ServletRequestDataBinder subclasses.
+	 *
 	 * @param binderMethods {@code @InitBinder} methods
 	 * @return the InitBinderDataBinderFactory instance to use
 	 * @throws Exception in case of invalid state or arguments
 	 */
+	// 20201222 用于创建新的InitBinderDataBinderFactory实例的模板方法
 	protected InitBinderDataBinderFactory createDataBinderFactory(List<InvocableHandlerMethod> binderMethods)
 			throws Exception {
-
-		return new ServletRequestDataBinderFactory(binderMethods, getWebBindingInitializer());
+		// 20201222 创建一个新ServletRequestDataBinderFactory实例。
+		return new ServletRequestDataBinderFactory(
+				// 20201222 eg: []
+				binderMethods,
+				// 20201222 eg: ConfigurableWebBindingInitializer
+				getWebBindingInitializer()
+		);
 	}
 
 	@Nullable

@@ -31,11 +31,16 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.method.support.InvocableHandlerMethod;
 
 /**
+ * 20201222
+ * 通过{@code @InitBinder}方法将初始化添加到WebDataBinder。
+ */
+/**
  * Adds initialization to a WebDataBinder via {@code @InitBinder} methods.
  *
  * @author Rossen Stoyanchev
  * @since 3.1
  */
+// 20201222 通过{@code @InitBinder}方法将初始化添加到WebDataBinder。
 public class InitBinderDataBinderFactory extends DefaultDataBinderFactory {
 
 	private final List<InvocableHandlerMethod> binderMethods;
@@ -46,10 +51,13 @@ public class InitBinderDataBinderFactory extends DefaultDataBinderFactory {
 	 * @param binderMethods {@code @InitBinder} methods
 	 * @param initializer for global data binder initialization
 	 */
+	// 20201222 创建一个新的InitBinderDataBinderFactory实例。
 	public InitBinderDataBinderFactory(@Nullable List<InvocableHandlerMethod> binderMethods,
 			@Nullable WebBindingInitializer initializer) {
-
+		// 20201222 eg: ConfigurableWebBindingInitializer
 		super(initializer);
+
+		// 20201222 eg: []
 		this.binderMethods = (binderMethods != null ? binderMethods : Collections.emptyList());
 	}
 

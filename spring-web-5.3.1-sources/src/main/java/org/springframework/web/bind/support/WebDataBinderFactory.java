@@ -21,11 +21,16 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 20201222
+ * 用于为命名目标对象创建{@link WebDataBinder}实例的工厂。
+ */
+/**
  * A factory for creating a {@link WebDataBinder} instance for a named target object.
  *
  * @author Arjen Poutsma
  * @since 3.1
  */
+// 20201222 用于为命名目标对象创建{@link WebDataBinder}实例的工厂。
 public interface WebDataBinderFactory {
 
 	/**

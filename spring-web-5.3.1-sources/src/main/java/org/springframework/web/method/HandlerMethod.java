@@ -258,10 +258,19 @@ public class HandlerMethod {
 	}
 
 	/**
+	 * 20201222
+	 * A. 此方法返回此处理程序方法的处理程序类型。
+	 * B. 请注意，如果bean类型是CGLIB生成的类，则返回原始的用户定义类。
+	 */
+	/**
+	 * A.
 	 * This method returns the type of the handler for this handler method.
+	 *
+	 * B.
 	 * <p>Note that if the bean type is a CGLIB-generated class, the original
 	 * user-defined class is returned.
 	 */
+	// 20201222 此方法返回此处理程序方法的处理程序类型
 	public Class<?> getBeanType() {
 		return this.beanType;
 	}

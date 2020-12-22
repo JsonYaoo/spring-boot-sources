@@ -41,9 +41,17 @@ import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 /**
+ * 20201222
+ * A. 封装有关{@link ControllerAdvice @ControllerAdvice} Spring管理的bean的信息，而不必要求对其进行实例化。
+ * B. {@link #findAnnotatedBeans（ApplicationContext）}方法可用于发现此类bean。 但是，可以从任何对象创建{@code ControllerAdviceBean}，包括没有
+ *    {@code @ControllerAdvice}批注的对象。
+ */
+/**
+ * A.
  * Encapsulates information about an {@link ControllerAdvice @ControllerAdvice}
  * Spring-managed bean without necessarily requiring it to be instantiated.
  *
+ * B.
  * <p>The {@link #findAnnotatedBeans(ApplicationContext)} method can be used to
  * discover such beans. However, a {@code ControllerAdviceBean} may be created
  * from any object, including ones without an {@code @ControllerAdvice} annotation.
@@ -54,6 +62,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
  * @author Sam Brannen
  * @since 3.2
  */
+// 20201222 封装有关{@link ControllerAdvice @ControllerAdvice} Spring管理的bean的信息，而不必要求对其进行实例化。
 public class ControllerAdviceBean implements Ordered {
 
 	/**

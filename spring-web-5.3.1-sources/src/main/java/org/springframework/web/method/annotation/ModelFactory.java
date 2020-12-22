@@ -47,18 +47,28 @@ import org.springframework.web.method.support.InvocableHandlerMethod;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
+ * 20201222
+ * A. 在控制器方法调用之前协助{@link Model}初始化，并在调用之后对其进行更新。
+ * B. 初始化时，通过调用{@code @ModelAttribute}方法将临时存储在会话中的属性填充到模型中。
+ * C. 更新时，模型属性与会话同步，并且如果缺少属性，还将添加{@link BindingResult}属性。
+ */
+/**
+ * A.
  * Assist with initialization of the {@link Model} before controller method
  * invocation and with updates to it after the invocation.
  *
+ * B.
  * <p>On initialization the model is populated with attributes temporarily stored
  * in the session and through the invocation of {@code @ModelAttribute} methods.
  *
+ * C.
  * <p>On update model attributes are synchronized with the session and also
  * {@link BindingResult} attributes are added if missing.
  *
  * @author Rossen Stoyanchev
  * @since 3.1
  */
+// 20201222 在控制器方法调用之前协助{@link Model}初始化，并在调用之后对其进行更新。
 public final class ModelFactory {
 
 	private static final Log logger = LogFactory.getLog(ModelFactory.class);

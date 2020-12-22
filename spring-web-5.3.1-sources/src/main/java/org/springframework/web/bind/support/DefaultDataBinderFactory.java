@@ -21,27 +21,33 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 20201222
+ * 创建一个{@link WebRequestDataBinder}实例，并使用{@link WebBindingInitializer}对其进行初始化。
+ */
+/**
  * Create a {@link WebRequestDataBinder} instance and initialize it with a
  * {@link WebBindingInitializer}.
  *
  * @author Rossen Stoyanchev
  * @since 3.1
  */
+// 20201222 创建一个{@link WebRequestDataBinder}实例，并使用{@link WebBindingInitializer}对其进行初始化。
 public class DefaultDataBinderFactory implements WebDataBinderFactory {
 
+	// 20201222 回调接口，用于初始化{@link WebDataBinder}，以便在特定Web请求的上下文中执行数据绑定。
 	@Nullable
 	private final WebBindingInitializer initializer;
-
 
 	/**
 	 * Create a new {@code DefaultDataBinderFactory} instance.
 	 * @param initializer for global data binder initialization
 	 * (or {@code null} if none)
 	 */
+	// 20201222 创建一个新的{@code DefaultDataBinderFactory}实例。
 	public DefaultDataBinderFactory(@Nullable WebBindingInitializer initializer) {
+		// 20201222 eg: ConfigurableWebBindingInitializer
 		this.initializer = initializer;
 	}
-
 
 	/**
 	 * Create a new {@link WebDataBinder} for the given target object and

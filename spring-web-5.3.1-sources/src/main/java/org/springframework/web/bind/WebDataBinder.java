@@ -29,11 +29,21 @@ import org.springframework.validation.DataBinder;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * 20201222
+ * A. 特殊的{@link DataBinder}用于将数据从Web请求参数绑定到JavaBean对象。 专为Web环境而设计，但不依赖Servlet API； 用作更具体的DataBinder变体（例如
+ *    {@link ServletRequestDataBinder}）的基类。
+ * B. 包括对字段标记的支持，该字段标记解决了HTML复选框的常见问题并选择了选项：检测到字段是表单的一部分，但未生成请求参数，因为该字段为空。 字段标记允许检测该状态并
+ *    相应地重置相应的bean属性。 对于原本不存在的参数，默认值可以为字段指定其他值，然后再为空。
+ *
+ */
+/**
+ * A.
  * Special {@link DataBinder} for data binding from web request parameters
  * to JavaBean objects. Designed for web environments, but not dependent on
  * the Servlet API; serves as base class for more specific DataBinder variants,
  * such as {@link ServletRequestDataBinder}.
  *
+ * B.
  * <p>Includes support for field markers which address a common problem with
  * HTML checkboxes and select options: detecting that a field was part of
  * the form, but did not generate a request parameter because it was empty.
@@ -52,6 +62,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @see #setFieldDefaultPrefix
  * @see ServletRequestDataBinder
  */
+// 20201222 特殊的{@link DataBinder}用于将数据从Web请求参数绑定到JavaBean对象
 public class WebDataBinder extends DataBinder {
 
 	/**
