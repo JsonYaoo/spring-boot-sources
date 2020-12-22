@@ -23,17 +23,34 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.method.HandlerMethod;
 
 /**
+ * 20201222
+ * A. 工作流接口，允许自定义处理程序执行链。 应用程序可以为某些处理程序组注册任意数量的现有或自定义拦截器，以添加常见的预处理行为，而无需修改每个处理程序实现。
+ * B. 在适当的HandlerAdapter触发处理程序本身的执行之前，将调用HandlerInterceptor。 该机制可以用于预处理方面的大领域，例如用于授权检查或常见的处理程序行为，
+ *    例如语言环境或主题更改。 其主要目的是允许排除重复的处理程序代码。
+ * C. 在异步处理方案中，处理程序可以在主线程退出时在单独的线程中执行，而无需呈现或调用{@code postHandle}和{@code afterCompletion}回调。 当并发处理程序执行完成时，
+ *    将回发该请求以继续呈现模型，并再次调用该协定的所有方法。 有关更多选项和详细信息，请参见{@code org.springframework.web.servlet.AsyncHandlerInterceptor}
+ * D. 通常，每个HandlerMapping bean定义一个拦截器链，共享其粒度。 为了能够将某个拦截器链应用于一组处理程序，需要通过一个HandlerMapping bean映射所需的处理程序。
+ *    拦截器本身在应用程序上下文中定义为bean，由映射bean定义通过其“interceptors”属性（在XML中：a <list> of <ref>）进行引用。
+ * E. HandlerInterceptor基本上类似于Servlet过滤器，但与后者相反，它仅允许自定义预处理以及禁止执行处理程序本身和自定义后处理的选项。 过滤器功能更强大，
+ *    例如，它们允许交换传递到链中的请求和响应对象。 请注意，在应用程序上下文中的HandlerInterceptor web.xml中配置了过滤器。
+ * F. 作为基本准则，与处理程序相关的细粒度预处理任务是HandlerInterceptor实现的候选对象，尤其是分解出的公共处理程序代码和授权检查。 另一方面，过滤器非常适合请求内容和
+ *    视图内容处理，例如多部分表单和GZIP压缩。 这通常显示何时需要将过滤器映射到某些内容类型（例如图像）或所有请求。
+ */
+/**
+ * A.
  * Workflow interface that allows for customized handler execution chains.
  * Applications can register any number of existing or custom interceptors
  * for certain groups of handlers, to add common preprocessing behavior
  * without needing to modify each handler implementation.
  *
+ * B.
  * <p>A HandlerInterceptor gets called before the appropriate HandlerAdapter
  * triggers the execution of the handler itself. This mechanism can be used
  * for a large field of preprocessing aspects, e.g. for authorization checks,
  * or common handler behavior like locale or theme changes. Its main purpose
  * is to allow for factoring out repetitive handler code.
  *
+ * C.
  * <p>In an asynchronous processing scenario, the handler may be executed in a
  * separate thread while the main thread exits without rendering or invoking the
  * {@code postHandle} and {@code afterCompletion} callbacks. When concurrent
@@ -42,6 +59,7 @@ import org.springframework.web.method.HandlerMethod;
  * again. For further options and details see
  * {@code org.springframework.web.servlet.AsyncHandlerInterceptor}
  *
+ * D.
  * <p>Typically an interceptor chain is defined per HandlerMapping bean,
  * sharing its granularity. To be able to apply a certain interceptor chain
  * to a group of handlers, one needs to map the desired handlers via one
@@ -49,6 +67,7 @@ import org.springframework.web.method.HandlerMethod;
  * in the application context, referenced by the mapping bean definition
  * via its "interceptors" property (in XML: a &lt;list&gt; of &lt;ref&gt;).
  *
+ * E.
  * <p>HandlerInterceptor is basically similar to a Servlet Filter, but in
  * contrast to the latter it just allows custom pre-processing with the option
  * of prohibiting the execution of the handler itself, and custom post-processing.
@@ -56,6 +75,7 @@ import org.springframework.web.method.HandlerMethod;
  * and response objects that are handed down the chain. Note that a filter
  * gets configured in web.xml, a HandlerInterceptor in the application context.
  *
+ * F.
  * <p>As a basic guideline, fine-grained handler-related preprocessing tasks are
  * candidates for HandlerInterceptor implementations, especially factored-out
  * common handler code and authorization checks. On the other hand, a Filter
@@ -72,6 +92,7 @@ import org.springframework.web.method.HandlerMethod;
  * @see org.springframework.web.servlet.theme.ThemeChangeInterceptor
  * @see javax.servlet.Filter
  */
+// 20201222 工作流接口，允许自定义处理程序执行链: 添加常见的预处理行为，而无需修改每个处理程序实现, 在适当的HandlerAdapter触发处理程序本身的执行之前，将调用HandlerInterceptor
 public interface HandlerInterceptor {
 
 	/**

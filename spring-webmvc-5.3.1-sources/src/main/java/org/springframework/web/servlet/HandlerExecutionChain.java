@@ -49,6 +49,7 @@ public class HandlerExecutionChain {
 
 	private final Object handler;
 
+	// 20201222 工作流接口，允许自定义处理程序执行链: 添加常见的预处理行为，而无需修改每个处理程序实现, 在适当的HandlerAdapter触发处理程序本身的执行之前，将调用HandlerInterceptor
 	private final List<HandlerInterceptor> interceptorList = new ArrayList<>();
 
 	private int interceptorIndex = -1;
@@ -102,6 +103,7 @@ public class HandlerExecutionChain {
 	/**
 	 * Add the given interceptor to the end of this chain.
 	 */
+	// 20201222 将给定的拦截器添加到此链的末尾。
 	public void addInterceptor(HandlerInterceptor interceptor) {
 		this.interceptorList.add(interceptor);
 	}

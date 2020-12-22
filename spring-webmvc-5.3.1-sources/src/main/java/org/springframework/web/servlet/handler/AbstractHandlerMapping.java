@@ -96,6 +96,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 	private final List<Object> interceptors = new ArrayList<>();
 
+	// 20201222 工作流接口，允许自定义处理程序执行链: 添加常见的预处理行为，而无需修改每个处理程序实现, 在适当的HandlerAdapter触发处理程序本身的执行之前，将调用HandlerInterceptor
 	private final List<HandlerInterceptor> adaptedInterceptors = new ArrayList<>();
 
 	@Nullable
@@ -524,7 +525,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			handler = obtainApplicationContext().getBean(handlerName);
 		}
 
-
+		// 20201222 为给定的处理程序（包括适用的拦截器）构建一个HandlerExecutionChain eg:{handler: "com.jsonyao.cs.Controller.TestController#testRestController()"、interceptorList:[ConversionServiceExposingInterceptor、ResourceUrlProviderExposingInterceptor] }
 		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
 
 		if (logger.isTraceEnabled()) {
@@ -630,29 +631,50 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	}
 
 	/**
+	 * 20201222
+	 * A. 为给定的处理程序（包括适用的拦截器）构建一个{@link HandlerExecutionChain}。
+	 * B. 默认实现使用给定的处理程序，处理程序映射的公共拦截器以及与当前请求URL匹配的任何{@link MappedInterceptor MappedInterceptors}构建标准的\
+	 *    {@link HandlerExecutionChain}。 拦截器按照注册时的顺序添加。 子类可以重写此方法，以扩展/重新排列拦截器的列表。
+	 * C. 注意：传入的处理程序对象可以是原始处理程序，也可以是预构建的{@link HandlerExecutionChain}。 此方法应显式处理这两种情况，要么构建新的
+	 *    {@link HandlerExecutionChain}，要么扩展现有链。
+	 * D. 为了仅在自定义子类中添加拦截器，请考虑调用{@code super.getHandlerExecutionChain（handler，request）}并在返回的链对象上调用
+	 *    {@link HandlerExecutionChain＃addInterceptor}。
+	 */
+	/**
+	 * A.
 	 * Build a {@link HandlerExecutionChain} for the given handler, including
 	 * applicable interceptors.
+	 *
+	 * B.
 	 * <p>The default implementation builds a standard {@link HandlerExecutionChain}
 	 * with the given handler, the common interceptors of the handler mapping, and any
 	 * {@link MappedInterceptor MappedInterceptors} matching to the current request URL. Interceptors
 	 * are added in the order they were registered. Subclasses may override this
 	 * in order to extend/rearrange the list of interceptors.
+	 *
+	 * C.
 	 * <p><b>NOTE:</b> The passed-in handler object may be a raw handler or a
 	 * pre-built {@link HandlerExecutionChain}. This method should handle those
 	 * two cases explicitly, either building a new {@link HandlerExecutionChain}
 	 * or extending the existing chain.
+	 *
+	 * D.
 	 * <p>For simply adding an interceptor in a custom subclass, consider calling
 	 * {@code super.getHandlerExecutionChain(handler, request)} and invoking
 	 * {@link HandlerExecutionChain#addInterceptor} on the returned chain object.
+	 *
 	 * @param handler the resolved handler instance (never {@code null})
 	 * @param request current HTTP request
 	 * @return the HandlerExecutionChain (never {@code null})
 	 * @see #getAdaptedInterceptors()
 	 */
+	// 20201222 为给定的处理程序（包括适用的拦截器）构建一个{@link HandlerExecutionChain}
 	protected HandlerExecutionChain getHandlerExecutionChain(Object handler, HttpServletRequest request) {
+		// 20201222 eg: “com.jsonyao.cs.Controller.TestController#testRestController()” => false
 		HandlerExecutionChain chain = (handler instanceof HandlerExecutionChain ?
 				(HandlerExecutionChain) handler : new HandlerExecutionChain(handler));
 
+		// 20201222 eg: ConversionServiceExposingInterceptor & ResourceUrlProviderExposingInterceptor
 		for (HandlerInterceptor interceptor : this.adaptedInterceptors) {
 			if (interceptor instanceof MappedInterceptor) {
 				MappedInterceptor mappedInterceptor = (MappedInterceptor) interceptor;
@@ -661,9 +683,12 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 				}
 			}
 			else {
+				// 20201222 eg: ConversionServiceExposingInterceptor & ResourceUrlProviderExposingInterceptor
 				chain.addInterceptor(interceptor);
 			}
 		}
+
+		// 20201222 eg: HandlerExecutionChain:{handler: "com.jsonyao.cs.Controller.TestController#testRestController()"、interceptorList:[ConversionServiceExposingInterceptor、ResourceUrlProviderExposingInterceptor] }
 		return chain;
 	}
 
