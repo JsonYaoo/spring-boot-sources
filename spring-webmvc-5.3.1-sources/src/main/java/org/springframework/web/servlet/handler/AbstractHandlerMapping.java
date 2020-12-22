@@ -535,6 +535,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			logger.debug("Mapped to " + executionChain.getHandler());
 		}
 
+		// 20201222 eg: false(没有CORS配置) || eg: false(没有跨域头配置) => 所以没有跨域配置
 		if (hasCorsConfigurationSource(handler) || CorsUtils.isPreFlightRequest(request)) {
 			CorsConfiguration config = getCorsConfiguration(handler, request);
 			if (getCorsConfigurationSource() != null) {
@@ -547,6 +548,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			executionChain = getCorsHandlerExecutionChain(request, executionChain, config);
 		}
 
+		// HandlerExecutionChain eg:{handler: "com.jsonyao.cs.Controller.TestController#testRestController()"、interceptorList:[ConversionServiceExposingInterceptor、ResourceUrlProviderExposingInterceptor] }
 		return executionChain;
 	}
 
@@ -696,10 +698,13 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * Return {@code true} if there is a {@link CorsConfigurationSource} for this handler.
 	 * @since 5.2
 	 */
+	// 20201222 如果此处理程序有一个{@link CorsConfigurationSource}，则返回{@code true}。
 	protected boolean hasCorsConfigurationSource(Object handler) {
 		if (handler instanceof HandlerExecutionChain) {
 			handler = ((HandlerExecutionChain) handler).getHandler();
 		}
+
+		// 20201222 eg: false
 		return (handler instanceof CorsConfigurationSource || this.corsConfigurationSource != null);
 	}
 

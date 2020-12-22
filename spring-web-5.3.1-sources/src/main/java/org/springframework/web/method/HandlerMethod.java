@@ -93,6 +93,7 @@ public class HandlerMethod {
 	@Nullable
 	private String responseStatusReason;
 
+	// 20201222 解析后的HandlerMethod
 	@Nullable
 	private HandlerMethod resolvedFromHandlerMethod;
 
@@ -349,8 +350,10 @@ public class HandlerMethod {
 	 * Return the HandlerMethod from which this HandlerMethod instance was
 	 * resolved via {@link #createWithResolvedBean()}.
 	 */
+	// 20201222 通过{@link #createWithResolvedBean（）}返回从其解析了该HandlerMethod实例的HandlerMethod。
 	@Nullable
 	public HandlerMethod getResolvedFromHandlerMethod() {
+		// 20201222 解析后的HandlerMethod eg: “com.jsonyao.cs.Controller.TestController#testRestController()”
 		return this.resolvedFromHandlerMethod;
 	}
 

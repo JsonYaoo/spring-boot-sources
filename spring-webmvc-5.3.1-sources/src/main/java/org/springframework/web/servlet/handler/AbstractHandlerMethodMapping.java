@@ -104,8 +104,8 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	@Nullable
 	private HandlerMethodMappingNamingStrategy<T> namingStrategy;
 
+	// 20201221 一个注册表，用于维护到处理程序方法的所有映射，公开用于执行查找的方法并提供并发访问
 	private final MappingRegistry mappingRegistry = new MappingRegistry();
-
 
 	/**
 	 * Whether to detect handler methods in beans in ancestor ApplicationContexts.
@@ -496,8 +496,10 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		return null;
 	}
 
+	// 20201222 如果此处理程序有一个{@link CorsConfigurationSource}，则返回{@code true}。
 	@Override
 	protected boolean hasCorsConfigurationSource(Object handler) {
+		// 20201222 eg: false || true && false => false
 		return super.hasCorsConfigurationSource(handler) ||
 				(handler instanceof HandlerMethod &&
 						this.mappingRegistry.getCorsConfiguration((HandlerMethod) handler) != null);
@@ -607,6 +609,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 		private final Map<String, List<HandlerMethod>> nameLookup = new ConcurrentHashMap<>();
 
+		// 20201222 CORS配置信息列表
 		private final Map<HandlerMethod, CorsConfiguration> corsLookup = new ConcurrentHashMap<>();
 
 		private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
@@ -641,9 +644,13 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		/**
 		 * Return CORS configuration. Thread-safe for concurrent use.
 		 */
+		// 20201222 返回CORS(跨资源共享机制)配置。 线程安全并发使用
 		@Nullable
 		public CorsConfiguration getCorsConfiguration(HandlerMethod handlerMethod) {
+			// 20201222 解析后的HandlerMethod eg: “com.jsonyao.cs.Controller.TestController#testRestController()”
 			HandlerMethod original = handlerMethod.getResolvedFromHandlerMethod();
+
+			// 20201222 CORS配置信息列表 eg: []
 			return this.corsLookup.get(original != null ? original : handlerMethod);
 		}
 

@@ -1147,6 +1147,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 				// 20201221 确定当前请求的处理程序。
 				// Determine handler for the current request.
+				// 20201221 RequestMappingHandlerMapping => HandlerExecutionChain eg:{handler: "com.jsonyao.cs.Controller.TestController#testRestController()"、interceptorList:[ConversionServiceExposingInterceptor、ResourceUrlProviderExposingInterceptor] }
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
 					noHandlerFound(processedRequest, response);
@@ -1388,6 +1389,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			// 20201221 遍历HandlerMappings列表
 			for (HandlerMapping mapping : this.handlerMappings) {
 				// 20201221 返回此请求的处理程序和所有拦截器。 该选择可以根据请求URL，会话状态或实现类选择的任何因素进行
+				// 20201221 RequestMappingHandlerMapping => HandlerExecutionChain eg:{handler: "com.jsonyao.cs.Controller.TestController#testRestController()"、interceptorList:[ConversionServiceExposingInterceptor、ResourceUrlProviderExposingInterceptor] }
 				HandlerExecutionChain handler = mapping.getHandler(request);
 				if (handler != null) {
 					return handler;

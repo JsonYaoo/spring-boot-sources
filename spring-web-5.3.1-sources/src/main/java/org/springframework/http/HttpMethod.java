@@ -78,6 +78,7 @@ public enum HttpMethod {
 	 * @return {@code true} if it matches, {@code false} otherwise
 	 * @since 4.2.4
 	 */
+	// 20201222 确定此{@code HttpMethod}是否与给定的方法值匹配。
 	public boolean matches(String method) {
 		return (this == resolve(method));
 	}
