@@ -238,14 +238,21 @@ public final class ModelFactory {
 	 * @param container contains the model to update
 	 * @throws Exception if creating BindingResult attributes fails
 	 */
+	// 20201223 将列为{@code @SessionAttributes}的模型属性提升到会话。 如有必要，添加{@link BindingResult}属性。
 	public void updateModel(NativeWebRequest request, ModelAndViewContainer container) throws Exception {
+		// 20201223 返回实例化时创建的“默认”模型 => eg: BindingAwareModelMap@xxxx: {}
 		ModelMap defaultModel = container.getDefaultModel();
+
+		// 20201213 eg: SimpleSessionStatus@xxxx: complete: false
 		if (container.getSessionStatus().isComplete()){
 			this.sessionAttributesHandler.cleanupAttributes(request);
 		}
 		else {
+			// 20201223 eg: do nothing
 			this.sessionAttributesHandler.storeAttributes(request, defaultModel);
 		}
+
+		// 20201223 !true => false, 表示请求已经处理完成
 		if (!container.isRequestHandled() && container.getModel() == defaultModel) {
 			updateBindingResult(request, defaultModel);
 		}

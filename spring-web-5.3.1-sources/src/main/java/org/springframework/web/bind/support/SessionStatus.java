@@ -17,6 +17,13 @@
 package org.springframework.web.bind.support;
 
 /**
+ * 20201223
+ * A. 可以注入到处理程序方法中的简单接口，使它们可以发出会话处理已完成的信号。 然后，处理程序调用者可以进行适当的清理，例如清理。 在此处理程序的处理过程中隐式创建的会话属性
+ *   （根据{@link org.springframework.web.bind.annotation.SessionAttributes @SessionAttributes}批注）。
+ */
+
+/**
+ * A.
  * Simple interface that can be injected into handler methods, allowing them to
  * signal that their session processing is complete. The handler invoker may
  * then follow up with appropriate cleanup, e.g. of session attributes which
@@ -30,6 +37,7 @@ package org.springframework.web.bind.support;
  * @see org.springframework.web.bind.annotation.RequestMapping
  * @see org.springframework.web.bind.annotation.SessionAttributes
  */
+// 20201223 可以注入到处理程序方法中的简单接口，使它们可以发出会话处理已完成的信号。 然后，处理程序调用者可以进行适当的清理，例如清理。
 public interface SessionStatus {
 
 	/**

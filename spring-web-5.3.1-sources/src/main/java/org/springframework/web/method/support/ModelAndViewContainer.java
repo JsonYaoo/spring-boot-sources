@@ -83,6 +83,7 @@ public class ModelAndViewContainer {
 
 	private final Set<String> bindingDisabled = new HashSet<>(4);
 
+	// 20201223 可以注入到处理程序方法中的简单接口，使它们可以发出会话处理已完成的信号。 然后，处理程序调用者可以进行适当的清理，例如清理。
 	private final SessionStatus sessionStatus = new SimpleSessionStatus();
 
 	private boolean requestHandled = false;
@@ -193,15 +194,26 @@ public class ModelAndViewContainer {
 	}
 
 	/**
+	 * 20201223
+	 * A. 返回实例化时创建的“默认”模型。
+	 * B. 通常，建议使用{@link #getModel（）}代替它返回“默认”模型（模板渲染）或“重定向”模型（重定向URL准备）。 在某些情况下，无论是否需要访问“默认”模型，
+	 *    都可能需要使用此方法。 保存通过{@code @SessionAttributes}指定的模型属性。
+	 */
+	/**
+	 * A.
 	 * Return the "default" model created at instantiation.
+	 *
+	 * B.
 	 * <p>In general it is recommended to use {@link #getModel()} instead which
 	 * returns either the "default" model (template rendering) or the "redirect"
 	 * model (redirect URL preparation). Use of this method may be needed for
 	 * advanced cases when access to the "default" model is needed regardless,
 	 * e.g. to save model attributes specified via {@code @SessionAttributes}.
+	 *
 	 * @return the default model (never {@code null})
 	 * @since 4.1.4
 	 */
+	// 20201213 返回实例化时创建的“默认”模型。
 	public ModelMap getDefaultModel() {
 		return this.defaultModel;
 	}
@@ -281,6 +293,7 @@ public class ModelAndViewContainer {
 	 * Return the {@link SessionStatus} instance to use that can be used to
 	 * signal that session processing is complete.
 	 */
+	// 20201213 返回要使用的{@link SessionStatus}实例，该实例可用于指示会话处理已完成。
 	public SessionStatus getSessionStatus() {
 		return this.sessionStatus;
 	}
@@ -309,6 +322,7 @@ public class ModelAndViewContainer {
 	/**
 	 * Whether the request has been handled fully within the handler.
 	 */
+	// 20201223 请求是否已在处理程序中完全处理。
 	public boolean isRequestHandled() {
 		return this.requestHandled;
 	}

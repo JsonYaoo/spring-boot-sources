@@ -34,13 +34,23 @@ import org.springframework.web.context.request.WebRequest;
 public interface SessionAttributeStore {
 
 	/**
+	 * 20201223
+	 * A. 将提供的属性存储在后端会话中。
+	 * B. 可以为新属性以及现有属性调用。 在后一种情况下，这表明属性值可能已被修改。
+	 */
+	/**
+	 * A.
 	 * Store the supplied attribute in the backend session.
+	 *
+	 * B.
 	 * <p>Can be called for new attributes as well as for existing attributes.
 	 * In the latter case, this signals that the attribute value may have been modified.
+	 *
 	 * @param request the current request
 	 * @param attributeName the name of the attribute
 	 * @param attributeValue the attribute value to store
 	 */
+	// 20201223 将提供的属性存储在后端会话中
 	void storeAttribute(WebRequest request, String attributeName, Object attributeValue);
 
 	/**

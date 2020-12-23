@@ -967,7 +967,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 				return null;
 			}
 
-
+			// 20201223 获取ModelAndView实例 => eg: null
 			return getModelAndView(mavContainer, modelFactory, webRequest);
 		}
 		finally {
@@ -1110,11 +1110,14 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 		);
 	}
 
+	// 20201223 获取ModelAndView实例
 	@Nullable
-	private ModelAndView getModelAndView(ModelAndViewContainer mavContainer,
-			ModelFactory modelFactory, NativeWebRequest webRequest) throws Exception {
+	private ModelAndView getModelAndView(ModelAndViewContainer mavContainer, ModelFactory modelFactory, NativeWebRequest webRequest) throws Exception {
 
+		// 20201223 将列为{@code @SessionAttributes}的模型属性提升到会话。 如有必要，添加{@link BindingResult}属性 => eg: do nothing
 		modelFactory.updateModel(webRequest, mavContainer);
+
+		// 20201223 请求是否已在处理程序中完全处理 => eg: true
 		if (mavContainer.isRequestHandled()) {
 			return null;
 		}

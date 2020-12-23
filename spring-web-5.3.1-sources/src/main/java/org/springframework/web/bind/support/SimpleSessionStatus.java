@@ -17,12 +17,17 @@
 package org.springframework.web.bind.support;
 
 /**
+ * 20201223
+ * {@link SessionStatus}接口的简单实现，将{@code complete}标志保留为实例变量。
+ */
+/**
  * Simple implementation of the {@link SessionStatus} interface,
  * keeping the {@code complete} flag as an instance variable.
  *
  * @author Juergen Hoeller
  * @since 2.5
  */
+// 20201223 {@link SessionStatus}接口的简单实现，将{@code complete}标志保留为实例变量。
 public class SimpleSessionStatus implements SessionStatus {
 
 	private boolean complete = false;

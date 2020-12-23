@@ -63,6 +63,7 @@ public class SessionAttributesHandler {
 
 	private final Set<String> knownAttributeNames = Collections.newSetFromMap(new ConcurrentHashMap<>(4));
 
+	// 20021222 策略接口，用于在后端会话中存储模型属性。
 	private final SessionAttributeStore sessionAttributeStore;
 
 	/**
@@ -99,14 +100,24 @@ public class SessionAttributesHandler {
 	}
 
 	/**
+	 * 20201223
+	 * A. 属性名称或类型是否与通过基础控制器上的{@code @SessionAttributes}指定的名称和类型匹配。
+	 * B. 通过此方法成功解析的属性将被“记住”，随后用于{@link #retrieveAttributes（WebRequest）}和{@link #cleanupAttributes(WebRequest)}.
+	 */
+	/**
+	 * A.
 	 * Whether the attribute name or type match the names and types specified
 	 * via {@code @SessionAttributes} on the underlying controller.
+	 *
+	 * B.
 	 * <p>Attributes successfully resolved through this method are "remembered"
 	 * and subsequently used in {@link #retrieveAttributes(WebRequest)} and
 	 * {@link #cleanupAttributes(WebRequest)}.
+	 *
 	 * @param attributeName the attribute name to check
 	 * @param attributeType the type for the attribute
 	 */
+	// 20201223 属性名称或类型是否与通过基础控制器上的{@code @SessionAttributes}指定的名称和类型匹配。
 	public boolean isHandlerSessionAttribute(String attributeName, Class<?> attributeType) {
 		Assert.notNull(attributeName, "Attribute name must not be null");
 		if (this.attributeNames.contains(attributeName) || this.attributeTypes.contains(attributeType)) {
@@ -124,8 +135,11 @@ public class SessionAttributesHandler {
 	 * @param request the current request
 	 * @param attributes candidate attributes for session storage
 	 */
+	// 20201223 在会话中存储给定属性的子集。 通过{@code @SessionAttributes}未声明为会话属性的属性将被忽略。
 	public void storeAttributes(WebRequest request, Map<String, ?> attributes) {
+		// 20201223 eg: []
 		attributes.forEach((name, value) -> {
+			// 20201223 属性名称或类型是否与通过基础控制器上的{@code @SessionAttributes}指定的名称和类型匹配。
 			if (value != null && isHandlerSessionAttribute(name, value.getClass())) {
 				this.sessionAttributeStore.storeAttribute(request, name, value);
 			}
