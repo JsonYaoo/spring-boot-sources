@@ -47,6 +47,10 @@ import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201223
+ * 基于{@link HttpServletRequest}的{@link ServerHttpRequest}实现。
+ */
+/**
  * {@link ServerHttpRequest} implementation that is based on a {@link HttpServletRequest}.
  *
  * @author Arjen Poutsma
@@ -54,6 +58,7 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @since 3.0
  */
+// 20201223 基于{@link HttpServletRequest}的{@link ServerHttpRequest}实现。
 public class ServletServerHttpRequest implements ServerHttpRequest {
 
 	protected static final String FORM_CONTENT_TYPE = "application/x-www-form-urlencoded";
@@ -72,21 +77,21 @@ public class ServletServerHttpRequest implements ServerHttpRequest {
 	@Nullable
 	private ServerHttpAsyncRequestControl asyncRequestControl;
 
-
 	/**
 	 * Construct a new instance of the ServletServerHttpRequest based on the
 	 * given {@link HttpServletRequest}.
 	 * @param servletRequest the servlet request
 	 */
+	// 20201223 根据给定的{@link HttpServletRequest}构造ServletServerHttpRequest的新实例。
 	public ServletServerHttpRequest(HttpServletRequest servletRequest) {
 		Assert.notNull(servletRequest, "HttpServletRequest must not be null");
 		this.servletRequest = servletRequest;
 	}
 
-
 	/**
 	 * Returns the {@code HttpServletRequest} this object is based on.
 	 */
+	// 20201223 返回此对象所基于的{@code HttpServletRequest}。
 	public HttpServletRequest getServletRequest() {
 		return this.servletRequest;
 	}

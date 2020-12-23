@@ -32,8 +32,16 @@ import org.springframework.util.Assert;
 import org.springframework.web.context.request.ServletWebRequest;
 
 /**
+ * 20201223
+ * A. {@link AsyncWebRequest}的Servlet 3.0实现。
+ * B. Servlet和异步请求中涉及的所有筛选器必须使用Servlet API或通过向Servlet和{@code web.xml}中的筛选器声明添加
+ *    <async-supported>true</ async-supported>元素来启用异步支持。
+ */
+/**
+ * A.
  * A Servlet 3.0 implementation of {@link AsyncWebRequest}.
  *
+ * B.
  * <p>The servlet and all filters involved in an async request must have async
  * support enabled using the Servlet API or by adding an
  * <code>&ltasync-supported&gttrue&lt/async-supported&gt</code> element to servlet and filter
@@ -42,6 +50,7 @@ import org.springframework.web.context.request.ServletWebRequest;
  * @author Rossen Stoyanchev
  * @since 3.2
  */
+// 20201223 {@link AsyncWebRequest}的Servlet 3.0实现: <async-supported>true</ async-supported>元素来启用异步支持
 public class StandardServletAsyncWebRequest extends ServletWebRequest implements AsyncWebRequest, AsyncListener {
 
 	private Long timeout;
@@ -54,18 +63,18 @@ public class StandardServletAsyncWebRequest extends ServletWebRequest implements
 
 	private final List<Consumer<Throwable>> exceptionHandlers = new ArrayList<>();
 
+	// 20201223 完成时启动的任务
 	private final List<Runnable> completionHandlers = new ArrayList<>();
-
 
 	/**
 	 * Create a new instance for the given request/response pair.
 	 * @param request current HTTP request
 	 * @param response current HTTP response
 	 */
+	// 202012223 为给定的请求/响应对创建一个{@link AsyncWebRequest}的Servlet 3.0实现新实例。
 	public StandardServletAsyncWebRequest(HttpServletRequest request, HttpServletResponse response) {
 		super(request, response);
 	}
-
 
 	/**
 	 * In Servlet 3 async processing, the timeout period begins after the
@@ -87,8 +96,10 @@ public class StandardServletAsyncWebRequest extends ServletWebRequest implements
 		this.exceptionHandlers.add(exceptionHandler);
 	}
 
+	// 20201223 添加处理程序以在请求处理完成时调用。
 	@Override
 	public void addCompletionHandler(Runnable runnable) {
+		// 20201223 eg: WebAsyncManager@lambda@xxxx
 		this.completionHandlers.add(runnable);
 	}
 

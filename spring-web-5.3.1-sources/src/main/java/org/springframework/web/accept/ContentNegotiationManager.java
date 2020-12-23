@@ -35,10 +35,17 @@ import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 20201223
+ * A. 中央类，用于确定请求的请求{@linkplain MediaType媒体类型}。 通过委派已配置的{@code ContentNegotiationStrategy}实例列表来完成此操作。
+ * B. 还提供了用于查找媒体类型的文件扩展名的方法。 通过委派已配置的{@code MediaTypeFileExtensionResolver}实例列表来完成此操作。
+ */
+/**
+ * A.
  * Central class to determine requested {@linkplain MediaType media types}
  * for a request. This is done by delegating to a list of configured
  * {@code ContentNegotiationStrategy} instances.
  *
+ * B.
  * <p>Also provides methods to look up file extensions for a media type.
  * This is done by delegating to the list of configured
  * {@code MediaTypeFileExtensionResolver} instances.
@@ -47,6 +54,7 @@ import org.springframework.web.context.request.NativeWebRequest;
  * @author Juergen Hoeller
  * @since 3.2
  */
+// 20201223 中央类: 用于确定请求的请求{@linkplain MediaType媒体类型}, 还提供了用于查找媒体类型的文件扩展名的方法
 public class ContentNegotiationManager implements ContentNegotiationStrategy, MediaTypeFileExtensionResolver {
 
 	private final List<ContentNegotiationStrategy> strategies = new ArrayList<>();
@@ -122,13 +130,20 @@ public class ContentNegotiationManager implements ContentNegotiationStrategy, Me
 		Collections.addAll(this.resolvers, resolvers);
 	}
 
+	// 20201223 解析MediaType列表
 	@Override
 	public List<MediaType> resolveMediaTypes(NativeWebRequest request) throws HttpMediaTypeNotAcceptableException {
+		// 20201223 eg: HeaderContentNegotitationStrategy@xxxx
 		for (ContentNegotiationStrategy strategy : this.strategies) {
+			// 20201223 将给定的（可能）逗号分隔的字符串列表解析为{@code MediaType}对象的列表: 可用于解析Accept或Content-Type标头
 			List<MediaType> mediaTypes = strategy.resolveMediaTypes(request);
+
+			// 20201223 eg: */* => false
 			if (mediaTypes.equals(MEDIA_TYPE_ALL_LIST)) {
 				continue;
 			}
+
+			// 20201223 逗号分割后的"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
 			return mediaTypes;
 		}
 		return MEDIA_TYPE_ALL_LIST;

@@ -1062,15 +1062,26 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	 * Set the length of the body in bytes, as specified by the
 	 * {@code Content-Length} header.
 	 */
+	// 20201223 按照{@code Content-Length}标头指定的格式设置正文长度（以字节为单位）。
 	public void setContentLength(long contentLength) {
+		// 20201223 "Content-Length": 22
 		set(CONTENT_LENGTH, Long.toString(contentLength));
 	}
 
 	/**
+	 * 20201223
+	 * A. 返回正文的长度（以字节为单位），由{@code Content-Length}标头指定。
+	 * B. 当content-length未知时，返回-1。
+	 */
+	/**
+	 * A.
 	 * Return the length of the body in bytes, as specified by the
 	 * {@code Content-Length} header.
+	 *
+	 * B.
 	 * <p>Returns -1 when the content-length is unknown.
 	 */
+	// 20201223 返回正文的长度（以字节为单位），由{@code Content-Length}标头指定。当content-length未知时，返回-1。
 	public long getContentLength() {
 		String value = getFirst(CONTENT_LENGTH);
 		return (value != null ? Long.parseLong(value) : -1);
@@ -1080,6 +1091,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	 * Set the {@linkplain MediaType media type} of the body,
 	 * as specified by the {@code Content-Type} header.
 	 */
+	// 20201223 设置主体的{@linkplain MediaType媒体类型}，如{@code Content-Type}标头所指定。
 	public void setContentType(@Nullable MediaType mediaType) {
 		if (mediaType != null) {
 			Assert.isTrue(!mediaType.isWildcardType(), "Content-Type cannot contain wildcard type '*'");
@@ -1092,10 +1104,19 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
+	 * 20201223
+	 * A. 返回正文的{@linkplain MediaType媒体类型}，如{@code Content-Type}标头所指定。
+	 * B. 当内容类型未知时，返回{@code null}。
+	 */
+	/**
+	 * A.
 	 * Return the {@linkplain MediaType media type} of the body, as specified
 	 * by the {@code Content-Type} header.
+	 *
+	 * B.
 	 * <p>Returns {@code null} when the content-type is unknown.
 	 */
+	// 20201223 返回正文的{@linkplain MediaType媒体类型}，如{@code Content-Type}标头所指定
 	@Nullable
 	public MediaType getContentType() {
 		String value = getFirst(CONTENT_TYPE);

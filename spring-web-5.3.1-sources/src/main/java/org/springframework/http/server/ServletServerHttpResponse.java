@@ -31,12 +31,17 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
+ * 20201223
+ * 基于{@link HttpServletResponse}的{@link ServerHttpResponse}实现。
+ */
+/**
  * {@link ServerHttpResponse} implementation that is based on a {@link HttpServletResponse}.
  *
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
  * @since 3.0
  */
+// 20201223 基于{@link HttpServletResponse}的{@link ServerHttpResponse}实现。
 public class ServletServerHttpResponse implements ServerHttpResponse {
 
 	private final HttpServletResponse servletResponse;
@@ -50,17 +55,19 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 	@Nullable
 	private HttpHeaders readOnlyHeaders;
 
-
 	/**
 	 * Construct a new instance of the ServletServerHttpResponse based on the given {@link HttpServletResponse}.
 	 * @param servletResponse the servlet response
 	 */
+	// 20201223 根据给定的{@link HttpServletResponse}构造一个ServletServerHttpResponse的新实例。
 	public ServletServerHttpResponse(HttpServletResponse servletResponse) {
 		Assert.notNull(servletResponse, "HttpServletResponse must not be null");
+		// 20201223 eg: ResponseFacade@xxxx: Response@xxxx
 		this.servletResponse = servletResponse;
+
+		// 20201223 eg: ServletServerHttpResponse$ServletResponseHttpHeaders@xxxx: []
 		this.headers = new ServletResponseHttpHeaders();
 	}
-
 
 	/**
 	 * Return the {@code HttpServletResponse} this object is based on.
@@ -89,10 +96,13 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 		}
 	}
 
+	// 20201223 返回消息的主体作为输出流。
 	@Override
 	public OutputStream getBody() throws IOException {
 		this.bodyUsed = true;
 		writeHeaders();
+
+		// 20201223 eg: CoyoteOutputStream@xxxx
 		return this.servletResponse.getOutputStream();
 	}
 
@@ -128,11 +138,18 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 		}
 	}
 
-
 	/**
+	 * 20201223
+	 * A. 扩展HttpHeaders的功能，以查找基础HttpServletResponse中已经存在的标头。
+	 * B. 目的只是公开通过HttpServletResponse提供的功能，即按名称查找特定标头值的功能。 所有其他与Map相关的操作（例如，迭代，删除等）仅适用于
+	 *    直接通过HttpHeaders方法添加的值。
+	 */
+	/**
+	 * A.
 	 * Extends HttpHeaders with the ability to look up headers already present in
 	 * the underlying HttpServletResponse.
 	 *
+	 * B.
 	 * <p>The intent is merely to expose what is available through the HttpServletResponse
 	 * i.e. the ability to look up specific header values by name. All other
 	 * map-related operations (e.g. iteration, removal, etc) apply only to values
@@ -140,6 +157,7 @@ public class ServletServerHttpResponse implements ServerHttpResponse {
 	 *
 	 * @since 4.0.3
 	 */
+	// 20201223 扩展HttpHeaders的功能，以查找基础HttpServletResponse中已经存在的标头
 	private class ServletResponseHttpHeaders extends HttpHeaders {
 
 		private static final long serialVersionUID = 3410708522401046302L;

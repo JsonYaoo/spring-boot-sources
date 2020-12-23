@@ -108,13 +108,16 @@ public class ServletWebRequest extends ServletRequestAttributes implements Nativ
 		return getResponse();
 	}
 
+	// 20201223 返回基础本机请求对象（如果有）。
 	@Override
 	public <T> T getNativeRequest(@Nullable Class<T> requiredType) {
 		return WebUtils.getNativeRequest(getRequest(), requiredType);
 	}
 
+	// 20201223 返回基础本机响应对象（如果有）。
 	@Override
 	public <T> T getNativeResponse(@Nullable Class<T> requiredType) {
+		// 20201223 eg: ResponseFacade@xxxx: Response@xxxx
 		HttpServletResponse response = getResponse();
 		return (response != null ? WebUtils.getNativeResponse(response, requiredType) : null);
 	}

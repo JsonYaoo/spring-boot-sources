@@ -25,6 +25,10 @@ import java.lang.reflect.Parameter;
 import org.springframework.core.MethodParameter;
 
 /**
+ * 20201223
+ * 一个{@link MethodParameter}变体，用于合成通过{@link AliasFor @AliasFor}声明属性别名的注释。
+ */
+/**
  * A {@link MethodParameter} variant which synthesizes annotations that
  * declare attribute aliases via {@link AliasFor @AliasFor}.
  *
@@ -34,6 +38,7 @@ import org.springframework.core.MethodParameter;
  * @see AnnotationUtils#synthesizeAnnotation
  * @see AnnotationUtils#synthesizeAnnotationArray
  */
+// 20201223 一个{@link MethodParameter}变体，用于合成通过{@link AliasFor @AliasFor}声明属性别名的注释。
 public class SynthesizingMethodParameter extends MethodParameter {
 
 	/**
@@ -44,6 +49,7 @@ public class SynthesizingMethodParameter extends MethodParameter {
 	 * return type; 0 for the first method parameter; 1 for the second method
 	 * parameter, etc.
 	 */
+	// 20201223 为给定方法创建一个新的{@code SynthesizingMethodParameter}，嵌套级别为1。
 	public SynthesizingMethodParameter(Method method, int parameterIndex) {
 		super(method, parameterIndex);
 	}

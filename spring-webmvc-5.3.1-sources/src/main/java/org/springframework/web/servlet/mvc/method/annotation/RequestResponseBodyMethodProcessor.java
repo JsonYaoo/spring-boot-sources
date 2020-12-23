@@ -46,10 +46,18 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 /**
+ * 20201223
+ * A. 通过用{@link HttpMessageConverter}读写请求或响应的主体，解析用{@code @RequestBody}注释的方法参数，并处理用{@code @ResponseBody}注释的方法的返回值。
+ * B. 如果使用{@code @javax.validation.Valid}进行注释，则{@code @RequestBody}方法参数也将得到验证。 在验证失败的情况下，如果配置了
+ *    {@link DefaultHandlerExceptionResolver}，则会引发{@link MethodArgumentNotValidException}并导致HTTP 400响应状态代码。
+ */
+/**
+ * A.
  * Resolves method arguments annotated with {@code @RequestBody} and handles return
  * values from methods annotated with {@code @ResponseBody} by reading and writing
  * to the body of the request or response with an {@link HttpMessageConverter}.
  *
+ * B.
  * <p>An {@code @RequestBody} method argument is also validated if it is annotated
  * with {@code @javax.validation.Valid}. In case of validation failure,
  * {@link MethodArgumentNotValidException} is raised and results in an HTTP 400
@@ -60,6 +68,7 @@ import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolv
  * @author Juergen Hoeller
  * @since 3.1
  */
+// 20201223 通过用{@link HttpMessageConverter}读写请求或响应的主体，解析用{@code @RequestBody}注释的方法参数，并处理用{@code @ResponseBody}注释的方法的返回值
 public class RequestResponseBodyMethodProcessor extends AbstractMessageConverterMethodProcessor {
 
 	/**
@@ -111,8 +120,10 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 		return parameter.hasParameterAnnotation(RequestBody.class);
 	}
 
+	// 20201223 此处理程序是否支持给定的{@linkplain MethodParameter方法返回类型}。
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
+		// 20201223 eg: true(@RestController)|| false => true
 		return (AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(), ResponseBody.class) ||
 				returnType.hasMethodAnnotation(ResponseBody.class));
 	}
@@ -168,16 +179,24 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 		return (requestBody != null && requestBody.required() && !parameter.isOptional());
 	}
 
+	// 20201223 通过向模型添加属性并设置视图或将{@link ModelAndViewContainer＃setRequestHandled}标志设置为{@code true}来处理给定的返回值，以指示已直接处理响应。
 	@Override
 	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
 			ModelAndViewContainer mavContainer, NativeWebRequest webRequest)
 			throws IOException, HttpMediaTypeNotAcceptableException, HttpMessageNotWritableException {
 
+		// 20201223 该请求是否已在处理程序中完全处理, 设置为true
 		mavContainer.setRequestHandled(true);
+
+		// 20201223 eg: ServletServerHttpRequest@xxxx: "ServletWebRequest: uri=/testController/testRestController;client=0:0:0:0:0:0:0:1
 		ServletServerHttpRequest inputMessage = createInputMessage(webRequest);
+
+		// 20201223 eg: ServletServerHttpResponse@xxxx: servletResponse(ResponseFacade@xxxx: Response@xxxx)、headers(ServletServerHttpResponse$ServletResponseHttpHeaders@xxxx: [])
 		ServletServerHttpResponse outputMessage = createOutputMessage(webRequest);
 
+		// 20201223 尝试使用零返回值。 ResponseBodyAdvice可能会参与其中。
 		// Try even with null return value. ResponseBodyAdvice could get involved.
+		// 20201223 将给定的返回类型写入给定的输出消息。=> eg: 页面输出"Test RestController~~~"
 		writeWithMessageConverters(returnValue, returnType, inputMessage, outputMessage);
 	}
 

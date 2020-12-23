@@ -51,6 +51,8 @@ public abstract class WebAsyncUtils {
 	// 20201221 获取当前请求的{@link WebAsyncManager}，如果找不到，请创建该请求并将其与请求关联。
 	public static WebAsyncManager getAsyncManager(ServletRequest servletRequest) {
 		WebAsyncManager asyncManager = null;
+
+		// 20201223 eg: "org.springframework.web.context.request.async.WebAsyncManager.WEB_ASYNC_MANAGER"-WebAsyncManager@xxxx
 		Object asyncManagerAttr = servletRequest.getAttribute(WEB_ASYNC_MANAGER_ATTRIBUTE);
 		if (asyncManagerAttr instanceof WebAsyncManager) {
 			asyncManager = (WebAsyncManager) asyncManagerAttr;
@@ -87,7 +89,9 @@ public abstract class WebAsyncUtils {
 	 * @param response the current response
 	 * @return an AsyncWebRequest instance (never {@code null})
 	 */
+	// 20201223 创建一个AsyncWebRequest实例。 默认情况下，将创建{@link StandardServletAsyncWebRequest}的实例。
 	public static AsyncWebRequest createAsyncWebRequest(HttpServletRequest request, HttpServletResponse response) {
+		// 202012223 为给定的请求/响应对创建一个{@link AsyncWebRequest}的Servlet 3.0实现新实例。
 		return new StandardServletAsyncWebRequest(request, response);
 	}
 

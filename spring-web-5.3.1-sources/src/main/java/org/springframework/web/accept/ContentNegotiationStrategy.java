@@ -24,11 +24,16 @@ import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 20201223
+ * 解决请求的请求媒体类型的策略。
+ */
+/**
  * A strategy for resolving the requested media types for a request.
  *
  * @author Rossen Stoyanchev
  * @since 3.2
  */
+// 20201223 解决请求的请求媒体类型的策略。
 @FunctionalInterface
 public interface ContentNegotiationStrategy {
 
@@ -37,19 +42,21 @@ public interface ContentNegotiationStrategy {
 	 * {@link #resolveMediaTypes} when no specific media types are requested.
 	 * @since 5.0.5
 	 */
+	// 20201223 当不要求特定媒体类型时，从{@link #resolveMediaTypes}返回的带有{@link MediaType＃ALL}的单例列表。
 	List<MediaType> MEDIA_TYPE_ALL_LIST = Collections.singletonList(MediaType.ALL);
-
 
 	/**
 	 * Resolve the given request to a list of media types. The returned list is
 	 * ordered by specificity first and by quality parameter second.
 	 * @param webRequest the current request
+	 *
+	 * // 20201223 所请求的媒体类型；如果未请求，则为{@link #MEDIA_TYPE_ALL_LIST}。
 	 * @return the requested media types, or {@link #MEDIA_TYPE_ALL_LIST} if none
 	 * were requested.
 	 * @throws HttpMediaTypeNotAcceptableException if the requested media
 	 * types cannot be parsed
 	 */
-	List<MediaType> resolveMediaTypes(NativeWebRequest webRequest)
-			throws HttpMediaTypeNotAcceptableException;
+	// 20201223 将给定的请求解析为媒体类型列表。 返回的列表首先按特异性排序，然后按质量参数排序。
+	List<MediaType> resolveMediaTypes(NativeWebRequest webRequest) throws HttpMediaTypeNotAcceptableException;
 
 }

@@ -19,20 +19,32 @@ package org.springframework.web.context.request.async;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 20201223
+ * A. 拦截并发请求处理，其中并发结果是通过等待从应用程序选择的线程中设置{@link DeferredResult}来获得的（例如，响应某些外部事件）。
+ * B. {@code DeferredResultProcessingInterceptor}在异步处理开始之前，设置{@code DeferredResult}之后以及在超时/错误时，或者在由于某种原因（包括超时或网络错误）
+ *    而完成之后都被调用。
+ * C. 通常，拦截器方法引发的异常将通过分派回容器并将Exception实例用作并发结果来恢复异步处理。 然后，将通过{@code HandlerExceptionResolver}机制处理此类异常。
+ * D. {@link #handleTimeout（NativeWebRequest，DeferredResult）handleTimeout}方法可以设置{@code DeferredResult}以便继续处理。
+ */
+/**
+ * A.
  * Intercepts concurrent request handling, where the concurrent result is
  * obtained by waiting for a {@link DeferredResult} to be set from a thread
  * chosen by the application (e.g. in response to some external event).
  *
+ * B.
  * <p>A {@code DeferredResultProcessingInterceptor} is invoked before the start
  * of async processing, after the {@code DeferredResult} is set as well as on
  * timeout/error, or after completing for any reason including a timeout or network
  * error.
  *
+ * C.
  * <p>As a general rule exceptions raised by interceptor methods will cause
  * async processing to resume by dispatching back to the container and using
  * the Exception instance as the concurrent result. Such exceptions will then
  * be processed through the {@code HandlerExceptionResolver} mechanism.
  *
+ * D.
  * <p>The {@link #handleTimeout(NativeWebRequest, DeferredResult) handleTimeout}
  * method can set the {@code DeferredResult} in order to resume processing.
  *
@@ -40,6 +52,7 @@ import org.springframework.web.context.request.NativeWebRequest;
  * @author Rob Winch
  * @since 3.2
  */
+// 20201223 拦截并发请求处理: 在异步处理开始之前，设置{@code DeferredResult}之后以及在超时/错误时，或者在由于某种原因（包括超时或网络错误）而完成之后都被调用
 public interface DeferredResultProcessingInterceptor {
 
 	/**

@@ -79,6 +79,7 @@ public class UrlPathHelper {
 	 * Preferable over the standard Servlet 2.4 forward attribute on WebSphere,
 	 * simply because we need the very first URI in the request forwarding chain.
 	 */
+	// 20201223 特殊的WebSphere请求属性，指示原始请求URI。 比起WebSphere上的标准Servlet 2.4转发属性，它更可取，因为我们需要请求转发链中的第一个URI。
 	private static final String WEBSPHERE_URI_ATTRIBUTE = "com.ibm.websphere.servlet.uri_non_decoded";
 
 	private static final Log logger = LogFactory.getLog(UrlPathHelper.class);
@@ -572,6 +573,7 @@ public class UrlPathHelper {
 	 * Return the request URI for the given request. If this is a forwarded request,
 	 * correctly resolves to the request URI of the original request.
 	 */
+	// 20201223 返回给定请求的请求URI。 如果这是转发的请求，则正确解析为原始请求的请求URI。
 	public String getOriginatingRequestUri(HttpServletRequest request) {
 		String uri = (String) request.getAttribute(WEBSPHERE_URI_ATTRIBUTE);
 		if (uri == null) {
@@ -894,14 +896,31 @@ public class UrlPathHelper {
 	}
 
 	/**
+	 * 20201223
+	 * A. 完整的编码路径的共享只读实例。 以下内容适用：
+	 * 		a. {@code alwaysUseFullPath=true}
+	 * 		b. {@code urlDecode=false}
+	 * 		c. {@code removeSemicolon=false}
+	 * 		d. {@code defaultEncoding=}{@link WebUtils#DEFAULT_CHARACTER_ENCODING}
+	 */
+	/**
+	 * A.
 	 * Shared, read-only instance for the full, encoded path. The following apply:
 	 * <ul>
+	 * a.
 	 * <li>{@code alwaysUseFullPath=true}
+	 *
+	 * b.
 	 * <li>{@code urlDecode=false}
+	 *
+	 * c.
 	 * <li>{@code removeSemicolon=false}
+	 *
+	 * d.
 	 * <li>{@code defaultEncoding=}{@link WebUtils#DEFAULT_CHARACTER_ENCODING}
 	 * </ul>
 	 */
+	// 20201223 完整的编码路径的共享只读实例
 	public static final UrlPathHelper rawPathInstance = new UrlPathHelper() {
 
 		@Override

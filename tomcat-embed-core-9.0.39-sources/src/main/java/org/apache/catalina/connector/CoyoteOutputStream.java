@@ -25,11 +25,16 @@ import javax.servlet.WriteListener;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
+ * 20201223
+ * 土狼实现servlet输出流。
+ */
+/**
  * Coyote implementation of the servlet output stream.
  *
  * @author Costin Manolache
  * @author Remy Maucherat
  */
+// 20201223 土狼实现servlet输出流。
 public class CoyoteOutputStream extends ServletOutputStream {
 
     protected static final StringManager sm = StringManager.getManager(CoyoteOutputStream.class);
@@ -108,10 +113,10 @@ public class CoyoteOutputStream extends ServletOutputStream {
         }
     }
 
-
     /**
      * Will send the buffer to the client.
      */
+    // 20201223 将缓冲区发送给客户端。
     @Override
     public void flush() throws IOException {
         boolean nonBlocking = checkNonBlockingWrite();

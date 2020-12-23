@@ -73,7 +73,7 @@ public final class ModelFactory {
 
 	private static final Log logger = LogFactory.getLog(ModelFactory.class);
 
-
+	// 20201222 模型方法列表
 	private final List<ModelMethod> modelMethods = new ArrayList<>();
 
 	private final WebDataBinderFactory dataBinderFactory;
@@ -143,9 +143,11 @@ public final class ModelFactory {
 		// 20201222 eg: do nothing
 		container.mergeAttributes(sessionAttributes);
 
-
+		// 20201223 eg: ServletWebRequest@xxxx: "ServletWebRequest: uri=/testController/testRestController;client=0:0:0:0:0:0:0:1", ModelAndViewContainer@xxxx: ModelAndViewContainer: View is [null]; default model {}
+		// 20201223 eg: do nothing
 		invokeModelAttributeMethods(request, container);
 
+		// 20201223 eg: do nothing
 		for (String name : findSessionAttributeArguments(handlerMethod)) {
 			if (!container.containsAttribute(name)) {
 				Object value = this.sessionAttributesHandler.retrieveAttribute(request, name);
@@ -161,9 +163,10 @@ public final class ModelFactory {
 	 * Invoke model attribute methods to populate the model.
 	 * Attributes are added only if not already present in the model.
 	 */
+	// 20201223 调用模型属性方法以填充模型。 仅当模型中不存在属性时，才添加属性。
 	private void invokeModelAttributeMethods(NativeWebRequest request, ModelAndViewContainer container)
 			throws Exception {
-
+		// 20201222 eg: []
 		while (!this.modelMethods.isEmpty()) {
 			InvocableHandlerMethod modelMethod = getNextModelMethod(container).getHandlerMethod();
 			ModelAttribute ann = modelMethod.getMethodAnnotation(ModelAttribute.class);
@@ -211,8 +214,11 @@ public final class ModelFactory {
 	/**
 	 * Find {@code @ModelAttribute} arguments also listed as {@code @SessionAttributes}.
 	 */
+	// 20201223 查找也列为{@code @SessionAttributes}的{@code @ModelAttribute}参数。
 	private List<String> findSessionAttributeArguments(HandlerMethod handlerMethod) {
 		List<String> result = new ArrayList<>();
+
+		// 20201223 eg: []
 		for (MethodParameter parameter : handlerMethod.getMethodParameters()) {
 			if (parameter.hasParameterAnnotation(ModelAttribute.class)) {
 				String name = getNameForParameter(parameter);
@@ -319,7 +325,7 @@ public final class ModelFactory {
 		}
 	}
 
-
+	// 20201222 模型方法
 	private static class ModelMethod {
 
 		private final InvocableHandlerMethod handlerMethod;

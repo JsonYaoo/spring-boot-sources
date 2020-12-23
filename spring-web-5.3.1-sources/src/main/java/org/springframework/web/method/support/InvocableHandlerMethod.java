@@ -52,8 +52,8 @@ import org.springframework.web.method.HandlerMethod;
 // 20201222 {@link HandlerMethod}的扩展，它通过通过{@link HandlerMethodArgumentResolver}列表从当前HTTP请求中解析的参数值调用基础方法。
 public class InvocableHandlerMethod extends HandlerMethod {
 
+	// 20201223 空参数
 	private static final Object[] EMPTY_ARGS = new Object[0];
-
 
 	private HandlerMethodArgumentResolverComposite resolvers = new HandlerMethodArgumentResolverComposite();
 
@@ -134,15 +134,28 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	}
 
 	/**
+	 * 20201223
+	 * A. 在给定请求的上下文中解析其参数值后，调用该方法。
+	 * B. 参数值通常是通过{@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}解析的。{@code includedArgs}参数可以提供直接使用的参数值，
+	 *    即无需参数解析。 提供的参数值的示例包括{@link WebDataBinder}，{@link SessionStatus}或引发的异常实例。 在参数解析器之前检查提供的参数值。
+	 * C. 委托给{@link #getMethodArgumentValues}并使用已解析的参数调用{@link #doInvoke}。
+	 */
+	/**
+	 * A.
 	 * Invoke the method after resolving its argument values in the context of the given request.
+	 *
+	 * B.
 	 * <p>Argument values are commonly resolved through
 	 * {@link HandlerMethodArgumentResolver HandlerMethodArgumentResolvers}.
 	 * The {@code providedArgs} parameter however may supply argument values to be used directly,
 	 * i.e. without argument resolution. Examples of provided argument values include a
 	 * {@link WebDataBinder}, a {@link SessionStatus}, or a thrown exception instance.
 	 * Provided argument values are checked before argument resolvers.
+	 *
+	 * C.
 	 * <p>Delegates to {@link #getMethodArgumentValues} and calls {@link #doInvoke} with the
 	 * resolved arguments.
+	 *
 	 * @param request the current request
 	 * @param mavContainer the ModelAndViewContainer for this request
 	 * @param providedArgs "given" arguments matched by type, not resolved
@@ -152,10 +165,12 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	 * @see #getMethodArgumentValues
 	 * @see #doInvoke
 	 */
+	// 20201223 在给定请求的上下文中解析其参数值后，调用该方法
 	@Nullable
 	public Object invokeForRequest(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
+		// 20201223 eg: 空参数 Object[0]xxxx
 		Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Arguments: " + Arrays.toString(args));
@@ -164,16 +179,27 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	}
 
 	/**
+	 * 20201223
+	 * A. 获取当前请求的方法参数值，检查提供的参数值并返回配置的参数解析器。
+	 * B. 结果数组将传递到{@link #doInvoke}中。
+	 */
+	/**
+	 * A.
 	 * Get the method argument values for the current request, checking the provided
 	 * argument values and falling back to the configured argument resolvers.
+	 *
+	 * B.
 	 * <p>The resulting array will be passed into {@link #doInvoke}.
 	 * @since 5.1.2
 	 */
+	// 20201223 获取当前请求的方法参数值，检查提供的参数值并返回配置的参数解析器
 	protected Object[] getMethodArgumentValues(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
+		// 20201223 eg: MethodParameter[0]@xxxx
 		MethodParameter[] parameters = getMethodParameters();
 		if (ObjectUtils.isEmpty(parameters)) {
+			// 20201223 返回空参数
 			return EMPTY_ARGS;
 		}
 
@@ -208,14 +234,21 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	/**
 	 * Invoke the handler method with the given argument values.
 	 */
+	// 20201223 使用给定的参数值调用处理程序方法。
 	@Nullable
 	protected Object doInvoke(Object... args) throws Exception {
+		// 20201223 eg: Method@xxxx: "public java.lang.String com.jsonyao.cs.Controller.TestController.testRestController()"
 		Method method = getBridgedMethod();
+
+		// 20201223 使给定的方法可访问，并在必要时显式设置它的可访问性: 不是public 或者不是public也不可访问的情况下
 		ReflectionUtils.makeAccessible(method);
 		try {
+			// 20201223 eg: false
 			if (KotlinDetector.isSuspendingFunction(method)) {
 				return CoroutinesUtils.invokeSuspendingFunction(method, getBean(), args);
 			}
+
+			// 20201223 执行Method方法 => eg: TestController@xxxx, Object[0]xxxx
 			return method.invoke(getBean(), args);
 		}
 		catch (IllegalArgumentException ex) {

@@ -36,6 +36,10 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201223
+ * {@link MimeType}的子类，它增加了对HTTP规范中定义的质量参数的支持。
+ */
+/**
  * A subclass of {@link MimeType} that adds support for quality parameters
  * as defined in the HTTP specification.
  *
@@ -49,6 +53,7 @@ import org.springframework.util.StringUtils;
  * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.1.1">
  *     HTTP 1.1: Semantics and Content, section 3.1.1.1</a>
  */
+// 20201223 {@link MimeType}的子类，它增加了对HTTP规范中定义的质量参数的支持。
 public class MediaType extends MimeType implements Serializable {
 
 	private static final long serialVersionUID = 2069937152339670231L;
@@ -56,6 +61,7 @@ public class MediaType extends MimeType implements Serializable {
 	/**
 	 * Public constant media type that includes all media ranges (i.e. "&#42;/&#42;").
 	 */
+	// 20201223 包含所有媒体范围的公共常量媒体类型（即“＆＃42; /＆＃42;”）。
 	public static final MediaType ALL;
 
 	/**
@@ -550,16 +556,29 @@ public class MediaType extends MimeType implements Serializable {
 	}
 
 	/**
+	 * 20201223
+	 * A. 指示此{@code MediaType}是否与给定的媒体类型兼容。
+	 * B. 例如，{@code text / *}与{@code text / plain}，{@code text / html}兼容，反之亦然。 实际上，此方法类似于{@link #includes}，但它的是对称的。
+	 * C. 只需调用{@link MimeType＃isCompatibleWith（MimeType）}，但使用{@code MediaType}参数进行声明即可实现二进制向后兼容性。
+	 */
+	/**
+	 * A.
 	 * Indicate whether this {@code MediaType} is compatible with the given media type.
+	 *
+	 * B.
 	 * <p>For instance, {@code text/*} is compatible with {@code text/plain},
 	 * {@code text/html}, and vice versa. In effect, this method is similar to
 	 * {@link #includes}, except that it <b>is</b> symmetric.
+	 *
+	 * C.
 	 * <p>Simply calls {@link MimeType#isCompatibleWith(MimeType)} but declared with a
 	 * {@code MediaType} parameter for binary backwards compatibility.
+	 *
 	 * @param other the reference media type with which to compare
 	 * @return {@code true} if this media type is compatible with the given media type;
 	 * {@code false} otherwise
 	 */
+	// 20201223 指示此{@code MediaType}是否与给定的媒体类型兼容。
 	public boolean isCompatibleWith(@Nullable MediaType other) {
 		return super.isCompatibleWith(other);
 	}
@@ -580,9 +599,12 @@ public class MediaType extends MimeType implements Serializable {
 
 	/**
 	 * Return a replica of this instance with its quality value removed.
+	 *
+	 * // 20201223 如果媒体类型不包含质量值，则为同一实例，否则为新实例
 	 * @return the same instance if the media type doesn't contain a quality value,
 	 * or a new one otherwise
 	 */
+	// 20201223 返回此实例的副本，该副本的质量值已删除。
 	public MediaType removeQualityValue() {
 		if (!getParameters().containsKey(PARAM_QUALITY_FACTOR)) {
 			return this;
@@ -650,14 +672,23 @@ public class MediaType extends MimeType implements Serializable {
 	}
 
 	/**
+	 * 20201223
+	 * A. 将给定的（可能）逗号分隔的字符串列表解析为{@code MediaType}对象的列表。
+	 * B. 此方法可用于解析Accept或Content-Type标头。
+	 */
+	/**
+	 * A.
 	 * Parse the given list of (potentially) comma-separated strings into a
 	 * list of {@code MediaType} objects.
+	 *
+	 * B.
 	 * <p>This method can be used to parse an Accept or Content-Type header.
 	 * @param mediaTypes the string to parse
 	 * @return the list of media types
 	 * @throws InvalidMediaTypeException if the media type value cannot be parsed
 	 * @since 4.3.2
 	 */
+	// 20201223 将给定的（可能）逗号分隔的字符串列表解析为{@code MediaType}对象的列表: 可用于解析Accept或Content-Type标头
 	public static List<MediaType> parseMediaTypes(@Nullable List<String> mediaTypes) {
 		if (CollectionUtils.isEmpty(mediaTypes)) {
 			return Collections.emptyList();
@@ -774,6 +805,7 @@ public class MediaType extends MimeType implements Serializable {
 	 * @see MediaType#sortBySpecificity(List)
 	 * @see MediaType#sortByQualityValue(List)
 	 */
+	// 20201223 按特定性将给定的{@code MediaType}对象列表分类为主要标准，次要质量为值。
 	public static void sortBySpecificityAndQuality(List<MediaType> mediaTypes) {
 		Assert.notNull(mediaTypes, "'mediaTypes' must not be null");
 		if (mediaTypes.size() > 1) {
@@ -823,6 +855,7 @@ public class MediaType extends MimeType implements Serializable {
 	/**
 	 * Comparator used by {@link #sortBySpecificity(List)}.
 	 */
+	// 20201223 {@link #sortBySpecificity（List）}使用的比较器
 	public static final Comparator<MediaType> SPECIFICITY_COMPARATOR = new SpecificityComparator<MediaType>() {
 
 		@Override

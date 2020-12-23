@@ -32,13 +32,23 @@ import java.util.TreeSet;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201223
+ * A. 表示MIME类型，该类型最初在RFC 2046中定义，随后在包括HTTP在内的其他Internet协议中使用。
+ * B. 但是，此类不包含对HTTP内容协商中使用的q参数的支持。 这些可以在{@code spring-web}模块中的子类{@code org.springframework.http.MediaType}中找到。
+ * C. 由{@linkplain #getType（）type}和{@linkplain #getSubtype（）子类型}组成。 还具有使用{@link #valueOf（String）}从{@code String}解析MIME类型值的功能。
+ *    有关更多解析选项，请参见{@link MimeTypeUtils}。
+ */
+/**
+ * A.
  * Represents a MIME Type, as originally defined in RFC 2046 and subsequently
  * used in other Internet protocols including HTTP.
  *
+ * B.
  * <p>This class, however, does not contain support for the q-parameters used
  * in HTTP content negotiation. Those can be found in the subclass
  * {@code org.springframework.http.MediaType} in the {@code spring-web} module.
  *
+ * C.
  * <p>Consists of a {@linkplain #getType() type} and a {@linkplain #getSubtype() subtype}.
  * Also has functionality to parse MIME Type values from a {@code String} using
  * {@link #valueOf(String)}. For more parsing options see {@link MimeTypeUtils}.
@@ -50,6 +60,7 @@ import org.springframework.lang.Nullable;
  * @since 4.0
  * @see MimeTypeUtils
  */
+// 20201223 表示MIME类型，该类型最初在RFC 2046中定义，随后在包括HTTP在内的其他Internet协议中使用。
 public class MimeType implements Comparable<MimeType>, Serializable {
 
 	private static final long serialVersionUID = 4085923477777865903L;
@@ -255,6 +266,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 	 * Indicates whether the {@linkplain #getType() type} is the wildcard character
 	 * <code>&#42;</code> or not.
 	 */
+	// 20201223 指示{@linkplain #getType（）type}是否为通配符*。
 	public boolean isWildcardType() {
 		return WILDCARD_TYPE.equals(getType());
 	}
@@ -263,8 +275,10 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 	 * Indicates whether the {@linkplain #getSubtype() subtype} is the wildcard
 	 * character <code>&#42;</code> or the wildcard character followed by a suffix
 	 * (e.g. <code>&#42;+xml</code>).
+	 *
 	 * @return whether the subtype is a wildcard
 	 */
+	// 20201223 指示{@linkplain #getSubtype（）子类型}是通配符*还是通配符后跟后缀（例如> * xml）。
 	public boolean isWildcardSubtype() {
 		return WILDCARD_TYPE.equals(getSubtype()) || getSubtype().startsWith("*+");
 	}
@@ -274,6 +288,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 	 * nor the subtype is a wildcard character <code>&#42;</code>.
 	 * @return whether this MIME Type is concrete
 	 */
+	// 20201223 指示此MIME类型是否具体，即该类型或子类型是否都不是通配符*。
 	public boolean isConcrete() {
 		return !isWildcardType() && !isWildcardSubtype();
 	}
@@ -378,14 +393,24 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 	}
 
 	/**
+	 * 20201223
+	 * A. 指示此MIME类型是否与给定的MIME类型兼容。
+	 * B. 例如，{@code text / *}与{@code text / plain}，{@code text / html}兼容，反之亦然。 实际上，此方法类似于{@link #includes}，但它是对称的。
+	 */
+	/**
+	 * A.
 	 * Indicate whether this MIME Type is compatible with the given MIME Type.
+	 *
+	 * B.
 	 * <p>For instance, {@code text/*} is compatible with {@code text/plain},
 	 * {@code text/html}, and vice versa. In effect, this method is similar to
 	 * {@link #includes}, except that it <b>is</b> symmetric.
+	 *
 	 * @param other the reference MIME Type with which to compare
 	 * @return {@code true} if this MIME Type is compatible with the given MIME Type;
 	 * {@code false} otherwise
 	 */
+	// 20201223 指示此MIME类型是否与给定的MIME类型兼容。
 	public boolean isCompatibleWith(@Nullable MimeType other) {
 		if (other == null) {
 			return false;
@@ -421,6 +446,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 	 * @return whether the two mime types have the same type and subtype
 	 * @since 5.1.4
 	 */
+	// 20201223 与{@link #equals（Object）}类似，但仅基于类型和子类型，即忽略参数。
 	public boolean equalsTypeAndSubtype(@Nullable MimeType other) {
 		if (other == null) {
 			return false;
@@ -436,6 +462,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 	 * @return whether the list contains the given mime type
 	 * @since 5.1.4
 	 */
+	// 20201223 与依赖于{@link MimeType＃equals（Object）}的{@link Collection＃contains（Object）}不同，此方法仅检查类型和子类型，而忽略参数。
 	public boolean isPresentIn(Collection<? extends MimeType> mimeTypes) {
 		for (MimeType mimeType : mimeTypes) {
 			if (mimeType.equalsTypeAndSubtype(this)) {
@@ -614,6 +641,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 	 *
 	 * @param <T> the type of mime types that may be compared by this comparator
 	 */
+	// 20201223 比较器按特定性对{@link MimeType MimeTypes}进行排序。
 	public static class SpecificityComparator<T extends MimeType> implements Comparator<T> {
 
 		@Override

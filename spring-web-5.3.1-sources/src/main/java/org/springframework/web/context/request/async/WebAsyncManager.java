@@ -72,6 +72,7 @@ import org.springframework.web.context.request.async.DeferredResult.DeferredResu
 // 20201221 用于管理异步请求处理的中央类
 public final class WebAsyncManager {
 
+	// 20201223 结果不存在
 	private static final Object RESULT_NONE = new Object();
 
 	private static final AsyncTaskExecutor DEFAULT_TASK_EXECUTOR =
@@ -87,11 +88,12 @@ public final class WebAsyncManager {
 
 	private static Boolean taskExecutorWarning = true;
 
-
+	// 20201223 用异步请求处理方法扩展{@link NativeWebRequest}。
 	private AsyncWebRequest asyncWebRequest;
 
 	private AsyncTaskExecutor taskExecutor = DEFAULT_TASK_EXECUTOR;
 
+	// 20201223 并发结果, 默认为不存在
 	private volatile Object concurrentResult = RESULT_NONE;
 
 	private volatile Object[] concurrentResultContext;
@@ -117,7 +119,11 @@ public final class WebAsyncManager {
 	WebAsyncManager() {
 	}
 
-
+	/**
+	 * 20201223
+	 * 配置{@link AsyncWebRequest}以使用。 在单个请求期间可以多次设置此属性，以准确反映请求的当前状态（例如，在转发，请求/响应包装等之后）。
+	 * 但是，不应在进行并发处理时（即{@link #isConcurrentHandlingStarted（）}为{@code true}时设置）。
+	 */
 	/**
 	 * Configure the {@link AsyncWebRequest} to use. This property may be set
 	 * more than once during a single request to accurately reflect the current
@@ -127,16 +133,27 @@ public final class WebAsyncManager {
 	 * {@code true}.
 	 * @param asyncWebRequest the web request to use
 	 */
+	// 20201223 配置{@link AsyncWebRequest}以使用。 在单个请求期间可以多次设置此属性，以准确反映请求的当前状态（例如，在转发，请求/响应包装等之后）
 	public void setAsyncWebRequest(AsyncWebRequest asyncWebRequest) {
 		Assert.notNull(asyncWebRequest, "AsyncWebRequest must not be null");
 		this.asyncWebRequest = asyncWebRequest;
+
+		// 20201223 添加lambda表达式: 在转发，请求/响应包装等之后调用
 		this.asyncWebRequest.addCompletionHandler(() -> asyncWebRequest.removeAttribute(
 				WebAsyncUtils.WEB_ASYNC_MANAGER_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST));
 	}
 
 	/**
+	 * 20201223
+	 * A. 配置一个AsyncTaskExecutor通过{@link #startCallableProcessing（Callable，Object ...）}与并发处理一起使用。
+	 * B. 默认情况下，使用{@link SimpleAsyncTaskExecutor}实例。
+	 */
+	/**
+	 * A.
 	 * Configure an AsyncTaskExecutor for use with concurrent processing via
 	 * {@link #startCallableProcessing(Callable, Object...)}.
+	 *
+	 * B.
 	 * <p>By default a {@link SimpleAsyncTaskExecutor} instance is used.
 	 */
 	public void setTaskExecutor(AsyncTaskExecutor taskExecutor) {
@@ -164,7 +181,9 @@ public final class WebAsyncManager {
 	/**
 	 * Whether a result value exists as a result of concurrent handling.
 	 */
+	// 20201223 结果值是否由于并发处理而存在。
 	public boolean hasConcurrentResult() {
+		// 20201223 eg: false
 		return (this.concurrentResult != RESULT_NONE);
 	}
 
@@ -226,6 +245,7 @@ public final class WebAsyncManager {
 	 * The key is derived from the class name and hashcode.
 	 * @param interceptors one or more interceptors to register
 	 */
+	// 20201223 注册没有密钥的{@link CallableProcessingInterceptor}。 密钥是从类名称和哈希码派生的。
 	public void registerCallableInterceptors(CallableProcessingInterceptor... interceptors) {
 		Assert.notNull(interceptors, "A CallableProcessingInterceptor is required");
 		for (CallableProcessingInterceptor interceptor : interceptors) {
@@ -246,10 +266,16 @@ public final class WebAsyncManager {
 	}
 
 	/**
+	 * 20201223
+	 * 在没有指定密钥的情况下注册一个或多个{@link DeferredResultProcessingInterceptor DeferredResultProcessingInterceptors}。
+	 * 默认密钥是从拦截器类名称和哈希码派生的。
+	 */
+	/**
 	 * Register one or more {@link DeferredResultProcessingInterceptor DeferredResultProcessingInterceptors} without a specified key.
 	 * The default key is derived from the interceptor class name and hash code.
 	 * @param interceptors one or more interceptors to register
 	 */
+	// 20201223 在没有指定密钥的情况下注册一个或多个{@link DeferredResultProcessingInterceptor DeferredResultProcessingInterceptors}
 	public void registerDeferredResultInterceptors(DeferredResultProcessingInterceptor... interceptors) {
 		Assert.notNull(interceptors, "A DeferredResultProcessingInterceptor is required");
 		for (DeferredResultProcessingInterceptor interceptor : interceptors) {

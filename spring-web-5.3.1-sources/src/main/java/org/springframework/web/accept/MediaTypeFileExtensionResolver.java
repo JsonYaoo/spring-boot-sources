@@ -21,12 +21,17 @@ import java.util.List;
 import org.springframework.http.MediaType;
 
 /**
+ * 20201223
+ * 将{@link MediaType}解析为文件扩展名列表的策略＆mdash; 例如，将“ application / json”解析为“ json”。
+ */
+/**
  * Strategy to resolve a {@link MediaType} to a list of file extensions &mdash;
  * for example, to resolve "application/json" to "json".
  *
  * @author Rossen Stoyanchev
  * @since 3.2
  */
+// 20201223 将{@link MediaType}解析为文件扩展名列表的策略＆mdash; 例如，将“ application / json”解析为“ json”。
 public interface MediaTypeFileExtensionResolver {
 
 	/**

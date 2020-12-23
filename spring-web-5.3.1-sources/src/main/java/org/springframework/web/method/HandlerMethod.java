@@ -301,6 +301,7 @@ public class HandlerMethod {
 	 * If the bean method is a bridge method, this method returns the bridged
 	 * (user-defined) method. Otherwise it returns the same method as {@link #getMethod()}.
 	 */
+	// 20201223 如果bean方法是桥接方法，则此方法返回桥接（用户定义）方法。 否则，它将返回与{@link #getMethod（）}相同的方法。
 	protected Method getBridgedMethod() {
 		return this.bridgedMethod;
 	}
@@ -308,6 +309,7 @@ public class HandlerMethod {
 	/**
 	 * Return the method parameters for this handler method.
 	 */
+	// 20201223 返回此处理程序方法的方法参数。
 	public MethodParameter[] getMethodParameters() {
 		return this.parameters;
 	}
@@ -317,6 +319,7 @@ public class HandlerMethod {
 	 * @since 4.3.8
 	 * @see ResponseStatus#code()
 	 */
+	// 20201223 返回指定的响应状态（如果有）。
 	@Nullable
 	protected HttpStatus getResponseStatus() {
 		return this.responseStatus;
@@ -342,6 +345,7 @@ public class HandlerMethod {
 	/**
 	 * Return the actual return value type.
 	 */
+	// 20201223 返回实际的返回值类型。
 	public MethodParameter getReturnValueType(@Nullable Object returnValue) {
 		return new ReturnValueMethodParameter(returnValue);
 	}
@@ -530,10 +534,10 @@ public class HandlerMethod {
 				"with argument values:\n" + formattedArgs;
 	}
 
-
 	/**
 	 * A MethodParameter with HandlerMethod-specific behavior.
 	 */
+	// 20201223 具有HandlerMethod特定行为的MethodParameter。
 	protected class HandlerMethodParameter extends SynthesizingMethodParameter {
 
 		@Nullable
@@ -620,6 +624,8 @@ public class HandlerMethod {
 
 		public ReturnValueMethodParameter(@Nullable Object returnValue) {
 			super(-1);
+
+			// 2021223 eg: "Test RestController~~~"
 			this.returnValue = returnValue;
 		}
 

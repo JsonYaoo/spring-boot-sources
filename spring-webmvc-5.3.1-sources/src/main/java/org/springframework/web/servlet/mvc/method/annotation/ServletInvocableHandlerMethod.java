@@ -74,9 +74,9 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 
 	private static final Method CALLABLE_METHOD = ClassUtils.getMethod(Callable.class, "call");
 
+	// 20201222 通过委派给已注册的{@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers}列表来处理方法返回值。 先前解析的返回类型将被缓存，以加快查找速度。
 	@Nullable
 	private HandlerMethodReturnValueHandlerComposite returnValueHandlers;
-
 
 	/**
 	 * Creates an instance from the given handler and method.
@@ -106,7 +106,10 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 		this.returnValueHandlers = returnValueHandlers;
 	}
 
-
+	/**
+	 * 20201223
+	 * 调用该方法并通过已配置的{@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers}中的一个来处理返回值。
+	 */
 	/**
 	 * Invoke the method and handle the return value through one of the
 	 * configured {@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers}.
@@ -114,12 +117,17 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	 * @param mavContainer the ModelAndViewContainer for this request
 	 * @param providedArgs "given" arguments matched by type (not resolved)
 	 */
+	// 20201223 调用该方法并通过已配置的{@link HandlerMethodReturnValueHandler HandlerMethodReturnValueHandlers}中的一个来处理返回值 => eg: 页面输出"Test RestController~~~"
 	public void invokeAndHandle(ServletWebRequest webRequest, ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
+		// 20201223 method.invoke(getBean(), args); 执行Method方法 => eg: TestController@xxxx, Object[0]xxxx
 		Object returnValue = invokeForRequest(webRequest, mavContainer, providedArgs);
+
+		// 20201223 eg: do nothing
 		setResponseStatus(webRequest);
 
+		// 20201223 Method执行结果 => eg: "Test RestController~~~"
 		if (returnValue == null) {
 			if (isRequestNotModified(webRequest) || getResponseStatus() != null || mavContainer.isRequestHandled()) {
 				disableContentCachingIfNecessary(webRequest);
@@ -132,11 +140,24 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 			return;
 		}
 
+		// 20201223 该请求是否已在处理程序中完全处理 => eg: false
 		mavContainer.setRequestHandled(false);
 		Assert.state(this.returnValueHandlers != null, "No return value handlers");
 		try {
+			// 20201223 eg: HandlerMethodReturnValueHandlerComposite@xxxx: [xxx]size=15
+			// 20201223 通过向模型添加属性并设置视图或将{@link ModelAndViewContainer＃setRequestHandled}标志设置为{@code true}来处理给定的返回值，以指示已直接处理响应  => eg: 页面输出"Test RestController~~~"
 			this.returnValueHandlers.handleReturnValue(
-					returnValue, getReturnValueType(returnValue), mavContainer, webRequest);
+					// 20201223 eg: "Test RestController~~~"
+					returnValue,
+
+					// 20201223 eg: HandlerMethod$ReturnValueMethodParameter@xxxx: method 'testRestController' parameter -1
+					getReturnValueType(returnValue),
+
+					// 20201223 eg: ModelAndViewContainer@xxxx: "ModelAndViewContainer: View is [null]; default model {}"
+					mavContainer,
+
+					// 20201223 eg: ServletWebReqest@xxxx: "ServletWebRequest: uri=/testController/testRestController;client=0:0:0:0:0:0:0:1"
+					webRequest);
 		}
 		catch (Exception ex) {
 			if (logger.isTraceEnabled()) {
@@ -149,7 +170,9 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	/**
 	 * Set the response status according to the {@link ResponseStatus} annotation.
 	 */
+	// 20201223 根据{@link ResponseStatus}注释设置响应状态。
 	private void setResponseStatus(ServletWebRequest webRequest) throws IOException {
+		// 20201223 eg: null
 		HttpStatus status = getResponseStatus();
 		if (status == null) {
 			return;

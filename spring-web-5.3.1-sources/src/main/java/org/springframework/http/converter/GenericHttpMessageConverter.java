@@ -25,6 +25,10 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201223
+ * {@link HttpMessageConverter}的特殊化，可以将HTTP请求转换为指定的通用类型的目标对象，并将指定的通用类型的源对象转换为HTTP响应。
+ */
+/**
  * A specialization of {@link HttpMessageConverter} that can convert an HTTP request
  * into a target object of a specified generic type and a source object of a specified
  * generic type into an HTTP response.
@@ -36,6 +40,7 @@ import org.springframework.lang.Nullable;
  * @param <T> the converted object type
  * @see org.springframework.core.ParameterizedTypeReference
  */
+// 20201223 {@link HttpMessageConverter}的特殊化，可以将HTTP请求转换为指定的通用类型的目标对象，并将指定的通用类型的源对象转换为HTTP响应。
 public interface GenericHttpMessageConverter<T> extends HttpMessageConverter<T> {
 
 	/**

@@ -20,15 +20,23 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * 20201223
+ * A. 表示一个HTTP输入消息，由{@linkplain #getHeaders（）标头}和可读的{@linkplain #getBody（）主体}组成。
+ * B. 通常由服务器端的HTTP请求句柄或客户端的HTTP响应句柄实现。
+ */
+/**
+ * A.
  * Represents an HTTP input message, consisting of {@linkplain #getHeaders() headers}
  * and a readable {@linkplain #getBody() body}.
  *
+ * B.
  * <p>Typically implemented by an HTTP request handle on the server side,
  * or an HTTP response handle on the client side.
  *
  * @author Arjen Poutsma
  * @since 3.0
  */
+// 20201223 表示一个HTTP输入消息，由{@linkplain #getHeaders（）标头}和可读的{@linkplain #getBody（）主体}组成
 public interface HttpInputMessage extends HttpMessage {
 
 	/**

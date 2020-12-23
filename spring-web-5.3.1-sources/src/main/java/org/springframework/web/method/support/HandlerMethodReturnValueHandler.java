@@ -42,13 +42,20 @@ public interface HandlerMethodReturnValueHandler {
 	 * @return {@code true} if this handler supports the supplied return type;
 	 * {@code false} otherwise
 	 */
+	// 20201223 此处理程序是否支持给定的{@linkplain MethodParameter方法返回类型}。
 	boolean supportsReturnType(MethodParameter returnType);
 
 	/**
+	 * 20201223
+	 * A. 通过向模型添加属性并设置视图或将{@link ModelAndViewContainer＃setRequestHandled}标志设置为{@code true}来处理给定的返回值，以指示已直接处理响应。
+	 */
+	/**
+	 * A.
 	 * Handle the given return value by adding attributes to the model and
 	 * setting a view or setting the
 	 * {@link ModelAndViewContainer#setRequestHandled} flag to {@code true}
 	 * to indicate the response has been handled directly.
+	 *
 	 * @param returnValue the value returned from the handler method
 	 * @param returnType the type of the return value. This type must have
 	 * previously been passed to {@link #supportsReturnType} which must
@@ -57,6 +64,7 @@ public interface HandlerMethodReturnValueHandler {
 	 * @param webRequest the current request
 	 * @throws Exception if the return value handling results in an error
 	 */
+	// 20201223 通过向模型添加属性并设置视图或将{@link ModelAndViewContainer＃setRequestHandled}标志设置为{@code true}来处理给定的返回值，以指示已直接处理响应。
 	void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
                            ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception;
 

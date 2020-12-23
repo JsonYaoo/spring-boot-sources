@@ -472,10 +472,13 @@ public abstract class WebUtils {
 	 * @return the matching request object, or {@code null} if none
 	 * of that type is available
 	 */
+	// 20201223 返回指定类型的适当请求对象（如果有），并尽可能地展开给定请求。
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public static <T> T getNativeRequest(ServletRequest request, @Nullable Class<T> requiredType) {
+		// 20201223 eg: Class@xxxx: "interface javax.servlet.http.HttpServletRequest"
 		if (requiredType != null) {
+			// 20201223 eg: true
 			if (requiredType.isInstance(request)) {
 				return (T) request;
 			}
@@ -494,10 +497,13 @@ public abstract class WebUtils {
 	 * @return the matching response object, or {@code null} if none
 	 * of that type is available
 	 */
+	// 20201223 返回指定类型的适当响应对象（如果有），并在必要时展开给定响应。
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public static <T> T getNativeResponse(ServletResponse response, @Nullable Class<T> requiredType) {
+		// 20201223 eg: Class@xxxx: "interface javax.servlet.http.HttpServletRequest"
 		if (requiredType != null) {
+			// 20201223 eg: true
 			if (requiredType.isInstance(response)) {
 				return (T) response;
 			}

@@ -25,6 +25,10 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201223
+ * 用于在HTTP请求和响应之间进行转换的策略接口。
+ */
+/**
  * Strategy interface for converting from and to HTTP requests and responses.
  *
  * @author Arjen Poutsma
@@ -32,6 +36,7 @@ import org.springframework.lang.Nullable;
  * @since 3.0
  * @param <T> the converted object type
  */
+// 20201223 用于在HTTP请求和响应之间进行转换的策略接口。
 public interface HttpMessageConverter<T> {
 
 	/**
@@ -50,6 +55,7 @@ public interface HttpMessageConverter<T> {
 	 * typically the value of an {@code Accept} header.
 	 * @return {@code true} if writable; {@code false} otherwise
 	 */
+	// 20201223 指示给定的类是否可以由此转换器编写。
 	boolean canWrite(Class<?> clazz, @Nullable MediaType mediaType);
 
 	/**
@@ -82,6 +88,7 @@ public interface HttpMessageConverter<T> {
 	 * @throws IOException in case of I/O errors
 	 * @throws HttpMessageNotWritableException in case of conversion errors
 	 */
+	// 20201223 将给定对象写入给定输出消息
 	void write(T t, @Nullable MediaType contentType, HttpOutputMessage outputMessage)
 			throws IOException, HttpMessageNotWritableException;
 

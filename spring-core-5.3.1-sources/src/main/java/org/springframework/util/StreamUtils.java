@@ -32,10 +32,17 @@ import java.nio.charset.Charset;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201223
+ * A. 用于处理流的简单实用方法。 此类的复制方法与{@link FileCopyUtils}中定义的复制方法类似，只是在完成后所有受影响的流都保持打开状态。 所有复制方法都使用4096字节的块大小。
+ * B. 主要用于框架内，但对于应用程序代码也很有用
+ */
+/**
+ * A.
  * Simple utility methods for dealing with streams. The copy methods of this class are
  * similar to those defined in {@link FileCopyUtils} except that all affected streams are
  * left open when done. All copy methods use a block size of 4096 bytes.
  *
+ * B.
  * <p>Mainly for use within the framework, but also useful for application code.
  *
  * @author Juergen Hoeller
@@ -44,6 +51,7 @@ import org.springframework.lang.Nullable;
  * @since 3.2.2
  * @see FileCopyUtils
  */
+// 20201223 用于处理流的简单实用方法
 public abstract class StreamUtils {
 
 	/**
@@ -131,13 +139,22 @@ public abstract class StreamUtils {
 	}
 
 	/**
+	 * 20201223
+	 * A. 将给定String的内容复制到给定OutputStream。
+	 * B. 完成后，使流保持打开状态。
+	 */
+	/**
+	 * A.
 	 * Copy the contents of the given String to the given OutputStream.
+	 *
+	 * B.
 	 * <p>Leaves the stream open when done.
 	 * @param in the String to copy from
 	 * @param charset the Charset
 	 * @param out the OutputStream to copy to
 	 * @throws IOException in case of I/O errors
 	 */
+	// 20201223 将给定String的内容复制到给定OutputStream, 完成后，使流保持打开状态
 	public static void copy(String in, Charset charset, OutputStream out) throws IOException {
 		Assert.notNull(in, "No input String specified");
 		Assert.notNull(charset, "No Charset specified");

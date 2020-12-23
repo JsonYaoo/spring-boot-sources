@@ -23,9 +23,17 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 /**
+ * 20201223
+ * A. 提供用于将二进制数据发送到客户端的输出流。 通常，通过{@link ServletResponse＃getOutputStream}方法检索ServletOutputStream对象。
+ * B. 这是servlet容器实现的抽象类。 此类的子类必须实现java.io.OutputStream.write（int）方法。
+ */
+/**
+ * A.
  * Provides an output stream for sending binary data to the client. A
  * <code>ServletOutputStream</code> object is normally retrieved via the
  * {@link ServletResponse#getOutputStream} method.
+ *
+ * B.
  * <p>
  * This is an abstract class that the servlet container implements. Subclasses
  * of this class must implement the <code>java.io.OutputStream.write(int)</code>
@@ -33,6 +41,7 @@ import java.util.ResourceBundle;
  *
  * @see ServletResponse
  */
+// 20201223 提供用于将二进制数据发送到客户端的输出流。 通常，通过{@link ServletResponse＃getOutputStream}方法检索ServletOutputStream对象
 public abstract class ServletOutputStream extends OutputStream {
 
     private static final String LSTRING_FILE = "javax.servlet.LocalStrings";

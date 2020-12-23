@@ -24,11 +24,16 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpStatus;
 
 /**
+ * 20201222
+ * 表示服务器端HTTP响应。
+ */
+/**
  * Represents a server-side HTTP response.
  *
  * @author Arjen Poutsma
  * @since 3.0
  */
+// 20201222 表示服务器端HTTP响应: 由{@linkplain #getHeaders（）标头}和可写的{@linkplain #getBody（）主体}组成
 public interface ServerHttpResponse extends HttpOutputMessage, Flushable, Closeable {
 
 	/**

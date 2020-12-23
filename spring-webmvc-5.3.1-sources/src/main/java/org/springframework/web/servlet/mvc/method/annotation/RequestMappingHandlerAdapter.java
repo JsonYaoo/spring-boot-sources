@@ -180,12 +180,15 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 	@Nullable
 	private Long asyncRequestTimeout;
 
+	// 20201221 拦截并发请求处理: 通常，拦截器方法引发的异常将通过分派回容器并将Exception实例用作并发结果来恢复异步处理
 	private CallableProcessingInterceptor[] callableInterceptors = new CallableProcessingInterceptor[0];
 
+	// 20201223 拦截并发请求处理: 在异步处理开始之前，设置{@code DeferredResult}之后以及在超时/错误时，或者在由于某种原因（包括超时或网络错误）而完成之后都被调用
 	private DeferredResultProcessingInterceptor[] deferredResultInterceptors = new DeferredResultProcessingInterceptor[0];
 
 	private ReactiveAdapterRegistry reactiveAdapterRegistry = ReactiveAdapterRegistry.getSharedInstance();
 
+	// 20201223 是否忽略默认的模型重定向, 默认为false
 	private boolean ignoreDefaultModelOnRedirect = false;
 
 	private int cacheSecondsForSessionAttributeHandlers = 0;
@@ -916,18 +919,34 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 			mavContainer.addAllAttributes(RequestContextUtils.getInputFlashMap(request));
 
 			// 20201222 eg: ServletWebRequest@xxxx, ModelAndViewContainer@xxxx, ServletInvocableHandlerMethod@xxxx
+			// 20201223 eg: do nothing
 			modelFactory.initModel(webRequest, mavContainer, invocableMethod);
+
+			// 20201223 eg: true
 			mavContainer.setIgnoreDefaultModelOnRedirect(this.ignoreDefaultModelOnRedirect);
 
+			// 20201223 eg: StandardServletAsyncWebRequest: "ServletWebRequest: uri=/testController/testRestController;client=0:0:0:0:0:0:0:1"
 			AsyncWebRequest asyncWebRequest = WebAsyncUtils.createAsyncWebRequest(request, response);
+
+			// 20201223 eg: null
 			asyncWebRequest.setTimeout(this.asyncRequestTimeout);
 
+			// 20201223 eg: "org.springframework.web.context.request.async.WebAsyncManager.WEB_ASYNC_MANAGER"-WebAsyncManager@xxxx
 			WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+
+			// 20201223 eg: ThreadPoolTaskExecutor@xxxx
 			asyncManager.setTaskExecutor(this.taskExecutor);
+
+			// 20201223 添加lambda表达式: 在转发，请求/响应包装等之后调用
 			asyncManager.setAsyncWebRequest(asyncWebRequest);
+
+			// 20201223 eg: CallableProcessingInterceptor[0]@xxxx: {}
 			asyncManager.registerCallableInterceptors(this.callableInterceptors);
+
+			// 20201223 eg: DeferredResultProcessingInterceptor[0]@xxxx: {}
 			asyncManager.registerDeferredResultInterceptors(this.deferredResultInterceptors);
 
+			// 20201223 结果值是否由于并发处理而存在 => eg: false
 			if (asyncManager.hasConcurrentResult()) {
 				Object result = asyncManager.getConcurrentResult();
 				mavContainer = (ModelAndViewContainer) asyncManager.getConcurrentResultContext()[0];
@@ -939,10 +958,15 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 				invocableMethod = invocableMethod.wrapConcurrentResult(result);
 			}
 
+			// 20201223 eg: ServletWebRequest@xxxx: "ServletWebRequest: uri=/testController/testRestController;client=0:0:0:0:0:0:0:1"
+			// 20201223 eg: ModelAndViewContainer@xxxx: "ModelAndViewContainer: View is [null]; default model {}" => eg: 页面输出"Test RestController~~~"
 			invocableMethod.invokeAndHandle(webRequest, mavContainer);
+
+			// 20201221 当前请求的选定处理程序是否选择异步处理该请求 => eg: false
 			if (asyncManager.isConcurrentHandlingStarted()) {
 				return null;
 			}
+
 
 			return getModelAndView(mavContainer, modelFactory, webRequest);
 		}

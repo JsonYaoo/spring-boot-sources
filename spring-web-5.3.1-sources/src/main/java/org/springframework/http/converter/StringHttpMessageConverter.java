@@ -31,8 +31,16 @@ import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 
 /**
+ * 20201223
+ * A. {@link HttpMessageConverter}的实现，可以读取和写入字符串。
+ * B. 默认情况下，此转换器支持所有媒体类型（*），并使用{@code text / plain}的{@code Content-Type}进行写入。 可以通过设置
+ *    {@link #setSupportedMediaTypessupportedMediaTypes}属性来覆盖此属性。
+ */
+/**
+ * A.
  * Implementation of {@link HttpMessageConverter} that can read and write strings.
  *
+ * B.
  * <p>By default, this converter supports all media types (<code>&#42;/&#42;</code>),
  * and writes with a {@code Content-Type} of {@code text/plain}. This can be overridden
  * by setting the {@link #setSupportedMediaTypes supportedMediaTypes} property.
@@ -41,6 +49,7 @@ import org.springframework.util.StreamUtils;
  * @author Juergen Hoeller
  * @since 3.0
  */
+// 20201223 {@link HttpMessageConverter}的实现，可以读取和写入字符串: 默认情况下，此转换器支持所有媒体类型（*），并使用{@code text / plain}的{@code Content-Type}进行写入
 public class StringHttpMessageConverter extends AbstractHttpMessageConverter<String> {
 
 	private static final MediaType APPLICATION_PLUS_JSON = new MediaType("application", "*+json");
@@ -54,8 +63,8 @@ public class StringHttpMessageConverter extends AbstractHttpMessageConverter<Str
 	@Nullable
 	private volatile List<Charset> availableCharsets;
 
+	// 20201223 是否接入接受的字符集, 默认为false
 	private boolean writeAcceptCharset = false;
-
 
 	/**
 	 * A default constructor that uses {@code "ISO-8859-1"} as the default charset.
@@ -96,18 +105,25 @@ public class StringHttpMessageConverter extends AbstractHttpMessageConverter<Str
 		return StreamUtils.copyToString(inputMessage.getBody(), charset);
 	}
 
+	// 20201223 返回给定类型的内容长度
 	@Override
 	protected Long getContentLength(String str, @Nullable MediaType contentType) {
+		// 20201223 UTF_8@xxxx: "UTF-8"
 		Charset charset = getContentTypeCharset(contentType);
 		return (long) str.getBytes(charset).length;
 	}
 
-
+	// 20201223 将默认标题添加到输出消息
 	@Override
 	protected void addDefaultHeaders(HttpHeaders headers, String s, @Nullable MediaType type) throws IOException {
+		// 20201223 eg: null
 		if (headers.getContentType() == null ) {
+			// 20201223 type: MediaType@xxx: "text/html" => eg: true && true && false || false
 			if (type != null && type.isConcrete() &&
+					// 20201223 eg: "application/json"
 					(type.isCompatibleWith(MediaType.APPLICATION_JSON) ||
+
+					// 20201223 eg: "application/*+json"
 					type.isCompatibleWith(APPLICATION_PLUS_JSON))) {
 				// Prevent charset parameter for JSON..
 				headers.setContentType(type);
@@ -116,14 +132,31 @@ public class StringHttpMessageConverter extends AbstractHttpMessageConverter<Str
 		super.addDefaultHeaders(headers, s, type);
 	}
 
+	// 20201223 编写实际正文的抽象模板方法。 从{@link #write}调用 => eg: 页面输出"Test RestController~~~"
 	@Override
 	protected void writeInternal(String str, HttpOutputMessage outputMessage) throws IOException {
+		// 20201223 eg: ServletServerHttpResponse$ServletReponseHttpHeaders@xxxx: "Content-Type": "text/html;charset=UTF-8"、"Content-Length": "22"
 		HttpHeaders headers = outputMessage.getHeaders();
+
+		// 20201223 eg: false && true(null == null) => false
 		if (this.writeAcceptCharset && headers.get(HttpHeaders.ACCEPT_CHARSET) == null) {
 			headers.setAcceptCharset(getAcceptedCharsets());
 		}
+
+		// 20201223 获取ContentType的字符集 => eg: "UTF-8"
 		Charset charset = getContentTypeCharset(headers.getContentType());
-		StreamUtils.copy(str, charset, outputMessage.getBody());
+
+		// 20201223 将给定String的内容复制到给定OutputStream, 完成后，使流保持打开状态 => eg: 页面输出"Test RestController~~~"
+		StreamUtils.copy(
+				// 20201223 eg: "Test RestController~~~"
+				str,
+
+				// 20201223 eg: "UTF-8"
+				charset,
+
+				// 20201223 eg: CoyoteOutputStream@xxxx
+				outputMessage.getBody()
+		);
 	}
 
 
@@ -142,6 +175,7 @@ public class StringHttpMessageConverter extends AbstractHttpMessageConverter<Str
 		return charsets;
 	}
 
+	// 20201223 获取ContentType的字符集
 	private Charset getContentTypeCharset(@Nullable MediaType contentType) {
 		if (contentType != null) {
 			Charset charset = contentType.getCharset();

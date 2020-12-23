@@ -22,11 +22,16 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * 20201223
+ * 用异步请求处理方法扩展{@link NativeWebRequest}。
+ */
+/**
  * Extends {@link NativeWebRequest} with methods for asynchronous request processing.
  *
  * @author Rossen Stoyanchev
  * @since 3.2
  */
+// 20201223 用异步请求处理方法扩展{@link NativeWebRequest}。
 public interface AsyncWebRequest extends NativeWebRequest {
 
 	/**
@@ -53,6 +58,7 @@ public interface AsyncWebRequest extends NativeWebRequest {
 	/**
 	 * Add a handler to invoke when request processing completes.
 	 */
+	// 20201223 添加处理程序以在请求处理完成时调用。
 	void addCompletionHandler(Runnable runnable);
 
 	/**

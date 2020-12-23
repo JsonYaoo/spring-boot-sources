@@ -30,6 +30,7 @@ import org.springframework.lang.Nullable;
  * @author Rossen Stoyanchev
  * @since 3.0
  */
+// 20201223 表示服务器端HTTP请求: 由{@linkplain #getMethod（）方法}、{@linkplain #getURI（）uri}、{@linkplain #getHeaders（）标头}和可读的{@linkplain #getBody（）主体}组成。
 public interface ServerHttpRequest extends HttpRequest, HttpInputMessage {
 
 	/**

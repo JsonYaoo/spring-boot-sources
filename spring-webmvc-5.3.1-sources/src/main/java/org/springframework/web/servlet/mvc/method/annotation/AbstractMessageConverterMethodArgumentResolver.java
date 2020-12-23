@@ -60,6 +60,10 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 
 /**
+ * 20201223
+ * 通过使用{@link HttpMessageConverter HttpMessageConverters}从请求的主体中读取内容来解析方法参数值的基类。
+ */
+/**
  * A base class for resolving method argument values by reading from the body of
  * a request with {@link HttpMessageConverter HttpMessageConverters}.
  *
@@ -68,6 +72,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
  * @author Juergen Hoeller
  * @since 3.1
  */
+// 20201223 通过使用{@link HttpMessageConverter HttpMessageConverters}从请求的主体中读取内容来解析方法参数值的基类。
 public abstract class AbstractMessageConverterMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
 	private static final Set<HttpMethod> SUPPORTED_METHODS =
@@ -78,8 +83,10 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// 20201223 用于在HTTP请求和响应之间进行转换的策略接口。
 	protected final List<HttpMessageConverter<?>> messageConverters;
 
+	// 20201223 所有支持的MediaType列表
 	protected final List<MediaType> allSupportedMediaTypes;
 
 	private final RequestResponseBodyAdviceChain advice;
@@ -240,9 +247,13 @@ public abstract class AbstractMessageConverterMethodArgumentResolver implements 
 	 * @param webRequest the web request to create an input message from
 	 * @return the input message
 	 */
+	// 20201223 从给定的{@link NativeWebRequest}创建一个新的{@link HttpInputMessage}。
 	protected ServletServerHttpRequest createInputMessage(NativeWebRequest webRequest) {
+		// 20201223 @ReqeustFacade@xxxx: Requset@xxxx
 		HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
 		Assert.state(servletRequest != null, "No HttpServletRequest");
+
+		// 20201223 eg: ServletServerHttpRequest@xxxx: "ServletWebRequest: uri=/testController/testRestController;client=0:0:0:0:0:0:0:1"
 		return new ServletServerHttpRequest(servletRequest);
 	}
 

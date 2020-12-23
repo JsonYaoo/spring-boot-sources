@@ -79,6 +79,7 @@ public abstract class KotlinDetector {
 	 * Return {@code true} if the method is a suspending function.
 	 * @since 5.3
 	 */
+	// 202012223 如果该方法是一个挂起函数，则返回{@code true}。
 	public static boolean isSuspendingFunction(Method method) {
 		if (KotlinDetector.isKotlinType(method.getDeclaringClass())) {
 			Class<?>[] types = method.getParameterTypes();

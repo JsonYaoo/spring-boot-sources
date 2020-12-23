@@ -41,10 +41,18 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * 20201222
+ * A. 封装方法参数规范的帮助程序类，即{@link Method}或{@link Constructor}以及已声明的泛型类型的参数索引和嵌套类型索引。 用作传递的规范对象。
+ * B. 从4.2开始，提供了一个{@link org.springframework.core.annotation.SynthesizingMethodParameter}子类，该子类可以使用属性别名来合成注释。
+ *    该子类尤其用于Web和消息终结点处理。
+ */
+/**
+ * A.
  * Helper class that encapsulates the specification of a method parameter, i.e. a {@link Method}
  * or {@link Constructor} plus a parameter index and a nested type index for a declared generic
  * type. Useful as a specification object to pass along.
  *
+ * B.
  * <p>As of 4.2, there is a {@link org.springframework.core.annotation.SynthesizingMethodParameter}
  * subclass available which synthesizes annotations with attribute aliases. That subclass is used
  * for web and message endpoint processing, in particular.
@@ -58,11 +66,12 @@ import org.springframework.util.ObjectUtils;
  * @since 2.0
  * @see org.springframework.core.annotation.SynthesizingMethodParameter
  */
+// 20201223 封装方法参数规范的帮助程序类，即{@link Method}或{@link Constructor}以及已声明的泛型类型的参数索引和嵌套类型索引
 public class MethodParameter {
 
 	private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
 
-
+	// 20201223 线程任务
 	private final Executable executable;
 
 	private final int parameterIndex;
@@ -98,7 +107,6 @@ public class MethodParameter {
 	@Nullable
 	private volatile MethodParameter nestedMethodParameter;
 
-
 	/**
 	 * Create a new {@code MethodParameter} for the given method, with nesting level 1.
 	 * @param method the Method to specify a parameter for
@@ -106,6 +114,7 @@ public class MethodParameter {
 	 * return type; 0 for the first method parameter; 1 for the second method
 	 * parameter, etc.
 	 */
+	// 20201223 使用嵌套级别1为给定方法创建一个新的{@code MethodParameter}。
 	public MethodParameter(Method method, int parameterIndex) {
 		this(method, parameterIndex, 1);
 	}
@@ -120,10 +129,16 @@ public class MethodParameter {
 	 * (typically 1; e.g. in case of a List of Lists, 1 would indicate the
 	 * nested List, whereas 2 would indicate the element of the nested List)
 	 */
+	// 20201223 为给定方法创建一个新的{@code MethodParameter}。
 	public MethodParameter(Method method, int parameterIndex, int nestingLevel) {
 		Assert.notNull(method, "Method must not be null");
+		// 20201223 eg: Method@xxxx: "public java.lang.String com.jsonyao.cs.Controller.TestController.testRestController()"
 		this.executable = method;
+
+		// 20201223 eg: -1
 		this.parameterIndex = validateIndex(method, parameterIndex);
+
+		// 20201223 eg: 1
 		this.nestingLevel = nestingLevel;
 	}
 

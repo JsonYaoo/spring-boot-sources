@@ -30,9 +30,16 @@ import java.util.Map;
 import org.springframework.lang.Nullable;
 
 /**
+ * 20201223
+ * A. 用于使用反射API和处理反射异常的简单实用程序类。
+ * B. 仅供内部使用。
+ */
+/**
+ * A.
  * Simple utility class for working with the reflection API and handling
  * reflection exceptions.
  *
+ * B.
  * <p>Only intended for internal use.
  *
  * @author Juergen Hoeller
@@ -43,6 +50,7 @@ import org.springframework.lang.Nullable;
  * @author Chris Beams
  * @since 1.2.2
  */
+// 20201223 用于使用反射API和处理反射异常的简单实用程序类。
 public abstract class ReflectionUtils {
 
 	/**
@@ -570,6 +578,11 @@ public abstract class ReflectionUtils {
 	}
 
 	/**
+	 * 20201223
+	 * 使给定的方法可访问，并在必要时显式设置它的可访问性。 仅在实际需要时才调用{@code setAccessible（true）}方法，以避免与JVM SecurityManager发生不必要的冲突
+	 * （如果处于活动状态）。
+	 */
+	/**
 	 * Make the given method accessible, explicitly setting it accessible if
 	 * necessary. The {@code setAccessible(true)} method is only called
 	 * when actually necessary, to avoid unnecessary conflicts with a JVM
@@ -577,10 +590,10 @@ public abstract class ReflectionUtils {
 	 * @param method the method to make accessible
 	 * @see Method#setAccessible
 	 */
+	// 20201223 使给定的方法可访问，并在必要时显式设置它的可访问性: 不是public 或者不是public也不可访问的情况下
 	@SuppressWarnings("deprecation")  // on JDK 9
 	public static void makeAccessible(Method method) {
-		if ((!Modifier.isPublic(method.getModifiers()) ||
-				!Modifier.isPublic(method.getDeclaringClass().getModifiers())) && !method.isAccessible()) {
+		if ((!Modifier.isPublic(method.getModifiers()) || !Modifier.isPublic(method.getDeclaringClass().getModifiers())) && !method.isAccessible()) {
 			method.setAccessible(true);
 		}
 	}

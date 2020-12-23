@@ -87,19 +87,31 @@ public class ModelAndViewContainer {
 
 	private boolean requestHandled = false;
 
-
 	/**
+	 * 20201223
+	 * A. 默认情况下，在渲染和重定向方案中都使用“默认”模型的内容。 另外，控制器方法可以声明{@code RedirectAttributes}类型的参数，并使用它提供属性以准备重定向URL。
+	 * B. 将此标志设置为{@code true}可以确保即使未声明RedirectAttributes参数，也不会在重定向方案中使用“默认”模型。 将其设置为{@code false}意味着如果控制器方法未声明
+	 *    RedirectAttributes参数，则可以在重定向中使用“默认”模型。
+	 * C. 默认设置为{@code false}。
+	 */
+	/**
+	 * A.
 	 * By default the content of the "default" model is used both during
 	 * rendering and redirect scenarios. Alternatively controller methods
 	 * can declare an argument of type {@code RedirectAttributes} and use
 	 * it to provide attributes to prepare the redirect URL.
+	 *
+	 * B.
 	 * <p>Setting this flag to {@code true} guarantees the "default" model is
 	 * never used in a redirect scenario even if a RedirectAttributes argument
 	 * is not declared. Setting it to {@code false} means the "default" model
 	 * may be used in a redirect if the controller method doesn't declare a
 	 * RedirectAttributes argument.
+	 *
+	 * C.
 	 * <p>The default setting is {@code false}.
 	 */
+	// 20201223 默认情况下，在渲染和重定向方案中都使用“默认”模型的内容。 另外，控制器方法可以声明{@code RedirectAttributes}类型的参数，并使用它提供属性以准备重定向URL
 	public void setIgnoreDefaultModelOnRedirect(boolean ignoreDefaultModelOnRedirect) {
 		this.ignoreDefaultModelOnRedirect = ignoreDefaultModelOnRedirect;
 	}
@@ -274,12 +286,22 @@ public class ModelAndViewContainer {
 	}
 
 	/**
+	 * 20201223
+	 * A. 该请求是否已在处理程序中完全处理，例如 {@code @ResponseBody}方法，因此不需要视图分辨率。 当控制器方法声明类型为{@code ServletResponse}或
+	 *    {@code OutputStream}的参数时，也可以设置此标志。
+	 * B. 默认值为{@code false}。
+	 */
+	/**
+	 * A.
 	 * Whether the request has been handled fully within the handler, e.g.
 	 * {@code @ResponseBody} method, and therefore view resolution is not
 	 * necessary. This flag can also be set when controller methods declare an
 	 * argument of type {@code ServletResponse} or {@code OutputStream}).
+	 *
+	 * B.
 	 * <p>The default value is {@code false}.
 	 */
+	// 20201223 该请求是否已在处理程序中完全处理
 	public void setRequestHandled(boolean requestHandled) {
 		this.requestHandled = requestHandled;
 	}

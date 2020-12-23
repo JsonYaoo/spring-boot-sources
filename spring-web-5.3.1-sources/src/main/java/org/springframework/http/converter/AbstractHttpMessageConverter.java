@@ -36,8 +36,16 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 20201223
+ * A. 大多数{@link HttpMessageConverter}实现的抽象基类。
+ * B. 该基类通过{@link #setSupportedMediaTypes（List）supportedMediaTypes} bean属性添加了对设置受支持的{@code MediaTypes}的支持。 在写入输出消息时，
+ *    它还增加了对{@code Content-Type}和{@code Content-Length}的支持。
+ */
+/**
+ * A.
  * Abstract base class for most {@link HttpMessageConverter} implementations.
  *
+ * B.
  * <p>This base class adds support for setting supported {@code MediaTypes}, through the
  * {@link #setSupportedMediaTypes(List) supportedMediaTypes} bean property. It also adds
  * support for {@code Content-Type} and {@code Content-Length} when writing to output messages.
@@ -48,6 +56,7 @@ import org.springframework.util.Assert;
  * @since 3.0
  * @param <T> the converted object type
  */
+// 20201223 大多数{@link HttpMessageConverter}实现的抽象基类: 添加了对设置受支持的{@code MediaTypes}的支持, 还增加了对{@code Content-Type}和{@code Content-Length}的支持。
 public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConverter<T> {
 
 	/** Logger available to subclasses. */
@@ -203,13 +212,18 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 	 * This implementation sets the default headers by calling {@link #addDefaultHeaders},
 	 * and then calls {@link #writeInternal}.
 	 */
+	// 20201223 此实现通过调用{@link #addDefaultHeaders}设置默认标头，然后调用{@link #writeInternal} => eg: 页面输出"Test RestController~~~"
 	@Override
 	public final void write(final T t, @Nullable MediaType contentType, HttpOutputMessage outputMessage)
 			throws IOException, HttpMessageNotWritableException {
 
+		// 20201223 ServletServerHttpResponse$ServletResponseHttpHeaders@xxxx: []
 		final HttpHeaders headers = outputMessage.getHeaders();
+
+		// 20201223 将默认标题添加到输出消息 => eg: ContentType: "text/html;charset=UTF-8", "Content-Length": 22
 		addDefaultHeaders(headers, t, contentType);
 
+		// 20201223 eg: false
 		if (outputMessage instanceof StreamingHttpOutputMessage) {
 			StreamingHttpOutputMessage streamingOutputMessage = (StreamingHttpOutputMessage) outputMessage;
 			streamingOutputMessage.setBody(outputStream -> writeInternal(t, new HttpOutputMessage() {
@@ -224,18 +238,31 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 			}));
 		}
 		else {
+			// 20201223 "Test RestController~~~", ServletServerHttpResponse@xxxx: Response@xxxx, ServletServerHttpResponse$ServletResponseHttpHeaders@xxxx
+			// 20201223 编写实际正文的抽象模板方法。 从{@link #write}调用 => eg: 页面输出"Test RestController~~~"
 			writeInternal(t, outputMessage);
+
+			// 20201223 将缓冲区发送给客户端。
 			outputMessage.getBody().flush();
 		}
 	}
 
 	/**
+	 * 20201223
+	 * A. 将默认标题添加到输出消息。
+	 * B. 如果未提供内容类型，则此实现委派给{@link #getDefaultContentType（Object）}，并在必要时设置默认字符集，调用{@link #getContentLength}，并设置相应的标头。
+	 */
+	/**
+	 * A.
 	 * Add default headers to the output message.
+	 *
+	 * B.
 	 * <p>This implementation delegates to {@link #getDefaultContentType(Object)} if a
 	 * content type was not provided, set if necessary the default character set, calls
 	 * {@link #getContentLength}, and sets the corresponding headers.
 	 * @since 4.2
 	 */
+	// 20201223 将默认标题添加到输出消息 => eg: ContentType: "text/html;charset=UTF-8", "Content-Length": 22
 	protected void addDefaultHeaders(HttpHeaders headers, T t, @Nullable MediaType contentType) throws IOException {
 		if (headers.getContentType() == null) {
 			MediaType contentTypeToUse = contentType;
@@ -248,17 +275,23 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 			}
 			if (contentTypeToUse != null) {
 				if (contentTypeToUse.getCharset() == null) {
+					// 20201223 eg: "UTF-8"
 					Charset defaultCharset = getDefaultCharset();
 					if (defaultCharset != null) {
 						contentTypeToUse = new MediaType(contentTypeToUse, defaultCharset);
 					}
 				}
+				// 20201223 MediaType@xxxx: "text/html;charset=UTF-8"
 				headers.setContentType(contentTypeToUse);
 			}
 		}
+
+		// 20201223 eg: -1, "Transfer-Encoding" => true && !false => true
 		if (headers.getContentLength() < 0 && !headers.containsKey(HttpHeaders.TRANSFER_ENCODING)) {
+			// 20201223 eg: 22
 			Long contentLength = getContentLength(t, headers.getContentType());
 			if (contentLength != null) {
+				// 20201223 按照{@code Content-Length}标头指定的格式设置正文长度（以字节为单位）: "Content-Length": 22
 				headers.setContentLength(contentLength);
 			}
 		}
@@ -280,17 +313,26 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 	}
 
 	/**
+	 * 20201223
+	 * A. 返回给定类型的内容长度。
+	 * B. 默认情况下，它返回{@code null}，表示内容长度未知。 可以在子类中覆盖。
+	 */
+	/**
+	 * A.
 	 * Returns the content length for the given type.
+	 *
+	 * B.
 	 * <p>By default, this returns {@code null}, meaning that the content length is unknown.
 	 * Can be overridden in subclasses.
+	 *
 	 * @param t the type to return the content length for
 	 * @return the content length, or {@code null} if not known
 	 */
+	// 20201223 返回给定类型的内容长度
 	@Nullable
 	protected Long getContentLength(T t, @Nullable MediaType contentType) throws IOException {
 		return null;
 	}
-
 
 	/**
 	 * Indicates whether the given class is supported by this converter.
@@ -317,7 +359,7 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 	 * @throws IOException in case of I/O errors
 	 * @throws HttpMessageNotWritableException in case of conversion errors
 	 */
-	protected abstract void writeInternal(T t, HttpOutputMessage outputMessage)
-			throws IOException, HttpMessageNotWritableException;
+	// 20201223 编写实际正文的抽象模板方法。 从{@link #write}调用。
+	protected abstract void writeInternal(T t, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException;
 
 }

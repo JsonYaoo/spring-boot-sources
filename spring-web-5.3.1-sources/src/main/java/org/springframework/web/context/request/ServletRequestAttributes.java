@@ -105,15 +105,19 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 	/**
 	 * Exposes the native {@link HttpServletRequest} that we're wrapping.
 	 */
+	// 20201223 公开我们要包装的本机{@link HttpServletRequest}。
 	public final HttpServletRequest getRequest() {
+		// 20201223 eg: RequestFacade@xxxx: Request@xxxx
 		return this.request;
 	}
 
 	/**
 	 * Exposes the native {@link HttpServletResponse} that we're wrapping (if any).
 	 */
+	// 20201223 公开我们要包装的本地{@link HttpServletResponse}（如果有）。
 	@Nullable
 	public final HttpServletResponse getResponse() {
+		// 20201223 eg: ResponseFacade@xxxx: Response@xxxx
 		return this.response;
 	}
 

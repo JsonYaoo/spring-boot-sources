@@ -58,6 +58,7 @@ public interface NativeWebRequest extends WebRequest {
 	 * of that type is available
 	 * @see javax.servlet.http.HttpServletRequest
 	 */
+	// 20201223 返回基础本机请求对象（如果有）。
 	@Nullable
 	<T> T getNativeRequest(@Nullable Class<T> requiredType);
 
@@ -68,6 +69,7 @@ public interface NativeWebRequest extends WebRequest {
 	 * of that type is available
 	 * @see javax.servlet.http.HttpServletResponse
 	 */
+	// 20201223 返回基础本机响应对象（如果有）。
 	@Nullable
 	<T> T getNativeResponse(@Nullable Class<T> requiredType);
 
