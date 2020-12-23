@@ -806,7 +806,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 		return true;
 	}
 
-	// 20201222 使用给定的处理程序方法处理请求。
+	// 20201222 使用给定的处理程序方法处理请求 => eg: 页面输出"Test RestController~~~", mav = null, 根据给定的设置设置HTTP Cache-Control标头 => eg: do nothing
 	@Override
 	protected ModelAndView handleInternal(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
@@ -836,18 +836,23 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 		else {
 			// 20201222 完全不需要会话同步...
 			// No synchronization on session demanded at all...
+			// 20201222 如果需要视图分辨率，则调用{@link RequestMapping}处理程序方法，以准备{@link ModelAndView} => eg: 页面输出"Test RestController~~~", mav = null
 			mav = invokeHandlerMethod(request, response, handlerMethod);
 		}
 
+		// 20201223 需要打开缓存 "Cache-Control" => eg: !false => true
 		if (!response.containsHeader(HEADER_CACHE_CONTROL)) {
+			// 20201223 eg: SessionAttributesHandler@xxxx: attributeNames: [], attributeTypes: [] => false
 			if (getSessionAttributesHandler(handlerMethod).hasSessionAttributes()) {
 				applyCacheSeconds(response, this.cacheSecondsForSessionAttributeHandlers);
 			}
 			else {
+				// 20201223 根据给定的设置设置HTTP Cache-Control标头 => eg: do nothing
 				prepareResponse(response);
 			}
 		}
 
+		// 20201223 eg: null
 		return mav;
 	}
 
@@ -971,6 +976,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 			return getModelAndView(mavContainer, modelFactory, webRequest);
 		}
 		finally {
+			// 20201221 发出请求已完成的信号: 执行所有请求销毁回调，并更新在请求处理期间已访问的会话属性
 			webRequest.requestCompleted();
 		}
 	}

@@ -85,14 +85,18 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 	protected abstract boolean supportsInternal(HandlerMethod handlerMethod);
 
 	/**
+	 * 20201223
+	 * 此实现期望处理程序为{@link HandlerMethod}
+	 */
+	/**
 	 * This implementation expects the handler to be an {@link HandlerMethod}.
 	 */
-	// 20201222 此实现期望处理程序为{@link HandlerMethod}。
+	// 20201222 使用给定的处理程序方法处理请求 => eg: 页面输出"Test RestController~~~", mav = null, 根据给定的设置设置HTTP Cache-Control标头 => eg: do nothing
 	@Override
 	@Nullable
 	public final ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-
+		// 20201222 使用给定的处理程序方法处理请求 => eg: 页面输出"Test RestController~~~", mav = null, 根据给定的设置设置HTTP Cache-Control标头 => eg: do nothing
 		return handleInternal(request, response, (HandlerMethod) handler);
 	}
 

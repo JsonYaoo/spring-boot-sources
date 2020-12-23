@@ -95,7 +95,9 @@ public class SessionAttributesHandler {
 	 * Whether the controller represented by this instance has declared any
 	 * session attributes through an {@link SessionAttributes} annotation.
 	 */
+	// 20201223 此实例表示的控制器是否已通过{@link SessionAttributes}批注声明了任何会话属性。
 	public boolean hasSessionAttributes() {
+		// 20201223 eg: SessionAttributesHandler@xxxx: attributeNames: [], attributeTypes: []
 		return (!this.attributeNames.isEmpty() || !this.attributeTypes.isEmpty());
 	}
 

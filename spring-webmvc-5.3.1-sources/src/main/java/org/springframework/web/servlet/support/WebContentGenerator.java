@@ -93,6 +93,7 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 
 	private static final String HEADER_EXPIRES = "Expires";
 
+	// 20201223 需要打开缓存 "Cache-Control"
 	protected static final String HEADER_CACHE_CONTROL = "Cache-Control";
 
 	// 20201222 支持的HTTP方法集。
@@ -109,17 +110,20 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 	@Nullable
 	private CacheControl cacheControl;
 
+	// 20201223 缓存秒数, 默认为-1
 	private int cacheSeconds = -1;
 
 	@Nullable
 	private String[] varyByRequestHeaders;
 
 
-	// deprecated fields
+	// deprecated fields // 20201223 弃用的字段
 
+	// 202012223 使用HTTP 1.0过期标头？默认为false
 	/** Use HTTP 1.0 expires header? */
 	private boolean useExpiresHeader = false;
 
+	// 20201223 使用HTTP 1.1缓存控制标头？默认为true
 	/** Use HTTP 1.1 cache-control header? */
 	private boolean useCacheControlHeader = true;
 
@@ -413,7 +417,9 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 	 * @param response current HTTP response
 	 * @since 4.2
 	 */
+	// 20201223 根据此生成器的设置准备给定的响应。 应用为此生成器指定的高速缓存秒数。
 	protected final void prepareResponse(HttpServletResponse response) {
+		// 20201223 eg: null
 		if (this.cacheControl != null) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Applying default " + getCacheControl());
@@ -424,8 +430,12 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Applying default cacheSeconds=" + this.cacheSeconds);
 			}
+
+			// 20201223 根据给定的设置设置HTTP Cache-Control标头 => eg: do nothing
 			applyCacheSeconds(response, this.cacheSeconds);
 		}
+
+		// 20201223 eg: null
 		if (this.varyByRequestHeaders != null) {
 			for (String value : getVaryRequestHeadersToAdd(response, this.varyByRequestHeaders)) {
 				response.addHeader("Vary", value);
@@ -439,7 +449,9 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 	 * @param cacheControl the pre-configured cache control settings
 	 * @since 4.2
 	 */
+	// 20201223 根据给定的设置设置HTTP Cache-Control标头。
 	protected final void applyCacheControl(HttpServletResponse response, CacheControl cacheControl) {
+		// 20201223 返回“ Cache-Control”标头值（如果有）=> eg: null
 		String ccValue = cacheControl.getHeaderValue();
 		if (ccValue != null) {
 			// Set computed HTTP 1.1 Cache-Control header
@@ -457,6 +469,10 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 	}
 
 	/**
+	 * 20201223
+	 * 应用给定的缓存秒数并生成相应的HTTP标头，即，在为正数的情况下允许缓存给定的秒数，如果给定的值为0，则阻止缓存，什么也不做。 不告诉浏览器重新验证资源。
+	 */
+	/**
 	 * Apply the given cache seconds and generate corresponding HTTP headers,
 	 * i.e. allow caching for the given number of seconds in case of a positive
 	 * value, prevent caching if given a 0 value, do nothing else.
@@ -465,9 +481,12 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 	 * @param cacheSeconds positive number of seconds into the future that the
 	 * response should be cacheable for, 0 to prevent caching
 	 */
+	// 20201223 应用给定的缓存秒数并生成相应的HTTP标头，即，在为正数的情况下允许缓存给定的秒数，如果给定的值为0，则阻止缓存，什么也不做。 不告诉浏览器重新验证资源。
 	@SuppressWarnings("deprecation")
 	protected final void applyCacheSeconds(HttpServletResponse response, int cacheSeconds) {
+		// 20201223 false || !true =>  false
 		if (this.useExpiresHeader || !this.useCacheControlHeader) {
+			// 20201223 与以前的Spring版本一样，不赞成使用HTTP 1.0缓存行为
 			// Deprecated HTTP 1.0 cache behavior, as in previous Spring versions
 			if (cacheSeconds > 0) {
 				cacheForSeconds(response, cacheSeconds);
@@ -478,6 +497,7 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 		}
 		else {
 			CacheControl cControl;
+			// 20201223 eg: -1
 			if (cacheSeconds > 0) {
 				cControl = CacheControl.maxAge(cacheSeconds, TimeUnit.SECONDS);
 				if (this.alwaysMustRevalidate) {
@@ -488,8 +508,11 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 				cControl = (this.useCacheControlNoStore ? CacheControl.noStore() : CacheControl.noCache());
 			}
 			else {
+				// 20201223 返回一个空指令 => 适合使用其他没有“max-age”，“no-cache”或“no-store”的可选指令 eg: CacheControl@xxxx: "CacheControl []"
 				cControl = CacheControl.empty();
 			}
+
+			// 20201223 根据给定的设置设置HTTP Cache-Control标头。
 			applyCacheControl(response, cControl);
 		}
 	}

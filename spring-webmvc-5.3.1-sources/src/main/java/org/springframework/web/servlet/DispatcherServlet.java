@@ -1184,7 +1184,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 				// 20201222 实际调用处理程序。
 				// Actually invoke the handler.
-
+				// 20201222 使用给定的处理程序方法处理请求 => eg: 页面输出"Test RestController~~~", mav = null, 根据给定的设置设置HTTP Cache-Control标头 => eg: do nothing
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
 				if (asyncManager.isConcurrentHandlingStarted()) {

@@ -23,21 +23,38 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201223
+ * A. 用于创建“缓存控制” HTTP响应标头的构建器。
+ * B. 在与Web应用程序交互时，将Cache-Control指令添加到HTTP响应可以显着改善客户端体验。 该构建器仅考虑响应用例，创建带有响应指令的自带“ Cache-Control”标头:
+ * 		a. 使用{@code CacheControl cc = CacheControl.maxAge（1，TimeUnit.HOURS）}缓存HTTP响应将导致{@code Cache-Control：“max-age = 3600”}
+ * 		b. 使用{@code CacheControl cc = CacheControl.noStore（）}阻止缓存将导致{@code Cache-Control：“no-store”}
+ * 		c. 像{@code CacheControl cc = CacheControl.maxAge（1，TimeUnit.HOURS）.noTransform（）.cachePublic（）}之类的高级情况将导致
+ * 	   	   {@code Cache-Control："max-age = 3600, no-transform, public"}
+ */
+/**
+ * A.
  * A builder for creating "Cache-Control" HTTP response headers.
  *
+ * B.
  * <p>Adding Cache-Control directives to HTTP responses can significantly improve the client
  * experience when interacting with a web application. This builder creates opinionated
  * "Cache-Control" headers with response directives only, with several use cases in mind.
  *
  * <ul>
+ * a.
  * <li>Caching HTTP responses with {@code CacheControl cc = CacheControl.maxAge(1, TimeUnit.HOURS)}
  * will result in {@code Cache-Control: "max-age=3600"}</li>
+ *
+ * b.
  * <li>Preventing cache with {@code CacheControl cc = CacheControl.noStore()}
  * will result in {@code Cache-Control: "no-store"}</li>
+ *
+ * c.
  * <li>Advanced cases like {@code CacheControl cc = CacheControl.maxAge(1, TimeUnit.HOURS).noTransform().cachePublic()}
  * will result in {@code Cache-Control: "max-age=3600, no-transform, public"}</li>
  * </ul>
  *
+ * C.
  * <p>Note that to be efficient, Cache-Control headers should be written along HTTP validators
  * such as "Last-Modified" or "ETag" headers.
  *
@@ -49,6 +66,7 @@ import org.springframework.util.StringUtils;
  * HTTP caching - Google developers reference</a>
  * @see <a href="https://www.mnot.net/cache_docs/">Mark Nottingham's cache documentation</a>
  */
+// 20201223 用于创建“缓存控制” HTTP响应标头的构建器
 public class CacheControl {
 
 	@Nullable
@@ -77,21 +95,30 @@ public class CacheControl {
 	@Nullable
 	private Duration sMaxAge;
 
-
 	/**
 	 * Create an empty CacheControl instance.
 	 * @see #empty()
 	 */
+	// 20201223 创建一个空的CacheControl实例。
 	protected CacheControl() {
 	}
 
-
 	/**
+	 * 20201223
+	 * A. 返回一个空指令。
+	 * B. 这非常适合使用其他没有“max-age”，“no-cache”或“no-store”的可选指令。
+	 */
+	/**
+	 * A.
 	 * Return an empty directive.
+	 *
+	 * B.
 	 * <p>This is well suited for using other optional directives without "max-age",
 	 * "no-cache" or "no-store".
+	 *
 	 * @return {@code this}, to facilitate method chaining
 	 */
+	// 20201223 返回一个空指令 => 适合使用其他没有“max-age”，“no-cache”或“no-store”的可选指令
 	public static CacheControl empty() {
 		return new CacheControl();
 	}
@@ -324,6 +351,7 @@ public class CacheControl {
 	 * Return the "Cache-Control" header value, if any.
 	 * @return the header value, or {@code null} if no directive was added
 	 */
+	// 20201223 返回“ Cache-Control”标头值（如果有）。
 	@Nullable
 	public String getHeaderValue() {
 		String headerValue = toHeaderValue();
