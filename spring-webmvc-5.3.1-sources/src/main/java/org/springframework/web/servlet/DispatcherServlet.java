@@ -1187,21 +1187,28 @@ public class DispatcherServlet extends FrameworkServlet {
 				// 20201222 使用给定的处理程序方法处理请求 => eg: 页面输出"Test RestController~~~", mav = null, 根据给定的设置设置HTTP Cache-Control标头 => eg: do nothing
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
+				// 20201224 当前请求的选定处理程序是否选择异步处理该请求 => eg: false
 				if (asyncManager.isConcurrentHandlingStarted()) {
 					return;
 				}
 
+				// 20201224 我们需要视图名称翻译吗？ => eg: null => false
 				applyDefaultViewName(processedRequest, mv);
+
+				// 20201224 应用注册拦截器的postHandle方法。 在HandlerAdapter实际调用处理程序之后但在DispatcherServlet呈现视图之前调用。 => eg: donothing
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
 				dispatchException = ex;
 			}
 			catch (Throwable err) {
+				// 20201224 从4.3开始，我们还处理从处理程序方法引发的错误，使它们可用于@ExceptionHandler方法和其他情况。
 				// As of 4.3, we're processing Errors thrown from handler methods as well,
 				// making them available for @ExceptionHandler methods and other scenarios.
 				dispatchException = new NestedServletException("Handler dispatch failed", err);
 			}
+
+
 			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 		}
 		catch (Exception ex) {
@@ -1230,6 +1237,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	/**
 	 * Do we need view name translation?
 	 */
+	// 20201224 我们需要视图名称翻译吗？
 	private void applyDefaultViewName(HttpServletRequest request, @Nullable ModelAndView mv) throws Exception {
 		if (mv != null && !mv.hasView()) {
 			String defaultViewName = getDefaultViewName(request);
@@ -1562,6 +1570,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * @return the view name (or {@code null} if no default found)
 	 * @throws Exception if view name translation failed
 	 */
+	// 20201224 将提供的请求转换为默认视图名称。
 	@Nullable
 	protected String getDefaultViewName(HttpServletRequest request) throws Exception {
 		return (this.viewNameTranslator != null ? this.viewNameTranslator.getViewName(request) : null);

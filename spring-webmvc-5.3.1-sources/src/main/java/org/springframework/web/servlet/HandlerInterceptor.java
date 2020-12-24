@@ -139,17 +139,33 @@ public interface HandlerInterceptor {
 	}
 
 	/**
+	 * 20201224
+	 * A. 拦截处理程序的执行。 在HandlerAdapter实际调用处理程序之后但在DispatcherServlet呈现视图之前调用。 可以通过给定的ModelAndView将其他模型对象暴露给视图。
+	 * B. DispatcherServlet处理执行链中的处理程序，该处理程序由任意数量的拦截器组成，处理程序本身位于末尾。 使用此方法，每个拦截器都可以对执行进行后处理，
+	 *    并以与执行链相反的顺序进行应用。
+	 * C. 注意：特殊注意事项适用于异步请求处理。 有关更多详细信息，请参见{@link org.springframework.web.servlet.AsyncHandlerInterceptor}。
+	 * D. 默认实现为空。
+	 */
+	/**
+	 * A.
 	 * Intercept the execution of a handler. Called after HandlerAdapter actually
 	 * invoked the handler, but before the DispatcherServlet renders the view.
 	 * Can expose additional model objects to the view via the given ModelAndView.
+	 *
+	 * B.
 	 * <p>DispatcherServlet processes a handler in an execution chain, consisting
 	 * of any number of interceptors, with the handler itself at the end.
 	 * With this method, each interceptor can post-process an execution,
 	 * getting applied in inverse order of the execution chain.
+	 *
+	 * C.
 	 * <p><strong>Note:</strong> special considerations apply for asynchronous
 	 * request processing. For more details see
 	 * {@link org.springframework.web.servlet.AsyncHandlerInterceptor}.
+	 *
+	 * D.
 	 * <p>The default implementation is empty.
+	 *
 	 * @param request current HTTP request
 	 * @param response current HTTP response
 	 * @param handler the handler (or {@link HandlerMethod}) that started asynchronous
@@ -158,6 +174,7 @@ public interface HandlerInterceptor {
 	 * (can also be {@code null})
 	 * @throws Exception in case of errors
 	 */
+	// 202012224 拦截处理程序的执行。 在HandlerAdapter实际调用处理程序之后但在DispatcherServlet呈现视图之前调用。
 	default void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			@Nullable ModelAndView modelAndView) throws Exception {
 	}

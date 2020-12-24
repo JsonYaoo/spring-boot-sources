@@ -175,11 +175,15 @@ public class HandlerExecutionChain {
 	/**
 	 * Apply postHandle methods of registered interceptors.
 	 */
+	// 20201224 应用注册拦截器的postHandle方法。
 	void applyPostHandle(HttpServletRequest request, HttpServletResponse response, @Nullable ModelAndView mv)
 			throws Exception {
-
+		// 20201224 ArrayList@xxxx: ConversionServiceExposingInterceptor@xxxx, ResourceUrlProviderExposingInterceptor@xxxx
+		// 20201224 逆序遍历
 		for (int i = this.interceptorList.size() - 1; i >= 0; i--) {
 			HandlerInterceptor interceptor = this.interceptorList.get(i);
+
+			// 202012224 拦截处理程序的执行。 在HandlerAdapter实际调用处理程序之后但在DispatcherServlet呈现视图之前调用。
 			interceptor.postHandle(request, response, this.handler, mv);
 		}
 	}
