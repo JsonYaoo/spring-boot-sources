@@ -1219,14 +1219,18 @@ public class DispatcherServlet extends FrameworkServlet {
 					new NestedServletException("Handler processing failed", err));
 		}
 		finally {
+			// 20201224 当前请求的选定处理程序是否选择异步处理该请求 => eg: false
 			if (asyncManager.isConcurrentHandlingStarted()) {
+				// 20201224 代替postHandle和afterCompletion
 				// Instead of postHandle and afterCompletion
 				if (mappedHandler != null) {
 					mappedHandler.applyAfterConcurrentHandlingStarted(processedRequest, response);
 				}
 			}
 			else {
+				// 20201224 清理多部分请求使用的所有资源。
 				// Clean up any resources used by a multipart request.
+				// 20201224 判断是否存在多部分文件 => eg: false
 				if (multipartRequestParsed) {
 					cleanupMultipart(processedRequest);
 				}
@@ -1388,6 +1392,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * @param request current HTTP request
 	 * @see MultipartResolver#cleanupMultipart
 	 */
+	// 202012224 清理给定的多部分请求（如果有）使用的所有资源。
 	protected void cleanupMultipart(HttpServletRequest request) {
 		if (this.multipartResolver != null) {
 			MultipartHttpServletRequest multipartRequest =

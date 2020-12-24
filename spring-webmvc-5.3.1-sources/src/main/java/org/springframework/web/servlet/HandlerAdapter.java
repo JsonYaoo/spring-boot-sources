@@ -85,6 +85,7 @@ public interface HandlerAdapter {
 	 * @param handler the handler object to check
 	 * @return whether or not this object can use the given handler
 	 */
+	// 20201224 给定处理程序实例，请返回此{@code HandlerAdapter}是否可以支持它
 	boolean supports(Object handler);
 
 	/**

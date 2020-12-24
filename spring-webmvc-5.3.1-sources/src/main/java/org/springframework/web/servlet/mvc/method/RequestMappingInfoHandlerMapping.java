@@ -134,6 +134,7 @@ public abstract class RequestMappingInfoHandlerMapping extends AbstractHandlerMe
 			return super.getHandlerInternal(request);
 		}
 		finally {
+			// 20201224 从此请求中删除属性 "org.springframework.web.servlet.mvc.condition.ProducesRequestCondition.MEDIA_TYPES"
 			ProducesRequestCondition.clearMediaTypesAttribute(request);
 		}
 	}

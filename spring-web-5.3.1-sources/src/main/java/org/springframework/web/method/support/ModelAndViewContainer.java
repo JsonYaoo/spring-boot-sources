@@ -363,7 +363,7 @@ public class ModelAndViewContainer {
 	 */
 	// 20201222 复制提供的{@code Map}中的属性，并使用具有相同名称的现有对象优先（即不被替换）。 {@code getModel（）。mergeAttributes（Map <String，？>）}的快捷方式。
 	public ModelAndViewContainer mergeAttributes(@Nullable Map<String, ?> attributes) {
-		// 20201222
+		// 20201222 将提供的{@code映射}中的所有属性复制到该{@code映射}中，同名的现有对象优先（即不被替换）。
 		getModel().mergeAttributes(attributes);
 		return this;
 	}

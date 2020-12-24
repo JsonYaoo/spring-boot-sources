@@ -64,13 +64,12 @@ public final class ProducesRequestCondition extends AbstractRequestCondition<Pro
 	private static final List<ProduceMediaTypeExpression> MEDIA_TYPE_ALL_LIST =
 			Collections.singletonList(new ProduceMediaTypeExpression(MediaType.ALL_VALUE));
 
+	// 20201224 "org.springframework.web.servlet.mvc.condition.ProducesRequestCondition.MEDIA_TYPES"
 	private static final String MEDIA_TYPES_ATTRIBUTE = ProducesRequestCondition.class.getName() + ".MEDIA_TYPES";
-
 
 	private final List<ProduceMediaTypeExpression> expressions;
 
 	private final ContentNegotiationManager contentNegotiationManager;
-
 
 	/**
 	 * Creates a new instance from "produces" expressions. If 0 expressions
@@ -347,7 +346,9 @@ public final class ProducesRequestCondition extends AbstractRequestCondition<Pro
 	 * @param request the current request
 	 * @since 5.2
 	 */
+	// 20201224 使用它清除包含已解析的请求的媒体类型的{@link #MEDIA_TYPES_ATTRIBUTE}。
 	public static void clearMediaTypesAttribute(HttpServletRequest request) {
+		// 20201224 从此请求中删除属性 "org.springframework.web.servlet.mvc.condition.ProducesRequestCondition.MEDIA_TYPES"
 		request.removeAttribute(MEDIA_TYPES_ATTRIBUTE);
 	}
 

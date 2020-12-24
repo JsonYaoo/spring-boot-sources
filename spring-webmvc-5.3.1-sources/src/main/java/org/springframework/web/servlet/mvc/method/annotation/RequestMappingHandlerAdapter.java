@@ -840,7 +840,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter i
 			mav = invokeHandlerMethod(request, response, handlerMethod);
 		}
 
-		// 20201223 需要打开缓存 "Cache-Control" => eg: !false => true
+		// 20201223 是否包含缓存标头 "Cache-Control" => eg: !false => true
 		if (!response.containsHeader(HEADER_CACHE_CONTROL)) {
 			// 20201223 eg: SessionAttributesHandler@xxxx: attributeNames: [], attributeTypes: [] => false
 			if (getSessionAttributesHandler(handlerMethod).hasSessionAttributes()) {

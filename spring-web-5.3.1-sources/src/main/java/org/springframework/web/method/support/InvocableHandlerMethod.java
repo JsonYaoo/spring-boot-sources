@@ -116,6 +116,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	 * B.
 	 * <p>Default is a {@link DefaultParameterNameDiscoverer}.
 	 */
+	// 20201224 设置ParameterNameDiscoverer以在需要时解析参数名称（例如默认请求属性名称）。
 	public void setParameterNameDiscoverer(ParameterNameDiscoverer parameterNameDiscoverer) {
 		this.parameterNameDiscoverer = parameterNameDiscoverer;
 	}

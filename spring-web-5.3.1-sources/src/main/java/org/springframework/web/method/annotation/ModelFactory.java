@@ -214,7 +214,7 @@ public final class ModelFactory {
 	/**
 	 * Find {@code @ModelAttribute} arguments also listed as {@code @SessionAttributes}.
 	 */
-	// 20201223 查找也列为{@code @SessionAttributes}的{@code @ModelAttribute}参数。
+	// 20201223 查找{@code @SessionAttributes}的{@code @ModelAttribute}参数。
 	private List<String> findSessionAttributeArguments(HandlerMethod handlerMethod) {
 		List<String> result = new ArrayList<>();
 
