@@ -1208,7 +1208,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				dispatchException = new NestedServletException("Handler dispatch failed", err);
 			}
 
-
+			// 20201224 处理处理程序选择和处理程序调用的结果，该结果可以是ModelAndView或要解析为ModelAndView的异常。
 			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 		}
 		catch (Exception ex) {
@@ -1251,12 +1251,14 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * Handle the result of handler selection and handler invocation, which is
 	 * either a ModelAndView or an Exception to be resolved to a ModelAndView.
 	 */
+	// 20201224 处理处理程序选择和处理程序调用的结果，该结果可以是ModelAndView或要解析为ModelAndView的异常。
 	private void processDispatchResult(HttpServletRequest request, HttpServletResponse response,
 			@Nullable HandlerExecutionChain mappedHandler, @Nullable ModelAndView mv,
 			@Nullable Exception exception) throws Exception {
 
 		boolean errorView = false;
 
+		// 20201224 eg: null
 		if (exception != null) {
 			if (exception instanceof ModelAndViewDefiningException) {
 				logger.debug("ModelAndViewDefiningException encountered", exception);
@@ -1269,7 +1271,9 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
+		// 20201224 处理程序是否返回了要渲染的视图？
 		// Did the handler return a view to render?
+		// 20201224 eg: null
 		if (mv != null && !mv.wasCleared()) {
 			render(mv, request, response);
 			if (errorView) {
@@ -1282,13 +1286,19 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
+		// 20201224 当前请求的选定处理程序是否选择异步处理该请求	=> eg: false
 		if (WebAsyncUtils.getAsyncManager(request).isConcurrentHandlingStarted()) {
+			// 20201224 在转发过程中开始并发处理
 			// Concurrent handling started during a forward
 			return;
 		}
 
+		// 20201224 HandlerExecutionChain@xxxx: "HandlerExecutionChain with [com.jsonyao.cs.Controller.TestController#testRestController()] and 2 interceptors"
+		// 20201224 handler: HandlerMethod@xxxx: "com.jsonyao.cs.Controller.TestController#testRestController()", interceptorList: ArrayList@xxxx: size = 2
 		if (mappedHandler != null) {
+			// 20201224 异常（如果有）已经处理。
 			// Exception (if any) is already handled..
+			// 20201224 在映射的HandlerInterceptor上触发afterCompletion回调。 只会对preHandle调用已成功完成并返回true的所有拦截器调用afterCompletion。
 			mappedHandler.triggerAfterCompletion(request, response, null);
 		}
 	}

@@ -180,18 +180,36 @@ public interface HandlerInterceptor {
 	}
 
 	/**
+	 * 20201224
+	 * A. 完成请求处理后（即渲染视图之后）的回调。 处理程序执行的任何结果都将被调用，从而允许适当的资源清理
+	 * B. 注意：仅当此拦截器的{@code preHandle}方法成功完成并返回{@code true}时才会调用！
+	 * C. 与{@code postHandle}方法一样，该方法将在链中的每个拦截器上以相反的顺序被调用，因此第一个拦截器将是最后一个被调用。
+	 * D. 注意：特殊注意事项适用于异步请求处理。 有关更多详细信息，请参见{@link org.springframework.web.servlet.AsyncHandlerInterceptor}。
+	 * E. 默认实现为空。
+	 */
+	/**
+	 * A.
 	 * Callback after completion of request processing, that is, after rendering
 	 * the view. Will be called on any outcome of handler execution, thus allows
 	 * for proper resource cleanup.
+	 *
+	 * B.
 	 * <p>Note: Will only be called if this interceptor's {@code preHandle}
 	 * method has successfully completed and returned {@code true}!
+	 *
+	 * C.
 	 * <p>As with the {@code postHandle} method, the method will be invoked on each
 	 * interceptor in the chain in reverse order, so the first interceptor will be
 	 * the last to be invoked.
+	 *
+	 * D.
 	 * <p><strong>Note:</strong> special considerations apply for asynchronous
 	 * request processing. For more details see
 	 * {@link org.springframework.web.servlet.AsyncHandlerInterceptor}.
+	 *
+	 * E.
 	 * <p>The default implementation is empty.
+	 *
 	 * @param request current HTTP request
 	 * @param response current HTTP response
 	 * @param handler the handler (or {@link HandlerMethod}) that started asynchronous

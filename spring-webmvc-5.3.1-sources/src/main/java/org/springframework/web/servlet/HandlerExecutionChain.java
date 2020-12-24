@@ -193,10 +193,14 @@ public class HandlerExecutionChain {
 	 * Will just invoke afterCompletion for all interceptors whose preHandle invocation
 	 * has successfully completed and returned true.
 	 */
+	// 20201224 在映射的HandlerInterceptor上触发afterCompletion回调。 只会对preHandle调用已成功完成并返回true的所有拦截器调用afterCompletion。
 	void triggerAfterCompletion(HttpServletRequest request, HttpServletResponse response, @Nullable Exception ex) {
+		// 20201224 拦截器索引 => eg: = 1
 		for (int i = this.interceptorIndex; i >= 0; i--) {
+			// 20201224 eg: ResourceUrlProviderExposingInterceptor@xxxx、ConversionServiceExposingInterceptor@xxxx
 			HandlerInterceptor interceptor = this.interceptorList.get(i);
 			try {
+				// 20201224 完成请求处理后（即渲染视图之后）的回调。 处理程序执行的任何结果都将被调用，从而允许适当的资源清理 => eg: do nothing
 				interceptor.afterCompletion(request, response, this.handler, ex);
 			}
 			catch (Throwable ex2) {
