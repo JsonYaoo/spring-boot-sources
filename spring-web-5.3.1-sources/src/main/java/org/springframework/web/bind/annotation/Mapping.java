@@ -28,6 +28,7 @@ import java.lang.annotation.Target;
  * @since 3.0
  * @see RequestMapping
  */
+// 202012225 指示Web映射注释的元注释。
 @Target({ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Mapping {

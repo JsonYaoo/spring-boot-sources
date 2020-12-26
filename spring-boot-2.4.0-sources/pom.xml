@@ -29,5 +29,11 @@
             <artifactId>spring-boot-autoconfigure-2.4.0-sources</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.jsonyao.cs</groupId>
+            <artifactId>class-04-spring-boot</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
