@@ -79,22 +79,35 @@ import java.io.IOException;
 public interface Servlet {
 
     /**
+     * 20201227
+     * A. servlet容器调用以向servlet指示该servlet正在投入使用。
+     * B. 实例化servlet之后，servlet容器仅调用一次init方法。 servlet可以接收任何请求之前，init方法必须成功完成。
+     * C. 如果使用init方法，则servlet容器无法将servlet投入使用:
+     *      a. 抛出ServletException
+     *      b. 在Web服务器定义的时间段内不返回
+     */
+    /**
+     * A.
      * Called by the servlet container to indicate to a servlet that the servlet
      * is being placed into service.
      *
+     * B.
      * <p>
      * The servlet container calls the <code>init</code> method exactly once
      * after instantiating the servlet. The <code>init</code> method must
      * complete successfully before the servlet can receive any requests.
      *
+     * C.
      * <p>
      * The servlet container cannot place the servlet into service if the
      * <code>init</code> method
      * <ol>
+     * a.
      * <li>Throws a <code>ServletException</code>
+     *
+     * b.
      * <li>Does not return within a time period defined by the Web server
      * </ol>
-     *
      *
      * @param config
      *            a <code>ServletConfig</code> object containing the servlet's
@@ -107,6 +120,7 @@ public interface Servlet {
      * @see UnavailableException
      * @see #getServletConfig
      */
+    // 20201227 servlet容器调用以向servlet指示该servlet正在投入使用。实例化servlet之后，servlet容器仅调用一次init方法。 servlet可以接收任何请求之前，init方法必须成功完成。
     public void init(ServletConfig config) throws ServletException;
 
     /**
@@ -195,6 +209,13 @@ public interface Servlet {
     public String getServletInfo();
 
     /**
+     * 20201227
+     * A. 由Servlet容器调用以向Servlet指示该Servlet正在退出服务。 仅当servlet的service方法中的所有线程都已退出或经过超时时间后，才调用此方法。
+     *    Servlet容器调用此方法后，将不再在该Servlet上再次调用service方法。
+     * B. 此方法使Servlet有机会清理所持有的任何资源（例如，内存，文件句柄，线程），并确保任何持久状态都与Servlet在内存中的当前状态同步。
+     */
+    /**
+     * A.
      * Called by the servlet container to indicate to a servlet that the servlet
      * is being taken out of service. This method is only called once all
      * threads within the servlet's <code>service</code> method have exited or
@@ -202,11 +223,13 @@ public interface Servlet {
      * method, it will not call the <code>service</code> method again on this
      * servlet.
      *
+     * B.
      * <p>
      * This method gives the servlet an opportunity to clean up any resources
      * that are being held (for example, memory, file handles, threads) and make
      * sure that any persistent state is synchronized with the servlet's current
      * state in memory.
      */
+    // 20201227 由Servlet容器调用以向Servlet指示该Servlet正在退出服务。 仅当servlet的service方法中的所有线程都已退出或经过超时时间后，才调用此方法。Servlet容器调用此方法后，将不再在该Servlet上再次调用service方法。
     public void destroy();
 }
