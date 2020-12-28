@@ -19,15 +19,27 @@ package javax.servlet;
 import java.util.Set;
 
 /**
+ * 20201228
+ * A. ServletContainerInitializer（SCI）通过文件META-INF / services / javax.servlet.ServletContainerInitializer中的条目注册，该条目必须实现SCI接口。
+ * B. 不管元数据完成的设置如何，都执行SCI处理。 可以通过片段顺序对每个JAR文件控制SCI处理。 如果定义了绝对排序，则仅对SCI处理排序中包含的JAR。 为了完全禁用SCI处理，
+ *    可以定义一个空的绝对顺序。
+ * C. SCI通过添加到类中的{@link javax.servlet.annotation.HandlesTypes}注释来注册对注释（类，方法或字段）和/或类型的兴趣。
+ */
+/**
+ * A.
  * ServletContainerInitializers (SCIs) are registered via an entry in the
  * file META-INF/services/javax.servlet.ServletContainerInitializer that must be
  * included in the JAR file that contains the SCI implementation.
+ *
+ * B.
  * <p>
  * SCI processing is performed regardless of the setting of metadata-complete.
  * SCI processing can be controlled per JAR file via fragment ordering. If
  * absolute ordering is defined, then only the JARs included in the ordering
  * will be processed for SCIs. To disable SCI processing completely, an empty
  * absolute ordering may be defined.
+ *
+ * C.
  * <p>
  * SCIs register an interest in annotations (class, method or field) and/or
  * types via the {@link javax.servlet.annotation.HandlesTypes} annotation which
@@ -35,6 +47,7 @@ import java.util.Set;
  *
  * @since Servlet 3.0
  */
+// 20201228 ServletContainerInitializer（SCI）通过文件META-INF / services / javax.servlet.ServletContainerInitializer中的条目注册: 该条目必须实现SCI接口
 public interface ServletContainerInitializer {
 
     /**

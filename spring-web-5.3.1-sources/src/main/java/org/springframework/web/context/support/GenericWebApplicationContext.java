@@ -132,6 +132,7 @@ public class GenericWebApplicationContext extends GenericApplicationContext impl
 	/**
 	 * Set the ServletContext that this WebApplicationContext runs in.
 	 */
+	// 20201228 设置运行此WebApplicationContext的ServletContext。
 	@Override
 	public void setServletContext(@Nullable ServletContext servletContext) {
 		this.servletContext = servletContext;

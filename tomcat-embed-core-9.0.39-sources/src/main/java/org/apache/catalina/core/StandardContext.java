@@ -136,6 +136,11 @@ import org.apache.tomcat.util.security.PrivilegedGetTccl;
 import org.apache.tomcat.util.security.PrivilegedSetTccl;
 
 /**
+ * 20201228
+ * A. Context接口的标准实现。 每个子容器必须是Wrapper实现，才能处理针对特定servlet的请求。
+ */
+/**
+ * A.
  * Standard implementation of the <b>Context</b> interface.  Each
  * child container must be a Wrapper implementation to process the
  * requests directed to a particular servlet.
@@ -143,8 +148,8 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-public class StandardContext extends ContainerBase
-        implements Context, NotificationEmitter {
+// 20201228 Context接口的标准实现。 每个子容器必须是Wrapper实现，才能处理针对特定servlet的请求。
+public class StandardContext extends ContainerBase implements Context, NotificationEmitter {
 
     private static final Log log = LogFactory.getLog(StandardContext.class);
 

@@ -212,12 +212,15 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 
 	// 20201213 启动Web服务器, 替换与{@code Servlet}相关的属性源
 	private void createWebServer() {
+		// 20201228 eg: null
 		WebServer webServer = this.webServer;
+
+		// 20201228 eg: null
 		ServletContext servletContext = getServletContext();
 		if (webServer == null && servletContext == null) {
 			StartupStep createWebServer = this.getApplicationStartup().start("spring.boot.webserver.create");
 
-			// 20201214 获取WebServer工厂
+			// 20201214 获取WebServer工厂 eg: TomcatServletWebServerFactory@xxxx: protocol: "org.apache.coyote.http11.Http11NioProtocol"
 			ServletWebServerFactory factory = getWebServerFactory();
 			createWebServer.tag("factory", factory.getClass().toString());
 
@@ -258,7 +261,9 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	 */
 	// 20201214 返回用于创建嵌入式{@link WebServer}的{@link ServletWebServerFactory}。 默认情况下，此方法在上下文本身中搜索合适的bean。
 	protected ServletWebServerFactory getWebServerFactory() {
-		// Use bean names so that we don't consider the hierarchy // 20201214 使用Bean名称，这样我们就不会考虑层次结构
+		// 20201214 使用Bean名称，这样我们就不会考虑层次结构
+		// Use bean names so that we don't consider the hierarchy
+		// 20201228 eg: "tomcatServletWebServerFactory"
 		String[] beanNames = getBeanFactory().getBeanNamesForType(ServletWebServerFactory.class);
 		if (beanNames.length == 0) {
 			throw new ApplicationContextException("Unable to start ServletWebServerApplicationContext due to missing "
@@ -269,7 +274,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 					+ "ServletWebServerFactory beans : " + StringUtils.arrayToCommaDelimitedString(beanNames));
 		}
 
-		// 20201207 返回一个实例，该实例可以是指定bean的共享或独立的。
+		// 20201207 构造ServletWebServerFactory实例，该实例可以是指定bean的共享或独立的。
 		return getBeanFactory().getBean(beanNames[0], ServletWebServerFactory.class);
 	}
 
@@ -324,13 +329,20 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	}
 
 	/**
+	 * 20201228
+	 * 使用给定的完全加载的{@link ServletContext}准备{@link WebApplicationContext}。 通常从{@link ServletContextInitializer＃onStartup（ServletContext）}
+	 * 调用此方法，该方法类似于{@link ContextLoaderListener}通常提供的功能。
+	 */
+	/**
 	 * Prepare the {@link WebApplicationContext} with the given fully loaded
 	 * {@link ServletContext}. This method is usually called from
 	 * {@link ServletContextInitializer#onStartup(ServletContext)} and is similar to the
 	 * functionality usually provided by a {@link ContextLoaderListener}.
 	 * @param servletContext the operational servlet context
 	 */
+	// 20201228 使用给定的完全加载的{@link ServletContext}准备{@link WebApplicationContext}
 	protected void prepareWebApplicationContext(ServletContext servletContext) {
+		// 20201228 eg: "org.springframework.web.context.WebApplicationContext.ROOT": null
 		Object rootContext = servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 		if (rootContext != null) {
 			if (rootContext == this) {
@@ -342,6 +354,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		}
 		servletContext.log("Initializing Spring embedded WebApplicationContext");
 		try {
+			// 20201228 eg: "org.springframework.web.context.WebApplicationContext.ROOT": AnnotationConfigServletWebSeverApplicationContext@xxxx
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Published root WebApplicationContext as ServletContext attribute with name ["
