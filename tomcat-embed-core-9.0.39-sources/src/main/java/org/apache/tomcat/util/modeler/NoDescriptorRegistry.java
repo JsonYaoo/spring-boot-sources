@@ -45,10 +45,16 @@ import javax.management.ReflectionException;
 import javax.management.loading.ClassLoaderRepository;
 
 /**
+ * 20201228
+ * A. MBean注册表的实现，可以有效地禁用MBean注册。 通常在低内存占用量是主要问题时使用。
+ */
+/**
+ * A.
  * An implementation of the MBean registry that effectively disables MBean
  * registration. This is typically used when low memory footprint is a primary
  * concern.
  */
+// 20201228 MBean注册表的实现，可以有效地禁用MBean注册。 通常在低内存占用量是主要问题时使用。
 public class NoDescriptorRegistry extends Registry {
 
     private final MBeanServer mBeanServer = new NoJmxMBeanServer();

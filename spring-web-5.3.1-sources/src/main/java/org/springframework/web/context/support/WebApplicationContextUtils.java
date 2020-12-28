@@ -223,7 +223,9 @@ public abstract class WebApplicationContextUtils {
 	 * @param bf the BeanFactory to configure
 	 * @param sc the ServletContext that we're running within
 	 */
+	// 20201228 使用WebApplicationContext所使用的给定BeanFactory注册特定于Web的环境Bean（“ contextParameters”，“ contextAttributes”）。
 	public static void registerEnvironmentBeans(ConfigurableListableBeanFactory bf, @Nullable ServletContext sc) {
+		// 20201228 "servletContext"、"servletConfig"、"contextParameters"、"contextAttributes"
 		registerEnvironmentBeans(bf, sc, null);
 	}
 
@@ -234,17 +236,21 @@ public abstract class WebApplicationContextUtils {
 	 * @param servletContext the ServletContext that we're running within
 	 * @param servletConfig the ServletConfig
 	 */
+	// 20201228 使用WebApplicationContext所使用的给定BeanFactory注册特定于Web的环境Bean（“ contextParameters”，“ contextAttributes”）。
 	public static void registerEnvironmentBeans(ConfigurableListableBeanFactory bf,
 			@Nullable ServletContext servletContext, @Nullable ServletConfig servletConfig) {
 
+		// 20201228 "servletContext": ApplicationContextFacade@xxxx
 		if (servletContext != null && !bf.containsBean(WebApplicationContext.SERVLET_CONTEXT_BEAN_NAME)) {
 			bf.registerSingleton(WebApplicationContext.SERVLET_CONTEXT_BEAN_NAME, servletContext);
 		}
 
+		// 20201228 "servletConfig": null
 		if (servletConfig != null && !bf.containsBean(ConfigurableWebApplicationContext.SERVLET_CONFIG_BEAN_NAME)) {
 			bf.registerSingleton(ConfigurableWebApplicationContext.SERVLET_CONFIG_BEAN_NAME, servletConfig);
 		}
 
+		// 20201228 "contextParameters": Collections$UnmodifiableMap@xxxx: size = 0
 		if (!bf.containsBean(WebApplicationContext.CONTEXT_PARAMETERS_BEAN_NAME)) {
 			Map<String, String> parameterMap = new HashMap<>();
 			if (servletContext != null) {
@@ -265,6 +271,7 @@ public abstract class WebApplicationContextUtils {
 					Collections.unmodifiableMap(parameterMap));
 		}
 
+		// 20201228 "contextAttributes": Collections$UnmodifiableMap@xxxx: size = 8
 		if (!bf.containsBean(WebApplicationContext.CONTEXT_ATTRIBUTES_BEAN_NAME)) {
 			Map<String, Object> attributeMap = new HashMap<>();
 			if (servletContext != null) {

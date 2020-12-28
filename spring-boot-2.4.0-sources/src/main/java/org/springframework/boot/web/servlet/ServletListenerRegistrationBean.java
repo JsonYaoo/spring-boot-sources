@@ -138,6 +138,10 @@ public class ServletListenerRegistrationBean<T extends EventListener> extends Re
 	 * Return the supported types for this registration.
 	 * @return the supported types
 	 */
+	// 20201228 返回此注册支持的类型
+	// 20201228 "interface javax.servlet.ServletContextAttributeListener"、"interface javax.servlet.ServletContextListener"、
+	// 20201228 "interface javax.servlet.http.HttpSessionAttributeListener"、"interface javax.servlet.http.HttpSessionListener"
+	// 20201228 "interface javax.servlet.ServletRequestListener"、"interface javax.servlet.ServletRequestAttributeListener"
 	public static Set<Class<?>> getSupportedTypes() {
 		return SUPPORTED_TYPES;
 	}

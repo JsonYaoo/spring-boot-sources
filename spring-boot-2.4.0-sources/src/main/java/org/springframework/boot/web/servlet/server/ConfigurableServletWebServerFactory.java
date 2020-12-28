@@ -31,6 +31,11 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.WebListenerRegistry;
 
 /**
+ * 20201228
+ * A.一个可配置的{@link ServletWebServerFactory}。
+ */
+/**
+ * A.
  * A configurable {@link ServletWebServerFactory}.
  *
  * @author Dave Syer
@@ -42,8 +47,8 @@ import org.springframework.boot.web.servlet.WebListenerRegistry;
  * @see ServletWebServerFactory
  * @see WebServerFactoryCustomizer
  */
-public interface ConfigurableServletWebServerFactory
-		extends ConfigurableWebServerFactory, ServletWebServerFactory, WebListenerRegistry {
+// 20201228 一个可配置的{@link ServletWebServerFactory}: 可配置的{@link WebServerFactory}, 可用于创建{@link WebServer}的工厂接口, 拥有{@link WebListener @WebListeners}的注册表。
+public interface ConfigurableServletWebServerFactory extends ConfigurableWebServerFactory, ServletWebServerFactory, WebListenerRegistry {
 
 	/**
 	 * Sets the context path for the web server. The context should start with a "/"

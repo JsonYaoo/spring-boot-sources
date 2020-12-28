@@ -399,8 +399,12 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         }
     }
 
-
     /**
+     * 20201228
+     * A. 启动嵌套组件（{@link Executor}，{@ ink Connector}和{@link Container}）并实现{@link org.apache.catalina.util.LifecycleBase＃startInternal（）}的要求。
+     */
+    /**
+     * A.
      * Start nested components ({@link Executor}s, {@link Connector}s and
      * {@link Container}s) and implement the requirements of
      * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
@@ -408,6 +412,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    // 20201228 启动嵌套组件（{@link Executor}，{@ ink Connector}和{@link Container}）并实现{@link org.apache.catalina.util.LifecycleBase＃startInternal（）}的要求。
     @Override
     protected void startInternal() throws LifecycleException {
 
@@ -418,6 +423,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // Start our defined Container first
         if (engine != null) {
             synchronized (engine) {
+                // 20201228 【重点】{@link LifecycleState＃STARTING_PREP} => {@link LifecycleState＃STARTING} => {@link LifecycleState＃STARTED}
                 engine.start();
             }
         }
@@ -435,6 +441,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             for (Connector connector: connectors) {
                 // If it has already failed, don't try and start it
                 if (connector.getState() != LifecycleState.FAILED) {
+                    // 20201228 启动Connector
                     connector.start();
                 }
             }
@@ -507,16 +514,20 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * Invoke a pre-startup initialization. This is used to allow connectors
      * to bind to restricted ports under Unix operating environments.
      */
+    // 20201228 调用启动前的初始化。 这用于允许连接器在Unix操作环境下绑定到受限端口。
     @Override
     protected void initInternal() throws LifecycleException {
-
+        // 20201228 eg: "Tomcat:type=Service"
         super.initInternal();
 
+        // 20201228 eg: true
         if (engine != null) {
             engine.init();
         }
 
+        // 20201228 初始化任何执行器
         // Initialize any Executors
+        // 20201228 eg: []
         for (Executor executor : findExecutors()) {
             if (executor instanceof JmxEnabled) {
                 ((JmxEnabled) executor).setDomain(getDomain());
@@ -524,12 +535,17 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             executor.init();
         }
 
+        // 20201228 初始化映射器监听器
         // Initialize mapper listener
+        // 20201228 eg: MapperListener@xxxx
         mapperListener.init();
 
+        // 20201228 初始化我们定义的连接器
         // Initialize our defined Connectors
         synchronized (connectorsLock) {
+            // 20201228 eg: size = 1, Connector: "Connector[HTTP/1.1-8087]": StandardService@xxxx: "StandardService[Tomcat]"
             for (Connector connector : connectors) {
+                // 20201228 New => init
                 connector.init();
             }
         }

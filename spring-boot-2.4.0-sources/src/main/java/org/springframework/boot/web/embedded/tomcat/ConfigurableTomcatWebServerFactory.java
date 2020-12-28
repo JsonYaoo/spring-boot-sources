@@ -27,6 +27,11 @@ import org.apache.catalina.connector.Connector;
 import org.springframework.boot.web.server.ConfigurableWebServerFactory;
 
 /**
+ * 20201228
+ * A. {@link ConfigurableWebServerFactory}用于特定于Tomcat的功能。
+ */
+/**
+ * A.
  * {@link ConfigurableWebServerFactory} for Tomcat-specific features.
  *
  * @author Brian Clozel
@@ -34,6 +39,7 @@ import org.springframework.boot.web.server.ConfigurableWebServerFactory;
  * @see TomcatServletWebServerFactory
  * @see TomcatReactiveWebServerFactory
  */
+// 20201228 {@link ConfigurableWebServerFactory}用于特定于Tomcat的功能: 创建{@link WebServer}的工厂的标记接口, 包含{@link ErrorPage ErrorPages}的注册表的接口
 public interface ConfigurableTomcatWebServerFactory extends ConfigurableWebServerFactory {
 
 	/**

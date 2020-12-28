@@ -553,31 +553,40 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * and prevent invalid state transitions.
      */
 
+    // 20201228 初始化协议。
     @Override
     public void init() throws Exception {
+        // 20201228 eg: fale
         if (getLog().isInfoEnabled()) {
             getLog().info(sm.getString("abstractProtocolHandler.init", getName()));
             logPortOffset();
         }
 
+        // 20201228 eg: null
         if (oname == null) {
+            // 20201228 组件未预注册，请注册
             // Component not pre-registered so register it
+            // 20201228 eg: "Tomcat:type=ProtocolHandler,port=8087"
             oname = createObjectName();
             if (oname != null) {
                 Registry.getRegistry(null, null).registerComponent(this, oname, null);
             }
         }
 
+        // 20201228 eg: "Tomcat"
         if (this.domain != null) {
+            // 20201228 eg: "Tomcat:type=GlobalRequestProcessor,name="http-nio-8087""
             rgOname = new ObjectName(domain + ":type=GlobalRequestProcessor,name=" + getName());
             Registry.getRegistry(null, null).registerComponent(
                     getHandler().getGlobal(), rgOname, null);
         }
 
+        // 20201228 ""http-nio-8087""
         String endpointName = getName();
         endpoint.setName(endpointName.substring(1, endpointName.length()-1));
         endpoint.setDomain(domain);
 
+        // 20201228 初始化Endpoint eg: NioEndpoint@xxxx
         endpoint.init();
     }
 

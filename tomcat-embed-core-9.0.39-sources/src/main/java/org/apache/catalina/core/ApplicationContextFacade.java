@@ -50,13 +50,17 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.ExceptionUtils;
 
-
+/**
+ * 20201228
+ * 从Web应用程序屏蔽内部ApplicationContext对象的Facade对象。
+ */
 /**
  * Facade object which masks the internal <code>ApplicationContext</code>
  * object from the web application.
  *
  * @author Remy Maucherat
  */
+// 20201228 从Web应用程序屏蔽内部ApplicationContext对象的Facade对象。
 public class ApplicationContextFacade implements ServletContext {
 
     // ---------------------------------------------------------- Attributes
@@ -504,10 +508,8 @@ public class ApplicationContextFacade implements ServletContext {
         }
     }
 
-
     @Override
-    public ServletRegistration.Dynamic addServlet(String servletName,
-            String className) {
+    public ServletRegistration.Dynamic addServlet(String servletName, String className) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration.Dynamic) doPrivileged(
                     "addServlet", new Object[]{servletName, className});
@@ -516,19 +518,18 @@ public class ApplicationContextFacade implements ServletContext {
         }
     }
 
-
+    // 20201228 注册一个Servlet实现以在此ServletContext中使用。
     @Override
-    public ServletRegistration.Dynamic addServlet(String servletName,
-            Servlet servlet) {
+    public ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration.Dynamic) doPrivileged("addServlet",
                     new Class[]{String.class, Servlet.class},
                     new Object[]{servletName, servlet});
         } else {
+            // 20201228 eg: "dispatcherServlet"-DispatcherServlet@xxxx
             return context.addServlet(servletName, servlet);
         }
     }
-
 
     @Override
     public ServletRegistration.Dynamic addServlet(String servletName,

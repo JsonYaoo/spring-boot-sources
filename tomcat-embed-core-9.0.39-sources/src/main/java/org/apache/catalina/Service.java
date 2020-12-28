@@ -102,6 +102,7 @@ public interface Service extends Lifecycle {
      *
      * @param connector The Connector to be added
      */
+    // 20201228 将新的连接器添加到已定义的连接器集，并将其与此服务的容器关联。
     public void addConnector(Connector connector);
 
     /**

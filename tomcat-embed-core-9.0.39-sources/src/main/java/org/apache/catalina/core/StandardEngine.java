@@ -259,6 +259,7 @@ public class StandardEngine extends ContainerBase implements Engine {
         }
 
         // Standard container startup
+        // 20201228 【重点】启动此组件并实现{@link org.apache.catalina.util.LifecycleBase＃startInternal（）}的要求。
         super.startInternal();
     }
 

@@ -351,6 +351,7 @@ public interface Wrapper extends Container {
      *
      * @param asyncSupport the new value
      */
+    // 20201228 为关联的Servlet设置异步支持。
     public void setAsyncSupported(boolean asyncSupport);
 
     /**

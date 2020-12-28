@@ -78,9 +78,17 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201228
+ * A. {@link AbstractServletWebServerFactory}，可用于创建{@link TomcatWebServer}。 可以使用Spring的{@link ServletContextInitializer}或Tomcat {@link LifecycleListener}进行初始化。
+ * B. 除非明确配置，否则该工厂将创建在端口8080上侦听HTTP请求的容器。
+ */
+/**
+ * A.
  * {@link AbstractServletWebServerFactory} that can be used to create
  * {@link TomcatWebServer}s. Can be initialized using Spring's
  * {@link ServletContextInitializer}s or Tomcat {@link LifecycleListener}s.
+ *
+ * B.
  * <p>
  * Unless explicitly configured otherwise this factory will create containers that listen
  * for HTTP requests on port 8080.
@@ -98,8 +106,8 @@ import org.springframework.util.StringUtils;
  * @see #setContextLifecycleListeners(Collection)
  * @see TomcatWebServer
  */
-public class TomcatServletWebServerFactory extends AbstractServletWebServerFactory
-		implements ConfigurableTomcatWebServerFactory, ResourceLoaderAware {
+// 20201228 {@link AbstractServletWebServerFactory}，可用于创建{@link TomcatWebServer}。 可以使用Spring的{@link ServletContextInitializer}或Tomcat {@link LifecycleListener}进行初始化
+public class TomcatServletWebServerFactory extends AbstractServletWebServerFactory implements ConfigurableTomcatWebServerFactory, ResourceLoaderAware {
 
 	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
@@ -108,6 +116,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	/**
 	 * The class name of default protocol used.
 	 */
+	// 20201228 使用的默认协议的类名称 eg: "org.apache.coyote.http11.Http11NioProtocol"
 	public static final String DEFAULT_PROTOCOL = "org.apache.coyote.http11.Http11NioProtocol";
 
 	private static final boolean IN_NATIVE_IMAGE = System.getProperty("org.graalvm.nativeimage.imagecode") != null;
@@ -130,6 +139,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 	private ResourceLoader resourceLoader;
 
+	// 20201228 使用的默认协议的类名称 eg: "org.apache.coyote.http11.Http11NioProtocol"
 	private String protocol = DEFAULT_PROTOCOL;
 
 	private Set<String> tldSkipPatterns = new LinkedHashSet<>(TldPatterns.DEFAULT_SKIP);
@@ -140,6 +150,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 	private int backgroundProcessorDelay;
 
+	// 20201228 禁用MBean, 默认为true
 	private boolean disableMBeanRegistry = true;
 
 	/**
@@ -181,23 +192,44 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	// 20201213 【Tomcat源码】获取一个新的完全配置但暂停的{@link WebServer}实例
 	@Override
 	public WebServer getWebServer(ServletContextInitializer... initializers) {
+		// 禁用MBean注册 => eg: true
 		if (this.disableMBeanRegistry) {
 			Registry.disableRegistry();
 		}
 
 		// 20201213 【Tomcat源码】tomcat-embed-core-9.0.39.jar
+		// 20201228 此类用于嵌入tomcat的应用程序: Tomcat支持多种样式的配置和启动-最常见和稳定的是基于server.xml的服务器
 		Tomcat tomcat = new Tomcat();
 
 		// 20201213 设置Tomcat必要属性
+		// 20201228 eg: "C:\Users\14840\AppData\Local\Temp\tomcat.8087.1601608683379134423"
 		File baseDir = (this.baseDirectory != null) ? this.baseDirectory : createTempDir("tomcat");
+
+		// 20201228 eg: "C:\Users\14840\AppData\Local\Temp\tomcat.8087.1601608683379134423"
 		tomcat.setBaseDir(baseDir.getAbsolutePath());
+
+		// 20201228 Connector@xxxx: protocolHandlerName: "org.apache.coyote.http11.Http11NioProtocol"
 		Connector connector = new Connector(this.protocol);
+
+		// 20201228 在重要位置抛出的异常将被重新抛出以供调用者处理或将其记录下来 eg: true
 		connector.setThrowOnFailure(true);
+
+		// 20201228 将新的连接器添加到已定义的连接器集，并将其与此服务的容器关联。
 		tomcat.getService().addConnector(connector);
+
+		// 20201228 自定义Connector
 		customizeConnector(connector);
+
+		// 20201228 在服务中设置指定的连接器（如果尚不存在）。
 		tomcat.setConnector(connector);
+
+		// 20201228 设置此主机的自动部署标志值 eg: false
 		tomcat.getHost().setAutoDeploy(false);
+
+		// 20201228 配置引擎
 		configureEngine(tomcat.getEngine());
+
+		// 20201228 eg: []
 		for (Connector additionalConnector : this.additionalTomcatConnectors) {
 			tomcat.getService().addConnector(additionalConnector);
 		}
@@ -205,10 +237,13 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		// 20201214 准备上下文环境, 设置其他属性
 		prepareContext(tomcat.getHost(), initializers);
 
+		// 20201214 【重点】调用工厂方法来创建{@link TomcatWebServer}。 子类可以重写此方法以返回不同的{@link TomcatWebServer}或对Tomcat服务器进行其他处理。
 		return getTomcatWebServer(tomcat);
 	}
 
+	// 20201228 配置引擎
 	private void configureEngine(Engine engine) {
+		// 20201228 设置在此容器及其子容器上调用execute方法之间的延迟 eg: 10
 		engine.setBackgroundProcessorDelay(this.backgroundProcessorDelay);
 		for (Valve valve : this.engineValves) {
 			engine.getPipeline().addValve(valve);
@@ -217,19 +252,39 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 	// 20201214 准备上下文环境, 设置其他属性
 	protected void prepareContext(Host host, ServletContextInitializer[] initializers) {
+		// 20201228 eg: null
 		File documentRoot = getValidDocumentRoot();
+
+		// 20201228 {@link TomcatWebServer}使用的Tomcat {@link StandardContext}支持延迟的初始化:  Context接口的标准实现, 每个子容器必须是Wrapper实现，才能处理针对特定servlet的请求
+		// 20201228 eg: TomcatEmbeddedContext@xxxx: "TomcatEmbeddedContext[null]", state: LifecycleState@xxxx: "NEW"
 		TomcatEmbeddedContext context = new TomcatEmbeddedContext();
 		if (documentRoot != null) {
 			context.setResources(new LoaderHidingResourceRoot(context));
 		}
+
+		// 20201228 eg: ""
 		context.setName(getContextPath());
+
+		// 20201228 eg: "application"
 		context.setDisplayName(getDisplayName());
+
+		// 20201228 eg: ""
 		context.setPath(getContextPath());
+
+		// 20201228 eg: "C:\Users\14840\AppData\Local\Temp\tomcat-docbase.8087.3533994348268659940"
 		File docBase = (documentRoot != null) ? documentRoot : createTempDir("tomcat-docbase");
+
+		// 20201228 eg: "C:\Users\14840\AppData\Local\Temp\tomcat-docbase.8087.3533994348268659940"
 		context.setDocBase(docBase.getAbsolutePath());
+
+		// 20201228 添加声明周期监听器 eg: Tomcat$FixContextListener@xxxx
 		context.addLifecycleListener(new FixContextListener());
-		context.setParentClassLoader((this.resourceLoader != null) ? this.resourceLoader.getClassLoader()
-				: ClassUtils.getDefaultClassLoader());
+
+		// 20201228 eg: "org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@6b3e12b5, started on Tue Dec 29 00:30:58 CST 2020"
+		// 20201228 eg: parentClassLoader-Launcher$AppClassLoader@xxxx
+		context.setParentClassLoader((this.resourceLoader != null) ? this.resourceLoader.getClassLoader() : ClassUtils.getDefaultClassLoader());
+
+		// 202012228 覆盖Tomcat的默认语言环境映射以与其他服务器对齐。 请参阅{@code org.apache.catalina.util.CharsetMapperDefault.properties}。
 		resetDefaultLocaleMapping(context);
 		addLocaleMappings(context);
 		try {
@@ -251,9 +306,16 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 			addJasperInitializer(context);
 		}
 		context.addLifecycleListener(new StaticResourceConfigurer(context));
+
+		// 20201228 希望将指定的{@link ServletContextInitializer}参数与此实例中定义的参数组合在一起的子类可以使用的实用程序方法。
+		// 20201228 eg: ServletContextInitialzer[3]@xxxx: AbstractServletWebServerFactory$lambda@xxxx、AbstractServletWebServerFactory$SessionConfigurationInitializer@xxxx、ServletWebServerApplicationContext$lambda@xxxx
 		ServletContextInitializer[] initializersToUse = mergeInitializers(initializers);
 		host.addChild(context);
+
+		// 20201228 配置Tomcat {@link上下文}。
 		configureContext(context, initializersToUse);
+
+		// 20201228 eg: do nothing
 		postProcessContext(context);
 	}
 
@@ -262,6 +324,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	 * {@code org.apache.catalina.util.CharsetMapperDefault.properties}.
 	 * @param context the context to reset
 	 */
+	// 202012228 覆盖Tomcat的默认语言环境映射以与其他服务器对齐。 请参阅{@code org.apache.catalina.util.CharsetMapperDefault.properties}。
 	private void resetDefaultLocaleMapping(TomcatEmbeddedContext context) {
 		context.addLocaleEncodingMappingParameter(Locale.ENGLISH.toString(), DEFAULT_CHARSET.displayName());
 		context.addLocaleEncodingMappingParameter(Locale.FRENCH.toString(), DEFAULT_CHARSET.displayName());
@@ -317,6 +380,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	}
 
 	// Needs to be protected so it can be used by subclasses
+	// 20201228 需要受到保护，以便子类可以使用它
 	protected void customizeConnector(Connector connector) {
 		int port = Math.max(getPort(), 0);
 		connector.setPort(port);
@@ -366,7 +430,9 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	 * @param context the Tomcat context
 	 * @param initializers initializers to apply
 	 */
+	// 20201228 配置Tomcat {@link上下文}。
 	protected void configureContext(Context context, ServletContextInitializer[] initializers) {
+		// 20201228 eg: ServletContextInitialzer[3]@xxxx: AbstractServletWebServerFactory$lambda@xxxx、AbstractServletWebServerFactory$SessionConfigurationInitializer@xxxx、ServletWebServerApplicationContext$lambda@xxxx
 		TomcatStarter starter = new TomcatStarter(initializers);
 		if (context instanceof TomcatEmbeddedContext) {
 			TomcatEmbeddedContext embeddedContext = (TomcatEmbeddedContext) context;
@@ -374,12 +440,18 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 			embeddedContext.setFailCtxIfServletStartFails(true);
 		}
 		context.addServletContainerInitializer(starter, NO_CLASSES);
+
+		// 20201228 eg: []
 		for (LifecycleListener lifecycleListener : this.contextLifecycleListeners) {
 			context.addLifecycleListener(lifecycleListener);
 		}
+
+		// 20201228 eg: []
 		for (Valve valve : this.contextValves) {
 			context.getPipeline().addValve(valve);
 		}
+
+		// 20201228 eg: ErrorPage@xxxx: path: "/error"
 		for (ErrorPage errorPage : getErrorPages()) {
 			org.apache.tomcat.util.descriptor.web.ErrorPage tomcatErrorPage = new org.apache.tomcat.util.descriptor.web.ErrorPage();
 			tomcatErrorPage.setLocation(errorPage.getPath());
@@ -387,15 +459,22 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 			tomcatErrorPage.setExceptionType(errorPage.getExceptionName());
 			context.addErrorPage(tomcatErrorPage);
 		}
+
+		// 20201228 eg: size = 176
 		for (MimeMappings.Mapping mapping : getMimeMappings()) {
 			context.addMimeMapping(mapping.getExtension(), mapping.getMimeType());
 		}
 		configureSession(context);
 		new DisableReferenceClearingContextCustomizer().customize(context);
+
+		// 20201228 eg: []
 		for (String webListenerClassName : getWebListenerClassNames()) {
 			context.addApplicationListener(webListenerClassName);
 		}
+
+		// 20201228 eg: size = 5
 		for (TomcatContextCustomizer customizer : this.tomcatContextCustomizers) {
+			// 20201228 自定义上下文。
 			customizer.customize(context);
 		}
 	}
@@ -446,6 +525,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	 * {@link Context}.
 	 * @param context the Tomcat {@link Context}
 	 */
+	// 20201228 在将Tomcat {@link Context}与Tomcat服务器一起使用之前，请对其进行后期处理。 子类可以重写此方法，以对{@link Context}进行其他处理。
 	protected void postProcessContext(Context context) {
 	}
 
@@ -456,8 +536,9 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	 * @param tomcat the Tomcat server.
 	 * @return a new {@link TomcatWebServer} instance
 	 */
-	// 20201214 调用工厂方法来创建{@link TomcatWebServer}。 子类可以重写此方法以返回不同的{@link TomcatWebServer}或对Tomcat服务器进行其他处理。
+	// 20201214 【重点】调用工厂方法来创建{@link TomcatWebServer}。 子类可以重写此方法以返回不同的{@link TomcatWebServer}或对Tomcat服务器进行其他处理。
 	protected TomcatWebServer getTomcatWebServer(Tomcat tomcat) {
+		// 20201214 【重点】创建一个新的{@link TomcatWebServer}实例。
 		return new TomcatWebServer(tomcat, getPort() >= 0, getShutdown());
 	}
 

@@ -24,15 +24,27 @@ import org.springframework.web.SpringServletContainerInitializer;
 import org.springframework.web.WebApplicationInitializer;
 
 /**
+ * 20201228
+ * A. 用于以编程方式配置Servlet 3.0+ {@link ServletContext context}的接口。 与{@link WebApplicationInitializer}不同，{@link SpringServletContainerInitializer}不会检测到实现此接口的类
+ *   （而不实现{@link WebApplicationInitializer}），因此Servlet容器不会自动引导它们。
+ * B. 该接口旨在以类似于{@link ServletContainerInitializer}的方式工作，但是其生命周期由Spring而不是Servlet容器管理。
+ * C. 有关配置示例，请参见{@link WebApplicationInitializer}。
+ */
+/**
+ * A.
  * Interface used to configure a Servlet 3.0+ {@link ServletContext context}
  * programmatically. Unlike {@link WebApplicationInitializer}, classes that implement this
  * interface (and do not implement {@link WebApplicationInitializer}) will <b>not</b> be
  * detected by {@link SpringServletContainerInitializer} and hence will not be
  * automatically bootstrapped by the Servlet container.
+ *
+ * B.
  * <p>
  * This interface is designed to act in a similar way to
  * {@link ServletContainerInitializer}, but have a lifecycle that's managed by Spring and
  * not the Servlet container.
+ *
+ * C.
  * <p>
  * For configuration examples see {@link WebApplicationInitializer}.
  *
@@ -40,6 +52,7 @@ import org.springframework.web.WebApplicationInitializer;
  * @since 1.4.0
  * @see WebApplicationInitializer
  */
+// 20201228 用于以编程方式配置Servlet 3.0+ {@link ServletContext context}的接口: Servlet容器不会自动引导它们, 其生命周期由Spring而不是Servlet容器管理
 @FunctionalInterface
 public interface ServletContextInitializer {
 

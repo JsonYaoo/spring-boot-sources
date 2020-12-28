@@ -29,8 +29,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class LifecycleMBeanBase extends LifecycleBase
-        implements JmxEnabled {
+// 20201228 生命周期MBean实现抽象基类: 实现了{@link Lifecycle＃start（）}和{@link Lifecycle＃stop（）}的状态转换规则, 创建MBean服务器时注册到MBean服务器并在销毁它们时取消注册的组件来实现
+public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEnabled {
 
     private static final Log log = LogFactory.getLog(LifecycleMBeanBase.class);
 
@@ -49,13 +49,18 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      * this method, ensuring that super.initInternal() is the first call in the
      * overriding method.
      */
+    // 20201228 希望执行其他初始化的子类应重写此方法，并确保super.initInternal（）是重写方法中的第一个调用。
     @Override
     protected void initInternal() throws LifecycleException {
+        // 20201228 如果oname不为null，则已经通过preRegister（）注册了。
         // If oname is not null then registration has already happened via
         // preRegister().
+        // 20201228 eg: null
         if (oname == null) {
+            // 20201228 eg: NoDescriptorRegistry$NoJmxBeanServer@XXXX
             mserver = Registry.getRegistry(null, null).getMBeanServer();
 
+            // 20201228 "Tomcat:type=Server"
             oname = register(this, getObjectNameKeyProperties());
         }
     }
@@ -128,11 +133,18 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      */
     protected abstract String getObjectNameKeyProperties();
 
-
     /**
+     * 20201228
+     * A. 使子类能够轻松地向MBean服务器注册未实现{@link JmxEnabled}的其他组件的实用程序方法。
+     * B. 注意：仅应在调用{@link #initInternal（）}之后且在调用{@link #destroyInternal（）}之前使用此方法。
+     */
+    /**
+     * A.
      * Utility method to enable sub-classes to easily register additional
      * components that don't implement {@link JmxEnabled} with an MBean server.
      * <br>
+     *
+     * B.
      * Note: This method should only be used once {@link #initInternal()} has
      * been called and before {@link #destroyInternal()} has been called.
      *
@@ -143,6 +155,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      *
      * @return  The name used to register the object
      */
+    // 20201228 使子类能够轻松地向MBean服务器注册未实现{@link JmxEnabled}的其他组件的实用程序方法
     protected final ObjectName register(Object obj,
             String objectNameKeyProperties) {
 

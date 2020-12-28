@@ -993,37 +993,47 @@ public class Connector extends LifecycleMBeanBase  {
         }
     }
 
-
+    // 20201228 子类实现此方法以执行所需的任何实例初始化。
     @Override
     protected void initInternal() throws LifecycleException {
-
+        // 20201228 eg: null
         super.initInternal();
 
+        // 20201228 eg: HttpllNioProtocol@xxxx
         if (protocolHandler == null) {
             throw new LifecycleException(
                     sm.getString("coyoteConnector.protocolHandlerInstantiationFailed"));
         }
 
+        // 20201228 初始化适配器
         // Initialize adapter
+        // 20201228 eg: CoyoteAdapter@xxxx: Connector@xxxx: "Connector[HTTP/1.1-8087]"
         adapter = new CoyoteAdapter(this);
         protocolHandler.setAdapter(adapter);
         if (service != null) {
             protocolHandler.setUtilityExecutor(service.getServer().getUtilityExecutor());
         }
 
+        // 20201228 确保parseBodyMethodsSet具有默认值
         // Make sure parseBodyMethodsSet has a default
+        // 20201228 eg: null
         if (null == parseBodyMethodsSet) {
             setParseBodyMethods(getParseBodyMethods());
         }
 
+        // 20201228 eg: false
         if (protocolHandler.isAprRequired() && !AprStatus.isInstanceCreated()) {
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerNoAprListener",
                     getProtocolHandlerClassName()));
         }
+
+        // 20201228 eg: false
         if (protocolHandler.isAprRequired() && !AprStatus.isAprAvailable()) {
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerNoAprLibrary",
                     getProtocolHandlerClassName()));
         }
+
+        // 20201228 eg: false
         if (AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
                 protocolHandler instanceof AbstractHttp11JsseProtocol) {
             AbstractHttp11JsseProtocol<?> jsseProtocolHandler =
@@ -1036,6 +1046,7 @@ public class Connector extends LifecycleMBeanBase  {
         }
 
         try {
+            // 20201228 初始化协议。
             protocolHandler.init();
         } catch (Exception e) {
             throw new LifecycleException(

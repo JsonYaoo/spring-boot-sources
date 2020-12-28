@@ -16,16 +16,60 @@
  */
 package org.apache.catalina;
 
-
 /**
+ * 20201228
+ * A. 组件生命周期方法的通用接口。 Catalina组件可以实现此接口（以及它们支持的功能的相应接口），以便提供一致的机制来启动和停止该组件。
+ * B. 支持{@link Lifecycle}的组件的有效状态转换为：
+ *      a.
+ *            start()
+ *  -----------------------------
+ *  |                           |
+ *  | init()                    |
+ * NEW -»-- INITIALIZING        |
+ * | |           |              |     ------------------«-----------------------
+ * | |           |auto          |     |                                        |
+ * | |          \|/    start() \|/   \|/     auto          auto         stop() |
+ * | |      INITIALIZED --»-- STARTING_PREP --»- STARTING --»- STARTED --»---  |
+ * | |         |                                                            |  |
+ * | |destroy()|                                                            |  |
+ * | --»-----«--    ------------------------«--------------------------------  ^
+ * |     |          |                                                          |
+ * |     |         \|/          auto                 auto              start() |
+ * |     |     STOPPING_PREP ----»---- STOPPING ------»----- STOPPED -----»-----
+ * |    \|/                               ^                     |  ^
+ * |     |               stop()           |                     |  |
+ * |     |       --------------------------                     |  |
+ * |     |       |                                              |  |
+ * |     |       |    destroy()                       destroy() |  |
+ * |     |    FAILED ----»------ DESTROYING ---«-----------------  |
+ * |     |                        ^     |                          |
+ * |     |     destroy()          |     |auto                      |
+ * |     --------»-----------------    \|/                         |
+ * |                                 DESTROYED                     |
+ * |                                                               |
+ * |                            stop()                             |
+ * ----»-----------------------------»------------------------------
+ *      b. 任何状态都可以转换为FAILED。
+ *      c. 当组件处于状态STARTING_PREP，STARTING或STARTED时调用start（）无效。
+ *      d. 在组件处于NEW状态时调用start（）将导致在输入start（）方法后立即调用init（）。
+ *      e. 组件处于STOPPING_PREP，STOPPING或STOPPED状态时，调用stop（）无效。
+ *      f. 当组件处于状态NEW时调用stop（）会将组件转换为STOPPED。 当组件无法启动并且没有启动其所有子组件时，通常会遇到这种情况。 当组件停止时，它将尝试停止所有子组件-包括那些尚未启动的子组件。
+ *      g. 尝试任何其他转换将引发{@link LifecycleException}。
+ * C. 在状态更改期间触发的{@link LifecycleEvent}在触发更改的方法中定义。 如果尝试的转换无效，则不会触发任何{@link LifecycleEvent}。
+ */
+/**
+ * A.
  * Common interface for component life cycle methods.  Catalina components
  * may implement this interface (as well as the appropriate interface(s) for
  * the functionality they support) in order to provide a consistent mechanism
  * to start and stop the component.
  * <br>
+ *
+ * B.
  * The valid state transitions for components that support {@link Lifecycle}
  * are:
  * <pre>
+ * a.
  *            start()
  *  -----------------------------
  *  |                           |
@@ -55,31 +99,39 @@ package org.apache.catalina;
  * |                            stop()                             |
  * ----»-----------------------------»------------------------------
  *
+ * b.
  * Any state can transition to FAILED.
  *
+ * c.
  * Calling start() while a component is in states STARTING_PREP, STARTING or
  * STARTED has no effect.
  *
+ * d.
  * Calling start() while a component is in state NEW will cause init() to be
  * called immediately after the start() method is entered.
  *
+ * e.
  * Calling stop() while a component is in states STOPPING_PREP, STOPPING or
  * STOPPED has no effect.
  *
+ * f.
  * Calling stop() while a component is in state NEW transitions the component
  * to STOPPED. This is typically encountered when a component fails to start and
  * does not start all its sub-components. When the component is stopped, it will
  * try to stop all sub-components - even those it didn't start.
  *
+ * g.
  * Attempting any other transition will throw {@link LifecycleException}.
- *
  * </pre>
+ *
+ * C.
  * The {@link LifecycleEvent}s fired during state changes are defined in the
  * methods that trigger the changed. No {@link LifecycleEvent}s are fired if the
  * attempted transition is not valid.
  *
  * @author Craig R. McClanahan
  */
+// 20201228 组件生命周期方法的通用接口。 Catalina组件可以实现此接口（以及它们支持的功能的相应接口），以便提供一致的机制来启动和停止该组件
 public interface Lifecycle {
 
 
@@ -172,14 +224,13 @@ public interface Lifecycle {
 
     // --------------------------------------------------------- Public Methods
 
-
     /**
      * Add a LifecycleEvent listener to this component.
      *
      * @param listener The listener to add
      */
+    // 20201228 将LifecycleEvent侦听器添加到此组件。
     public void addLifecycleListener(LifecycleListener listener);
-
 
     /**
      * Get the life cycle listeners associated with this life cycle.
@@ -198,12 +249,18 @@ public interface Lifecycle {
      */
     public void removeLifecycleListener(LifecycleListener listener);
 
-
     /**
+     * 20201228
+     * A. 准备要启动的组件。 此方法应执行对象创建后所需的任何初始化。 以下{@link LifecycleEvent}将按以下顺序触发：
+     *      a. INIT_EVENT: 成功完成组件初始化。
+     */
+    /**
+     * A.
      * Prepare the component for starting. This method should perform any
      * initialization required post object creation. The following
      * {@link LifecycleEvent}s will be fired in the following order:
      * <ol>
+     *   a.
      *   <li>INIT_EVENT: On the successful completion of component
      *                   initialization.</li>
      * </ol>
@@ -211,9 +268,19 @@ public interface Lifecycle {
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    // 20201228 准备要启动的组件。 此方法应执行对象创建后所需的任何初始化
     public void init() throws LifecycleException;
 
     /**
+     * 20201228
+     * A. 准备开始积极使用公共方法，而不是该组件的属性获取器/设置器和生命周期方法。 在使用此组件的属性获取器/设置器和生命周期方法以外的任何公共方法之前，应先调用此方法。 以下
+     *    {@link LifecycleEvent}将按以下顺序触发：
+     *      a. BEFORE_START_EVENT: 在方法开始时。 至此，状态将转换为{@link LifecycleState＃STARTING_PREP}。
+     *      b. START_EVENT: 在方法执行期间，可以安全地为任何子组件调用start（）。 此时，状态转换为{@link LifecycleState＃STARTING}，并且可以使用除属性获取器/设置器和生命周期方法以外的公共方法。
+     *      c. AFTER_START_EVENT: 在方法结束时，在返回之前。 正是在这一点上，状态转换为{@link LifecycleState＃STARTED}。
+     */
+    /**
+     * A.
      * Prepare for the beginning of active use of the public methods other than
      * property getters/setters and life cycle methods of this component. This
      * method should be called before any of the public methods other than
@@ -221,15 +288,18 @@ public interface Lifecycle {
      * utilized. The following {@link LifecycleEvent}s will be fired in the
      * following order:
      * <ol>
+     *   a.
      *   <li>BEFORE_START_EVENT: At the beginning of the method. It is as this
      *                           point the state transitions to
      *                           {@link LifecycleState#STARTING_PREP}.</li>
+     *   b.
      *   <li>START_EVENT: During the method once it is safe to call start() for
      *                    any child components. It is at this point that the
      *                    state transitions to {@link LifecycleState#STARTING}
      *                    and that the public methods other than property
      *                    getters/setters and life cycle methods may be
      *                    used.</li>
+     *   c.
      *   <li>AFTER_START_EVENT: At the end of the method, immediately before it
      *                          returns. It is at this point that the state
      *                          transitions to {@link LifecycleState#STARTED}.
@@ -239,8 +309,8 @@ public interface Lifecycle {
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    // 20201228 {@link LifecycleState＃STARTING_PREP} => {@link LifecycleState＃STARTING} => {@link LifecycleState＃STARTED}
     public void start() throws LifecycleException;
-
 
     /**
      * Gracefully terminate the active use of the public methods other than

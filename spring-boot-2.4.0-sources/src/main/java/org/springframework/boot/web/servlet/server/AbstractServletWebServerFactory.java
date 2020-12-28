@@ -44,6 +44,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 20201228
+ * A. {@link ConfigurableServletWebServerFactory}实现的抽象基类。
+ */
+/**
+ * A.
  * Abstract base class for {@link ConfigurableServletWebServerFactory} implementations.
  *
  * @author Phillip Webb
@@ -55,8 +60,8 @@ import org.springframework.util.ClassUtils;
  * @author Brian Clozel
  * @since 2.0.0
  */
-public abstract class AbstractServletWebServerFactory extends AbstractConfigurableWebServerFactory
-		implements ConfigurableServletWebServerFactory {
+// 20201228 {@link ConfigurableServletWebServerFactory}实现的抽象基类: : 可配置的{@link WebServerFactory}, 可用于创建{@link WebServer}的工厂接口, 拥有{@link WebListener @WebListeners}的注册表。
+public abstract class AbstractServletWebServerFactory extends AbstractConfigurableWebServerFactory implements ConfigurableServletWebServerFactory {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -247,11 +252,21 @@ public abstract class AbstractServletWebServerFactory extends AbstractConfigurab
 	 * @return a complete set of merged initializers (with the specified parameters
 	 * appearing first)
 	 */
+	// 20201228 希望将指定的{@link ServletContextInitializer}参数与此实例中定义的参数组合在一起的子类可以使用的实用程序方法。
 	protected final ServletContextInitializer[] mergeInitializers(ServletContextInitializer... initializers) {
+		// 20201228 eg: ServletContextInitialzer[3]@xxxx: AbstractServletWebServerFactory$lambda@xxxx、AbstractServletWebServerFactory$SessionConfigurationInitializer@xxxx、ServletWebServerApplicationContext$lambda@xxxx
 		List<ServletContextInitializer> mergedInitializers = new ArrayList<>();
+
+		// 20201228 eg: AbstractServletWebServerFactory$lambda@xxxx => eg: 回调时 initParameters = [], do nothing
 		mergedInitializers.add((servletContext) -> this.initParameters.forEach(servletContext::setInitParameter));
+
+		// 20201228 eg: AbstractServletWebServerFactory$SessionConfigurationInitializer@xxxx
 		mergedInitializers.add(new SessionConfiguringInitializer(this.session));
+
+		// 20201228 eg: ServletWebServerApplicationContext$lambda@xxxx
 		mergedInitializers.addAll(Arrays.asList(initializers));
+
+		// 20201228 eg: []
 		mergedInitializers.addAll(this.initializers);
 		return mergedInitializers.toArray(new ServletContextInitializer[0]);
 	}
@@ -270,6 +285,7 @@ public abstract class AbstractServletWebServerFactory extends AbstractConfigurab
 	 * warning and returning {@code null} otherwise.
 	 * @return the valid document root
 	 */
+	// 20201228 当指向有效目录时，返回绝对文档根目录，并记录警告并返回{@code null}。
 	protected final File getValidDocumentRoot() {
 		return this.documentRoot.getValidDirectory();
 	}
@@ -299,6 +315,7 @@ public abstract class AbstractServletWebServerFactory extends AbstractConfigurab
 	 * {@link ServletContextInitializer} to apply appropriate parts of the {@link Session}
 	 * configuration.
 	 */
+	// 20201228 {@link ServletContextInitializer}来应用{@link Session}配置的适当部分。
 	private static class SessionConfiguringInitializer implements ServletContextInitializer {
 
 		private final Session session;
@@ -307,11 +324,15 @@ public abstract class AbstractServletWebServerFactory extends AbstractConfigurab
 			this.session = session;
 		}
 
+		// 20201213 使用初始化所需的所有Servlet，过滤器，侦听器上下文参数和属性配置给定的{@link ServletContext}。
 		@Override
 		public void onStartup(ServletContext servletContext) throws ServletException {
+			// 20201228 eg: false
 			if (this.session.getTrackingModes() != null) {
 				servletContext.setSessionTrackingModes(unwrap(this.session.getTrackingModes()));
 			}
+
+			// 20201228 eg: ApplicationSessionCookieConfig@xxxx: context: TomcatEmbeddedContext@xxxx: StandardEngine[Tomcat].StandardHost[localhost].TomcatEmbeddedContext[]
 			configureSessionCookie(servletContext.getSessionCookieConfig());
 		}
 

@@ -126,8 +126,8 @@ public interface Host extends Container {
      *
      * @param autoDeploy The new auto deploy flag
      */
+    // 20201228 设置此主机的自动部署标志值。
     public void setAutoDeploy(boolean autoDeploy);
-
 
     /**
      * @return the Java class name of the context configuration class

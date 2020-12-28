@@ -41,6 +41,14 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.CookieProcessor;
 
 /**
+ * 20201228
+ * A. 上下文是一个容器，代表Catalina Servlet引擎中的servlet上下文，因此是一个单独的Web应用程序。 因此，它在Catalina的几乎所有部署中都非常有用（即使连接到Web服务器（例如Apache）的连接器
+ *    使用Web服务器的功能来标识适当的Wrapper来处理此请求。 它还提供了一种方便的机制来使用拦截器，该拦截器查看此特定Web应用程序处理的每个请求。
+ * B. 附加到上下文的父容器通常是一个主机，但可以是其他实现，如果不需要，可以将其省略。
+ * C. 附加到Context的子容器通常是Wrapper的实现（代表各个servlet定义）。
+ */
+/**
+ * A.
  * A <b>Context</b> is a Container that represents a servlet context, and
  * therefore an individual web application, in the Catalina servlet engine.
  * It is therefore useful in almost every deployment of Catalina (even if a
@@ -48,9 +56,13 @@ import org.apache.tomcat.util.http.CookieProcessor;
  * facilities to identify the appropriate Wrapper to handle this request.
  * It also provides a convenient mechanism to use Interceptors that see
  * every request processed by this particular web application.
+ *
+ * B.
  * <p>
  * The parent Container attached to a Context is generally a Host, but may
  * be some other implementation, or may be omitted if it is not necessary.
+ *
+ * C.
  * <p>
  * The child containers attached to a Context are generally implementations
  * of Wrapper (representing individual servlet definitions).
@@ -58,6 +70,7 @@ import org.apache.tomcat.util.http.CookieProcessor;
  *
  * @author Craig R. McClanahan
  */
+// 20201228 上下文是一个容器，代表Catalina Servlet引擎中的servlet上下文，因此是一个单独的Web应用程序。
 public interface Context extends Container, ContextBind {
 
 

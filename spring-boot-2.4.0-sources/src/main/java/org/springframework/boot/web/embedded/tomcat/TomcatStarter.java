@@ -28,12 +28,18 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 
 /**
+ * 20201228
+ * A. {@link ServletContainerInitializer}用于触发{@link ServletContextInitializer ServletContextInitializers}并跟踪启动错误。
+ */
+/**
+ * A.
  * {@link ServletContainerInitializer} used to trigger {@link ServletContextInitializer
  * ServletContextInitializers} and track startup errors.
  *
  * @author Phillip Webb
  * @author Andy Wilkinson
  */
+// 20201228 {@link ServletContainerInitializer}用于触发{@link ServletContextInitializer ServletContextInitializers}并跟踪启动错误
 class TomcatStarter implements ServletContainerInitializer {
 
 	private static final Log logger = LogFactory.getLog(TomcatStarter.class);
@@ -46,10 +52,13 @@ class TomcatStarter implements ServletContainerInitializer {
 		this.initializers = initializers;
 	}
 
+	// 20201228 【重点】在Web应用程序启动期间接收与通过{@link javax.servlet.annotation.HandlesTypes}注释定义的条件相匹配的Web应用程序中的类的通知。
 	@Override
 	public void onStartup(Set<Class<?>> classes, ServletContext servletContext) throws ServletException {
 		try {
+			// 20201228 eg: ServletContextInitialzer[3]@xxxx: AbstractServletWebServerFactory$lambda@xxxx、AbstractServletWebServerFactory$SessionConfigurationInitializer@xxxx、ServletWebServerApplicationContext$lambda@xxxx
 			for (ServletContextInitializer initializer : this.initializers) {
+				// 20201213 【重点】使用初始化所需的所有Servlet，过滤器，侦听器上下文参数和属性配置给定的{@link ServletContext}。
 				initializer.onStartup(servletContext);
 			}
 		}

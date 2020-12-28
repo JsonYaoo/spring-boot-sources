@@ -25,28 +25,56 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.juli.logging.Log;
 
-
 /**
+ * 20201228
+ * A. 容器是一个对象，可以执行从客户端收到的请求，并根据这些请求返回响应。 容器还可以选择通过实现Pipeline接口来支持Valve管道，以在运行时配置的顺序处理请求。
+ * B. 容器将在Catalina的几个概念层次上存在。 以下示例代表了常见的情况：
+ *      a. Engine: 整个Catalina Servlet引擎的表示形式，很可能包含一个或多个作为宿主或上下文实现或其他自定义组的子容器。
+ *      b. Host: 包含多个上下文的虚拟主机的表示形式。
+ *      c. Context: 单个ServletContext的表示形式，通常将包含一个或多个支持的Servlet的包装器。
+ *      d. Wrapper: 单个servlet定义的表示形式（如果servlet本身实现SingleThreadModel，则它可以支持多个servlet实例）。
+ * C. Catalina的给定部署不需要包括上述所有级别的容器。 例如，嵌入在网络设备（例如路由器）中的管理应用程序可能只包含一个上下文和几个包装程序，如果应用程序相对较小，甚至可能包含一个包装程序。
+ *    因此，需要设计容器实现，以便在给定部署中没有父容器的情况下它们可以正确运行。
+ * D. 容器也可以与许多支持组件关联，这些支持组件提供可以共享（通过将其附加到父容器）或单独定制的功能。 当前公认以下支持组件：
+ *      a. Loader: 类加载器，用于将该容器的新Java类集成到运行Catalina的JVM中。
+ *      b. Logger: ServletContext接口的log（）方法签名的实现。
+ *      c. Manager: 与此容器关联的会话池的管理器。
+ *      d. Realm: 安全域的只读接口，用于验证用户身份及其相应角色。
+ *      e. Resources: JNDI目录上下文支持对静态资源的访问，当Catalina嵌入在较大的服务器中时，可以实现对现有服务器组件的自定义链接。
+ */
+/**
+ * A.
  * A <b>Container</b> is an object that can execute requests received from
  * a client, and return responses based on those requests.  A Container may
  * optionally support a pipeline of Valves that process the request in an
  * order configured at runtime, by implementing the <b>Pipeline</b> interface
  * as well.
+ *
+ * B.
  * <p>
  * Containers will exist at several conceptual levels within Catalina.  The
  * following examples represent common cases:
  * <ul>
+ * a.
  * <li><b>Engine</b> - Representation of the entire Catalina servlet engine,
  *     most likely containing one or more subcontainers that are either Host
  *     or Context implementations, or other custom groups.
+ *
+ * b.
  * <li><b>Host</b> - Representation of a virtual host containing a number
  *     of Contexts.
+ *
+ * c.
  * <li><b>Context</b> - Representation of a single ServletContext, which will
  *     typically contain one or more Wrappers for the supported servlets.
+ *
+ * d.
  * <li><b>Wrapper</b> - Representation of an individual servlet definition
  *     (which may support multiple servlet instances if the servlet itself
  *     implements SingleThreadModel).
  * </ul>
+ *
+ * C.
  * A given deployment of Catalina need not include Containers at all of the
  * levels described above.  For example, an administration application
  * embedded within a network device (such as a router) might only contain
@@ -54,20 +82,31 @@ import org.apache.juli.logging.Log;
  * application is relatively small.  Therefore, Container implementations
  * need to be designed so that they will operate correctly in the absence
  * of parent Containers in a given deployment.
+ *
+ * D.
  * <p>
  * A Container may also be associated with a number of support components
  * that provide functionality which might be shared (by attaching it to a
  * parent Container) or individually customized.  The following support
  * components are currently recognized:
  * <ul>
+ * a.
  * <li><b>Loader</b> - Class loader to use for integrating new Java classes
  *     for this Container into the JVM in which Catalina is running.
+ *
+ * b.
  * <li><b>Logger</b> - Implementation of the <code>log()</code> method
  *     signatures of the <code>ServletContext</code> interface.
+ *
+ * c.
  * <li><b>Manager</b> - Manager for the pool of Sessions associated with
  *     this Container.
+ *
+ * d.
  * <li><b>Realm</b> - Read-only interface to a security domain, for
  *     authenticating user identities and their corresponding roles.
+ *
+ * e.
  * <li><b>Resources</b> - JNDI directory context enabling access to static
  *     resources, enabling custom linkages to existing server components when
  *     Catalina is embedded in a larger server.
@@ -76,6 +115,7 @@ import org.apache.juli.logging.Log;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
+// 20201228 容器是一个对象，可以执行从客户端收到的请求，并根据这些请求返回响应。 容器还可以选择通过实现Pipeline接口来支持Valve管道，以在运行时配置的顺序处理请求
 public interface Container extends Lifecycle {
 
 
@@ -207,8 +247,8 @@ public interface Container extends Lifecycle {
      * @param delay The delay in seconds between the invocation of
      *              backgroundProcess methods
      */
+    // 20201228 设置在此容器及其子容器上调用execute方法之间的延迟。
     public void setBackgroundProcessorDelay(int delay);
-
 
     /**
      * Return a name string (suitable for use by humans) that describes this

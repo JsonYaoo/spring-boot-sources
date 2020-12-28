@@ -82,16 +82,26 @@ public interface WebApplicationContext extends ApplicationContext {
 	 * Scope identifier for the global web application scope: "application".
 	 * Supported in addition to the standard scopes "singleton" and "prototype".
 	 */
+	// 20201228 全局Web应用程序范围的范围标识符：“应用程序”。 除了标准范围“ singleton”和“ prototype”外，还受支持。
 	String SCOPE_APPLICATION = "application";
 
 	/**
 	 * Name of the ServletContext environment bean in the factory.
 	 * @see ServletContext
 	 */
+	// 20201228 工厂中ServletContext环境Bean的名称。
 	String SERVLET_CONTEXT_BEAN_NAME = "servletContext";
 
 	/**
+	 * 20201228
+	 * A. 工厂中ServletContext init-params环境Bean的名称。
+	 * B. 注意：可能与ServletConfig参数合并。 ServletConfig参数覆盖同名的ServletContext参数。
+	 */
+	/**
+	 * A.
 	 * Name of the ServletContext init-params environment bean in the factory.
+	 *
+	 * B.
 	 * <p>Note: Possibly merged with ServletConfig parameters.
 	 * ServletConfig parameters override ServletContext parameters of the same name.
 	 * @see ServletContext#getInitParameterNames()
@@ -99,6 +109,7 @@ public interface WebApplicationContext extends ApplicationContext {
 	 * @see javax.servlet.ServletConfig#getInitParameterNames()
 	 * @see javax.servlet.ServletConfig#getInitParameter(String)
 	 */
+	// 20201228 工厂中ServletContext init-params环境Bean的名称
 	String CONTEXT_PARAMETERS_BEAN_NAME = "contextParameters";
 
 	/**

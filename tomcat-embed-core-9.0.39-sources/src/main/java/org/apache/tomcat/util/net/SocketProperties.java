@@ -27,10 +27,16 @@ import java.nio.channels.AsynchronousSocketChannel;
 import javax.management.ObjectName;
 
 /**
+ * 20201228
+ * A. 可以在<Connector>中设置的属性。 server.xml中的元素。 所有属性都以“套接字”为前缀。 并且目前仅适用于Nio连接器
+ */
+/**
+ * A.
  * Properties that can be set in the &lt;Connector&gt; element
  * in server.xml. All properties are prefixed with &quot;socket.&quot;
  * and are currently only working for the Nio connector
  */
+// 20201228 可以在<Connector>中设置的属性。 server.xml中的元素。 所有属性都以“套接字”为前缀。 并且目前仅适用于Nio连接器
 public class SocketProperties {
 
     /**

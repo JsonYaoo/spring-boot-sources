@@ -26,6 +26,11 @@ import org.springframework.core.Ordered;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201228
+ * A. 基于Servlet 3.0+的注册Bean的基类。
+ */
+/**
+ * A.
  * Base class for Servlet 3.0+ based registration beans.
  *
  * @author Phillip Webb
@@ -35,6 +40,7 @@ import org.springframework.util.StringUtils;
  * @see DelegatingFilterProxyRegistrationBean
  * @see ServletListenerRegistrationBean
  */
+// 20201228 基于Servlet 3.0+的注册Bean的基类。
 public abstract class RegistrationBean implements ServletContextInitializer, Ordered {
 
 	private static final Log logger = LogFactory.getLog(RegistrationBean.class);
@@ -43,13 +49,17 @@ public abstract class RegistrationBean implements ServletContextInitializer, Ord
 
 	private boolean enabled = true;
 
+	// 20201213 使用初始化所需的所有Servlet，过滤器，侦听器上下文参数和属性配置给定的{@link ServletContext}。
 	@Override
 	public final void onStartup(ServletContext servletContext) throws ServletException {
+		// 20201228 返回注册说明 => eg: "servlet dispatcherServlet"
 		String description = getDescription();
 		if (!isEnabled()) {
 			logger.info(StringUtils.capitalize(description) + " was not registered (disabled)");
 			return;
 		}
+
+		// 20201228 在servlet上下文中注册此bean。
 		register(description, servletContext);
 	}
 
@@ -57,6 +67,7 @@ public abstract class RegistrationBean implements ServletContextInitializer, Ord
 	 * Return a description of the registration. For example "Servlet resourceServlet"
 	 * @return a description of the registration
 	 */
+	// 20201228 返回注册说明。 例如“ Servlet resourceServlet”
 	protected abstract String getDescription();
 
 	/**
@@ -64,6 +75,7 @@ public abstract class RegistrationBean implements ServletContextInitializer, Ord
 	 * @param description a description of the item being registered
 	 * @param servletContext the servlet context
 	 */
+	// 20201228 在servlet上下文中注册此bean。
 	protected abstract void register(String description, ServletContext servletContext);
 
 	/**

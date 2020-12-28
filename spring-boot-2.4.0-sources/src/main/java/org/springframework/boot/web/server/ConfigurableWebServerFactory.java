@@ -20,6 +20,11 @@ import java.net.InetAddress;
 import java.util.Set;
 
 /**
+ * 20201228
+ * A. 可配置的{@link WebServerFactory}。
+ */
+/**
+ * A.
  * A configurable {@link WebServerFactory}.
  *
  * @author Phillip Webb
@@ -27,6 +32,7 @@ import java.util.Set;
  * @since 2.0.0
  * @see ErrorPageRegistry
  */
+// 20201228 可配置的{@link WebServerFactory}: 创建{@link WebServer}的工厂的标记接口, 包含{@link ErrorPage ErrorPages}的注册表的接口
 public interface ConfigurableWebServerFactory extends WebServerFactory, ErrorPageRegistry {
 
 	/**

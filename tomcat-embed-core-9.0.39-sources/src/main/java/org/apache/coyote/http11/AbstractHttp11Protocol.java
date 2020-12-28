@@ -62,12 +62,14 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         getEndpoint().setHandler(cHandler);
     }
 
-
+    // 20201228 初始化协议。
     @Override
     public void init() throws Exception {
+        // 20201228 必须先配置升级协议，因为端点初始化（通过下面的super.init（）触发）使用此列表来配置要发布的ALPN协议列表
         // Upgrade protocols have to be configured first since the endpoint
         // init (triggered via super.init() below) uses this list to configure
         // the list of ALPN protocols to advertise
+        // 20201228 eg: []
         for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
             configureUpgradeProtocol(upgradeProtocol);
         }

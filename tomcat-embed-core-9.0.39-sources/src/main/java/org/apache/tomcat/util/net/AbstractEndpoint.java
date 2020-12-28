@@ -171,6 +171,7 @@ public abstract class AbstractEndpoint<S,U> {
     /**
      * Socket properties
      */
+    // 20201228 可以在<Connector>中设置的属性。 server.xml中的元素。 所有属性都以“套接字”为前缀。 并且目前仅适用于Nio连接器
     protected final SocketProperties socketProperties = new SocketProperties();
     public SocketProperties getSocketProperties() {
         return socketProperties;
@@ -1148,22 +1149,31 @@ public abstract class AbstractEndpoint<S,U> {
         }
     }
 
-
+    // 20201228 初始化Endpoint
     public final void init() throws Exception {
+        // 20201228 eg: fasle
         if (bindOnInit) {
             bindWithCleanup();
             bindState = BindState.BOUND_ON_INIT;
         }
+
+        // 20201228 eg: "Tomcat"
         if (this.domain != null) {
+            // 20201228 注册端点（作为ThreadPool-历史名称）
             // Register endpoint (as ThreadPool - historical name)
+            // 20201228 eg: "Tomcat:type=ThreadPool,name="http-nio-8087""
             oname = new ObjectName(domain + ":type=ThreadPool,name=\"" + getName() + "\"");
             Registry.getRegistry(null, null).registerComponent(this, oname, null);
 
+            // 20201228 eg: "Tomcat:type=SocketProperties,name="http-nio-8087""
             ObjectName socketPropertiesOname = new ObjectName(domain +
                     ":type=SocketProperties,name=\"" + getName() + "\"");
+
+            // 20201228 eg: SocketProperties@xxxx
             socketProperties.setObjectName(socketPropertiesOname);
             Registry.getRegistry(null, null).registerComponent(socketProperties, socketPropertiesOname, null);
 
+            // 20201228 eg: []
             for (SSLHostConfig sslHostConfig : findSslHostConfigs()) {
                 registerJmx(sslHostConfig);
             }

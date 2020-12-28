@@ -27,6 +27,11 @@ import java.util.Set;
 import org.springframework.util.Assert;
 
 /**
+ * 20201228
+ * A. {@link ConfigurableWebServerFactory}实现的抽象基类。
+ */
+/**
+ * A.
  * Abstract base class for {@link ConfigurableWebServerFactory} implementations.
  *
  * @author Phillip Webb
@@ -38,6 +43,7 @@ import org.springframework.util.Assert;
  * @author Brian Clozel
  * @since 2.0.0
  */
+// 20201228 {@link ConfigurableWebServerFactory}实现的抽象基类: 创建{@link WebServer}的工厂的标记接口, 包含{@link ErrorPage ErrorPages}的注册表的接口
 public abstract class AbstractConfigurableWebServerFactory implements ConfigurableWebServerFactory {
 
 	private int port = 8080;

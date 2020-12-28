@@ -36,12 +36,18 @@ import org.springframework.boot.web.server.WebServerException;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 20201228
+ * A. {@link TomcatWebServer}使用的Tomcat {@link StandardContext}支持延迟的初始化。
+ */
+/**
+ * A.
  * Tomcat {@link StandardContext} used by {@link TomcatWebServer} to support deferred
  * initialization.
  *
  * @author Phillip Webb
  * @author Andy Wilkinson
  */
+// 20201228 {@link TomcatWebServer}使用的Tomcat {@link StandardContext}支持延迟的初始化:  Context接口的标准实现, 每个子容器必须是Wrapper实现，才能处理针对特定servlet的请求
 class TomcatEmbeddedContext extends StandardContext {
 
 	private TomcatStarter starter;

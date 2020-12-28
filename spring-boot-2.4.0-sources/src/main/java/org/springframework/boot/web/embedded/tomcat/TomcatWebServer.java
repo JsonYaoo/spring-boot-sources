@@ -46,6 +46,11 @@ import org.springframework.boot.web.server.WebServerException;
 import org.springframework.util.Assert;
 
 /**
+ * 20201228
+ * A. {@link WebServer}，可用于控制Tomcat Web服务器。 通常，应使用{@link TomcatServletWebServerFactory}的{@link TomcatReactiveWebServerFactory}创建此类，但不能直接使用。
+ */
+/**
+ * A.
  * {@link WebServer} that can be used to control a Tomcat web server. Usually this class
  * should be created using the {@link TomcatReactiveWebServerFactory} of
  * {@link TomcatServletWebServerFactory}, but not directly.
@@ -54,6 +59,7 @@ import org.springframework.util.Assert;
  * @author Kristine Jetzke
  * @since 2.0.0
  */
+// 20201228 {@link WebServer}，可用于控制Tomcat Web服务器
 public class TomcatWebServer implements WebServer {
 
 	private static final Log logger = LogFactory.getLog(TomcatWebServer.class);
@@ -99,15 +105,21 @@ public class TomcatWebServer implements WebServer {
 	// 20201214 创建一个新的{@link TomcatWebServer}实例。
 	public TomcatWebServer(Tomcat tomcat, boolean autoStart, Shutdown shutdown) {
 		Assert.notNull(tomcat, "Tomcat Server must not be null");
+
+		// 20201228 eg: Tomcat@xxxx: hostname: "localhost"、basedir: "C:\Users\14840\AppData\Local\Temp\tomcat.8087.751596302043819895"
 		this.tomcat = tomcat;
+
+		// 20201228 eg: true
 		this.autoStart = autoStart;
+
+		// 20201228 eg: null
 		this.gracefulShutdown = (shutdown == Shutdown.GRACEFUL) ? new GracefulShutdown(tomcat) : null;
 
-		// 20201214 初始化Tomcat
+		// 20201214 【重点】初始化Tomcat
 		initialize();
 	}
 
-	// 20201214 初始化Tomcat
+	// 20201214 【重点】初始化Tomcat
 	private void initialize() throws WebServerException {
 		logger.info("Tomcat initialized with port(s): " + getPortsDescription(false));
 		synchronized (this.monitor) {
@@ -115,8 +127,10 @@ public class TomcatWebServer implements WebServer {
 				// 20201214 根据ID设置Tomcat引擎名称
 				addInstanceIdToEngineName();
 
-				// 20201214 获取Tomcat上下文
+				// 20201214 获取Tomcat上下文 eg: TomcatEmbeddedContext@xxxx:"StandardEngine[Tomcat].StandardHost[localhost].TomcatEmbeddedContext[]"
 				Context context = findContext();
+
+				// 20201228 将LifecycleEvent侦听器添加到此组件。
 				context.addLifecycleListener((event) -> {
 					if (context.equals(event.getSource()) && Lifecycle.START_EVENT.equals(event.getType())) {
 						// 20201214 删除服务连接器，以便在启动服务时不会发生协议绑定。
@@ -126,21 +140,24 @@ public class TomcatWebServer implements WebServer {
 					}
 				});
 
-				// Start the server to trigger initialization listeners	// 20201214 启动服务器以触发初始化侦听器
+				// 20201214 【重点】启动服务器以触发初始化侦听器
+				// Start the server to trigger initialization listeners
 				this.tomcat.start();
 
-				// We can re-throw failure exception directly in the main thread // 20201214 我们可以直接在主线程中重新抛出失败异常
+				// 20201214 我们可以直接在主线程中重新抛出失败异常
+				// We can re-throw failure exception directly in the main thread
 				rethrowDeferredStartupExceptions();
-
 				try {
 					ContextBindings.bindClassLoader(context, context.getNamingToken(), getClass().getClassLoader());
 				}
 				catch (NamingException ex) {
-					// Naming is not enabled. Continue // 20201214 未启用命名。 继续
+					// 20201214 未启用命名。 继续
+					// Naming is not enabled. Continue
 				}
 
+				// 20201214 与Jetty不同，所有Tomcat线程都是守护程序线程。 我们创建了一个阻止非守护进程来停止立即关闭
 				// Unlike Jetty, all Tomcat threads are daemon threads. We create a
-				// blocking non-daemon to stop immediate shutdown // 20201214 与Jetty不同，所有Tomcat线程都是守护程序线程。 我们创建了一个阻止非守护进程来停止立即关闭
+				// blocking non-daemon to stop immediate shutdown
 				startDaemonAwaitThread();
 			}
 			catch (Exception ex) {

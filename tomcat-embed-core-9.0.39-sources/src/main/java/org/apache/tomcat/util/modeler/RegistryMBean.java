@@ -24,11 +24,20 @@ import java.util.List;
 import javax.management.ObjectName;
 
 /**
+ * 20201228
+ * A. 建模器MBean的接口。
+ * B. 这是建模器的主要入口点。 它提供了创建和操纵模型Mbean并简化其使用的方法。
+ * C. 从1.1版开始，它不再是单例，并且强烈建议不要使用静态方法。 在容器环境中，我们可以期望不同的应用程序使用不同的注册表。
+ */
+/**
+ * A.
  * Interface for modeler MBeans.
  *
+ * B.
  * This is the main entry point into modeler. It provides methods to create
  * and manipulate model mbeans and simplify their use.
  *
+ * C.
  * Starting with version 1.1, this is no longer a singleton and the static
  * methods are strongly deprecated. In a container environment we can expect
  * different applications to use different registries.
@@ -38,6 +47,7 @@ import javax.management.ObjectName;
  *
  * @since 1.1
  */
+// 20201228 建模器MBean的接口
 public interface RegistryMBean {
 
     /**

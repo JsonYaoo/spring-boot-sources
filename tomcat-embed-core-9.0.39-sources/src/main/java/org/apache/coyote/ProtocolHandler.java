@@ -23,8 +23,16 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.apache.tomcat.util.net.SSLHostConfig;
 
 /**
+ * 20201228
+ * A. 抽象协议实现，包括线程等。
+ * B. 这是土狼协议要实现的主要接口。 适配器是由土狼Servlet容器实现的主要接口。
+ */
+
+/**
+ * A.
  * Abstract the protocol implementation, including threading, etc.
  *
+ * B.
  * This is the main interface to be implemented by a coyote protocol.
  * Adapter is the main interface to be implemented by a coyote servlet
  * container.
@@ -33,6 +41,7 @@ import org.apache.tomcat.util.net.SSLHostConfig;
  * @author Costin Manolache
  * @see Adapter
  */
+// 20201228 抽象协议实现: 包括线程等, 适配器是由土狼Servlet容器实现的主要接口
 public interface ProtocolHandler {
 
     /**
@@ -84,6 +93,7 @@ public interface ProtocolHandler {
      *
      * @throws Exception If the protocol handler fails to initialise
      */
+    // 20201228 初始化协议。
     public void init() throws Exception;
 
 

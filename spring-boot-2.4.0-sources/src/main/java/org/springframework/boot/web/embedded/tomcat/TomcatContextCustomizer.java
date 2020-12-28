@@ -19,12 +19,18 @@ package org.springframework.boot.web.embedded.tomcat;
 import org.apache.catalina.Context;
 
 /**
+ * 20201228
+ * A. 可用于自定义Tomcat {@link Context}的回调接口。
+ */
+/**
+ * A.
  * Callback interface that can be used to customize a Tomcat {@link Context}.
  *
  * @author Dave Syer
  * @see TomcatServletWebServerFactory
  * @since 2.0.0
  */
+// 20201228 可用于自定义Tomcat {@link Context}的回调接口。
 @FunctionalInterface
 public interface TomcatContextCustomizer {
 
@@ -32,6 +38,7 @@ public interface TomcatContextCustomizer {
 	 * Customize the context.
 	 * @param context the context to customize
 	 */
+	// 20201228 自定义上下文。
 	void customize(Context context);
 
 }

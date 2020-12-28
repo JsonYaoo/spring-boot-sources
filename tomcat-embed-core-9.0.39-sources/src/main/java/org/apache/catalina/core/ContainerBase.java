@@ -66,11 +66,20 @@ import org.apache.tomcat.util.MultiThrowable;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.InlineExecutorService;
 
-
 /**
+ * 20201228
+ * A. Container接口的抽象实现，提供几乎每个实现所需的通用功能。 扩展此基类的类必须实现对invoke（）的替换。
+ * B. 此抽象基类的所有子类将包括对Pipeline对象的支持，该对象使用“责任链”设计模式定义对此类的invoke（）方法接收的每个请求要执行的处理。 子类应该封装自己的处理功能作为Valve，
+ *    并通过调用setBasic（）将这个Valve配置到管道中。
+ * C. 此实现按照JavaBeans设计模式触发属性更改事件，以更改单例属性。 此外，它还会将以下ContainerEvent事件触发给使用addContainerListener（）注册自己的侦听器
+ */
+/**
+ * A.
  * Abstract implementation of the <b>Container</b> interface, providing common
  * functionality required by nearly every implementation.  Classes extending
  * this base class must may implement a replacement for <code>invoke()</code>.
+ *
+ * B.
  * <p>
  * All subclasses of this abstract base class will include support for a
  * Pipeline object that defines the processing to be performed for each request
@@ -78,6 +87,8 @@ import org.apache.tomcat.util.threads.InlineExecutorService;
  * "Chain of Responsibility" design pattern.  A subclass should encapsulate its
  * own processing functionality as a <code>Valve</code>, and configure this
  * Valve into the pipeline by calling <code>setBasic()</code>.
+ *
+ * C.
  * <p>
  * This implementation fires property change events, per the JavaBeans design
  * pattern, for changes in singleton properties.  In addition, it fires the
@@ -126,8 +137,8 @@ import org.apache.tomcat.util.threads.InlineExecutorService;
  *
  * @author Craig R. McClanahan
  */
-public abstract class ContainerBase extends LifecycleMBeanBase
-        implements Container {
+// 20201228 Container接口的抽象实现，提供几乎每个实现所需的通用功能。 扩展此基类的类必须实现对invoke（）的替换
+public abstract class ContainerBase extends LifecycleMBeanBase implements Container {
 
     private static final Log log = LogFactory.getLog(ContainerBase.class);
 
@@ -879,14 +890,19 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
     }
 
-
     /**
+     * 20201228
+     * A. 启动此组件并实现{@link org.apache.catalina.util.LifecycleBase＃startInternal（）}的要求。
+     */
+    /**
+     * A.
      * Start this component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    // 20201228 启动此组件并实现{@link org.apache.catalina.util.LifecycleBase＃startInternal（）}的要求。
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
@@ -930,6 +946,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         // Start the Valves in our pipeline (including the basic), if any
         if (pipeline instanceof Lifecycle) {
+            // 20201228 【重点】{@link LifecycleState＃STARTING_PREP} => {@link LifecycleState＃STARTING} => {@link LifecycleState＃STARTED}
             ((Lifecycle) pipeline).start();
         }
 

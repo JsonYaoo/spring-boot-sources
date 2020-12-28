@@ -87,36 +87,66 @@ import org.apache.tomcat.util.res.StringManager;
 // only programmatic. This would disable the default servlet.
 
 /**
+ * 20201228
+ * A. 用于嵌入/单元测试的最小的tomcat启动器。
+ * B. Tomcat支持多种样式的配置和启动-最常见和稳定的是基于server.xml的服务器，它在org.apache.catalina.startup.Bootstrap中实现。
+ * C. 此类用于嵌入tomcat的应用程序。
+ * D. 要求：
+ *      a. 所有tomcat类以及可能的servlet都在类路径中。 （例如，所有内容都放在一个大罐子中，或者在Eclipse CP中，或者在任何其他组合中）
+ *      b. 我们需要一个临时目录来存放工作文件
+ *      c. 不需要配置文件。 如果您的Web应用程序带有web.xml文件，则此类提供了使用的方法，但它是可选的-您可以使用自己的servlet。
+ * E. 有多种“添加”方法可配置servlet和webapp。 这些方法默认情况下会创建一个简单的内存安全领域并应用它。 如果需要更复杂的安全处理，则可以定义此类的子类。
+ * F. 此类提供了一组用于配置Web应用程序上下文的便捷方法。 方法addWebapp（）的所有重载。这些方法等效于将Web应用程序添加到主机的appBase（通常是webapps目录）。 这些方法将创建一个Context，
+ *    并使用conf / web.xml提供的默认值进行配置（有关详细信息，请参见{@link #initWebappDefaults（String）}），然后将Context添加到主机。 这些方法不使用全局默认web.xml。
+ *    相反，他们添加了一个{@link LifecycleListener}来配置默认值。 与应用程序打包在一起的任何WEB-INF / web.xml和META-INF / context.xml都将被正常处理。 将应用常规的Web片段和
+ *    {@link javax.servlet.ServletContainerInitializer}处理。
+ * G. 在复杂的情况下，您可能更喜欢使用普通的Tomcat API创建webapp上下文。 例如，您可能需要在调用{@link Host＃addChild（Container）}之前安装自定义加载程序。
+ *    要复制addWebapp方法的基本行为，您可能需要调用此类的两个方法：{@link #noDefaultWebXmlPath（）}和{@link #getDefaultWebXmlListener（）}。
+ * H. {@link #getDefaultWebXmlListener（）}返回一个{@link LifecycleListener}，其中添加了标准DefaultServlet，JSP处理和欢迎文件。 如果添加此侦听器，
+ *    则必须防止Tomcat将任何标准全局web.xml应用于...
+ * I. {@link #noDefaultWebXmlPath（）}返回一个虚拟路径名以进行配置，以防止{@link ContextConfig}尝试应用全局web.xml文件。
+ * J. 此类提供main（）和一些简单的CLI参数，请参阅doc的setter。 它可以用于简单的测试和演示。
+ */
+/**
+ * A.
  * Minimal tomcat starter for embedding/unit tests.
  *
+ * B.
  * <p>
  * Tomcat supports multiple styles of configuration and
  * startup - the most common and stable is server.xml-based,
  * implemented in org.apache.catalina.startup.Bootstrap.
  *
+ * C.
  * <p>
  * This class is for use in apps that embed tomcat.
  *
+ * D.
  * <p>
  * Requirements:
  * <ul>
+ *   a.
  *   <li>all tomcat classes and possibly servlets are in the classpath.
  *       (for example all is in one big jar, or in eclipse CP, or in
  *        any other combination)</li>
  *
+ *   b.
  *   <li>we need one temporary directory for work files</li>
  *
+ *   c.
  *   <li>no config file is required. This class provides methods to
  *       use if you have a webapp with a web.xml file, but it is
  *       optional - you can use your own servlets.</li>
  * </ul>
  *
+ * E.
  * <p>
  * There are a variety of 'add' methods to configure servlets and webapps. These
  * methods, by default, create a simple in-memory security realm and apply it.
  * If you need more complex security processing, you can define a subclass of
  * this class.
  *
+ * F.
  * <p>
  * This class provides a set of convenience methods for configuring web
  * application contexts; all overloads of the method <code>addWebapp()</code>.
@@ -130,6 +160,7 @@ import org.apache.tomcat.util.res.StringManager;
  * application will be processed normally. Normal web fragment and
  * {@link javax.servlet.ServletContainerInitializer} processing will be applied.
  *
+ * G.
  * <p>
  * In complex cases, you may prefer to use the ordinary Tomcat API to create
  * webapp contexts; for example, you might need to install a custom Loader
@@ -138,16 +169,19 @@ import org.apache.tomcat.util.res.StringManager;
  * methods of this class: {@link #noDefaultWebXmlPath()} and
  * {@link #getDefaultWebXmlListener()}.
  *
+ * H.
  * <p>
  * {@link #getDefaultWebXmlListener()} returns a {@link LifecycleListener} that
  * adds the standard DefaultServlet, JSP processing, and welcome files. If you
  * add this listener, you must prevent Tomcat from applying any standard global
  * web.xml with ...
  *
+ * I.
  * <p>
  * {@link #noDefaultWebXmlPath()} returns a dummy pathname to configure to
  * prevent {@link ContextConfig} from trying to apply a global web.xml file.
  *
+ * J.
  * <p>
  * This class provides a main() and few simple CLI arguments,
  * see setters for doc. It can be used for simple tests and
@@ -156,6 +190,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @see <a href="https://gitbox.apache.org/repos/asf?p=tomcat.git;a=blob;f=test/org/apache/catalina/startup/TestTomcat.java">TestTomcat</a>
  * @author Costin Manolache
  */
+// 20201228 此类用于嵌入tomcat的应用程序: Tomcat支持多种样式的配置和启动-最常见和稳定的是基于server.xml的服务器
 public class Tomcat {
 
     private static final StringManager sm = StringManager.getManager(Tomcat.class);
@@ -481,8 +516,11 @@ public class Tomcat {
      *
      * @throws LifecycleException Start error
      */
+    // 20201228 启动服务器。
     public void start() throws LifecycleException {
         getServer();
+
+        // 20201228 【重点】 {@link LifecycleState＃STARTING_PREP} => {@link LifecycleState＃STARTING} => {@link LifecycleState＃STARTED}
         server.start();
     }
 
@@ -566,6 +604,7 @@ public class Tomcat {
      * present.
      * @param connector The connector instance to add
      */
+    // 20201228 在服务中设置指定的连接器（如果尚不存在）。
     public void setConnector(Connector connector) {
         Service service = getService();
         boolean found = false;
@@ -585,6 +624,7 @@ public class Tomcat {
      * connectors and few other global settings.
      * @return The service
      */
+    // 20201228 获取服务对象。 可用于添加更多连接器和其他一些全局设置。
     public Service getService() {
         return getServer().findServices()[0];
     }
@@ -610,6 +650,7 @@ public class Tomcat {
         }
     }
 
+    // 20201228 获取Host虚拟主机
     public Host getHost() {
         Engine engine = getEngine();
         if (engine.findChildren().length > 0) {
@@ -626,6 +667,7 @@ public class Tomcat {
      * Access to the engine, for further customization.
      * @return The engine
      */
+    // 20201228 访问引擎，以进行进一步的自定义。
     public Engine getEngine() {
         Service service = getServer().findServices()[0];
         if (service.getContainer() != null) {
@@ -644,8 +686,9 @@ public class Tomcat {
      * customizations. JNDI is disabled by default.
      * @return The Server
      */
+    // 20201228 获取服务器对象。 您可以添加侦听器和更多自定义项。 默认情况下，JNDI是禁用的。
     public Server getServer() {
-
+        // 20201228 eg: StandServer@xxxx: "StandardServer[-1]" state: LifecycleState@xxxx: "NEW"
         if (server != null) {
             return server;
         }

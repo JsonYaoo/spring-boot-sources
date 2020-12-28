@@ -20,11 +20,17 @@ import javax.management.MBeanRegistration;
 import javax.management.ObjectName;
 
 /**
+ * 20201228
+ * A. 此接口由将在创建MBean服务器时注册到MBean服务器并在销毁它们时取消注册的组件来实现。 它主要旨在由实现{@link Lifecycle}的组件来实现，但并不专门针对它们。
+ */
+/**
+ * A.
  * This interface is implemented by components that will be registered with an
  * MBean server when they are created and unregistered when they are destroyed.
  * It is primarily intended to be implemented by components that implement
  * {@link Lifecycle} but is not exclusively for them.
  */
+// 20201228 此接口由将在创建MBean服务器时注册到MBean服务器并在销毁它们时取消注册的组件来实现。 它主要旨在由实现{@link Lifecycle}的组件来实现，但并不专门针对它们。
 public interface JmxEnabled extends MBeanRegistration {
 
     /**

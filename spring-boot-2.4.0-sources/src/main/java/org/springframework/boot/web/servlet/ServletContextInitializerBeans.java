@@ -45,9 +45,19 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * 20201228
+ * A. 从{@link ListableBeanFactory}获得的集合{@link ServletContextInitializer}。 包括所有{@link ServletContextInitializer} bean，还包括{@link Servlet}，{@link Filter}和某些
+ *    {@link EventListener} bean。
+ * B. 对项目进行排序，使适应的Bean位于顶部（{@link Servlet}，{@link Filter}，然后是{@link EventListener}），而直接的{@link ServletContextInitializer} Bean位于末尾。
+ *    使用{@link AnnotationAwareOrderComparator}在这些组中进行进一步排序。
+ */
+/**
+ * A.
  * A collection {@link ServletContextInitializer}s obtained from a
  * {@link ListableBeanFactory}. Includes all {@link ServletContextInitializer} beans and
  * also adapts {@link Servlet}, {@link Filter} and certain {@link EventListener} beans.
+ *
+ * B.
  * <p>
  * Items are sorted so that adapted beans are top ({@link Servlet}, {@link Filter} then
  * {@link EventListener}) and direct {@link ServletContextInitializer} beans are at the
@@ -59,6 +69,7 @@ import org.springframework.util.MultiValueMap;
  * @author Brian Clozel
  * @since 1.4.0
  */
+// 20201228 从{@link ListableBeanFactory}获得的集合{@link ServletContextInitializer}: {@link Servlet}，{@link Filter}，然后是{@link EventListener}），而直接的{@link ServletContextInitializer} Bean位于末尾
 public class ServletContextInitializerBeans extends AbstractCollection<ServletContextInitializer> {
 
 	private static final String DISPATCHER_SERVLET_NAME = "dispatcherServlet";
@@ -68,23 +79,33 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 	/**
 	 * Seen bean instances or bean names.
 	 */
+	// 20201228 可见的bean实例或bean名称。
 	private final Set<Object> seen = new HashSet<>();
 
+	// 20201228 用于以编程方式配置Servlet 3.0+ {@link ServletContext context}的接口: Servlet容器不会自动引导它们, 其生命周期由Spring而不是Servlet容器管理
 	private final MultiValueMap<Class<?>, ServletContextInitializer> initializers;
 
 	private final List<Class<? extends ServletContextInitializer>> initializerTypes;
 
 	private List<ServletContextInitializer> sortedList;
 
+	// 20201228 构造ServletContextInitializerBeans => eg: sortedList: size = 4: "dispatcherServlet urls=[/]"、"characterEncodingFilter"、"formContentFilter"、"requestContextFilter
 	@SafeVarargs
 	@SuppressWarnings("varargs")
-	public ServletContextInitializerBeans(ListableBeanFactory beanFactory,
-			Class<? extends ServletContextInitializer>... initializerTypes) {
+	public ServletContextInitializerBeans(ListableBeanFactory beanFactory, Class<? extends ServletContextInitializer>... initializerTypes) {
 		this.initializers = new LinkedMultiValueMap<>();
+
+		// 20201228 Class@xxxx: "interface org.springframework.boot.web.servlet.ServletContextInitializer"
 		this.initializerTypes = (initializerTypes.length != 0) ? Arrays.asList(initializerTypes)
 				: Collections.singletonList(ServletContextInitializer.class);
+
+		// 20201228 initializerBean: {"dispatcherServletRegistration"-DispatcherServletRegistrationBean@xxxx: "dispatcherServlet urls=[/]"}
 		addServletContextInitializerBeans(beanFactory);
+
+		// 20201228 添加Mutipart Servlet、Filer、Listener
 		addAdaptableBeans(beanFactory);
+
+		// 20201228 sortedList: size = 4: "dispatcherServlet urls=[/]"、"characterEncodingFilter"、"formContentFilter"、"requestContextFilter"
 		List<ServletContextInitializer> sortedInitializers = this.initializers.values().stream()
 				.flatMap((value) -> value.stream().sorted(AnnotationAwareOrderComparator.INSTANCE))
 				.collect(Collectors.toList());
@@ -92,10 +113,12 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 		logMappings(this.initializers);
 	}
 
+	// 20201228 initializerBean: {"dispatcherServletRegistration"-DispatcherServletRegistrationBean@xxxx: "dispatcherServlet urls=[/]"}
 	private void addServletContextInitializerBeans(ListableBeanFactory beanFactory) {
 		for (Class<? extends ServletContextInitializer> initializerType : this.initializerTypes) {
-			for (Entry<String, ? extends ServletContextInitializer> initializerBean : getOrderedBeansOfType(beanFactory,
-					initializerType)) {
+			// 20201228 initializerType: "interface org.springframework.boot.web.servlet.ServletContextInitializer"
+			for (Entry<String, ? extends ServletContextInitializer> initializerBean : getOrderedBeansOfType(beanFactory, initializerType)) {
+				// 20201228 initializerBean: {"dispatcherServletRegistration"-DispatcherServletRegistrationBean@xxxx: "dispatcherServlet urls=[/]"}
 				addServletContextInitializerBean(initializerBean.getKey(), initializerBean.getValue(), beanFactory);
 			}
 		}
@@ -148,11 +171,19 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 		return "unknown";
 	}
 
+	// 20201228 添加Mutipart Servlet、Filer、Listener
 	@SuppressWarnings("unchecked")
 	protected void addAdaptableBeans(ListableBeanFactory beanFactory) {
+		// 202012228 MultipartConfigElement@xxxx
 		MultipartConfigElement multipartConfig = getMultipartConfig(beanFactory);
+
+		// 20201228 添加多部件Servlet: ServletContextInitializerBeans$ServletRegistrationBeansAdapter@XXXX => eg: do nothing
 		addAsRegistrationBean(beanFactory, Servlet.class, new ServletRegistrationBeanAdapter(multipartConfig));
+
+		// 20201228 添加Filter eg: "characterEncodingFilter"-OrderedCharacterEncodingFilter@xxxx、"formContentFilter"-OrderedFormContentFilter@xxxx、"requestContextFilter"-OrderedRequestContextFilter@xxxx
 		addAsRegistrationBean(beanFactory, Filter.class, new FilterRegistrationBeanAdapter());
+
+		// 20201228 添加ServletContext(Attribute)、HttpSession(Attribute)、ServletRequest(Attribute) Listener
 		for (Class<?> listenerType : ServletListenerRegistrationBean.getSupportedTypes()) {
 			addAsRegistrationBean(beanFactory, EventListener.class, (Class<EventListener>) listenerType,
 					new ServletListenerRegistrationBeanAdapter());
@@ -165,13 +196,17 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 		return beans.isEmpty() ? null : beans.get(0).getValue();
 	}
 
+	// 20201228 用于以编程方式配置Servlet 3.0+ {@link ServletContext context}的接口: Servlet容器不会自动引导它们, 其生命周期由Spring而不是Servlet容器管理
 	protected <T> void addAsRegistrationBean(ListableBeanFactory beanFactory, Class<T> type,
 			RegistrationBeanAdapter<T> adapter) {
+		// 20201228 用于以编程方式配置Servlet 3.0+ {@link ServletContext context}的接口: Servlet容器不会自动引导它们, 其生命周期由Spring而不是Servlet容器管理
 		addAsRegistrationBean(beanFactory, type, type, adapter);
 	}
 
+	// 20201228 用于以编程方式配置Servlet 3.0+ {@link ServletContext context}的接口: Servlet容器不会自动引导它们, 其生命周期由Spring而不是Servlet容器管理
 	private <T, B extends T> void addAsRegistrationBean(ListableBeanFactory beanFactory, Class<T> type,
 			Class<B> beanType, RegistrationBeanAdapter<T> adapter) {
+		// 20201228 根据类型组装BeanName-实例集合 eg: "characterEncodingFilter"-OrderedCharacterEncodingFilter@xxxx、"formContentFilter"-OrderedFormContentFilter@xxxx、"requestContextFilter"-OrderedRequestContextFilter@xxxx
 		List<Entry<String, B>> entries = getOrderedBeansOfType(beanFactory, beanType, this.seen);
 		for (Entry<String, B> entry : entries) {
 			String beanName = entry.getKey();
@@ -181,6 +216,8 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 				RegistrationBean registration = adapter.createRegistrationBean(beanName, bean, entries.size());
 				int order = getOrder(bean);
 				registration.setOrder(order);
+
+				// 20201228 用于以编程方式配置Servlet 3.0+ {@link ServletContext context}的接口: Servlet容器不会自动引导它们, 其生命周期由Spring而不是Servlet容器管理
 				this.initializers.add(type, registration);
 				if (logger.isTraceEnabled()) {
 					logger.trace("Created " + type.getSimpleName() + " initializer for bean '" + beanName + "'; order="
@@ -203,6 +240,7 @@ public class ServletContextInitializerBeans extends AbstractCollection<ServletCo
 		return getOrderedBeansOfType(beanFactory, type, Collections.emptySet());
 	}
 
+	// 20201228 根据类型组装BeanName-实例集合
 	private <T> List<Entry<String, T>> getOrderedBeansOfType(ListableBeanFactory beanFactory, Class<T> type,
 			Set<?> excludes) {
 		String[] names = beanFactory.getBeanNamesForType(type, true, false);

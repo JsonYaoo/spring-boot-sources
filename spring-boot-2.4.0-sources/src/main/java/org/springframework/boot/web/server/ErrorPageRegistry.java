@@ -17,11 +17,17 @@
 package org.springframework.boot.web.server;
 
 /**
+ * 20201228
+ * A. 包含{@link ErrorPage ErrorPages}的注册表的接口。
+ */
+/**
+ * A.
  * Interface for a registry that holds {@link ErrorPage ErrorPages}.
  *
  * @author Phillip Webb
  * @since 2.0.0
  */
+// 20201228 包含{@link ErrorPage ErrorPages}的注册表的接口。
 @FunctionalInterface
 public interface ErrorPageRegistry {
 

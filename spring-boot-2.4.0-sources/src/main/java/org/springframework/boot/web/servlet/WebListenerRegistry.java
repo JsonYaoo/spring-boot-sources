@@ -19,11 +19,17 @@ package org.springframework.boot.web.servlet;
 import javax.servlet.annotation.WebListener;
 
 /**
+ * 20201228
+ * A. 一个拥有{@link WebListener @WebListeners}的注册表。
+ */
+/**
+ * A.
  * A registry that holds {@link WebListener @WebListeners}.
  *
  * @author Andy Wilkinson
  * @since 2.4.0
  */
+// 20201228 一个拥有{@link WebListener @WebListeners}的注册表。
 public interface WebListenerRegistry {
 
 	/**

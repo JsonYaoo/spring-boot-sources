@@ -78,8 +78,13 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * 20201228
+ * A. ServletContext的标准实现，表示Web应用程序的执行环境。 此类的一个实例与StandardContext的每个实例相关联。
+ */
 
 /**
+ * A.
  * Standard implementation of <code>ServletContext</code> that represents
  * a web application's execution environment.  An instance of this class is
  * associated with each instance of <code>StandardContext</code>.
@@ -87,6 +92,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
+// 20201228 ServletContext的标准实现，表示Web应用程序的执行环境。 此类的一个实例与StandardContext的每个实例相关联。
 public class ApplicationContext implements ServletContext {
 
     protected static final boolean STRICT_SERVLET_COMPLIANCE;
@@ -851,9 +857,10 @@ public class ApplicationContext implements ServletContext {
         return addServlet(servletName, className, null, null);
     }
 
-
+    // 20201228 注册一个Servlet实现以在此ServletContext中使用。
     @Override
     public ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet) {
+        // 20201228 注册一个Servlet实现以在此ServletContext中使用。
         return addServlet(servletName, null, servlet, null);
     }
 
@@ -900,15 +907,17 @@ public class ApplicationContext implements ServletContext {
         return addServlet(jspName, jspServletClassName, null, jspFileInitParams);
     }
 
-
+    // 20201228 注册一个Servlet实现以在此ServletContext中使用。
     private ServletRegistration.Dynamic addServlet(String servletName, String servletClass,
             Servlet servlet, Map<String,String> initParams) throws IllegalStateException {
 
+        // 20201228 eg: false
         if (servletName == null || servletName.equals("")) {
             throw new IllegalArgumentException(sm.getString(
                     "applicationContext.invalidServletName", servletName));
         }
 
+        // 20201228 eg: "STARTING_PREP" => false
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(
@@ -916,11 +925,14 @@ public class ApplicationContext implements ServletContext {
                             getContextPath()));
         }
 
+        // 20201228 eg: null
         Wrapper wrapper = (Wrapper) context.findChild(servletName);
 
+        // 20201228 假设一个“完整的” ServletRegistration是一个具有类和名称的对象
         // Assume a 'complete' ServletRegistration is one that has a class and
         // a name
         if (wrapper == null) {
+            // 20201228 eg: StandardWrapper@xxxx: "StandardEngine[Tomcat].StandardHost[localhost].TomcatEmbeddedContext[].StandardWrapper[dispatcherServlet]"
             wrapper = context.createWrapper();
             wrapper.setName(servletName);
             context.addChild(wrapper);
@@ -943,27 +955,32 @@ public class ApplicationContext implements ServletContext {
                 annotation = clazz.getAnnotation(ServletSecurity.class);
             }
         } else {
+            // 20201228 eg: "org.springframework.web.servlet.DispatcherServlet"
             wrapper.setServletClass(servlet.getClass().getName());
             wrapper.setServlet(servlet);
+
+            // 2021228 eg: false
             if (context.wasCreatedDynamicServlet(servlet)) {
                 annotation = servlet.getClass().getAnnotation(ServletSecurity.class);
             }
         }
 
+        // 20201228 eg: false
         if (initParams != null) {
             for (Map.Entry<String, String> initParam: initParams.entrySet()) {
                 wrapper.addInitParameter(initParam.getKey(), initParam.getValue());
             }
         }
 
-        ServletRegistration.Dynamic registration =
-                new ApplicationServletRegistration(wrapper, context);
+        // 20201228 ApplicationServletRegistration@xxxx：StandardWrapper@xxxx、TomcatEmbeddedContext@xxxx:"StandardEngine[Tomcat].StandardHost[localhost].TomcatEmbeddedContext[]"
+        ServletRegistration.Dynamic registration = new ApplicationServletRegistration(wrapper, context);
         if (annotation != null) {
             registration.setServletSecurity(new ServletSecurityElement(annotation));
         }
+
+        // 20201228 ApplicationServletRegistration@xxxx：StandardWrapper@xxxx、TomcatEmbeddedContext@xxxx:"StandardEngine[Tomcat].StandardHost[localhost].TomcatEmbeddedContext[]"
         return registration;
     }
-
 
     @Override
     public <T extends Servlet> T createServlet(Class<T> c) throws ServletException {
@@ -1029,12 +1046,12 @@ public class ApplicationContext implements ServletContext {
         return defaultSessionTrackingModes;
     }
 
-
+    // 20201228 获取Session配置
     @Override
     public SessionCookieConfig getSessionCookieConfig() {
+        // 20201228 eg: ApplicationSessionCookieConfig@xxxx: context: TomcatEmbeddedContext@xxxx: StandardEngine[Tomcat].StandardHost[localhost].TomcatEmbeddedContext[]
         return sessionCookieConfig;
     }
-
 
     @Override
     public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {

@@ -22,6 +22,7 @@ import javax.servlet.annotation.MultipartConfig;
  * @since Servlet 3.0
  * TODO SERVLET3 - Add comments
  */
+// 20201228 多部件配置元素
 public class MultipartConfigElement {
 
     private final String location;// = "";

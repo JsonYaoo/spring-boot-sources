@@ -20,9 +20,15 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * 20201228
+ * A. 过滤器和Servlet注册的通用接口。
+ */
+/**
+ * A.
  * Common interface for the registration of Filters and Servlets.
  * @since Servlet 3.0
  */
+// 20201228 过滤器和Servlet注册的通用接口
 public interface Registration {
 
     public String getName();
@@ -94,6 +100,7 @@ public interface Registration {
          * @throws IllegalStateException if the ServletContext associated with
          *         this registration has already been initialised
          */
+        // 20201228 将此Servlet / Filter标记为受支持的异步处理
         public void setAsyncSupported(boolean isAsyncSupported);
     }
 }

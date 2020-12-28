@@ -30,10 +30,16 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
+ * 20201228
+ * A. {@link Lifecycle}接口的基本实现，该接口实现了{@link Lifecycle＃start（）}和{@link Lifecycle＃stop（）}的状态转换规则
+ */
+/**
+ * A.
  * Base implementation of the {@link Lifecycle} interface that implements the
  * state transition rules for {@link Lifecycle#start()} and
  * {@link Lifecycle#stop()}
  */
+// 20201228 {@link Lifecycle}接口的基本实现，该接口实现了{@link Lifecycle＃start（）}和{@link Lifecycle＃stop（）}的状态转换规则
 public abstract class LifecycleBase implements Lifecycle {
 
     private static final Log log = LogFactory.getLog(LifecycleBase.class);
@@ -69,7 +75,11 @@ public abstract class LifecycleBase implements Lifecycle {
         return throwOnFailure;
     }
 
-
+    /**
+     * 20201228
+     * 配置是否在{@link #initInternal（）}，{@link #startInternal（）}，{@link #stopInternal（）}或{@link #destroyInternal（）}期间子类抛出{@link LifecycleException}
+     * 将被重新抛出以供调用者处理或将其记录下来。
+     */
     /**
      * Configure if a {@link LifecycleException} thrown by a sub-class during
      * {@link #initInternal()}, {@link #startInternal()},
@@ -79,6 +89,7 @@ public abstract class LifecycleBase implements Lifecycle {
      * @param throwOnFailure {@code true} if the exception should be re-thrown,
      *                       otherwise {@code false}
      */
+    // 20201228 在重要位置抛出的异常将被重新抛出以供调用者处理或将其记录下来
     public void setThrowOnFailure(boolean throwOnFailure) {
         this.throwOnFailure = throwOnFailure;
     }
@@ -87,6 +98,7 @@ public abstract class LifecycleBase implements Lifecycle {
     /**
      * {@inheritDoc}
      */
+    // 20201228 添加声明周期监听器
     @Override
     public void addLifecycleListener(LifecycleListener listener) {
         lifecycleListeners.add(listener);
@@ -124,16 +136,22 @@ public abstract class LifecycleBase implements Lifecycle {
         }
     }
 
-
+    // 20201228 New => init
     @Override
     public final synchronized void init() throws LifecycleException {
+        // 20201228 !true => false
         if (!state.equals(LifecycleState.NEW)) {
             invalidTransition(Lifecycle.BEFORE_INIT_EVENT);
         }
 
         try {
+            // 20201228 设置生命周期状态 eg: "INITIALIZING"
             setStateInternal(LifecycleState.INITIALIZING, null, false);
+
+            // 20201228 子类实现此方法以执行所需的任何实例初始化。
             initInternal();
+
+            // 20201228 设置生命周期状态 eg: "INITIALIZED"
             setStateInternal(LifecycleState.INITIALIZED, null, false);
         } catch (Throwable t) {
             handleSubClassException(t, "lifecycleBase.initFail", toString());
@@ -147,15 +165,16 @@ public abstract class LifecycleBase implements Lifecycle {
      *
      * @throws LifecycleException If the initialisation fails
      */
+    // 20201228 子类实现此方法以执行所需的任何实例初始化。
     protected abstract void initInternal() throws LifecycleException;
-
 
     /**
      * {@inheritDoc}
      */
+    // 20201228 {@link LifecycleState＃STARTING_PREP} => {@link LifecycleState＃STARTING} => {@link LifecycleState＃STARTED}
     @Override
     public final synchronized void start() throws LifecycleException {
-
+        // 20201228 eg: false
         if (LifecycleState.STARTING_PREP.equals(state) || LifecycleState.STARTING.equals(state) ||
                 LifecycleState.STARTED.equals(state)) {
 
@@ -169,7 +188,9 @@ public abstract class LifecycleBase implements Lifecycle {
             return;
         }
 
+        // 20201228 eg: true
         if (state.equals(LifecycleState.NEW)) {
+            // 20201228 New => init, Server -> Service -> Connector -> Protocol -> Endpoint -> SocketProperties
             init();
         } else if (state.equals(LifecycleState.FAILED)) {
             stop();
@@ -179,7 +200,10 @@ public abstract class LifecycleBase implements Lifecycle {
         }
 
         try {
+            // 20201228 设置生命周期状态
             setStateInternal(LifecycleState.STARTING_PREP, null, false);
+
+            // 20201228 【重点】子类必须确保在执行此方法期间将状态更改为{@link LifecycleState＃STARTING}。 更改状态将触发{@link Lifecycle＃START_EVENT}事件
             startInternal();
             if (state.equals(LifecycleState.FAILED)) {
                 // This is a 'controlled' failure. The component put itself into the
@@ -199,12 +223,19 @@ public abstract class LifecycleBase implements Lifecycle {
         }
     }
 
-
     /**
+     * 20201228
+     * A. 子类必须确保在执行此方法期间将状态更改为{@link LifecycleState＃STARTING}。 更改状态将触发{@link Lifecycle＃START_EVENT}事件
+     * B. 如果组件无法启动，则可能抛出{@link LifecycleException}，这将导致其父项无法启动，或者它可能将自己置于错误状态，在这种情况下，将在组件上调用{@link #stop（）}。
+     *    失败的组件，但父组件将继续正常启动。
+     */
+    /**
+     * A.
      * Sub-classes must ensure that the state is changed to
      * {@link LifecycleState#STARTING} during the execution of this method.
      * Changing state will trigger the {@link Lifecycle#START_EVENT} event.
      *
+     * B.
      * If a component fails to start it may either throw a
      * {@link LifecycleException} which will cause it's parent to fail to start
      * or it can place itself in the error state in which case {@link #stop()}
@@ -213,8 +244,8 @@ public abstract class LifecycleBase implements Lifecycle {
      *
      * @throws LifecycleException Start error occurred
      */
+    // 20201228 子类必须确保在执行此方法期间将状态更改为{@link LifecycleState＃STARTING}。 更改状态将触发{@link Lifecycle＃START_EVENT}事件
     protected abstract void startInternal() throws LifecycleException;
-
 
     /**
      * {@inheritDoc}
@@ -382,7 +413,7 @@ public abstract class LifecycleBase implements Lifecycle {
         setStateInternal(state, data, true);
     }
 
-
+    // 20201228 设置生命周期状态
     private synchronized void setStateInternal(LifecycleState state, Object data, boolean check)
             throws LifecycleException {
 

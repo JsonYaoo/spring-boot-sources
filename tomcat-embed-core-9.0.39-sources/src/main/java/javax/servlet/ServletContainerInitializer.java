@@ -51,6 +51,10 @@ import java.util.Set;
 public interface ServletContainerInitializer {
 
     /**
+     * 20201228
+     * 在Web应用程序启动期间接收与通过{@link javax.servlet.annotation.HandlesTypes}注释定义的条件相匹配的Web应用程序中的类的通知。
+     */
+    /**
      * Receives notification during startup of a web application of the classes
      * within the web application that matched the criteria defined via the
      * {@link javax.servlet.annotation.HandlesTypes} annotation.
@@ -62,5 +66,6 @@ public interface ServletContainerInitializer {
      *
      * @throws ServletException If an error occurs
      */
+    // 20201228 在Web应用程序启动期间接收与通过{@link javax.servlet.annotation.HandlesTypes}注释定义的条件相匹配的Web应用程序中的类的通知。
     void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException;
 }

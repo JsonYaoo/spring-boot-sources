@@ -54,19 +54,31 @@ import org.apache.tomcat.util.res.StringManager;
 */
 
 /**
+ * 20201228
+ * A. 建模器MBean的注册表。
+ * B. 这是建模器的主要入口点。 它提供了创建和操纵模型Mbean并简化其使用的方法。
+ * C. 此类本身就是mbean。
+ * D. 此类本身很重要：没有用@since x.x标记的公共方法是实验性的或内部的。 不应使用。
+ */
+/**
+ * A.
  * Registry for modeler MBeans.
  *
+ * B.
  * This is the main entry point into modeler. It provides methods to create and
  * manipulate model mbeans and simplify their use.
  *
+ * C.
  * This class is itself an mbean.
  *
+ * D.
  * IMPORTANT: public methods not marked with @since x.x are experimental or
  * internal. Should not be used.
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
  */
+// 20201228 建模器MBean的注册表: 它提供了创建和操纵模型Mbean并简化其使用的方法
 public class Registry implements RegistryMBean, MBeanRegistration {
 
     /**
@@ -81,6 +93,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * The registry instance created by our factory method the first time it is
      * called.
      */
+    // 20201228 第一次调用我们的工厂方法创建的注册表实例。
     private static Registry registry = null;
 
     // Per registry fields
@@ -148,9 +161,10 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         return registry;
     }
 
-
+    // 20201228 禁用MBean注册
     public static synchronized void disableRegistry() {
         if (registry == null) {
+            // 20201228 MBean注册表的实现，可以有效地禁用MBean注册。 通常在低内存占用量是主要问题时使用。
             registry = new NoDescriptorRegistry();
         } else if (!(registry instanceof NoDescriptorRegistry)) {
             log.warn(sm.getString("registry.noDisable"));

@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat;
 
+// 20201228 绑定上下文
 public interface ContextBind {
 
     /**

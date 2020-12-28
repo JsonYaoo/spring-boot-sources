@@ -678,7 +678,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses. // 20201210 在特定上下文子类中初始化其他特殊bean。
-				// 20201213 【Springboot扩展】【Tomcat源码】 启动Tomcat服务器, 替换与{@code Servlet}相关的属性源
+				// 20201213 【重点】【Springboot扩展】【Tomcat源码】 启动Tomcat服务器, 替换与{@code Servlet}相关的属性源
 				onRefresh();
 
 				// Check for listener beans and register them.

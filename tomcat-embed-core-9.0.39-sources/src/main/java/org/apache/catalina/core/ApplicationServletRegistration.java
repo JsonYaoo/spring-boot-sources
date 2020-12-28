@@ -35,8 +35,8 @@ import org.apache.catalina.util.ParameterMap;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.res.StringManager;
 
-public class ApplicationServletRegistration
-        implements ServletRegistration.Dynamic {
+// 20201228 应用上下文Servlet注册类
+public class ApplicationServletRegistration implements ServletRegistration.Dynamic {
 
     /**
      * The string manager for this package.
@@ -48,11 +48,10 @@ public class ApplicationServletRegistration
     private final Context context;
     private ServletSecurityElement constraint;
 
-    public ApplicationServletRegistration(Wrapper wrapper,
-            Context context) {
+    // 20201228 构建应用上下文Servlet注册类实例
+    public ApplicationServletRegistration(Wrapper wrapper, Context context) {
         this.wrapper = wrapper;
         this.context = context;
-
     }
 
     @Override
@@ -127,6 +126,7 @@ public class ApplicationServletRegistration
         return conflicts;
     }
 
+    // 20201228 将此Servlet / Filter标记为受支持的异步处理
     @Override
     public void setAsyncSupported(boolean asyncSupported) {
         wrapper.setAsyncSupported(asyncSupported);
@@ -165,7 +165,7 @@ public class ApplicationServletRegistration
         return context.addServletSecurity(this, constraint);
     }
 
-
+    // 20201228 为该ServletRegistration表示的Servlet添加具有给定URL模式的Servlet映射。 如果任何指定的URL模式已经映射到其他Servlet，则不会执行任何更新
     @Override
     public Set<String> addMapping(String... urlPatterns) {
         if (urlPatterns == null) {

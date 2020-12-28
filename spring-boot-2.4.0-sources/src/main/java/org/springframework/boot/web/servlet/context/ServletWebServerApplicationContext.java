@@ -188,13 +188,13 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		}
 	}
 
-	// 20201213 可以重写的模板方法以添加特定于上下文的刷新工作
+	// 20201213 【重点】可以重写的模板方法以添加特定于上下文的刷新工作
 	@Override
 	protected void onRefresh() {
 		// 20201213 初始化主题功能。
 		super.onRefresh();
 		try {
-			// 20201213 启动Web服务器, 替换与{@code Servlet}相关的属性源
+			// 20201213 【重点】启动Web服务器, 替换与{@code Servlet}相关的属性源
 			createWebServer();
 		}
 		catch (Throwable ex) {
@@ -210,7 +210,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		super.doClose();
 	}
 
-	// 20201213 启动Web服务器, 替换与{@code Servlet}相关的属性源
+	// 20201213 【重点】启动Web服务器, 替换与{@code Servlet}相关的属性源
 	private void createWebServer() {
 		// 20201228 eg: null
 		WebServer webServer = this.webServer;
@@ -224,9 +224,9 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 			ServletWebServerFactory factory = getWebServerFactory();
 			createWebServer.tag("factory", factory.getClass().toString());
 
-			// 20201213 【Tomcat源码】获取一个新的完全配置但暂停的{@link WebServer}实例
+			// 20201213 【Tomcat源码】获取一个新的完全配置但暂停的{@link WebServer}实例 => eg: TomcatWebServer@xxxx
 			this.webServer = factory.getWebServer(
-					// 20201213 返回{@link ServletContextInitializer}，它将用于完成此{@link WebApplicationContext}的设置。
+					// 20201228 "dispatcherServlet urls=[/]"、"characterEncodingFilter"、"formContentFilter"、"requestContextFilter"初始化到ServletContext中
 					getSelfInitializer()
 			);
 			createWebServer.end();
@@ -286,22 +286,40 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	 */
 	// 20201213 返回{@link ServletContextInitializer}，它将用于完成此{@link WebApplicationContext}的设置。
 	private org.springframework.boot.web.servlet.ServletContextInitializer getSelfInitializer() {
+		// 20201228 lambda表达式(TomcatStarter#onStartup()后执行): "dispatcherServlet urls=[/]"、"characterEncodingFilter"、"formContentFilter"、"requestContextFilter"初始化到ServletContext中
 		return this::selfInitialize;
 	}
 
+	// 20201228 lambda表达式(TomcatStarter#onStartup()后执行): "dispatcherServlet urls=[/]"、"characterEncodingFilter"、"formContentFilter"、"requestContextFilter"初始化到ServletContext中
 	private void selfInitialize(ServletContext servletContext) throws ServletException {
+		// 20201228 eg: "org.springframework.web.context.WebApplicationContext.ROOT": AnnotationConfigServletWebSeverApplicationContext@xxxx
 		prepareWebApplicationContext(servletContext);
+
+		// 20201228 "org.springframework.web.context.support.ServletContextScope": ServletContextScope@xxxx: ApplicationContextFacade@xxxx
 		registerApplicationScope(servletContext);
+
+		// 20201228 "servletContext"、"servletConfig"、"contextParameters"、"contextAttributes"
 		WebApplicationContextUtils.registerEnvironmentBeans(getBeanFactory(), servletContext);
+
+		// 20201228 构造ServletContextInitializerBeans => eg: sortedList: size = 4: "dispatcherServlet urls=[/]"、"characterEncodingFilter"、"formContentFilter"、"requestContextFilter"
 		for (ServletContextInitializer beans : getServletContextInitializerBeans()) {
+			// 20201228 使用初始化所需的所有Servlet，过滤器，侦听器上下文参数和属性配置给定的{@link ServletContext}。
+			// 20201228 eg: 配置DispatcherServlet、设置"\" mappings、设置多部件文件配置元素
 			beans.onStartup(servletContext);
 		}
 	}
 
+	// 20201228 "org.springframework.web.context.support.ServletContextScope": ServletContextScope@xxxx: ApplicationContextFacade@xxxx
 	private void registerApplicationScope(ServletContext servletContext) {
+		// 20201228 eg: ServletContextScope@xxxx: ApplicationContextFacade@xxxx
 		ServletContextScope appScope = new ServletContextScope(servletContext);
+
+		// 20201228 eg: "application"
 		getBeanFactory().registerScope(WebApplicationContext.SCOPE_APPLICATION, appScope);
+
+		// 20201228 注册为ServletContext属性，以便ContextCleanupListener对其进行检测。
 		// Register as ServletContext attribute, for ContextCleanupListener to detect it.
+		// 20201228 "org.springframework.web.context.support.ServletContextScope": ServletContextScope@xxxx: ApplicationContextFacade@xxxx
 		servletContext.setAttribute(ServletContextScope.class.getName(), appScope);
 	}
 
@@ -324,6 +342,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	 * {@link EventListener} beans.
 	 * @return the servlet initializer beans
 	 */
+	// 20201228 返回{@link ServletContextInitializer}，该值应与嵌入式Web服务器一起使用。 默认情况下，此方法将首先尝试查找
 	protected Collection<ServletContextInitializer> getServletContextInitializerBeans() {
 		return new ServletContextInitializerBeans(getBeanFactory());
 	}
@@ -360,6 +379,8 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 				logger.debug("Published root WebApplicationContext as ServletContext attribute with name ["
 						+ WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE + "]");
 			}
+
+			// 20201228 设置运行此WebApplicationContext的ServletContext => eg: ApplicationContextFacade
 			setServletContext(servletContext);
 			if (logger.isInfoEnabled()) {
 				long elapsedTime = System.currentTimeMillis() - getStartupDate();

@@ -148,7 +148,7 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-// 20201228 Context接口的标准实现。 每个子容器必须是Wrapper实现，才能处理针对特定servlet的请求。
+// 20201228 Context接口的标准实现, 每个子容器必须是Wrapper实现，才能处理针对特定servlet的请求: 容器, 一个单独的Web应用程序, 由发出通知的MBean实现的接口: 它允许将侦听器注册到MBean作为通知侦听器
 public class StandardContext extends ContainerBase implements Context, NotificationEmitter {
 
     private static final Log log = LogFactory.getLog(StandardContext.class);
@@ -3069,13 +3069,13 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
     }
 
-
     /**
      * Add a Locale Encoding Mapping (see Sec 5.4 of Servlet spec 2.4)
      *
      * @param locale locale to map an encoding for
      * @param encoding encoding to be used for a give locale
      */
+    // 20201228 添加区域设置编码映射（请参阅Servlet规范2.4的5.4节）
     @Override
     public void addLocaleEncodingMappingParameter(String locale, String encoding){
         getCharsetMapper().addCharsetMappingFromDeploymentDescriptor(locale, encoding);
@@ -4922,14 +4922,19 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     }
 
-
     /**
+     * 20201228
+     * A. 启动此组件并实现{@link org.apache.catalina.util.LifecycleBase＃startInternal（）}的要求。
+     */
+    /**
+     * A.
      * Start this component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    // 20201228 【重点】启动此组件并实现{@link org.apache.catalina.util.LifecycleBase＃startInternal（）}的要求。
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
@@ -5164,12 +5169,14 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             // Set up the context init params
             mergeParameters();
 
+            // 20201228 【重点】调用ServletContainerInitializers
             // Call ServletContainerInitializers
-            for (Map.Entry<ServletContainerInitializer, Set<Class<?>>> entry :
-                initializers.entrySet()) {
+            // 20201228 eg: TomcatStarter@xxxx: initializers: ServletContextInitialzer[3]@xxxx
+            // 20201228 eg: ServletContextInitialzer[3]@xxxx: AbstractServletWebServerFactory$lambda@xxxx、AbstractServletWebServerFactory$SessionConfigurationInitializer@xxxx、ServletWebServerApplicationContext$lambda@xxxx
+            for (Map.Entry<ServletContainerInitializer, Set<Class<?>>> entry : initializers.entrySet()) {
                 try {
-                    entry.getKey().onStartup(entry.getValue(),
-                            getServletContext());
+                    // 20201228【重点】 eg: ApplicationContextFacade@xxxx: context: ApplicationContext@xxxx: context: TomcatEmbeddedContext@xxxx: "StandardEngine[Tomcat].StandardHost[localhost].TomcatEmbeddedContext[]"
+                    entry.getKey().onStartup(entry.getValue(), getServletContext());
                 } catch (ServletException e) {
                     log.error(sm.getString("standardContext.sciFail"), e);
                     ok = false;

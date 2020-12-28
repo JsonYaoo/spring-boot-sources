@@ -392,6 +392,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * Return the outer Catalina startup/shutdown component if present.
      */
+    // 20201228 返回外部Catalina启动/关闭组件（如果有）。
     @Override
     public Catalina getCatalina() {
         return catalina;
@@ -908,18 +909,25 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         return useNaming;
     }
 
-
     /**
+     * 20201228
+     * A. 启动嵌套组件（{@link Service}）并实现{@link org.apache.catalina.util.LifecycleBase＃startInternal（）}的要求。
+     */
+    /**
+     * A.
      * Start nested components ({@link Service}s) and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    // 20201228 启动嵌套组件（{@link Service}）并实现{@link org.apache.catalina.util.LifecycleBase＃startInternal（）}的要求。
     @Override
     protected void startInternal() throws LifecycleException {
-
+        // 20201228 eg: "configure_start"
         fireLifecycleEvent(CONFIGURE_START_EVENT, null);
+
+        // 20201228 eg: "STARTING"
         setState(LifecycleState.STARTING);
 
         globalNamingResources.start();
@@ -927,6 +935,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         // Start our defined Services
         synchronized (servicesLock) {
             for (Service service : services) {
+                // 20201228 【重点】{@link LifecycleState＃STARTING_PREP} => {@link LifecycleState＃STARTING} => {@link LifecycleState＃STARTED}
                 service.start();
             }
         }
@@ -1001,31 +1010,47 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * Invoke a pre-startup initialization. This is used to allow connectors
      * to bind to restricted ports under Unix operating environments.
      */
+    // 20201228 调用启动前的初始化。 这用于允许连接器在Unix操作环境下绑定到受限端口。
     @Override
     protected void initInternal() throws LifecycleException {
 
+        // 20201228 "Tomcat:type=Server"
         super.initInternal();
 
+        // 20201228 初始化实用程序执行器 eg: size = 2
         // Initialize utility executor
         reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
+
+        // 20201228 eg: "java.util.concurrent.ScheduledThreadPoolExecutor@289778cd[Running, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]"
         register(utilityExecutor, "type=UtilityExecutor");
 
+        // 20201228 注册全局字符串缓存注意，尽管缓存是全局的，但如果JVM中存在多个服务器（嵌入时可能会发生），则相同的缓存将以多个名称注册。
         // Register global String cache
         // Note although the cache is global, if there are multiple Servers
         // present in the JVM (may happen when embedding) then the same cache
         // will be registered under multiple names
+        // 20201228 eg: "Tomcat:type=StringCache"
         onameStringCache = register(new StringCache(), "type=StringCache");
 
+        // 20201228 注册MBeanFactory
         // Register the MBeanFactory
         MBeanFactory factory = new MBeanFactory();
+
+        // 20201228 eg: StanderServer@xxxx: "StandardServer[-1]"
         factory.setContainer(this);
+
+        // 20201228 eg: MBeanFactory@xxxx: container: StanderdServer@xxxx: "StandardServer[-1]"
         onameMBeanFactory = register(factory, "type=MBeanFactory");
 
+        // 20201228 注册命名资源
         // Register the naming resources
+        // 20201228 eg: NamingResourceImpl@xxxx
         globalNamingResources.init();
 
+        // 20201228 使用来自公共和共享类加载器的JAR填充扩展验证器
         // Populate the extension validator with JARs from common and shared
         // class loaders
+        // 20201228 返回外部Catalina启动/关闭组件（如果有） => eg: null
         if (getCatalina() != null) {
             ClassLoader cl = getCatalina().getParentClassLoader();
             // Walk the class loader hierarchy. Stop at the system class loader.
@@ -1052,7 +1077,10 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 cl = cl.getParent();
             }
         }
+
+        // 20201228 初始化我们定义的服务
         // Initialize our defined Services
+        // 20201228 eg: size = 1: StandardService@xxxx: StandardService[Tomcat]: name: "Tomcat", server: "StandardServer[-1]"
         for (Service service : services) {
             service.init();
         }

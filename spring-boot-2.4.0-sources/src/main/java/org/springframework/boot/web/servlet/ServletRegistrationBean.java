@@ -31,10 +31,20 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201228
+ * A. {@link ServletContextInitializer}，用于在Servlet 3.0+容器中注册{@link Servlet}。 与{@link ServletContext}提供的
+ *    {@link ServletContext＃addServlet（String，Servlet）registration}功能类似，但具有Spring Bean友好的设计。
+ * B. 必须在调用{@link #onStartup}之前指定{@link #setServlet（Servlet）Servlet}。 可以使用{@link #setUrlMappings}配置URL映射，或者在映射到'/ *'时省略URL映射（除非
+ *    {@link #ServletRegistrationBean（Servlet，boolean，String ...）alwaysMapUrl}设置为{@code false}）。 如果未指定，则将推导出servlet名称。
+ */
+/**
+ * A.
  * A {@link ServletContextInitializer} to register {@link Servlet}s in a Servlet 3.0+
  * container. Similar to the {@link ServletContext#addServlet(String, Servlet)
  * registration} features provided by {@link ServletContext} but with a Spring Bean
  * friendly design.
+ *
+ * B.
  * <p>
  * The {@link #setServlet(Servlet) servlet} must be specified before calling
  * {@link #onStartup}. URL mapping can be configured used {@link #setUrlMappings} or
@@ -48,10 +58,12 @@ import org.springframework.util.StringUtils;
  * @see ServletContextInitializer
  * @see ServletContext#addServlet(String, Servlet)
  */
+// 20201228 {@link ServletContextInitializer}，用于在Servlet 3.0+容器中注册{@link Servlet}: 必须在调用{@link #onStartup}之前指定{@link #setServlet（Servlet）Servlet}
 public class ServletRegistrationBean<T extends Servlet> extends DynamicRegistrationBean<ServletRegistration.Dynamic> {
 
 	private static final String[] DEFAULT_MAPPINGS = { "/*" };
 
+	// 20201228 eg: DispatcherServlet@xxxx
 	private T servlet;
 
 	private Set<String> urlMappings = new LinkedHashSet<>();
@@ -172,9 +184,13 @@ public class ServletRegistrationBean<T extends Servlet> extends DynamicRegistrat
 		return "servlet " + getServletName();
 	}
 
+	// 20201228 注册Servlet
 	@Override
 	protected ServletRegistration.Dynamic addRegistration(String description, ServletContext servletContext) {
+		// 20201228 "dispatcherServlet"
 		String name = getServletName();
+
+		// 20201228 "dispatcherServlet", DispatcherServlet@xxxx
 		return servletContext.addServlet(name, this.servlet);
 	}
 
@@ -183,17 +199,25 @@ public class ServletRegistrationBean<T extends Servlet> extends DynamicRegistrat
 	 * additional configuration if required.
 	 * @param registration the registration
 	 */
+	// 20201228 配置注册设置。 如果需要，子类可以重写此方法以执行其他配置。
 	@Override
 	protected void configure(ServletRegistration.Dynamic registration) {
 		super.configure(registration);
+
+		// 20201228 eg: "/"
 		String[] urlMapping = StringUtils.toStringArray(this.urlMappings);
 		if (urlMapping.length == 0 && this.alwaysMapUrl) {
 			urlMapping = DEFAULT_MAPPINGS;
 		}
 		if (!ObjectUtils.isEmpty(urlMapping)) {
+			// 20201228 为该ServletRegistration表示的Servlet添加具有给定URL模式的Servlet映射。 如果任何指定的URL模式已经映射到其他Servlet，则不会执行任何更新
 			registration.addMapping(urlMapping);
 		}
+
+		// 20201228 设置启动级别 => eg: -1
 		registration.setLoadOnStartup(this.loadOnStartup);
+
+		// 20201228 多部件配置元素 => eg: MultipartConfigElement@xxxx: location: ""
 		if (this.multipartConfig != null) {
 			registration.setMultipartConfig(this.multipartConfig);
 		}

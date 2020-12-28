@@ -27,20 +27,36 @@ import java.util.Set;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
 /**
+ * 20201228
+ * A. 定义servlet用于与其servlet容器通信的一组方法，例如，获取文件的MIME类型，调度请求或写入日志文件。
+ * B. 每个Java虚拟机的每个“ Web应用程序”都有一个上下文。 （“ Web应用程序”是Servlet和内容的集合，这些Servlet和内容安装在服务器URL名称空间的特定子集（例如/ catalog）下，
+ *    并且可能通过.war文件安装。）
+ * C. 如果Web应用程序的部署描述符中标记为“ distributed”，则每个虚拟机都有一个上下文实例。 在这种情况下，上下文不能用作共享全局信息的位置（因为该信息不是真正的全局信息）。
+ *    请改用外部资源，例如数据库。
+ * D. ServletContext对象包含在{@link ServletConfig}对象中，该对象在初始化Servlet时由Web服务器提供。
+ */
+/**
+ * A.
  * Defines a set of methods that a servlet uses to communicate with its servlet
  * container, for example, to get the MIME type of a file, dispatch requests, or
  * write to a log file.
+ *
+ * B.
  * <p>
  * There is one context per "web application" per Java Virtual Machine. (A
  * "web application" is a collection of servlets and content installed under a
  * specific subset of the server's URL namespace such as <code>/catalog</code>
  * and possibly installed via a <code>.war</code> file.)
+ *
+ * C.
  * <p>
  * In the case of a web application marked "distributed" in its deployment
  * descriptor, there will be one context instance for each virtual machine. In
  * this situation, the context cannot be used as a location to share global
  * information (because the information won't be truly global). Use an external
  * resource like a database instead.
+ *
+ * D.
  * <p>
  * The <code>ServletContext</code> object is contained within the
  * {@link ServletConfig} object, which the Web server provides the servlet when
@@ -49,6 +65,7 @@ import javax.servlet.descriptor.JspConfigDescriptor;
  * @see Servlet#getServletConfig
  * @see ServletConfig#getServletContext
  */
+// 20201228 定义servlet用于与其servlet容器通信的一组方法, 每个Java虚拟机的每个“ Web应用程序”都有一个上下文, ServletContext对象包含在{@link ServletConfig}对象中，该对象在初始化Servlet时由Web服务器提供
 public interface ServletContext {
 
     public static final String TEMPDIR = "javax.servlet.context.tempdir";
@@ -571,6 +588,7 @@ public interface ServletContext {
      *    use this method.
      * @since Servlet 3.0
      */
+    // 20201228 注册一个Servlet实现以在此ServletContext中使用。
     public ServletRegistration.Dynamic addServlet(String servletName, String className);
 
     /**
@@ -589,6 +607,7 @@ public interface ServletContext {
      *    use this method.
      * @since Servlet 3.0
      */
+    // 20201228 注册一个Servlet实例以在此ServletContext中使用。
     public ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet);
 
     /**
@@ -796,6 +815,7 @@ public interface ServletContext {
      *    use this method.
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
+    // 20201228 获取Session配置
     public SessionCookieConfig getSessionCookieConfig();
 
     /**

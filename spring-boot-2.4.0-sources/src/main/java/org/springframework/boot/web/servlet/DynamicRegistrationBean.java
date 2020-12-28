@@ -30,6 +30,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * 20201228
+ * A. 基于Servlet 3.0+ {@link javax.servlet.Registration.Dynamic dynamic}的注册Bean的基类。
+ */
+/**
+ * A.
  * Base class for Servlet 3.0+ {@link javax.servlet.Registration.Dynamic dynamic} based
  * registration beans.
  *
@@ -37,12 +42,14 @@ import org.springframework.util.StringUtils;
  * @author Phillip Webb
  * @since 2.0.0
  */
+// 20201228 基于Servlet 3.0+ {@link javax.servlet.Registration.Dynamic dynamic}的注册Bean的基类。
 public abstract class DynamicRegistrationBean<D extends Registration.Dynamic> extends RegistrationBean {
 
 	private static final Log logger = LogFactory.getLog(RegistrationBean.class);
 
 	private String name;
 
+	// 20201228 是否异步支持, 默认为true
 	private boolean asyncSupported = true;
 
 	private Map<String, String> initParameters = new LinkedHashMap<>();
@@ -103,8 +110,10 @@ public abstract class DynamicRegistrationBean<D extends Registration.Dynamic> ex
 		this.initParameters.put(name, value);
 	}
 
+	// 20201228 在servlet上下文中注册此bean。
 	@Override
 	protected final void register(String description, ServletContext servletContext) {
+		// 20201228 ApplicationServletRegistration@xxxx：StandardWrapper@xxxx、TomcatEmbeddedContext@xxxx:"StandardEngine[Tomcat].StandardHost[localhost].TomcatEmbeddedContext[]"
 		D registration = addRegistration(description, servletContext);
 		if (registration == null) {
 			logger.info(StringUtils.capitalize(description) + " was not registered (possibly already registered?)");
@@ -113,10 +122,15 @@ public abstract class DynamicRegistrationBean<D extends Registration.Dynamic> ex
 		configure(registration);
 	}
 
+	// 20201228 注册Servlet | Filter
 	protected abstract D addRegistration(String description, ServletContext servletContext);
 
+	// 20201228 配置注册设置。
 	protected void configure(D registration) {
+		// 20201228 将此Servlet / Filter标记为受支持的异步处理 => eg: true
 		registration.setAsyncSupported(this.asyncSupported);
+
+		// 20201228 eg: []
 		if (!this.initParameters.isEmpty()) {
 			registration.setInitParameters(this.initParameters);
 		}

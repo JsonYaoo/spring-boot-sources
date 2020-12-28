@@ -20,12 +20,17 @@ import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 
 /**
+ * 20201228
+ * 可用于创建{@link WebServer}的工厂接口
+ */
+/**
  * Factory interface that can be used to create a {@link WebServer}.
  *
  * @author Phillip Webb
  * @see WebServer
  * @since 2.0.0
  */
+// 20201228 可用于创建{@link WebServer}的工厂接口
 @FunctionalInterface
 public interface ServletWebServerFactory {
 

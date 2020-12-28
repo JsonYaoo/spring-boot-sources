@@ -17,6 +17,11 @@
 package org.springframework.boot.web.server;
 
 /**
+ * 20201228
+ * A. 用于创建{@link WebServer}的工厂的标记接口。
+ */
+/**
+ * A.
  * Tagging interface for factories that create a {@link WebServer}.
  *
  * @author Phillip Webb
@@ -25,6 +30,7 @@ package org.springframework.boot.web.server;
  * @see org.springframework.boot.web.servlet.server.ServletWebServerFactory
  * @see org.springframework.boot.web.reactive.server.ReactiveWebServerFactory
  */
+// 202021228 用于创建{@link WebServer}的工厂的标记接口。
 public interface WebServerFactory {
 
 }
