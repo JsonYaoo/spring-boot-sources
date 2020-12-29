@@ -226,7 +226,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 
 			// 20201213 【Tomcat源码】获取一个新的完全配置但暂停的{@link WebServer}实例 => eg: TomcatWebServer@xxxx
 			this.webServer = factory.getWebServer(
-					// 20201228 "dispatcherServlet urls=[/]"、"characterEncodingFilter"、"formContentFilter"、"requestContextFilter"初始化到ServletContext中
+					// 20201228 获取ServletContextInitializer: "dispatcherServlet urls=[/]"、"characterEncodingFilter"、"formContentFilter"、"requestContextFilter"初始化到ServletContext中
 					getSelfInitializer()
 			);
 			createWebServer.end();

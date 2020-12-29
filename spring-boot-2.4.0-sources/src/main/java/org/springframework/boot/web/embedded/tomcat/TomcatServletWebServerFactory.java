@@ -312,7 +312,8 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		ServletContextInitializer[] initializersToUse = mergeInitializers(initializers);
 		host.addChild(context);
 
-		// 20201228 配置Tomcat {@link上下文}。
+		// 20201228 配置Tomcat {@link上下文} => eg: TomcatEmbeddedContext@xxxx": StandardEngine[Tomcat].StandardHost[localhost].TomcatEmbeddedContext[]
+		// 20201228 【重点】配置eg: ServletContextInitialzer[3]@xxxx: AbstractServletWebServerFactory$lambda@xxxx、AbstractServletWebServerFactory$SessionConfigurationInitializer@xxxx、ServletWebServerApplicationContext$lambda@xxxx
 		configureContext(context, initializersToUse);
 
 		// 20201228 eg: do nothing

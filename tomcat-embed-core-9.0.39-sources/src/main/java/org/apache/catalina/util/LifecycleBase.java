@@ -204,6 +204,7 @@ public abstract class LifecycleBase implements Lifecycle {
             setStateInternal(LifecycleState.STARTING_PREP, null, false);
 
             // 20201228 【重点】子类必须确保在执行此方法期间将状态更改为{@link LifecycleState＃STARTING}。 更改状态将触发{@link Lifecycle＃START_EVENT}事件
+            // 20201228 Server -> Service -> Engine -> Host -> Context
             startInternal();
             if (state.equals(LifecycleState.FAILED)) {
                 // This is a 'controlled' failure. The component put itself into the

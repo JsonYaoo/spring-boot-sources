@@ -5169,7 +5169,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             // Set up the context init params
             mergeParameters();
 
-            // 20201228 【重点】调用ServletContainerInitializers
+            // 20201228 【重点】调用ServletContainerInitializers => eg: org.springframework.boot.web.servlet.server.AbstractServletWebServerFactory.mergeInitializers(...)获取
             // Call ServletContainerInitializers
             // 20201228 eg: TomcatStarter@xxxx: initializers: ServletContextInitialzer[3]@xxxx
             // 20201228 eg: ServletContextInitialzer[3]@xxxx: AbstractServletWebServerFactory$lambda@xxxx、AbstractServletWebServerFactory$SessionConfigurationInitializer@xxxx、ServletWebServerApplicationContext$lambda@xxxx

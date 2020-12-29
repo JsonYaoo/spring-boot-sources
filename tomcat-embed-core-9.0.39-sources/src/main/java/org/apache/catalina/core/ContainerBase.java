@@ -922,6 +922,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<>();
         for (Container child : children) {
+            // 20201228 【重点】Engine -> Host -> Context
             results.add(startStopExecutor.submit(new StartChild(child)));
         }
 
@@ -946,7 +947,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
         // Start the Valves in our pipeline (including the basic), if any
         if (pipeline instanceof Lifecycle) {
-            // 20201228 【重点】{@link LifecycleState＃STARTING_PREP} => {@link LifecycleState＃STARTING} => {@link LifecycleState＃STARTED}
+            // 20201228 {@link LifecycleState＃STARTING_PREP} => {@link LifecycleState＃STARTING} => {@link LifecycleState＃STARTED}
             ((Lifecycle) pipeline).start();
         }
 
@@ -1396,8 +1397,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             this.child = child;
         }
 
+        // 20201228 执行线程池的任务
         @Override
         public Void call() throws LifecycleException {
+            // 20201228 【重点】Engine -> Host -> Context
             child.start();
             return null;
         }

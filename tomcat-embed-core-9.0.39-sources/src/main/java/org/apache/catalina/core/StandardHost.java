@@ -812,6 +812,7 @@ public class StandardHost extends ContainerBase implements Host {
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    // 20201228 启动此组件并实现{@link org.apache.catalina.util.LifecycleBase＃startInternal（）}的要求。
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
@@ -840,6 +841,8 @@ public class StandardHost extends ContainerBase implements Host {
                         errorValve), t);
             }
         }
+
+        // 20201228 【重点】启动此组件并实现{@link org.apache.catalina.util.LifecycleBase＃startInternal（）}的要求。
         super.startInternal();
     }
 
