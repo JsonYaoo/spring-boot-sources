@@ -26,6 +26,11 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 20210104
+ * A. {@link ApplicationListener}，它将liquibase {@link ServiceLocator}替换为与Spring Boot可执行档案兼容的版本。
+ */
+/**
+ * A.
  * {@link ApplicationListener} that replaces the liquibase {@link ServiceLocator} with a
  * version that works with Spring Boot executable archives.
  *
@@ -33,6 +38,7 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * @since 1.0.0
  */
+// 20210104 {@link ApplicationListener}，它将liquibase {@link ServiceLocator}替换为与Spring Boot可执行档案兼容的版本。
 public class LiquibaseServiceLocatorApplicationListener implements ApplicationListener<ApplicationStartingEvent> {
 
 	private static final Log logger = LogFactory.getLog(LiquibaseServiceLocatorApplicationListener.class);
