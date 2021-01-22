@@ -31,10 +31,25 @@ import org.springframework.web.context.request.async.WebAsyncUtils;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * 20210122
+ * A. 过滤器基类，旨在确保在任何servlet容器上每个请求分派单个执行。 它提供了一个带有HttpServletRequest和HttpServletResponse参数的{@link #doFilterInternal}方法。
+ * B. 从Servlet 3.0开始，过滤器可以作为在单独线程中发生的{@link DispatcherType＃REQUEST REQUEST}或{@link DispatcherType＃ASYNC ASYNC}调度的一部分来调用。
+ *    可以在{@code web.xml}中配置过滤器，是否应将其包含在异步调度中。 但是，在某些情况下，servlet容器采用不同的默认配置。 因此，子类可以重写方法
+ *    {@link #shouldNotFilterAsyncDispatch（）}以静态声明是否确实应在两种类型的调度期间一次调用它们，以提供线程初始化，日志记录，安全性等。 这种机制补充了并不能代替在
+ *    {@code web.xml}中使用调度程序类型配置过滤器的需求。
+ * C. 子类可以使用{@link #isAsyncDispatch（HttpServletRequest）}确定何时将过滤器作为异步调度的一部分来调用，并使用{@link #isAsyncStarted（HttpServletRequest）}
+ *    确定何时将请求置于异步模式，因此 当前派遣将不是给定请求的最后一个。
+ * D. 在其自己的线程中也发生的另一种调度类型是{@link DispatcherType＃ERROR ERROR}。 如果子类希望静态声明在错误分配期间应被调用一次，则可以重写
+ *    {@link #shouldNotFilterErrorDispatch（）}。
+ * E. {@link #getAlreadyFilteredAttributeName}方法确定如何识别请求已被过滤。 默认实现基于具体过滤器实例的配置名称。
+ */
+/**
+ * A.
  * Filter base class that aims to guarantee a single execution per request
  * dispatch, on any servlet container. It provides a {@link #doFilterInternal}
  * method with HttpServletRequest and HttpServletResponse arguments.
  *
+ * B.
  * <p>As of Servlet 3.0, a filter may be invoked as part of a
  * {@link DispatcherType#REQUEST REQUEST} or
  * {@link DispatcherType#ASYNC ASYNC} dispatches that occur in
@@ -47,17 +62,20 @@ import org.springframework.web.util.WebUtils;
  * and so on. This mechanism complements and does not replace the need to
  * configure a filter in {@code web.xml} with dispatcher types.
  *
+ * C.
  * <p>Subclasses may use {@link #isAsyncDispatch(HttpServletRequest)} to
  * determine when a filter is invoked as part of an async dispatch, and use
  * {@link #isAsyncStarted(HttpServletRequest)} to determine when the request
  * has been placed in async mode and therefore the current dispatch won't be
  * the last one for the given request.
  *
+ * D.
  * <p>Yet another dispatch type that also occurs in its own thread is
  * {@link DispatcherType#ERROR ERROR}. Subclasses can override
  * {@link #shouldNotFilterErrorDispatch()} if they wish to declare statically
  * if they should be invoked <em>once</em> during error dispatches.
  *
+ * E.
  * <p>The {@link #getAlreadyFilteredAttributeName} method determines how to
  * identify that a request is already filtered. The default implementation is
  * based on the configured name of the concrete filter instance.
@@ -66,6 +84,7 @@ import org.springframework.web.util.WebUtils;
  * @author Rossen Stoyanchev
  * @since 06.12.2003
  */
+// 20210122 过滤器基类，旨在确保在任何servlet容器上每个请求分派单个执行
 public abstract class OncePerRequestFilter extends GenericFilterBean {
 
 	/**
@@ -75,7 +94,6 @@ public abstract class OncePerRequestFilter extends GenericFilterBean {
 	 */
 	public static final String ALREADY_FILTERED_SUFFIX = ".FILTERED";
 
-
 	/**
 	 * This {@code doFilter} implementation stores a request attribute for
 	 * "already filtered", proceeding without filtering again if the
@@ -84,6 +102,7 @@ public abstract class OncePerRequestFilter extends GenericFilterBean {
 	 * @see #shouldNotFilter
 	 * @see #doFilterInternal
 	 */
+	// 20210122 此{@code doFilter}实现为“已过滤”存储了请求属性，如果该属性已经存在，则继续进行而不进行过滤。
 	@Override
 	public final void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
@@ -220,11 +239,18 @@ public abstract class OncePerRequestFilter extends GenericFilterBean {
 		return true;
 	}
 
-
 	/**
+	 * 20210122
+	 * A. 与{@code doFilter}的合同相同，但保证在单个请求线程中每个请求仅被调用一次。 有关详细信息，请参见{@link #shouldNotFilterAsyncDispatch（）}。
+	 * B. 提供HttpServletRequest和HttpServletResponse参数，而不是默认的ServletRequest和ServletResponse参数。
+	 */
+	/**
+	 * A.
 	 * Same contract as for {@code doFilter}, but guaranteed to be
 	 * just invoked once per request within a single request thread.
 	 * See {@link #shouldNotFilterAsyncDispatch()} for details.
+	 *
+	 * B.
 	 * <p>Provides HttpServletRequest and HttpServletResponse arguments instead of the
 	 * default ServletRequest and ServletResponse ones.
 	 */

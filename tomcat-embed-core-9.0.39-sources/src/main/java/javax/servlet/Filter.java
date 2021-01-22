@@ -19,16 +19,40 @@ package javax.servlet;
 import java.io.IOException;
 
 /**
+ * 20210122
+ * A. 过滤器是一个对象，它对资源（Servlet或静态内容）的请求或对资源的响应或两者都执行过滤任务。
+ * B. 过滤器在doFilter方法中执行过滤。 每个Filter都可以访问FilterConfig对象，可以从中获取其初始化参数，它是对ServletContext的引用，可以使用该ServletContext来加载
+ *    例如过滤任务所需的资源。
+ * C. 在Web应用程序的部署描述符中配置过滤器
+ * D. 为此设计确定的示例是:
+ *      1) Authentication Filters <br>
+ *      2) Logging and Auditing Filters <br>
+ *      3) Image conversion Filters <br>
+ *      4) Data compression Filters <br>
+ *      5) Encryption Filters <br>
+ *      6) Tokenizing Filters <br>
+ *      7) Filters that trigger resource access events <br>
+ *      8) XSL/T filters <br>
+ *      9) Mime-type chain Filter <br>
+ */
+/**
+ * A.
  * A filter is an object that performs filtering tasks on either the request to
  * a resource (a servlet or static content), or on the response from a resource,
  * or both. <br>
  * <br>
+ *
+ * B.
  * Filters perform filtering in the <code>doFilter</code> method. Every Filter
  * has access to a FilterConfig object from which it can obtain its
  * initialization parameters, a reference to the ServletContext which it can
  * use, for example, to load resources needed for filtering tasks.
+ *
+ * C.
  * <p>
  * Filters are configured in the deployment descriptor of a web application
+ *
+ * D.
  * <p>
  * Examples that have been identified for this design are<br>
  * 1) Authentication Filters <br>
@@ -43,6 +67,7 @@ import java.io.IOException;
  *
  * @since Servlet 2.3
  */
+// 20210122 过滤器是一个对象，它对资源（Servlet或静态内容）的请求或对资源的响应或两者都执行过滤任务: 在doFilter方法中执行过滤
 public interface Filter {
 
     /**

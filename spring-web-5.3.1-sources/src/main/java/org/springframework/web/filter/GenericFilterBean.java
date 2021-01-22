@@ -53,19 +53,32 @@ import org.springframework.web.context.support.StandardServletEnvironment;
 import org.springframework.web.util.NestedServletException;
 
 /**
+ * 20210122
+ * A. {@link Filter}的简单基础实现，将其配置参数（{@code web.xml}中{@code filter}标记内的{@code init-param}条目）视为Bean属性。
+ * B. 任何类型的过滤器的便捷超类。 配置参数的类型转换是自动的，将使用转换后的值调用相应的setter方法。 子类也可以指定所需的属性。 没有匹配的bean属性设置器的参数将被忽略。
+ * C. 该过滤器将实际过滤留给子类，这些子类必须实现{@link Filter＃doFilter}方法。
+ * D. 这个通用的过滤器基类与Spring无关{@link org.springframework.context.ApplicationContext}概念。 过滤器通常不加载自己的上下文，
+ *    而是从Spring根应用程序上下文访问服务bean，可通过过滤器的{@link #getServletContext（）ServletContext}访问（请参阅
+ *    {@link org.springframework.web.context.support.WebApplicationContextUtils }）。
+ */
+/**
+ * A.
  * Simple base implementation of {@link Filter} which treats
  * its config parameters ({@code init-param} entries within the
  * {@code filter} tag in {@code web.xml}) as bean properties.
  *
+ * B.
  * <p>A handy superclass for any type of filter. Type conversion of config
  * parameters is automatic, with the corresponding setter method getting
  * invoked with the converted value. It is also possible for subclasses to
  * specify required properties. Parameters without matching bean property
  * setter will simply be ignored.
  *
+ * C.
  * <p>This filter leaves actual filtering to subclasses, which have to
  * implement the {@link Filter#doFilter} method.
  *
+ * D.
  * <p>This generic filter base class has no dependency on the Spring
  * {@link org.springframework.context.ApplicationContext} concept.
  * Filters usually don't load their own context but rather access service
@@ -79,8 +92,8 @@ import org.springframework.web.util.NestedServletException;
  * @see #initFilterBean
  * @see #doFilter
  */
-public abstract class GenericFilterBean implements Filter, BeanNameAware, EnvironmentAware,
-		EnvironmentCapable, ServletContextAware, InitializingBean, DisposableBean {
+// 20210122 任何类型的过滤器的便捷超类: 该过滤器将实际过滤留给子类, 这些子类必须实现{@link Filter＃doFilter}方法
+public abstract class GenericFilterBean implements Filter, BeanNameAware, EnvironmentAware, EnvironmentCapable, ServletContextAware, InitializingBean, DisposableBean {
 
 	/** Logger available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
